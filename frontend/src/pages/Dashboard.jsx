@@ -52,14 +52,14 @@ export default function Dashboard() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard title="Total Students" value={total} icon={Users} colorTheme="teal" />
         <StatCard title="Messages Sent" value={totalSent} icon={Send} colorTheme="orange" />
         <StatCard title="Active Exams" value={activeExamsCount} icon={Target} colorTheme="green" />
       </div>
 
       {/* Lower Grid */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
         {/* Exam Distribution */}
         <div className="bg-[#0F0F17] border border-[#1A1A28] rounded-xl p-5">
@@ -93,7 +93,7 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Students */}
-        <div className="col-span-2 bg-[#0F0F17] border border-[#1A1A28] rounded-xl p-5">
+        <div className="bg-[#0F0F17] border border-[#1A1A28] rounded-xl p-5 lg:col-span-2">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-sm font-semibold text-white">Recent Students</h2>
             <span className="text-[10px] text-slate-600 bg-[#1A1A28] px-2 py-1 rounded font-mono">{total} total</span>
