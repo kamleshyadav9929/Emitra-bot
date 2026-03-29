@@ -55,7 +55,10 @@ export function Sidebar() {
         </div>
         
         <div className="px-3 py-2 rounded-lg border border-dashed border-[#1D1D2D]">
-          <p className="text-[9px] text-slate-700 font-bold uppercase tracking-wider mb-2">Shortcuts</p>
+          <div className="flex justify-between items-center mb-2">
+            <p className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Shortcuts</p>
+            <kbd className="px-1.5 py-0.5 rounded bg-[#1D1D2D] text-[#818CF8] text-[9px] font-mono border border-[#6366F1]/20">^K</kbd>
+          </div>
           <div className="grid grid-cols-4 gap-1">
             {[1,2,3,4].map(n => (
               <div key={n} className="flex flex-col items-center">

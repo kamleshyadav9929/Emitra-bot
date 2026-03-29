@@ -1,6 +1,7 @@
 import { Routes, Route, useNavigate } from "react-router-dom"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Sidebar, BottomNav } from "./components/Sidebar"
+import CommandPalette from "./components/CommandPalette"
 import Dashboard from "./pages/Dashboard"
 import SendNotification from "./pages/SendNotification"
 import Students from "./pages/Students"
@@ -8,10 +9,19 @@ import Logs from "./pages/Logs"
 
 function App() {
   const navigate = useNavigate()
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
 
   useEffect(() => {
     const handleKeys = (e) => {
+      // Toggle Command Palette on Ctrl+K
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault()
+        setIsCommandPaletteOpen(prev => !prev)
+        return
+      }
+
       if (["INPUT", "TEXTAREA"].includes(e.target.tagName)) return
+      
       if (e.key === "1") navigate("/")
       if (e.key === "2") navigate("/send")
       if (e.key === "3") navigate("/students")
@@ -24,6 +34,7 @@ function App() {
   return (
     <div className="flex bg-[#0C0C12] min-h-screen text-slate-200">
       <Sidebar />
+      <CommandPalette isOpen={isCommandPaletteOpen} setIsOpen={setIsCommandPaletteOpen} />
       <main className="flex-1 md:ml-64 min-h-screen pb-20 md:pb-0">
         {/* Mobile Header */}
         <div className="md:hidden flex items-center gap-3 px-5 py-4 border-b border-[#1D1D2D] bg-[#0C0C12] sticky top-0 z-40">
