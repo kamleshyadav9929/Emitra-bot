@@ -16,12 +16,18 @@ def init_db():
             telegram_id     TEXT PRIMARY KEY,
             name            TEXT NOT NULL,
             username        TEXT,
+            phone_number    TEXT,
             exam_preference TEXT DEFAULT 'NONE',
             is_registered   INTEGER DEFAULT 0,
             joined_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
             last_active     DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+    # Migration: add phone_number column if it doesn't exist (for existing databases)
+    try:
+        cursor.execute("ALTER TABLE students ADD COLUMN phone_number TEXT")
+    except Exception:
+        pass  # Column already exists, ignore
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS message_logs (
             id              INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -49,6 +55,17 @@ def register_user(telegram_id, name, username):
         INSERT OR IGNORE INTO students (telegram_id, name, username, is_registered)
         VALUES (?, ?, ?, 1)
     ''', (str(telegram_id), name, username))
+    conn.commit()
+    conn.close()
+
+def update_phone_number(telegram_id, phone_number):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE students
+        SET phone_number = ?, last_active = CURRENT_TIMESTAMP
+        WHERE telegram_id = ?
+    ''', (phone_number, str(telegram_id)))
     conn.commit()
     conn.close()
 

@@ -1,4 +1,3 @@
-import os
 import asyncio
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -27,7 +26,9 @@ def webhook():
                 update = Update.de_json(request.get_json(force=True), bot)
                 
                 # Manual Handler Routing (100% stable for Flask)
-                if update.message and update.message.text:
+                if update.message and update.message.contact:
+                    await bot_handlers.contact_handler(update, None)
+                elif update.message and update.message.text:
                     if update.message.text.startswith('/start'):
                         await bot_handlers.start_handler(update, None)
                     else:

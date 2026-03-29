@@ -67,7 +67,8 @@ export default function Students() {
                 <tr className="bg-[#1E1E2E]/30 text-slate-500 text-xs tracking-widest uppercase border-b border-[#1E1E2E]">
                   <th className="py-4 px-6 font-semibold">Student Name</th>
                   <th className="py-4 px-6 font-semibold">Exam Target</th>
-                  <th className="py-4 px-6 font-semibold">Telegram ID</th>
+                  <th className="py-4 px-6 font-semibold">Phone Number</th>
+                  <th className="py-4 px-6 font-semibold">Telegram</th>
                   <th className="py-4 px-6 font-semibold text-right">Registered On</th>
                 </tr>
               </thead>
@@ -89,10 +90,15 @@ export default function Students() {
                       <ExamBadge exam={s.exam_preference} />
                     </td>
                     <td className="py-4 px-6">
+                      {s.phone_number ? (
+                        <span className="text-[#4ECDC4] font-mono text-sm">{s.phone_number}</span>
+                      ) : (
+                        <span className="text-slate-600 italic text-sm">Not shared</span>
+                      )}
+                    </td>
+                    <td className="py-4 px-6">
                       {s.username ? (
-                        <span className="text-[#4ECDC4] font-mono text-sm group-hover:underline cursor-pointer">
-                          {s.username}
-                        </span>
+                        <span className="text-slate-300 font-mono text-sm">{s.username}</span>
                       ) : (
                         <span className="text-slate-600 italic text-sm">Not provided</span>
                       )}

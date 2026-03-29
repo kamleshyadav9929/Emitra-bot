@@ -1,4 +1,4 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import ContextTypes
 import database
 
@@ -12,7 +12,16 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             name = user.first_name + (f" {user.last_name}" if user.last_name else "")
             database.register_user(chat_id, name, username)
 
-    await prompt_exam_selection(update)
+    # Ask for phone number first
+    contact_button = KeyboardButton("📱 Apna Number Share Karein", request_contact=True)
+    reply_markup = ReplyKeyboardMarkup([[contact_button]], resize_keyboard=True, one_time_keyboard=True)
+
+    await update.message.reply_text(
+        "🙏 Namaste! E-Mitra Seva mein aapka swagat hai.\n\n"
+        "Pehle apna mobile number share karein taaki hum aapko SMS updates bhi bhej sakein:\n"
+        "(Neeche button dabayein)",
+        reply_markup=reply_markup
+    )
 
 async def prompt_exam_selection(update: Update):
     keyboard = [
@@ -61,6 +70,20 @@ async def button_callback_handler(update: Update, context):
             msg = f"✅ Badhai ho! Aap {exam_choice} exam ke updates ke liye successfully ENROLLED ho chuke hain! 🎯\n\nAb se aapko sirf {exam_choice} ke alerts milenge."
             
         await query.edit_message_text(text=msg)
+
+async def contact_handler(update: Update, context):
+    """Called when user shares their contact/phone number."""
+    if update.message and update.message.contact:
+        chat_id = update.effective_chat.id
+        phone = update.message.contact.phone_number
+        database.update_phone_number(chat_id, phone)
+
+        await update.message.reply_text(
+            "✅ Number save ho gaya!",
+            reply_markup=ReplyKeyboardRemove()
+        )
+        # Now ask for exam preference
+        await prompt_exam_selection(update)
 
 async def message_handler(update: Update, context):
     # If a user types randomly, check their status
