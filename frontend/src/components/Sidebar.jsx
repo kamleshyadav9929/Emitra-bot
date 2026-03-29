@@ -47,11 +47,22 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Status */}
-      <div className="px-4 py-5 border-t border-[#1D1D2D]">
+      {/* Status & Shortcuts */}
+      <div className="px-4 py-5 space-y-3 border-t border-[#1D1D2D]">
         <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-[#111119] border border-[#1D1D2D]">
           <div className="w-1.5 h-1.5 rounded-full bg-[#4ADE80] animate-pulse flex-shrink-0"></div>
           <span className="text-xs text-slate-500 font-medium">System Online</span>
+        </div>
+        
+        <div className="px-3 py-2 rounded-lg border border-dashed border-[#1D1D2D]">
+          <p className="text-[9px] text-slate-700 font-bold uppercase tracking-wider mb-2">Shortcuts</p>
+          <div className="grid grid-cols-4 gap-1">
+            {[1,2,3,4].map(n => (
+              <div key={n} className="flex flex-col items-center">
+                <kbd className="px-1.5 py-0.5 rounded bg-[#1D1D2D] text-[#818CF8] text-[9px] font-mono border border-[#6366F1]/20">{n}</kbd>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </aside>

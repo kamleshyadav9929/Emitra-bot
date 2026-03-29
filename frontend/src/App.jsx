@@ -1,4 +1,5 @@
-import { Routes, Route } from "react-router-dom"
+import { Routes, Route, useNavigate } from "react-router-dom"
+import { useEffect } from "react"
 import { Sidebar, BottomNav } from "./components/Sidebar"
 import Dashboard from "./pages/Dashboard"
 import SendNotification from "./pages/SendNotification"
@@ -6,6 +7,20 @@ import Students from "./pages/Students"
 import Logs from "./pages/Logs"
 
 function App() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const handleKeys = (e) => {
+      if (["INPUT", "TEXTAREA"].includes(e.target.tagName)) return
+      if (e.key === "1") navigate("/")
+      if (e.key === "2") navigate("/send")
+      if (e.key === "3") navigate("/students")
+      if (e.key === "4") navigate("/logs")
+    }
+    window.addEventListener("keydown", handleKeys)
+    return () => window.removeEventListener("keydown", handleKeys)
+  }, [navigate])
+
   return (
     <div className="flex bg-[#0C0C12] min-h-screen text-slate-200">
       <Sidebar />

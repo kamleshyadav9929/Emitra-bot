@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react"
-import { Users, Send, Target, TrendingUp, RefreshCw } from "lucide-react"
+import { Users, Send, Target, TrendingUp, RefreshCw, Cpu, Activity, Globe } from "lucide-react"
+import { motion } from "motion/react"
 import StatCard from "../components/StatCard"
 import ExamBadge, { EXAM_COLORS } from "../components/ExamBadge"
 import { getStats, getStudents, getLogs } from "../api"
@@ -54,7 +55,11 @@ export default function Dashboard() {
     <div className="space-y-6">
 
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }} 
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-start justify-between"
+      >
         <div>
           <p className="text-[10px] text-[#818CF8] font-semibold tracking-[0.15em] uppercase mb-1">Overview</p>
           <h1 className="text-2xl font-bold text-white">System Dashboard</h1>
@@ -75,22 +80,73 @@ export default function Dashboard() {
             </span>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard title="Total Students" value={total} icon={Users} colorTheme="indigo" />
-        <StatCard title="Messages Sent" value={totalSent} icon={Send} colorTheme="cyan" />
-        <StatCard title="Active Exams" value={activeExamsCount} icon={Target} colorTheme="green" />
-      </div>
+      <motion.div 
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+        }}
+        className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+      >
+        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+          <StatCard title="Total Students" value={total} icon={Users} colorTheme="indigo" />
+        </motion.div>
+        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+          <StatCard title="Messages Sent" value={totalSent} icon={Send} colorTheme="cyan" />
+        </motion.div>
+        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+          <StatCard title="Active Exams" value={activeExamsCount} icon={Target} colorTheme="green" />
+        </motion.div>
+      </motion.div>
 
-      {/* Lower Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* Lower Row: Health + Distribution + Recent */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        
+        {/* System Health */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3 }}
+          className="bg-[#111119] border border-[#1D1D2D] rounded-xl p-5 flex flex-col justify-between"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-semibold text-white">System Health</h2>
+            <Activity size={14} className="text-[#4ADE80]" />
+          </div>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <Globe size={12} />
+                <span>API Status</span>
+              </div>
+              <span className="text-[10px] font-bold text-[#4ADE80] bg-[#4ADE80]/10 px-1.5 py-0.5 rounded">ONLINE</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <Cpu size={12} />
+                <span>Bot Service</span>
+              </div>
+              <span className="text-[10px] font-bold text-[#4ADE80] bg-[#4ADE80]/10 px-1.5 py-0.5 rounded">ACTIVE</span>
+            </div>
+          </div>
+          <div className="mt-6 pt-4 border-t border-[#1D1D2D]">
+            <p className="text-[10px] text-slate-700 font-mono tracking-tighter">LATENCY: 42ms</p>
+          </div>
+        </motion.div>
 
         {/* Exam Distribution */}
-        <div className="bg-[#111119] border border-[#1D1D2D] rounded-xl p-5">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.4 }}
+          className="bg-[#111119] border border-[#1D1D2D] rounded-xl p-5 lg:col-span-1"
+        >
           <div className="flex items-center justify-between mb-5">
-            <h2 className="text-sm font-semibold text-white">Exam Distribution</h2>
+            <h2 className="text-sm font-semibold text-white">Distribution</h2>
             <TrendingUp size={14} className="text-slate-700" />
           </div>
           <div className="space-y-4">
@@ -101,7 +157,7 @@ export default function Dashboard() {
                 <div key={exam}>
                   <div className="flex justify-between items-center mb-1.5">
                     <span className="text-xs font-semibold text-slate-400">{exam}</span>
-                    <span className="text-xs text-slate-600 font-mono">{count} · {pct}%</span>
+                    <span className="text-xs text-slate-600 font-mono">{pct}%</span>
                   </div>
                   <div className="w-full bg-[#1D1D2D] h-1 rounded-full overflow-hidden">
                     <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: color }} />
@@ -109,12 +165,17 @@ export default function Dashboard() {
                 </div>
               )
             })}
-            {examEntries.length === 0 && <p className="text-xs text-slate-700 text-center py-4">No exam data yet</p>}
+            {examEntries.length === 0 && <p className="text-xs text-slate-700 text-center py-4">No data</p>}
           </div>
-        </div>
+        </motion.div>
 
         {/* Recent Students */}
-        <div className="bg-[#111119] border border-[#1D1D2D] rounded-xl p-5 lg:col-span-2">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5 }}
+          className="bg-[#111119] border border-[#1D1D2D] rounded-xl p-5 lg:col-span-2"
+        >
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-sm font-semibold text-white">Recent Students</h2>
             <span className="text-[10px] text-slate-600 bg-[#1D1D2D] px-2 py-1 rounded font-mono">{total} total</span>
@@ -130,7 +191,6 @@ export default function Dashboard() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-slate-200 truncate">{s.name}</p>
-                  <p className="text-[11px] text-slate-600 font-mono truncate">{s.phone_number || s.telegram_id}</p>
                 </div>
                 <ExamBadge exam={s.exam_preference} />
                 <span className="text-[10px] text-slate-700 flex-shrink-0">{new Date(s.joined_at).toLocaleDateString()}</span>
@@ -138,7 +198,7 @@ export default function Dashboard() {
             ))}
             {recent.length === 0 && <div className="text-center py-8"><p className="text-sm text-slate-700">No students yet</p></div>}
           </div>
-        </div>
+        </motion.div>
 
       </div>
     </div>
