@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react"
-import { Send, CheckCircle, Loader2, Bot, Info } from "lucide-react"
+import { Send, CheckCircle, Loader2, Bot, Users, MessageSquare } from "lucide-react"
 import { getStats, sendNotification } from "../api"
 import { EXAM_COLORS } from "../components/ExamBadge"
+import Stepper, { Step } from "../components/Stepper"
 
 const EXAMS = ["JEE", "NEET", "SSC", "UPSC", "CUET"]
 
 export default function SendNotification() {
-  const [stats, setStats] = useState(null)
+  const [stats, setStats]               = useState(null)
   const [selectedExams, setSelectedExams] = useState([])
-  const [message, setMessage] = useState("")
-  const [status, setStatus] = useState("idle") // idle, sending, success, error
-  const [errorMsg, setErrorMsg] = useState("")
+  const [message, setMessage]           = useState("")
+  const [status, setStatus]             = useState("idle")
+  const [errorMsg, setErrorMsg]         = useState("")
+  const [stepperKey, setStepperKey]     = useState(0) // reset stepper after completion
 
   useEffect(() => {
     getStats().then(setStats).catch(console.error)
@@ -20,93 +22,99 @@ export default function SendNotification() {
     if (selectedExams.includes("ALL")) {
       setSelectedExams([ex])
     } else {
-      if (selectedExams.includes(ex)) {
-        setSelectedExams(selectedExams.filter(e => e !== ex))
-      } else {
-        setSelectedExams([...selectedExams, ex])
-      }
+      setSelectedExams(prev =>
+        prev.includes(ex) ? prev.filter(e => e !== ex) : [...prev, ex]
+      )
     }
   }
 
   const selectAll = () => setSelectedExams(["ALL"])
 
-  let targetCount = 0
-  if (stats) {
-    if (selectedExams.includes("ALL")) {
-      targetCount = stats.total_students || 0
-    } else {
-      targetCount = selectedExams.reduce((acc, ex) => acc + (stats.by_exam?.[ex] || 0), 0)
-    }
-  }
+  const targetCount = stats
+    ? selectedExams.includes("ALL")
+      ? stats.total_students || 0
+      : selectedExams.reduce((acc, ex) => acc + (stats.by_exam?.[ex] || 0), 0)
+    : 0
 
   const handleSend = async () => {
-    if (!message.trim() || targetCount === 0 || status === 'sending') return
+    if (!message.trim() || targetCount === 0 || status === "sending") return
     setStatus("sending")
     setErrorMsg("")
-    
     try {
-      let examsToSend = selectedExams.includes("ALL") ? ["ALL"] : selectedExams
-      
-      for (const ex of examsToSend) {
-         const res = await sendNotification(ex, message)
-         if (!res.success) throw new Error(res.error || `Failed sending to ${ex}`)
+      const toSend = selectedExams.includes("ALL") ? ["ALL"] : selectedExams
+      for (const ex of toSend) {
+        const res = await sendNotification(ex, message)
+        if (!res.success) throw new Error(res.error || `Failed for ${ex}`)
       }
-      
       setStatus("success")
       setTimeout(() => {
         setStatus("idle")
         setMessage("")
         setSelectedExams([])
-      }, 3000)
-    } catch(e) {
-      console.error(e)
+        setStepperKey(k => k + 1) // reset stepper to step 1
+      }, 2500)
+    } catch (e) {
       setStatus("error")
       setErrorMsg(e.message)
     }
   }
 
-  const isSelected = (ex) => selectedExams.includes(ex) || selectedExams.includes("ALL")
-
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 max-w-5xl">
-      <header className="mb-10">
-        <h1 className="text-3xl font-bold text-white tracking-wide">Broadcast Message</h1>
-        <p className="text-slate-400 mt-2">Send updates to specific target exams or all registered students.</p>
-      </header>
+    <div className="space-y-6">
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
-        {/* LEFT COLUMN - EDITOR */}
-        <div className="space-y-8">
-          
-          <div className="bg-[#0D0D14] p-6 rounded-lg border border-[#1E1E2E] shadow-xl">
-            <h2 className="text-sm font-semibold mb-4 tracking-widest uppercase text-slate-400">1. Target Audience</h2>
-            
-            <div className="flex flex-wrap gap-3 mb-6">
-              <button 
+      {/* Header */}
+      <div>
+        <p className="text-xs text-[#FF6B35] font-semibold tracking-widest uppercase mb-1">Broadcast</p>
+        <h1 className="text-2xl font-bold text-white">Send Notification</h1>
+        <p className="text-sm text-slate-500 mt-0.5">3 simple steps to broadcast a message to students.</p>
+      </div>
+
+      {/* Stepper */}
+      <Stepper
+        key={stepperKey}
+        initialStep={1}
+        backButtonText="← Back"
+        nextButtonText="Next →"
+        onFinalStepCompleted={handleSend}
+        nextButtonProps={{
+          disabled:
+            (status === "sending") ||
+            (undefined), // per-step validation handled inside
+        }}
+      >
+
+        {/* ── STEP 1: Target Audience ── */}
+        <Step>
+          <div className="space-y-5">
+            <div className="flex items-center gap-2 mb-1">
+              <Users size={16} className="text-[#FF6B35]" />
+              <h2 className="text-base font-bold text-white">Select Target Audience</h2>
+            </div>
+            <p className="text-xs text-slate-500">Who should receive this notification?</p>
+
+            <div className="flex flex-wrap gap-2">
+              <button
                 onClick={selectAll}
-                className={`px-4 py-2 rounded-md font-bold tracking-wider text-sm transition-all border ${
-                  selectedExams.includes("ALL") 
-                  ? "bg-[#FF6B35]/20 border-[#FF6B35] text-[#FF6B35] shadow-[0_0_15px_rgba(255,107,53,0.3)]" 
-                  : "bg-[#1E1E2E]/50 border-[#1E1E2E] text-slate-400 hover:border-[#333344] hover:text-white"
+                className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-all ${
+                  selectedExams.includes("ALL")
+                    ? "bg-[#FF6B35]/15 border-[#FF6B35]/40 text-[#FF6B35]"
+                    : "bg-[#1A1A28] border-[#1A1A28] text-slate-500 hover:text-slate-200 hover:border-[#2a2a3a]"
                 }`}
               >
-                ALL STUDENTS
+                All Students
               </button>
-              
               {EXAMS.map(ex => {
-                const checked = selectedExams.includes("ALL") || selectedExams.includes(ex)
+                const active = selectedExams.includes("ALL") || selectedExams.includes(ex)
                 const color = EXAM_COLORS[ex]
                 return (
-                  <button 
+                  <button
                     key={ex}
                     onClick={() => toggleExam(ex)}
-                    className={`px-4 py-2 rounded-md font-bold tracking-wider text-sm transition-all border`}
+                    className="px-4 py-2 rounded-lg text-sm font-semibold border transition-all"
                     style={{
-                      backgroundColor: checked ? `${color}20` : '#1E1E2E80',
-                      borderColor: checked ? color : '#1E1E2E',
-                      color: checked ? color : '#94a3b8',
-                      boxShadow: checked ? `0 0 15px ${color}40` : 'none'
+                      backgroundColor: active ? `${color}18` : "#1A1A28",
+                      borderColor:     active ? `${color}50` : "#1A1A28",
+                      color:           active ? color : "#64748b",
                     }}
                   >
                     {ex}
@@ -115,96 +123,100 @@ export default function SendNotification() {
               })}
             </div>
 
-            <div className="flex items-center gap-3 p-3 bg-[#1E1E2E]/50 border border-[#333344] rounded-md text-slate-300">
-              <Info size={18} className="text-[#4ECDC4]" />
-              <span className="font-mono text-sm">
-                📨 <strong>{targetCount}</strong> students ko message jayega
+            <div className="flex items-center gap-2 p-3 bg-[#09090E] border border-[#1A1A28] rounded-lg">
+              <div className="w-2 h-2 rounded-full bg-[#FF6B35]"></div>
+              <span className="text-sm text-slate-400">
+                <span className="font-bold text-white">{targetCount}</span> students will receive this message
               </span>
             </div>
           </div>
+        </Step>
 
-          <div className="bg-[#0D0D14] p-6 rounded-lg border border-[#1E1E2E] shadow-xl flex flex-col h-[350px]">
-            <h2 className="text-sm font-semibold mb-4 tracking-widest uppercase text-slate-400 flexjustify-between">
-               2. Content
-            </h2>
-            <textarea 
+        {/* ── STEP 2: Write Message ── */}
+        <Step>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-1">
+              <MessageSquare size={16} className="text-[#FF6B35]" />
+              <h2 className="text-base font-bold text-white">Write Your Message</h2>
+            </div>
+            <p className="text-xs text-slate-500">Hindi or English dono chalega.</p>
+
+            <textarea
               value={message}
               onChange={e => setMessage(e.target.value)}
-              placeholder="Notification message likho... (Hindi/English dono chalega)\n\nUpdates, Mock Test alerts, etc."
-              className="w-full flex-1 bg-[#1E1E2E]/30 border border-[#333344] rounded-lg p-4 text-slate-200 focus:outline-none focus:border-[#FF6B35] transition-colors resize-none font-sans"
-            ></textarea>
-            <div className="text-right text-xs mt-2 text-slate-500 font-mono">
-              {message.length} characters
+              placeholder={"📢 Important Update!\n\nAaj ka Mock Test raat 8 baje hoga. Sab log join karein.\n\n— E-Mitra Team"}
+              rows={7}
+              className="w-full bg-[#09090E] border border-[#1A1A28] rounded-lg p-4 text-sm text-slate-200 placeholder:text-slate-700 focus:outline-none focus:border-[#FF6B35]/50 resize-none transition-colors"
+            />
+            <div className="flex justify-between text-xs text-slate-600">
+              <span>{message.trim() ? "✓ Message ready" : "Type a message above"}</span>
+              <span className="font-mono">{message.length} chars</span>
             </div>
           </div>
+        </Step>
 
-        </div>
-
-        {/* RIGHT COLUMN - PREVIEW & SEND */}
-        <div className="space-y-8">
-          
-          <div className="bg-[#0D0D14] p-6 rounded-lg border border-[#1E1E2E] shadow-xl relative overflow-hidden h-full flex flex-col">
-            <h2 className="text-sm font-semibold mb-4 tracking-widest uppercase text-slate-400">Preview (Telegram)</h2>
-            
-            <div className="flex-1 bg-gradient-to-b from-[#0F1626] to-[#172138] rounded-xl border border-[#2a3b5c] p-4 flex flex-col shadow-inner">
-               <div className="flex items-center gap-3 mb-6 pb-4 border-b border-[#2a3b5c]/50">
-                  <div className="w-10 h-10 bg-gradient-to-tr from-[#FF6B35] to-[#FF8E53] rounded-full flex items-center justify-center text-white shadow-lg">
-                    <Bot size={20} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-white text-sm">E-Mitra Seva</h3>
-                    <p className="text-xs text-[#8ca4d4]">bot</p>
-                  </div>
-               </div>
-
-               <div className="flex flex-col gap-4 overflow-y-auto">
-                 {/* Fake old message */}
-                 <div className="self-end bg-[#2b5278] text-white px-4 py-2 rounded-2xl rounded-tr-sm max-w-[85%] text-sm shadow-md font-sans">
-                   /start
-                   <div className="text-[10px] text-[#8ca4d4] text-right mt-1">10:00 AM</div>
-                 </div>
-
-                 {/* New Message preview */}
-                 {message.trim() ? (
-                   <div className="self-start bg-[#182533] text-white px-4 py-3 rounded-2xl rounded-tl-sm max-w-[90%] text-sm shadow-md font-sans border border-[#2a3b5c]">
-                     {message.split('\n').map((line, i) => (
-                       <span key={i}>{line}<br/></span>
-                     ))}
-                     <div className="text-[10px] text-[#8ca4d4] text-right mt-1">{new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
-                   </div>
-                 ) : (
-                   <div className="self-start text-[#8ca4d4]/50 text-xs italic mt-4 text-center w-full">
-                     Message preview will appear here...
-                   </div>
-                 )}
-               </div>
+        {/* ── STEP 3: Preview & Send ── */}
+        <Step>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-1">
+              <Bot size={16} className="text-[#FF6B35]" />
+              <h2 className="text-base font-bold text-white">Preview & Send</h2>
             </div>
 
-            <div className="mt-6">
-              {errorMsg && <div className="text-red-400 text-sm mb-3 bg-red-400/10 p-3 rounded-md">{errorMsg}</div>}
-              
-              <button 
-                onClick={handleSend}
-                disabled={!message.trim() || targetCount === 0 || status === 'sending'}
-                className={`w-full py-4 rounded-xl font-bold tracking-widest uppercase transition-all flex items-center justify-center gap-3 ${
-                  !message.trim() || targetCount === 0 
-                  ? "bg-[#1E1E2E] text-slate-500 cursor-not-allowed"
-                  : status === 'success'
-                  ? "bg-[#4ADE80] text-[#0A0A0F] shadow-[0_0_20px_rgba(74,222,128,0.4)]"
-                  : "bg-[#FF6B35] text-white hover:bg-[#FF8E53] hover:shadow-[0_0_20px_rgba(255,107,53,0.4)]"
-                }`}
-              >
-                {status === 'sending' && <><Loader2 className="animate-spin" size={20} /> SENDING...</>}
-                {status === 'success' && <><CheckCircle size={20} /> SENT SUCCESSFULLY!</>}
-                {status === 'idle' && <><Send size={20} /> SEND TO {targetCount} STUDENTS</>}
-                {status === 'error' && "RETRY SENDING"}
-              </button>
+            {/* Telegram Preview */}
+            <div className="bg-[#17212B] rounded-xl border border-[#2a3b5c] p-4">
+              <div className="flex items-center gap-2 mb-4 pb-3 border-b border-[#2a3b5c]/60">
+                <div className="w-8 h-8 bg-[#FF6B35] rounded-full flex items-center justify-center">
+                  <Bot size={16} className="text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white">E-Mitra Seva</p>
+                  <p className="text-[11px] text-[#8ca4d4]">bot</p>
+                </div>
+              </div>
+              <div className="bg-[#182533] border border-[#2a3b5c] rounded-xl rounded-tl-none px-4 py-3 max-w-[90%] text-sm text-white">
+                {message.trim()
+                  ? message.split("\n").map((line, i) => <div key={i}>{line || <br />}</div>)
+                  : <span className="text-[#8ca4d4] italic text-xs">No message written yet...</span>
+                }
+                <div className="text-[10px] text-[#8ca4d4] text-right mt-1.5">
+                  {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </div>
+              </div>
             </div>
-            
+
+            {/* Summary & Send */}
+            <div className="flex items-center justify-between text-xs text-slate-600 px-1">
+              <span>Sending to: <span className="text-slate-400 font-semibold">{selectedExams.includes("ALL") ? "All Students" : selectedExams.join(", ") || "None selected"}</span></span>
+              <span><span className="text-white font-bold">{targetCount}</span> recipients</span>
+            </div>
+
+            {errorMsg && (
+              <div className="text-red-400 text-xs bg-red-400/10 border border-red-400/20 p-3 rounded-lg">{errorMsg}</div>
+            )}
+
+            <button
+              onClick={handleSend}
+              disabled={!message.trim() || targetCount === 0 || status === "sending"}
+              className={`w-full py-3 rounded-lg font-bold text-sm tracking-wide flex items-center justify-center gap-2 transition-all ${
+                !message.trim() || targetCount === 0
+                  ? "bg-[#1A1A28] text-slate-600 cursor-not-allowed"
+                  : status === "success"
+                  ? "bg-[#4ADE80] text-black"
+                  : status === "sending"
+                  ? "bg-[#FF6B35]/70 text-white cursor-wait"
+                  : "bg-[#FF6B35] text-white hover:bg-[#ff805a]"
+              }`}
+            >
+              {status === "sending" && <><Loader2 size={16} className="animate-spin" /> Sending...</>}
+              {status === "success" && <><CheckCircle size={16} /> Sent Successfully!</>}
+              {(status === "idle" || status === "error") && <><Send size={16} /> Send to {targetCount} Students</>}
+            </button>
           </div>
-        </div>
+        </Step>
 
-      </div>
+      </Stepper>
+
     </div>
   )
 }
