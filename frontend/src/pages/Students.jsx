@@ -8,22 +8,29 @@ const FILTERS = ["ALL", "JEE", "NEET", "SSC", "UPSC", "CUET"]
 export default function Students() {
   const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [activeFilter, setActiveFilter] = useState("ALL")
   const [search, setSearch] = useState("")
 
   const fetchStudents = (filter) => {
     setLoading(true)
+    setError(null)
     getStudents(filter).then(res => {
       setStudents(res.students || [])
       setLoading(false)
-    }).catch(() => { setStudents([]); setLoading(false) })
+    }).catch((e) => {
+      setStudents([])
+      setError("Failed to fetch. Check connection or .env config.")
+      setLoading(false)
+    })
   }
 
   useEffect(() => { fetchStudents(activeFilter) }, [activeFilter])
 
   const getInitials = (name) => {
-    if (!name) return "?"
-    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+    if (!name || !name.trim()) return "?"
+    const parts = name.trim().split(/\s+/).filter(Boolean)
+    return parts.map(n => n[0]).join('').substring(0, 2).toUpperCase()
   }
 
   const filtered = search.trim()
@@ -111,6 +118,11 @@ export default function Students() {
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="w-5 h-5 border-2 border-[#6366F1] border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : error ? (
+          <div className="py-20 text-center px-10">
+            <p className="text-red-400 mb-2">⚠ {error}</p>
+            <button onClick={() => fetchStudents(activeFilter)} className="text-xs text-[#818CF8] underline hover:text-[#6366F1]">Try again</button>
           </div>
         ) : (
           <div className="overflow-x-auto">
