@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { getStudents } from "../api"
 import ExamBadge from "../components/ExamBadge"
-import { Phone, MessagesSquare, Search, X } from "lucide-react"
+import { Phone, MessagesSquare, Search, X, Download } from "lucide-react"
 
 const FILTERS = ["ALL", "JEE", "NEET", "SSC", "UPSC", "CUET"]
 
@@ -37,14 +37,44 @@ export default function Students() {
       )
     : students
 
+  const exportCSV = () => {
+    const headers = ["Name", "Telegram ID", "Exam", "Phone Number", "Username", "Joined"]
+    const rows = filtered.map(s => [
+      s.name || "",
+      s.telegram_id || "",
+      s.exam_preference || "",
+      s.phone_number || "",
+      s.username || "",
+      new Date(s.joined_at).toLocaleDateString('en-IN')
+    ])
+    const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(",")).join("\n")
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `emitra_students_${activeFilter}_${new Date().toISOString().slice(0,10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="space-y-6">
 
       {/* Header */}
-      <div>
-        <p className="text-xs text-[#FF6B35] font-semibold tracking-widest uppercase mb-1">Students</p>
-        <h1 className="text-2xl font-bold text-white">Registered Students</h1>
-        <p className="text-sm text-slate-500 mt-0.5">View and filter all E-Mitra registered students.</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs text-[#FF6B35] font-semibold tracking-widest uppercase mb-1">Students</p>
+          <h1 className="text-2xl font-bold text-white">Registered Students</h1>
+          <p className="text-sm text-slate-500 mt-0.5">View and filter all E-Mitra registered students.</p>
+        </div>
+        <button
+          onClick={exportCSV}
+          disabled={filtered.length === 0}
+          className="flex items-center gap-2 px-3 py-2 bg-[#0F0F17] border border-[#1A1A28] rounded-lg text-xs text-slate-400 hover:text-white hover:border-[#2a2a3a] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <Download size={13} />
+          Export CSV
+        </button>
       </div>
 
       {/* Filters + Search */}

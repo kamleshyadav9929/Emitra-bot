@@ -5,6 +5,7 @@ import { EXAM_COLORS } from "../components/ExamBadge"
 import Stepper, { Step } from "../components/Stepper"
 
 const EXAMS = ["JEE", "NEET", "SSC", "UPSC", "CUET"]
+const CHAR_LIMIT = 4096
 
 export default function SendNotification() {
   const [stats, setStats]               = useState(null)
@@ -143,14 +144,33 @@ export default function SendNotification() {
 
             <textarea
               value={message}
-              onChange={e => setMessage(e.target.value)}
+              onChange={e => e.target.value.length <= CHAR_LIMIT && setMessage(e.target.value)}
               placeholder={"📢 Important Update!\n\nAaj ka Mock Test raat 8 baje hoga. Sab log join karein.\n\n— E-Mitra Team"}
               rows={7}
-              className="w-full bg-[#09090E] border border-[#1A1A28] rounded-lg p-4 text-sm text-slate-200 placeholder:text-slate-700 focus:outline-none focus:border-[#FF6B35]/50 resize-none transition-colors"
+              className={`w-full bg-[#09090E] border rounded-lg p-4 text-sm text-slate-200 placeholder:text-slate-700 focus:outline-none resize-none transition-colors ${
+                message.length > CHAR_LIMIT * 0.9
+                  ? "border-red-500/50 focus:border-red-500/70"
+                  : "border-[#1A1A28] focus:border-[#FF6B35]/50"
+              }`}
             />
-            <div className="flex justify-between text-xs text-slate-600">
-              <span>{message.trim() ? "✓ Message ready" : "Type a message above"}</span>
-              <span className="font-mono">{message.length} chars</span>
+            <div className="flex justify-between items-center text-xs">
+              <span className={message.trim() ? "text-[#4ADE80]" : "text-slate-600"}>
+                {message.trim() ? "✓ Message ready" : "Type a message above"}
+              </span>
+              <div className="flex items-center gap-2">
+                {message.length > CHAR_LIMIT * 0.9 && (
+                  <span className="text-red-400 text-[10px] font-medium animate-pulse">
+                    ⚠ {CHAR_LIMIT - message.length} chars left
+                  </span>
+                )}
+                <span className={`font-mono ${
+                  message.length > CHAR_LIMIT * 0.9 ? "text-red-400" :
+                  message.length > CHAR_LIMIT * 0.75 ? "text-yellow-500" :
+                  "text-slate-600"
+                }`}>
+                  {message.length} / {CHAR_LIMIT}
+                </span>
+              </div>
             </div>
           </div>
         </Step>

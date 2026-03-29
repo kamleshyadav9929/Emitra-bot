@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import { Users, Send, Target, TrendingUp } from "lucide-react"
+import { useEffect, useState, useCallback } from "react"
+import { Users, Send, Target, TrendingUp, RefreshCw } from "lucide-react"
 import StatCard from "../components/StatCard"
 import ExamBadge, { EXAM_COLORS } from "../components/ExamBadge"
 import { getStats, getStudents, getLogs } from "../api"
@@ -9,26 +9,36 @@ export default function Dashboard() {
   const [recent, setRecent] = useState([])
   const [totalSent, setTotalSent] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  const [lastUpdated, setLastUpdated] = useState(null)
 
-  useEffect(() => {
-    Promise.all([
-      getStats().catch(() => ({ total_students: 0, by_exam: {} })),
-      getStudents().catch(() => ({ students: [] })),
-      getLogs().catch(() => ({ logs: [] }))
-    ]).then(([st, stList, logData]) => {
+  const fetchAll = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true)
+    else setLoading(true)
+
+    try {
+      const [st, stList, logData] = await Promise.all([
+        getStats().catch(() => ({ total_students: 0, by_exam: {} })),
+        getStudents().catch(() => ({ students: [] })),
+        getLogs().catch(() => ({ logs: [] }))
+      ])
       setStats(st)
       const sorted = (stList.students || []).sort((a, b) => new Date(b.joined_at) - new Date(a.joined_at))
       setRecent(sorted.slice(0, 5))
-      const logs = logData.logs || []
-      const sent = logs.reduce((acc, log) => acc + (log.total_recipients || 0), 0)
+      const sent = (logData.logs || []).reduce((acc, log) => acc + (log.total_recipients || 0), 0)
       setTotalSent(sent)
+      setLastUpdated(new Date())
+    } finally {
       setLoading(false)
-    })
+      setRefreshing(false)
+    }
   }, [])
+
+  useEffect(() => { fetchAll() }, [fetchAll])
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-[#FF6B35] border-t-transparent rounded-full animate-spin"></div>
           <p className="text-sm text-slate-500">Loading data...</p>
@@ -41,14 +51,33 @@ export default function Dashboard() {
   const activeExamsCount = Object.keys(stats?.by_exam || {}).filter(k => k !== 'ALL' && k !== 'NONE' && stats.by_exam[k] > 0).length
   const examEntries = Object.entries(stats?.by_exam || {}).filter(([k]) => k !== 'ALL' && k !== 'NONE')
 
+  const timeAgo = lastUpdated
+    ? `Updated ${Math.round((Date.now() - lastUpdated) / 1000)}s ago`
+    : ""
+
   return (
     <div className="space-y-6">
 
       {/* Header */}
-      <div>
-        <p className="text-xs text-[#FF6B35] font-semibold tracking-widest uppercase mb-1">Overview</p>
-        <h1 className="text-2xl font-bold text-white">System Dashboard</h1>
-        <p className="text-sm text-slate-500 mt-0.5">Real-time stats for E-Mitra bot.</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs text-[#FF6B35] font-semibold tracking-widest uppercase mb-1">Overview</p>
+          <h1 className="text-2xl font-bold text-white">System Dashboard</h1>
+          <p className="text-sm text-slate-500 mt-0.5">Real-time stats for E-Mitra bot.</p>
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          <button
+            onClick={() => fetchAll(true)}
+            disabled={refreshing}
+            className="flex items-center gap-2 px-3 py-2 bg-[#0F0F17] border border-[#1A1A28] rounded-lg text-xs text-slate-400 hover:text-white hover:border-[#2a2a3a] transition-all disabled:opacity-50"
+          >
+            <RefreshCw size={13} className={refreshing ? "animate-spin text-[#FF6B35]" : ""} />
+            {refreshing ? "Refreshing..." : "Refresh"}
+          </button>
+          {lastUpdated && (
+            <span className="text-[10px] text-slate-700 font-mono">{timeAgo}</span>
+          )}
+        </div>
       </div>
 
       {/* Stat Cards */}
