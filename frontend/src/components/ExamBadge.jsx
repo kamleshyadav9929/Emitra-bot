@@ -1,27 +1,25 @@
 export const EXAM_COLORS = {
-  JEE: "#FF6B35",
-  NEET: "#4ECDC4",
-  SSC: "#45B7D1",
-  UPSC: "#96CEB4",
-  CUET: "#FFEAA7",
-  ALL: "#FF6B35"
+  JEE:  "#F97316",
+  NEET: "#2DD4BF",
+  SSC:  "#38BDF8",
+  UPSC: "#A3E635",
+  CUET: "#FBBF24",
+  ALL:  "#6366F1"
 }
 
 export default function ExamBadge({ exam, className = "" }) {
-  const color = 
-    exam === "ALL" 
-      ? "#FF6B35" 
-      : (EXAM_COLORS[exam] || "#333344")
-  
-  const displayLabel = exam === "ALL" ? "Sabhi Exams" : exam
+  const color = EXAM_COLORS[exam] || "#6366F1"
+  const displayLabel = exam === "ALL" ? "All Exams" : exam
 
   return (
     <span
-      className={`px-3 py-1 rounded border text-xs font-bold tracking-widest ${className}`}
+      className={`px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wider ${className}`}
       style={{
+        borderWidth: "1px",
+        borderStyle: "solid",
         borderColor: `${color}40`,
         color: color,
-        backgroundColor: `${color}15`
+        backgroundColor: `${color}12`
       }}
     >
       {displayLabel}

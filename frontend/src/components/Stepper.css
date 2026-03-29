@@ -79,7 +79,7 @@
   justify-content: center;
   gap: 0.4rem;
   border-radius: 0.5rem;
-  background-color: #FF6B35;
+  background-color: #6366F1;
   color: #fff;
   font-weight: 600;
   font-size: 0.875rem;
@@ -89,11 +89,11 @@
 }
 
 .next-button:hover {
-  background-color: #ff805a;
+  background-color: #5558E3;
 }
 
 .next-button:active {
-  background-color: #e55a25;
+  background-color: #4547C9;
 }
 
 .step-indicator {

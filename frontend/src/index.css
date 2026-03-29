@@ -2,58 +2,42 @@
 @import "tailwindcss";
 
 @theme {
-  --color-dark-bg: #09090E;
-  --color-dark-card: #0F0F17;
-  --color-dark-border: #1A1A28;
-  --color-dark-hover: #16161F;
+  --color-bg:        #0C0C12;
+  --color-card:      #111119;
+  --color-border:    #1D1D2D;
+  --color-hover:     #18182A;
 
-  --color-accent: #FF6B35;
-  --color-accent-muted: rgba(255, 107, 53, 0.08);
+  --color-accent:    #6366F1;
+  --color-accent-lt: #818CF8;
 
-  --color-exam-jee: #FF6B35;
-  --color-exam-neet: #4ECDC4;
-  --color-exam-ssc: #45B7D1;
-  --color-exam-upsc: #96CEB4;
-  --color-exam-cuet: #F4D03F;
-  --color-exam-all: #FF6B35;
+  --color-exam-jee:  #F97316;
+  --color-exam-neet: #2DD4BF;
+  --color-exam-ssc:  #38BDF8;
+  --color-exam-upsc: #A3E635;
+  --color-exam-cuet: #FBBF24;
+  --color-exam-all:  #6366F1;
 
-  --color-success: #4ADE80;
+  --color-success:   #4ADE80;
+  --color-cyan:      #22D3EE;
 
   --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-mono: 'DM Mono', 'Courier New', monospace;
 }
 
 body {
-  background-color: var(--color-dark-bg);
+  background-color: #0C0C12;
   color: #E2E8F0;
-  font-family: var(--font-sans);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Only use mono for data/code */
-.font-data {
-  font-family: var(--font-mono);
-}
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1D1D2D; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #2a2a3f; }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #1A1A28;
-  border-radius: 99px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #2a2a3a;
-}
-
-/* Smooth transition for interactive elements */
 * {
   transition-property: color, background-color, border-color, opacity;
   transition-duration: 150ms;
