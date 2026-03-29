@@ -1,9 +1,9 @@
 import { Link, useLocation } from "react-router-dom"
-import { Home, Send, Users, History, Terminal } from "lucide-react"
+import { Home, Send, Users, History, Zap } from "lucide-react"
 
 export default function Sidebar() {
   const location = useLocation()
-  
+
   const navItems = [
     { name: "Dashboard", path: "/", icon: Home },
     { name: "Send Notification", path: "/send", icon: Send },
@@ -12,43 +12,51 @@ export default function Sidebar() {
   ]
 
   return (
-    <aside className="w-64 h-screen fixed top-0 left-0 bg-[#0D0D14] border-r border-[#1E1E2E] flex flex-col items-center py-8">
-      
-      <div className="w-full px-6 flex items-center gap-3 mb-10 text-orange-500">
-        <Terminal size={32} />
-        <div>
-          <h1 className="text-xl font-bold tracking-wider uppercase">E-Mitra</h1>
-          <p className="text-xs text-orange-500/60 uppercase tracking-widest">SysAdmin</p>
+    <aside className="w-64 h-screen fixed top-0 left-0 flex flex-col border-r border-[#1A1A28] bg-[#09090E]">
+
+      {/* Logo */}
+      <div className="px-6 py-7 border-b border-[#1A1A28]">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-[#FF6B35] flex items-center justify-center shadow-lg">
+            <Zap size={18} className="text-white" fill="white" />
+          </div>
+          <div>
+            <h1 className="text-[15px] font-bold tracking-tight text-white">E-Mitra</h1>
+            <p className="text-[11px] text-slate-500 font-medium tracking-wider uppercase">Admin Panel</p>
+          </div>
         </div>
       </div>
 
-      <nav className="flex-1 w-full px-4 space-y-2">
+      {/* Nav */}
+      <nav className="flex-1 px-3 py-5 space-y-1">
+        <p className="text-[10px] text-slate-600 font-semibold tracking-[0.15em] uppercase px-3 mb-3">Navigation</p>
         {navItems.map((item) => {
           const isActive = location.pathname === item.path
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all duration-200 border border-transparent ${
-                isActive 
-                  ? "bg-[#1E1E2E] text-white border-[#333344] shadow-[0_0_15px_rgba(255,107,53,0.1)]" 
-                  : "text-slate-400 hover:text-white hover:bg-[#1E1E2E]/50"
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                isActive
+                  ? "bg-[#FF6B35]/10 text-[#FF6B35] border border-[#FF6B35]/20"
+                  : "text-slate-500 hover:text-slate-200 hover:bg-[#1A1A28]"
               }`}
             >
-              <item.icon size={20} className={isActive ? "text-[#FF6B35]" : ""} />
-              <span className="font-medium text-sm tracking-wide">{item.name}</span>
+              <item.icon size={17} strokeWidth={isActive ? 2.5 : 2} />
+              <span>{item.name}</span>
             </Link>
           )
         })}
       </nav>
 
-      <div className="w-full px-8 pb-4">
-        <div className="px-4 py-3 bg-[#0A0A0F] border border-[#1E1E2E] rounded-md flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-[#4ADE80] shadow-[0_0_10px_#4ADE80] animate-pulse"></div>
-          <span className="text-xs text-slate-400">System Online</span>
+      {/* Status */}
+      <div className="px-4 py-5 border-t border-[#1A1A28]">
+        <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-[#0F0F17] border border-[#1A1A28]">
+          <div className="w-2 h-2 rounded-full bg-[#4ADE80] animate-pulse flex-shrink-0"></div>
+          <span className="text-xs text-slate-400 font-medium">System Online</span>
         </div>
       </div>
-      
+
     </aside>
   )
 }

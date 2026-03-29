@@ -1,43 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-dark-bg: #0A0A0F;
-  --color-dark-card: #0D0D14;
-  --color-dark-border: #1E1E2E;
+  --color-dark-bg: #09090E;
+  --color-dark-card: #0F0F17;
+  --color-dark-border: #1A1A28;
+  --color-dark-hover: #16161F;
+
+  --color-accent: #FF6B35;
+  --color-accent-muted: rgba(255, 107, 53, 0.08);
 
   --color-exam-jee: #FF6B35;
   --color-exam-neet: #4ECDC4;
   --color-exam-ssc: #45B7D1;
   --color-exam-upsc: #96CEB4;
-  --color-exam-cuet: #FFEAA7;
+  --color-exam-cuet: #F4D03F;
   --color-exam-all: #FF6B35;
 
   --color-success: #4ADE80;
-  
+
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-mono: 'DM Mono', 'Courier New', monospace;
 }
 
 body {
   background-color: var(--color-dark-bg);
   color: #E2E8F0;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   margin: 0;
   padding: 0;
-  /* subtle crt or dark mode background noise could go here */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Only use mono for data/code */
+.font-data {
+  font-family: var(--font-mono);
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-dark-bg); 
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-dark-border); 
-  border-radius: 4px;
+  background: #1A1A28;
+  border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #333344; 
+  background: #2a2a3a;
+}
+
+/* Smooth transition for interactive elements */
+* {
+  transition-property: color, background-color, border-color, opacity;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
 }

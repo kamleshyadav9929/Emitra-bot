@@ -7,10 +7,10 @@ import Logs from "./pages/Logs"
 
 function App() {
   return (
-    <div className="flex bg-[#0A0A0F] min-h-screen text-slate-200 font-mono">
+    <div className="flex bg-[#09090E] min-h-screen text-slate-200">
       <Sidebar />
-      <main className="flex-1 p-4 md:p-8 ml-64 h-screen overflow-y-auto">
-        <div className="max-w-6xl mx-auto">
+      <main className="flex-1 ml-64 min-h-screen">
+        <div className="max-w-5xl mx-auto px-8 py-8">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/send" element={<SendNotification />} />
