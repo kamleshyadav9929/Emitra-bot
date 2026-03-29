@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { getStudents } from "../api"
 import ExamBadge from "../components/ExamBadge"
-import { Phone, MessagesSquare } from "lucide-react"
+import { Phone, MessagesSquare, Search, X } from "lucide-react"
 
 const FILTERS = ["ALL", "JEE", "NEET", "SSC", "UPSC", "CUET"]
 
@@ -9,6 +9,7 @@ export default function Students() {
   const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeFilter, setActiveFilter] = useState("ALL")
+  const [search, setSearch] = useState("")
 
   const fetchStudents = (filter) => {
     setLoading(true)
@@ -28,6 +29,14 @@ export default function Students() {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
   }
 
+  const filtered = search.trim()
+    ? students.filter(s =>
+        s.name?.toLowerCase().includes(search.toLowerCase()) ||
+        s.phone_number?.includes(search) ||
+        String(s.telegram_id).includes(search)
+      )
+    : students
+
   return (
     <div className="space-y-6">
 
@@ -38,23 +47,40 @@ export default function Students() {
         <p className="text-sm text-slate-500 mt-0.5">View and filter all E-Mitra registered students.</p>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-2 flex-wrap">
-        {FILTERS.map(f => (
-          <button
-            key={f}
-            onClick={() => setActiveFilter(f)}
-            className={`px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wider transition-all border ${
-              activeFilter === f
-                ? "bg-[#FF6B35]/10 text-[#FF6B35] border-[#FF6B35]/25"
-                : "bg-[#0F0F17] text-slate-500 border-[#1A1A28] hover:text-slate-300 hover:border-[#2a2a3a]"
-            }`}
-          >
-            {f}
-          </button>
-        ))}
-        <span className="ml-auto text-xs text-slate-600 self-center font-mono">{students.length} results</span>
+      {/* Filters + Search */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex gap-2 flex-wrap flex-1">
+          {FILTERS.map(f => (
+            <button
+              key={f}
+              onClick={() => setActiveFilter(f)}
+              className={`px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wider transition-all border ${
+                activeFilter === f
+                  ? "bg-[#FF6B35]/10 text-[#FF6B35] border-[#FF6B35]/25"
+                  : "bg-[#0F0F17] text-slate-500 border-[#1A1A28] hover:text-slate-300 hover:border-[#2a2a3a]"
+              }`}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+        <div className="relative flex-shrink-0">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600" />
+          <input
+            type="text"
+            placeholder="Search students..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full sm:w-56 bg-[#0F0F17] border border-[#1A1A28] rounded-lg pl-9 pr-8 py-1.5 text-xs text-slate-300 placeholder:text-slate-700 focus:outline-none focus:border-[#FF6B35]/40 transition-colors"
+          />
+          {search && (
+            <button onClick={() => setSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-400">
+              <X size={12} />
+            </button>
+          )}
+        </div>
       </div>
+      <p className="text-xs text-slate-600 font-mono -mt-3">{filtered.length} of {students.length} students</p>
 
       {/* Table */}
       <div className="bg-[#0F0F17] border border-[#1A1A28] rounded-xl overflow-hidden">
@@ -75,7 +101,7 @@ export default function Students() {
                 </tr>
               </thead>
               <tbody>
-                {students.map((s) => (
+                {filtered.map((s) => (
                   <tr key={s.telegram_id} className="border-b border-[#1A1A28]/60 hover:bg-[#1A1A28]/40 transition-colors last:border-0">
                     <td className="py-4 px-5">
                       <div className="flex items-center gap-3">
@@ -118,11 +144,11 @@ export default function Students() {
                     </td>
                   </tr>
                 ))}
-                {students.length === 0 && (
+                {filtered.length === 0 && (
                   <tr>
                     <td colSpan="5" className="py-16 text-center">
                       <p className="text-3xl mb-2">📭</p>
-                      <p className="text-sm text-slate-600">No students in {activeFilter} category.</p>
+                      <p className="text-sm text-slate-600">{search ? `No results for "${search}"` : `No students in ${activeFilter} category.`}</p>
                     </td>
                   </tr>
                 )}
