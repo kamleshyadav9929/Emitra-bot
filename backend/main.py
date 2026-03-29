@@ -19,6 +19,18 @@ database.init_db()
 # Global Telegram Application instance
 tg_app = None
 
+import threading
+
+# Create a global loop for thread-safe execution
+global_loop = asyncio.new_event_loop()
+
+def start_background_loop(loop):
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+
+thread = threading.Thread(target=start_background_loop, args=(global_loop,), daemon=True)
+thread.start()
+
 def init_telegram():
     if not config.TELEGRAM_BOT_TOKEN or config.TELEGRAM_BOT_TOKEN == "your_bot_token_here":
         print("WARNING: TELEGRAM_BOT_TOKEN is not set properly. Telegram webhook will default to NO-OP.")
@@ -41,19 +53,18 @@ def webhook():
         return jsonify({"ok": False, "error": "Bot Not Configured"}), 500
 
     if request.method == "POST":
-        # Process the incoming webhook completely synchronously without async routes error
         try:
             update = Update.de_json(request.get_json(force=True), tg_app.bot)
             
             async def process():
                 if not tg_app._initialized:
                     await tg_app.initialize()
+                    await tg_app.start()
                 await tg_app.process_update(update)
 
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.run_until_complete(process())
-            loop.close()
+            # Threadsafe execution
+            future = asyncio.run_coroutine_threadsafe(process(), global_loop)
+            future.result(timeout=10) # Safely wait for it to process
             return jsonify({"ok": True})
         except Exception as e:
             print("Webhook processing error:", str(e))
