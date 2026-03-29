@@ -34,14 +34,14 @@ export function Sidebar() {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all group ${
                 isActive
-                  ? "bg-[#6366F1]/12 text-[#818CF8] border border-[#6366F1]/20"
+                  ? "bg-[#6366F1]/12 text-[#818CF8] border border-[#6366F1]/20 shadow-lg shadow-indigo-500/5"
                   : "text-slate-600 hover:text-slate-300 hover:bg-[#18182A] border border-transparent"
               }`}
             >
-              <item.icon size={16} strokeWidth={isActive ? 2.5 : 2} />
-              <span>{item.name}</span>
+              <item.icon size={18} strokeWidth={isActive ? 2.5 : 2} className="flex-shrink-0" />
+              <span className="flex-1">{item.name}</span>
             </Link>
           )
         })}
@@ -83,12 +83,14 @@ export function BottomNav() {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
+              className={`flex flex-col items-center justify-center gap-1 min-w-[64px] py-1.5 rounded-xl transition-all ${
                 isActive ? "text-[#818CF8]" : "text-slate-700 hover:text-slate-400"
               }`}
             >
-              <item.icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
-              <span className={`text-[10px] font-semibold ${isActive ? "text-[#818CF8]" : "text-slate-700"}`}>
+              <div className={`p-1 rounded-lg transition-colors ${isActive ? "bg-[#6366F1]/10" : ""}`}>
+                <item.icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
+              </div>
+              <span className={`text-[9px] font-bold uppercase tracking-wider ${isActive ? "text-[#818CF8]" : "text-slate-700 text-opacity-50"}`}>
                 {item.name.split(" ")[0]}
               </span>
             </Link>
