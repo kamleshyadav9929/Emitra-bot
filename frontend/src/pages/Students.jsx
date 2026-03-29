@@ -111,7 +111,7 @@ export default function Students() {
                 
                 {students.length === 0 && (
                   <tr>
-                    <td colSpan="4" className="py-20 text-center text-slate-500 border-none">
+                    <td colSpan="5" className="py-20 text-center text-slate-500 border-none">
                       <div className="flex flex-col items-center gap-2">
                         <span className="text-4xl block mb-2 opacity-50">📂</span>
                         <p>No students found for {activeFilter} category.</p>
