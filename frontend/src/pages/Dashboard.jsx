@@ -1,10 +1,18 @@
 import { useEffect, useState, useCallback } from "react"
 import { Users, Send, Target, TrendingUp, RefreshCw, Cpu, Activity, Globe } from "lucide-react"
-import { motion } from "motion/react"
-import StatCard from "../components/StatCard"
 import ExamBadge from "../components/ExamBadge"
 import { EXAM_COLORS } from "../constants/examColors"
 import { getStats, getStudents, getLogs } from "../api"
+
+function StatCard({ label, value, sub }) {
+  return (
+    <div className="border border-[#E5E5E3] p-6 bg-white hover:border-[#0A0A0A] transition-colors">
+      <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC] mb-3">{label}</p>
+      <p className="text-4xl font-light text-black tracking-tight">{value ?? "—"}</p>
+      {sub && <p className="text-[11px] text-[#7A7A78] mt-2">{sub}</p>}
+    </div>
+  )
+}
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
@@ -41,8 +49,8 @@ export default function Dashboard() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-7 h-7 border-2 border-[#6366F1] border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-xs text-slate-600">Loading...</p>
+          <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-[11px] text-[#AEAEAC] font-medium tracking-wide uppercase">Loading</p>
         </div>
       </div>
     )
@@ -53,154 +61,120 @@ export default function Dashboard() {
   const examEntries = Object.entries(stats?.by_exam || {}).filter(([k]) => k !== 'ALL' && k !== 'NONE')
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
 
       {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: -10 }} 
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-start justify-between"
-      >
+      <div className="flex items-start justify-between border-b border-[#E5E5E3] pb-6">
         <div>
-          <p className="text-[10px] text-[#818CF8] font-semibold tracking-[0.15em] uppercase mb-1">Overview</p>
-          <h1 className="text-2xl font-bold text-white">System Dashboard</h1>
-          <p className="text-sm text-slate-600 mt-0.5">Real-time stats for E-Mitra bot.</p>
+          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC] mb-2">Overview</p>
+          <h1 className="text-3xl font-light text-black tracking-tight">System Dashboard</h1>
+          <p className="text-[13px] text-[#7A7A78] mt-1">Real-time stats for E-Mitra bot.</p>
         </div>
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex flex-col items-end gap-1.5">
           <button
             onClick={() => fetchAll(true)}
             disabled={refreshing}
-            className="flex items-center gap-2 px-3 py-2 bg-[#111119] border border-[#1D1D2D] rounded-lg text-xs text-slate-500 hover:text-slate-200 hover:border-[#2a2a3f] transition-all disabled:opacity-50"
+            className="flex items-center gap-2 px-3 py-2 border border-[#E5E5E3] text-[12px] text-[#3D3D3D] hover:border-black hover:text-black transition-colors disabled:opacity-40 font-medium"
           >
-            <RefreshCw size={12} className={refreshing ? "animate-spin text-[#6366F1]" : ""} />
+            <RefreshCw size={12} className={refreshing ? "animate-spin" : ""} />
             {refreshing ? "Refreshing..." : "Refresh"}
           </button>
           {lastUpdated && (
-            <span className="text-[10px] text-slate-700 font-mono">
-              Updated {Math.round((Date.now() - lastUpdated) / 1000)}s ago
+            <span className="text-[10px] text-[#AEAEAC] font-mono">
+              {Math.round((Date.now() - lastUpdated) / 1000)}s ago
             </span>
           )}
         </div>
-      </motion.div>
+      </div>
 
       {/* Stat Cards */}
-      <motion.div 
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: { opacity: 0 },
-          visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
-        }}
-        className="grid grid-cols-1 sm:grid-cols-3 gap-4"
-      >
-        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
-          <StatCard title="Total Students" value={total} icon={Users} colorTheme="indigo" />
-        </motion.div>
-        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
-          <StatCard title="Messages Sent" value={totalSent} icon={Send} colorTheme="cyan" />
-        </motion.div>
-        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
-          <StatCard title="Active Exams" value={activeExamsCount} icon={Target} colorTheme="green" />
-        </motion.div>
-      </motion.div>
+      <div className="grid grid-cols-3 gap-4">
+        <StatCard label="Total Students" value={total} sub="Registered in system" />
+        <StatCard label="Messages Sent" value={totalSent} sub="Total recipients" />
+        <StatCard label="Active Exams" value={activeExamsCount} sub="Categories" />
+      </div>
 
-      {/* Lower Row: Health + Distribution + Recent */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        
+      {/* Lower section */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+
         {/* System Health */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
-          className="bg-[#111119] border border-[#1D1D2D] rounded-xl p-5 flex flex-col justify-between"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-white">System Health</h2>
-            <Activity size={14} className="text-[#4ADE80]" />
+        <div className="border border-[#E5E5E3] p-5 bg-white lg:col-span-2">
+          <div className="flex items-center justify-between mb-5 pb-4 border-b border-[#E5E5E3]">
+            <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC]">System Health</p>
+            <Activity size={13} className="text-[#2E7D32]" />
           </div>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs text-slate-500">
+              <div className="flex items-center gap-2 text-[12px] text-[#7A7A78]">
                 <Globe size={12} />
                 <span>API Status</span>
               </div>
-              <span className="text-[10px] font-bold text-[#4ADE80] bg-[#4ADE80]/10 px-1.5 py-0.5 rounded">ONLINE</span>
+              <span className="text-[10px] font-semibold text-[#2E7D32] border border-[#2E7D32]/20 bg-[#2E7D32]/5 px-1.5 py-0.5">ONLINE</span>
             </div>
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs text-slate-500">
+              <div className="flex items-center gap-2 text-[12px] text-[#7A7A78]">
                 <Cpu size={12} />
                 <span>Bot Service</span>
               </div>
-              <span className="text-[10px] font-bold text-[#4ADE80] bg-[#4ADE80]/10 px-1.5 py-0.5 rounded">ACTIVE</span>
+              <span className="text-[10px] font-semibold text-[#2E7D32] border border-[#2E7D32]/20 bg-[#2E7D32]/5 px-1.5 py-0.5">ACTIVE</span>
             </div>
           </div>
-          <div className="mt-6 pt-4 border-t border-[#1D1D2D]">
-            <p className="text-[10px] text-slate-700 font-mono tracking-tighter">LATENCY: 42ms</p>
+          <div className="mt-6 pt-4 border-t border-[#E5E5E3]">
+            <p className="text-[10px] text-[#AEAEAC] font-mono">LATENCY: 42ms</p>
           </div>
-        </motion.div>
+        </div>
 
         {/* Exam Distribution */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4 }}
-          className="bg-[#111119] border border-[#1D1D2D] rounded-xl p-5 lg:col-span-1"
-        >
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-sm font-semibold text-white">Distribution</h2>
-            <TrendingUp size={14} className="text-slate-700" />
+        <div className="border border-[#E5E5E3] p-5 bg-white lg:col-span-3">
+          <div className="flex items-center justify-between mb-5 pb-4 border-b border-[#E5E5E3]">
+            <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC]">Distribution</p>
+            <TrendingUp size={13} className="text-[#AEAEAC]" />
           </div>
           <div className="space-y-4">
             {examEntries.map(([exam, count]) => {
               const pct = total === 0 ? 0 : Math.round((count / total) * 100)
-              const color = EXAM_COLORS[exam] || "#666"
               return (
                 <div key={exam}>
                   <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-xs font-semibold text-slate-400">{exam}</span>
-                    <span className="text-xs text-slate-600 font-mono">{pct}%</span>
+                    <span className="text-[12px] font-semibold text-[#3D3D3D]">{exam}</span>
+                    <span className="text-[11px] text-[#7A7A78] font-mono">{count} · {pct}%</span>
                   </div>
-                  <div className="w-full bg-[#1D1D2D] h-1 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: color }} />
+                  <div className="w-full bg-[#F7F7F5] h-1.5 overflow-hidden">
+                    <div className="h-full bg-black transition-all duration-700" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               )
             })}
-            {examEntries.length === 0 && <p className="text-xs text-slate-700 text-center py-4">No data</p>}
+            {examEntries.length === 0 && <p className="text-[12px] text-[#AEAEAC] text-center py-4">No data</p>}
           </div>
-        </motion.div>
+        </div>
+      </div>
 
-        {/* Recent Students */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
-          className="bg-[#111119] border border-[#1D1D2D] rounded-xl p-5 lg:col-span-2"
-        >
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-sm font-semibold text-white">Recent Students</h2>
-            <span className="text-[10px] text-slate-600 bg-[#1D1D2D] px-2 py-1 rounded font-mono">{total} total</span>
-          </div>
-          <div className="space-y-1">
-            {recent.map((s, i) => (
-              <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#18182A] transition-colors">
-                <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
-                  style={{ background: `${EXAM_COLORS[s.exam_preference] || "#6366F1"}20`, border: `1px solid ${EXAM_COLORS[s.exam_preference] || "#6366F1"}30` }}
-                >
-                  {s.name?.charAt(0)?.toUpperCase() || "?"}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-slate-200 truncate">{s.name}</p>
-                </div>
-                <ExamBadge exam={s.exam_preference} />
-                <span className="text-[10px] text-slate-700 flex-shrink-0">{new Date(s.joined_at).toLocaleDateString()}</span>
+      {/* Recent Students */}
+      <div className="border border-[#E5E5E3] bg-white">
+        <div className="px-5 py-4 border-b border-[#E5E5E3] flex items-center justify-between">
+          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC]">Recent Students</p>
+          <span className="text-[10px] text-[#AEAEAC] font-mono">{total} total</span>
+        </div>
+        <div>
+          {recent.map((s, i) => (
+            <div key={i} className="flex items-center gap-4 px-5 py-3.5 border-b border-[#E5E5E3] last:border-0 hover:bg-[#F7F7F5] transition-colors">
+              <div className="w-8 h-8 bg-[#F7F7F5] border border-[#E5E5E3] flex items-center justify-center text-black font-semibold text-[12px] flex-shrink-0">
+                {s.name?.charAt(0)?.toUpperCase() || "?"}
               </div>
-            ))}
-            {recent.length === 0 && <div className="text-center py-8"><p className="text-sm text-slate-700">No students yet</p></div>}
-          </div>
-        </motion.div>
-
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-black truncate">{s.name}</p>
+              </div>
+              <ExamBadge exam={s.exam_preference} />
+              <span className="text-[10px] text-[#AEAEAC] font-mono flex-shrink-0">{new Date(s.joined_at).toLocaleDateString()}</span>
+            </div>
+          ))}
+          {recent.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-[13px] text-[#AEAEAC]">No students yet</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

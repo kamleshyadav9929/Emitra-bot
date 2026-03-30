@@ -1,120 +1,73 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Search, Home, Send, Users, History, Command, ClipboardList } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import { useState, useRef } from "react"
+import { useNavigate } from "react-router-dom"
+import { Search, X, Home, Send, Users, ClipboardList, History } from "lucide-react"
 
-export default function CommandPalette({ isOpen, setIsOpen }) {
-  const [query, setQuery] = useState("");
-  const navigate = useNavigate();
+const commands = [
+  { id: "dashboard", label: "Dashboard",        path: "/",         icon: Home          },
+  { id: "send",      label: "Send Notification", path: "/send",     icon: Send          },
+  { id: "students",  label: "Students",          path: "/students", icon: Users         },
+  { id: "requests",  label: "Service Requests",  path: "/requests", icon: ClipboardList },
+  { id: "logs",      label: "Logs",              path: "/logs",     icon: History       },
+]
 
-  const actions = [
-    { title: "Dashboard",        path: "/",         icon: Home,          key: "1" },
-    { title: "Broadcast",        path: "/send",     icon: Send,          key: "2" },
-    { title: "Students",         path: "/students", icon: Users,         key: "3" },
-    { title: "Service Requests", path: "/requests", icon: ClipboardList, key: "4" },
-    { title: "Logs",             path: "/logs",     icon: History,       key: "5" },
-  ];
+export default function CommandPalette({ onClose }) {
+  const [query, setQuery] = useState("")
+  const navigate = useNavigate()
+  const inputRef = useRef(null)
 
-  const filtered = actions.filter((action) =>
-    action.title.toLowerCase().includes(query.toLowerCase())
-  );
+  const filtered = query.trim()
+    ? commands.filter(c => c.label.toLowerCase().includes(query.toLowerCase()))
+    : commands
 
-  const closePalette = () => {
-    setQuery("");
-    setIsOpen(false);
-  };
-
-  const goToPath = (path) => {
-    navigate(path);
-    closePalette();
-  };
-
-  if (!isOpen) return null;
+  const go = (path) => { navigate(path); onClose() }
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={closePalette}
-        className="fixed inset-0 z-50 bg-[#000000]/80 backdrop-blur-sm flex items-start justify-center pt-[15vh] px-4"
+    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[20vh]" onClick={onClose}>
+      <div
+        className="w-full max-w-lg bg-white border border-[#0A0A0A] shadow-[4px_4px_0px_#0A0A0A]"
+        onClick={e => e.stopPropagation()}
       >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: -20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: -20 }}
-          onClick={(event) => event.stopPropagation()}
-          className="w-full max-w-xl bg-[#111119] border border-[#1D1D2D] rounded-xl shadow-2xl overflow-hidden shadow-indigo-500/10"
-        >
-          <div className="relative flex items-center border-b border-[#1D1D2D] px-4 py-3">
-            <Search size={18} className="text-slate-500" />
-            <input
-              autoFocus
-              type="text"
-              placeholder="Search or jump to..."
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              className="flex-1 bg-transparent border-none outline-none text-sm text-slate-200 px-3 placeholder:text-slate-700"
-              onKeyDown={(event) => {
-                if (event.key === "Enter" && filtered[0]) {
-                  goToPath(filtered[0].path);
-                }
-              }}
-            />
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-[#1D1D2D] border border-[#6366F1]/20">
-              <span className="text-[10px] text-slate-600 font-mono">ESC</span>
-            </div>
-          </div>
+        {/* Search header */}
+        <div className="flex items-center border-b border-[#E5E5E3] px-4 py-3 gap-3">
+          <Search size={16} className="text-[#7A7A78] flex-shrink-0" />
+          <input
+            ref={inputRef}
+            autoFocus
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Search pages..."
+            className="flex-1 text-sm text-black placeholder:text-[#AEAEAC] bg-transparent outline-none font-medium"
+          />
+          <button onClick={onClose} className="text-[#AEAEAC] hover:text-black">
+            <X size={16} />
+          </button>
+        </div>
 
-          <div className="p-2 max-h-[300px] overflow-y-auto custom-scrollbar">
-            {filtered.length > 0 ? (
-              filtered.map((action) => (
-                <button
-                  key={action.path}
-                  onClick={() => goToPath(action.path)}
-                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-[#6366F1]/10 group transition-colors text-left"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#18182A] group-hover:bg-[#6366F1]/20 flex items-center justify-center border border-[#1D1D2D]">
-                      <action.icon size={16} className="text-slate-500 group-hover:text-[#818CF8]" />
-                    </div>
-                    <span className="text-sm font-medium text-slate-400 group-hover:text-white">
-                      {action.title}
-                    </span>
-                  </div>
-                  <kbd className="text-[10px] font-mono text-slate-700 group-hover:text-[#818CF8]">
-                    {action.key}
-                  </kbd>
-                </button>
-              ))
-            ) : (
-              <p className="text-xs text-slate-700 text-center py-8 italic">No results found...</p>
-            )}
-          </div>
+        {/* Results */}
+        <div className="py-1 max-h-72 overflow-y-auto">
+          {filtered.length === 0 ? (
+            <p className="px-4 py-6 text-center text-sm text-[#AEAEAC]">No results.</p>
+          ) : (
+            filtered.map((cmd) => (
+              <button
+                key={cmd.id}
+                onClick={() => go(cmd.path)}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left text-[#3D3D3D] hover:bg-[#F7F7F5] hover:text-black transition-colors font-medium"
+              >
+                <cmd.icon size={15} strokeWidth={2} className="flex-shrink-0 text-[#7A7A78]" />
+                {cmd.label}
+                <span className="ml-auto text-[10px] text-[#AEAEAC] font-mono uppercase tracking-wider">Page</span>
+              </button>
+            ))
+          )}
+        </div>
 
-          <div className="bg-[#0C0C12] px-4 py-3 border-t border-[#1D1D2D] flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1">
-                <kbd className="px-1 py-0.5 rounded bg-[#1D1D2D] text-[9px] text-slate-600 border border-[#1D1D2D]">
-                  UP/DN
-                </kbd>
-                <span className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Navigate</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <kbd className="px-1 py-0.5 rounded bg-[#1D1D2D] text-[9px] text-slate-600 border border-[#1D1D2D]">
-                  ENTER
-                </kbd>
-                <span className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Select</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-1 text-[#6366F1]/40">
-              <Command size={10} />
-              <span className="text-[9px] font-bold uppercase tracking-wider">E-Mitra Pilot</span>
-            </div>
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
-  );
+        {/* Footer */}
+        <div className="border-t border-[#E5E5E3] px-4 py-2 flex gap-4 text-[10px] text-[#AEAEAC] font-medium">
+          <span><kbd className="font-mono">↵</kbd> open</span>
+          <span><kbd className="font-mono">ESC</kbd> close</span>
+        </div>
+      </div>
+    </div>
+  )
 }

@@ -1,45 +1,68 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-bg:        #0C0C12;
-  --color-card:      #111119;
-  --color-border:    #1D1D2D;
-  --color-hover:     #18182A;
+  --color-bg:        #FFFFFF;
+  --color-surface:   #F7F7F5;
+  --color-card:      #FFFFFF;
+  --color-border:    #E5E5E3;
+  --color-hover:     #F2F2F0;
 
-  --color-accent:    #6366F1;
-  --color-accent-lt: #818CF8;
+  --color-ink:       #0A0A0A;
+  --color-ink-2:     #3D3D3D;
+  --color-ink-3:     #7A7A78;
+  --color-ink-4:     #AEAEAC;
 
-  --color-exam-jee:  #F97316;
-  --color-exam-neet: #2DD4BF;
-  --color-exam-ssc:  #38BDF8;
-  --color-exam-upsc: #A3E635;
-  --color-exam-cuet: #FBBF24;
-  --color-exam-all:  #6366F1;
+  --color-accent:    #0A0A0A;
+  --color-accent-lt: #3D3D3D;
 
-  --color-success:   #4ADE80;
-  --color-cyan:      #22D3EE;
+  --color-exam-jee:  #D4450C;
+  --color-exam-neet: #0A7A6B;
+  --color-exam-ssc:  #0A52A3;
+  --color-exam-upsc: #5A7A0A;
+  --color-exam-cuet: #A37A0A;
+  --color-exam-all:  #0A0A0A;
 
-  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --color-success:   #2E7D32;
+  --color-danger:    #C62828;
+
+  --font-sans: 'DM Sans', system-ui, sans-serif;
   --font-mono: 'DM Mono', 'Courier New', monospace;
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background-color: #0C0C12;
-  color: #E2E8F0;
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background-color: #FFFFFF;
+  color: #0A0A0A;
+  font-family: 'DM Sans', system-ui, sans-serif;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #1D1D2D; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #2a2a3f; }
+::-webkit-scrollbar-thumb { background: #CFCFCD; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #AEAEAC; }
 
+/* Editorial transitions — fast and crisp */
 * {
-  transition-property: color, background-color, border-color, opacity;
-  transition-duration: 150ms;
+  transition-property: color, background-color, border-color, opacity, box-shadow;
+  transition-duration: 100ms;
   transition-timing-function: ease;
+}
+
+/* Focus ring — editorial black */
+:focus-visible {
+  outline: 2px solid #0A0A0A;
+  outline-offset: 2px;
 }

@@ -8,9 +8,10 @@ import Students from "./pages/Students"
 import Logs from "./pages/Logs"
 import ServiceRequests from "./pages/ServiceRequests"
 import Login from "./pages/Login"
+import { Layers } from "lucide-react"
 
 function PrivateRoute({ children }) {
-  const token = localStorage.getItem("emitra_token")
+  const token = localStorage.getItem("admin_token")
   if (!token) return <Navigate to="/login" replace />
   return children
 }
@@ -27,16 +28,14 @@ function App() {
         setIsCommandPaletteOpen((prev) => !prev)
         return
       }
-
+      if (event.key === "Escape") { setIsCommandPaletteOpen(false); return }
       if (["INPUT", "TEXTAREA"].includes(event.target.tagName)) return
-
       if (event.key === "1") navigate("/")
       if (event.key === "2") navigate("/send")
       if (event.key === "3") navigate("/students")
       if (event.key === "4") navigate("/requests")
       if (event.key === "5") navigate("/logs")
     }
-
     window.addEventListener("keydown", handleKeys)
     return () => window.removeEventListener("keydown", handleKeys)
   }, [navigate])
@@ -44,29 +43,28 @@ function App() {
   const isLoginPage = location.pathname === "/login"
 
   return (
-    <div className="flex bg-[#0C0C12] min-h-screen text-slate-200">
+    <div className="flex bg-white min-h-screen text-black">
       {!isLoginPage && <Sidebar />}
-      {!isLoginPage && (
-        <CommandPalette
-          key={isCommandPaletteOpen ? "open" : "closed"}
-          isOpen={isCommandPaletteOpen}
-          setIsOpen={setIsCommandPaletteOpen}
-        />
+      {!isLoginPage && isCommandPaletteOpen && (
+        <CommandPalette onClose={() => setIsCommandPaletteOpen(false)} />
       )}
-      <main className={`flex-1 ${!isLoginPage ? "md:ml-64 pb-20 md:pb-0" : ""} min-h-screen flex flex-col`}>
+
+      <main className={`flex-1 ${!isLoginPage ? "md:ml-[220px] pb-20 md:pb-0" : ""} min-h-screen flex flex-col`}>
+        {/* Mobile top bar */}
         {!isLoginPage && (
-          <div className="md:hidden flex items-center gap-3 px-5 py-4 border-b border-[#1D1D2D] bg-[#0C0C12] sticky top-0 z-40">
-            <div className="w-7 h-7 rounded-md bg-[#6366F1] flex items-center justify-center">
-              <span className="text-white text-xs font-bold">E</span>
+          <div className="md:hidden flex items-center gap-3 px-5 py-4 border-b border-[#E5E5E3] bg-white sticky top-0 z-40">
+            <div className="w-7 h-7 bg-black flex items-center justify-center">
+              <Layers size={14} className="text-white" />
             </div>
-            <span className="text-[15px] font-bold text-white tracking-tight">E-Mitra Admin</span>
+            <span className="text-[14px] font-semibold text-black">E-Mitra Admin</span>
             <div className="ml-auto flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#4ADE80] animate-pulse"></div>
-              <span className="text-[10px] text-slate-600">Online</span>
+              <div className="w-1.5 h-1.5 rounded-full bg-[#2E7D32]"></div>
+              <span className="text-[10px] text-[#7A7A78] font-medium">Online</span>
             </div>
           </div>
         )}
-        <div className={`max-w-5xl mx-auto w-full ${!isLoginPage ? "px-4 md:px-8 py-6" : "flex-1 flex flex-col"}`}>
+
+        <div className={`max-w-5xl mx-auto w-full ${!isLoginPage ? "px-5 md:px-8 py-8" : "flex-1 flex flex-col"}`}>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />

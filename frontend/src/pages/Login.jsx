@@ -1,109 +1,129 @@
 import { useState } from "react"
+import { login } from "../api"
 import { useNavigate } from "react-router-dom"
-import { Layers, ArrowRight, Lock, Loader2 } from "lucide-react"
-import { loginAdmin } from "../api"
+import { Layers, ArrowRight, Eye, EyeOff } from "lucide-react"
 
 export default function Login() {
   const [password, setPassword] = useState("")
+  const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const navigate = useNavigate()
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!password.trim()) return
     setLoading(true)
     setError("")
-
     try {
-      const data = await loginAdmin(password)
-      if (data.success && data.token) {
-        localStorage.setItem("emitra_token", data.token)
+      const data = await login(password)
+      if (data.token) {
+        localStorage.setItem("admin_token", data.token)
         navigate("/")
       } else {
-        setError(data.error || "Invalid password")
+        setError(data.error || "Invalid password.")
       }
-    } catch (err) {
-      setError("Failed to connect to the server.")
+    } catch {
+      setError("Could not reach server. Check connection.")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-[#0C0C12] text-white flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#6366F1] rounded-full mix-blend-screen filter blur-[150px] opacity-20"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#A855F7] rounded-full mix-blend-screen filter blur-[150px] opacity-20"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#1a1a2e] rounded-full filter blur-[100px] opacity-20 hidden md:block"></div>
-
-      {/* Grid Pattern */}
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 mix-blend-overlay"></div>
-      
-      <div className="w-full max-w-sm relative z-10">
-        <div className="flex flex-col items-center mb-10 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#6366F1] to-[#A855F7] flex items-center justify-center shadow-lg shadow-indigo-500/20 mb-4 ring-1 ring-white/10">
-            <Layers size={28} className="text-white drop-shadow-sm" />
+    <div className="min-h-screen bg-white flex">
+      {/* Left panel — editorial masthead */}
+      <div className="hidden md:flex w-1/2 flex-col justify-between p-12 bg-[#0A0A0A] text-white">
+        <div className="flex items-center gap-3">
+          <div className="w-7 h-7 border border-white flex items-center justify-center">
+            <Layers size={14} className="text-white" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-white/70">
-            E-Mitra Admin
-          </h1>
-          <p className="text-sm font-medium text-slate-500 mt-2 uppercase tracking-[0.2em]">
-            Secure Workspace
-          </p>
+          <span className="text-[13px] font-semibold tracking-wide">E-Mitra</span>
         </div>
 
-        <div className="bg-[#111119] border border-[#1D1D2D] rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
-          {/* Subtle line decoration */}
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#6366F1]/50 to-transparent opacity-50"></div>
-          
-          <form onSubmit={handleLogin} className="space-y-6">
+        <div>
+          <p className="text-[10px] text-white/40 font-semibold tracking-[0.2em] uppercase mb-6">Admin System</p>
+          <h1 className="text-5xl font-light leading-[1.1] tracking-tight">
+            Manage.<br />Send.<br />Monitor.
+          </h1>
+          <div className="mt-10 pt-8 border-t border-white/10">
+            <p className="text-[13px] text-white/40 leading-relaxed">
+              Secure administrative workspace for the E-Mitra student notification platform.
+            </p>
+          </div>
+        </div>
+
+        <div className="text-[10px] text-white/20 font-mono">
+          © {new Date().getFullYear()} E-Mitra Admin
+        </div>
+      </div>
+
+      {/* Right panel — login form */}
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="w-full max-w-sm">
+          {/* Mobile logo */}
+          <div className="flex md:hidden items-center gap-3 mb-10">
+            <div className="w-7 h-7 bg-black flex items-center justify-center">
+              <Layers size={14} className="text-white" />
+            </div>
+            <span className="text-[14px] font-semibold text-black">E-Mitra Admin</span>
+          </div>
+
+          <p className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.2em] uppercase mb-3">Sign In</p>
+          <h2 className="text-2xl font-semibold text-black leading-tight mb-8">Access your workspace</h2>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+              <label className="block text-[11px] font-semibold text-[#3D3D3D] tracking-wide uppercase mb-2">
                 Admin Password
               </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <Lock size={16} className="text-slate-500 group-focus-within:text-[#6366F1] transition-colors" />
-                </div>
+              <div className="relative">
                 <input
-                  type="password"
+                  type={showPw ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter the secret key"
-                  className="w-full bg-[#0C0C12] border border-[#1D1D2D] rounded-xl pl-10 pr-4 py-3.5 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#6366F1]/50 focus:border-[#6366F1]/50 transition-all placeholder:text-slate-700 font-mono tracking-wider"
-                  required
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="Enter secret key"
+                  className={`w-full border px-4 py-3 text-[14px] text-black placeholder:text-[#AEAEAC] bg-white outline-none focus:border-black transition-colors pr-10 ${
+                    error ? "border-[#C62828]" : "border-[#E5E5E3]"
+                  }`}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(p => !p)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#AEAEAC] hover:text-black"
+                >
+                  {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
               </div>
+              {error && (
+                <p className="mt-2 text-[12px] text-[#C62828] font-medium">{error}</p>
+              )}
             </div>
-
-            {error && (
-              <div className="text-xs text-rose-500 bg-rose-500/10 border border-rose-500/20 p-3 rounded-lg flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-rose-500"></div>
-                {error}
-              </div>
-            )}
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full bg-slate-100 hover:bg-white text-slate-900 font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] mt-2 group relative overflow-hidden"
+              disabled={loading || !password.trim()}
+              className={`w-full flex items-center justify-center gap-2 py-3 text-[14px] font-semibold transition-colors ${
+                loading || !password.trim()
+                  ? "bg-[#F7F7F5] text-[#AEAEAC] cursor-not-allowed"
+                  : "bg-black text-white hover:bg-[#3D3D3D]"
+              }`}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
               {loading ? (
-                <Loader2 size={18} className="animate-spin text-slate-600" />
+                <span className="text-[13px]">Verifying...</span>
               ) : (
                 <>
-                  <span className="text-[13px] uppercase tracking-wider font-bold">Access System</span>
-                  <ArrowRight size={16} className="text-slate-500 group-hover:translate-x-1 transition-transform" />
+                  Access System
+                  <ArrowRight size={16} />
                 </>
               )}
             </button>
           </form>
+
+          <p className="mt-8 text-[11px] text-[#AEAEAC] text-center">
+            Authorized personnel only
+          </p>
         </div>
-        
-        <p className="text-center text-[10px] text-slate-600 font-medium uppercase tracking-[0.2em] mt-8">
-          Authorized Personnel Only
-        </p>
       </div>
     </div>
   )
