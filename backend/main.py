@@ -2,7 +2,12 @@ import asyncio
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from telegram import Update, Bot
-from apscheduler.schedulers.background import BackgroundScheduler
+try:
+    from apscheduler.schedulers.background import BackgroundScheduler
+    APSCHEDULER_AVAILABLE = True
+except ImportError:
+    APSCHEDULER_AVAILABLE = False
+    print("WARNING: apscheduler not installed. Scheduled broadcasts will not run automatically.")
 
 import config
 import database
@@ -38,10 +43,13 @@ def check_scheduled_broadcasts():
         database.log_message(exam, message, success_count)
         database.mark_broadcast_complete(p["id"])
 
-scheduler = BackgroundScheduler()
-# Run the job every 60 seconds
-scheduler.add_job(func=check_scheduled_broadcasts, trigger="interval", seconds=60)
-scheduler.start()
+if APSCHEDULER_AVAILABLE:
+    scheduler = BackgroundScheduler()
+    # Run the job every 60 seconds
+    scheduler.add_job(func=check_scheduled_broadcasts, trigger="interval", seconds=60)
+    scheduler.start()
+else:
+    print("Scheduler not started. Run: pip install apscheduler")
 
 
 # ── Authentication ─────────────────────────────────────────────────────────────
