@@ -314,6 +314,34 @@ async def button_callback_handler(update: Update, context):
         )
 
 
+# ── Additional Command Handlers ───────────────────────────────────────────────
+
+async def status_handler(update: Update, context):
+    """Handles /status command — shows user registration details."""
+    chat_id = update.effective_chat.id
+    student = database.get_student(chat_id)
+
+    if not student:
+        await update.message.reply_text(
+            "❌ Aap register nahi hain. Start karne ke liye /start type karein."
+        )
+        return
+
+    msg = (
+        f"👤 *Aapki Details:*\n\n"
+        f"Name: {student.get('name', 'N/A')}\n"
+        f"Phone: {student.get('phone_number', 'Not provided')}\n"
+        f"Exam Preference: {student.get('exam_preference', 'NONE')}\n\n"
+        f"Agar aapna exam preference badalna chahte hain toh /change type karein."
+    )
+    await update.message.reply_text(msg, parse_mode="Markdown")
+
+
+async def change_handler(update: Update, context):
+    """Handles /change command — re-prompts exam selection."""
+    await prompt_exam_selection(update)
+
+
 # ── Default Message Handler ───────────────────────────────────────────────────
 
 async def message_handler(update: Update, context):

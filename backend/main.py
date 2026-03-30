@@ -54,6 +54,10 @@ def webhook():
                     await bot_handlers.start_handler(update, None)
                 elif text.startswith("/services"):
                     await bot_handlers.services_handler(update, None)
+                elif text.startswith("/status"):
+                    await bot_handlers.status_handler(update, None)
+                elif text.startswith("/change"):
+                    await bot_handlers.change_handler(update, None)
                 else:
                     await bot_handlers.message_handler(update, None)
 
