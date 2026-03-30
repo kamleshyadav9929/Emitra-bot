@@ -2,19 +2,11 @@ import { useState, useEffect, useCallback } from "react"
 import { getServiceRequests, sendReceipt, getStudentDocuments, getDocumentUrl } from "../api"
 import { ClipboardList, Clock, CheckCircle, Send, X, Phone, MessageSquare, RefreshCw, Paperclip, FileText, Image as ImageIcon, Download } from "lucide-react"
 
-const STATUS_COLORS = {
-  pending:   { bg: "bg-amber-500/10",  text: "text-amber-400",  border: "border-amber-500/20"  },
-  completed: { bg: "bg-emerald-500/10", text: "text-emerald-400", border: "border-emerald-500/20" },
-}
-
 const CATEGORY_EMOJI = {
-  documents: "📄",
-  utility:   "💡",
-  schemes:   "🏛️",
-  license:   "🚗",
-  land:      "🌾",
+  documents: "📄", utility: "💡", schemes: "🏛️", license: "🚗", land: "🌾",
 }
 
+// ── Receipt Modal ───────────────────────────────────────────────────────────────
 function ReceiptModal({ req, onClose, onSent }) {
   const [message, setMessage] = useState(
     `✅ Aapki ${req.service_name} seva process ho gayi hai.\n\nKoi sawaal ho to reply karein. 🙏`
@@ -24,94 +16,77 @@ function ReceiptModal({ req, onClose, onSent }) {
 
   const handleSend = async () => {
     if (!message.trim()) return
-    setSending(true)
-    setError("")
+    setSending(true); setError("")
     try {
       const res = await sendReceipt(req.telegram_id, message, req.id)
-      if (res.success) {
-        onSent(req.id)
-        onClose()
-      } else {
-        setError("Message nahi gaya. Dobara try karein.")
-      }
-    } catch {
-      setError("Network error. Check connection.")
-    } finally {
-      setSending(false)
-    }
+      if (res.success) { onSent(req.id); onClose() }
+      else setError("Message nahi gaya. Dobara try karein.")
+    } catch { setError("Network error.") }
+    finally { setSending(false) }
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
-      <div className="w-full max-w-lg bg-[#111119] border border-[#1D1D2D] rounded-2xl shadow-2xl shadow-indigo-500/10 overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4">
+      <div className="w-full max-w-lg bg-white border border-[#0A0A0A] shadow-[4px_4px_0px_#0A0A0A] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#1D1D2D]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E5E3] bg-[#F7F7F5]">
           <div>
-            <p className="text-xs text-[#818CF8] font-semibold tracking-widest uppercase">Send Receipt</p>
-            <h2 className="text-base font-bold text-white mt-0.5">{req.student_name}</h2>
+            <p className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.18em] uppercase">Send Receipt</p>
+            <h2 className="text-[15px] font-semibold text-black mt-0.5">{req.student_name}</h2>
           </div>
-          <button onClick={onClose} className="text-slate-600 hover:text-slate-300 transition-colors">
+          <button onClick={onClose} className="text-[#AEAEAC] hover:text-black transition-colors">
             <X size={18} />
           </button>
         </div>
 
-        {/* Student info */}
-        <div className="px-6 py-3 bg-[#0C0C12] border-b border-[#1D1D2D] flex flex-wrap gap-4">
-          <div className="flex items-center gap-2 text-xs text-slate-500">
-            <ClipboardList size={13} className="text-[#818CF8]" />
+        {/* Meta */}
+        <div className="px-6 py-3 border-b border-[#E5E5E3] flex flex-wrap gap-4">
+          <div className="flex items-center gap-2 text-[12px] text-[#7A7A78]">
+            <ClipboardList size={13} />
             <span>{CATEGORY_EMOJI[req.category] || "📋"} {req.service_name}</span>
           </div>
           {req.student_phone && (
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <Phone size={13} className="text-[#22D3EE]" />
-              <span>{req.student_phone}</span>
+            <div className="flex items-center gap-2 text-[12px] text-[#7A7A78]">
+              <Phone size={13} />
+              <span className="font-mono">{req.student_phone}</span>
             </div>
           )}
           {req.student_username && (
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <MessageSquare size={13} className="text-slate-600" />
-              <span>{req.student_username}</span>
+            <div className="flex items-center gap-2 text-[12px] text-[#7A7A78]">
+              <MessageSquare size={13} />
+              <span className="font-mono">{req.student_username}</span>
             </div>
           )}
         </div>
 
         {/* Textarea */}
         <div className="px-6 py-5">
-          <label className="text-[10px] text-slate-600 font-semibold tracking-widest uppercase block mb-2">
+          <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.18em] uppercase block mb-2">
             Receipt Message
           </label>
           <textarea
             value={message}
             onChange={e => setMessage(e.target.value)}
             rows={5}
-            className="w-full bg-[#0C0C12] border border-[#1D1D2D] rounded-xl px-4 py-3 text-sm text-slate-200 placeholder:text-slate-700 focus:outline-none focus:border-[#6366F1]/40 resize-none transition-colors font-mono"
+            className="w-full border border-[#E5E5E3] px-4 py-3 text-[13px] text-black placeholder:text-[#AEAEAC] bg-white focus:outline-none focus:border-black resize-none transition-colors font-mono"
           />
-          <p className="text-[10px] text-slate-700 mt-1 font-mono">
-            {message.length} chars
-          </p>
+          <p className="text-[10px] text-[#AEAEAC] mt-1 font-mono">{message.length} chars</p>
 
-          {error && <p className="text-xs text-red-400 mt-2">{error}</p>}
+          {error && <p className="text-[12px] text-[#C62828] mt-2">{error}</p>}
 
           <div className="flex gap-3 mt-4">
             <button
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl border border-[#1D1D2D] text-sm text-slate-500 hover:text-slate-300 transition-colors"
+              className="flex-1 py-2.5 border border-[#E5E5E3] text-[13px] text-[#7A7A78] hover:border-black hover:text-black transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSend}
               disabled={sending || !message.trim()}
-              className="flex-1 py-2.5 rounded-xl bg-[#6366F1] text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#4F51C9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-2.5 bg-black text-white text-[13px] font-semibold flex items-center justify-center gap-2 hover:bg-[#3D3D3D] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {sending ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <>
-                  <Send size={14} />
-                  Telegram pe Bhejein
-                </>
-              )}
+              {sending ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><Send size={14} /> Send</>}
             </button>
           </div>
         </div>
@@ -120,16 +95,16 @@ function ReceiptModal({ req, onClose, onSent }) {
   )
 }
 
+// ── Documents Modal ─────────────────────────────────────────────────────────────
 function DocumentsModal({ telegramId, studentName, onClose }) {
   const [docs, setDocs] = useState([])
   const [loading, setLoading] = useState(true)
   const [downloading, setDownloading] = useState(null)
 
   useEffect(() => {
-    getStudentDocuments(telegramId).then(data => {
-      setDocs(data.documents || [])
-      setLoading(false)
-    }).catch(() => setLoading(false))
+    getStudentDocuments(telegramId)
+      .then(data => { setDocs(data.documents || []); setLoading(false) })
+      .catch(() => setLoading(false))
   }, [telegramId])
 
   const handleOpenDoc = async (fileId) => {
@@ -138,65 +113,56 @@ function DocumentsModal({ telegramId, studentName, onClose }) {
       const res = await getDocumentUrl(fileId)
       if (res.url) window.open(res.url, "_blank")
       else alert("Could not fetch file link")
-    } catch {
-      alert("Network error")
-    } finally {
-      setDownloading(null)
-    }
+    } catch { alert("Network error") }
+    finally { setDownloading(null) }
   }
 
   return (
-    <div className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-[#111119] border border-[#1D1D2D] rounded-2xl shadow-2xl flex flex-col max-h-[80vh]">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#1D1D2D]">
+    <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-white border border-[#0A0A0A] shadow-[4px_4px_0px_#0A0A0A] flex flex-col max-h-[80vh]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E5E3] bg-[#F7F7F5]">
           <div className="flex items-center gap-2">
-            <Paperclip size={18} className="text-[#818CF8]" />
-            <h2 className="text-base font-bold text-white tracking-tight">Documents</h2>
+            <Paperclip size={15} className="text-[#7A7A78]" />
+            <div>
+              <p className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.18em] uppercase">Documents</p>
+              <h2 className="text-[14px] font-semibold text-black">{studentName}</h2>
+            </div>
           </div>
-          <button onClick={onClose} className="text-slate-600 hover:text-slate-300 transition-colors">
+          <button onClick={onClose} className="text-[#AEAEAC] hover:text-black transition-colors">
             <X size={18} />
           </button>
         </div>
-        
-        <div className="px-6 py-3 bg-[#0C0C12] border-b border-[#1D1D2D]">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Student</p>
-          <p className="text-sm font-bold text-white mt-0.5">{studentName}</p>
-        </div>
 
-        <div className="p-6 overflow-y-auto flex-1">
+        <div className="p-5 overflow-y-auto flex-1">
           {loading ? (
-             <div className="flex justify-center py-10">
-               <div className="w-5 h-5 border-2 border-[#6366F1] border-t-transparent rounded-full animate-spin" />
-             </div>
+            <div className="flex justify-center py-10">
+              <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+            </div>
           ) : docs.length === 0 ? (
             <div className="text-center py-10">
-              <p className="text-sm text-slate-500">Is student ne abhi tak koi document nahi bheja hai.</p>
+              <p className="text-[13px] text-[#AEAEAC]">No documents uploaded yet.</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {docs.map(doc => (
-                <div key={doc.id} className="bg-[#0C0C12] border border-[#1D1D2D] rounded-xl p-3 flex items-center justify-between group hover:border-[#2a2a3f] transition-all">
+                <div key={doc.id} className="border border-[#E5E5E3] p-3 flex items-center justify-between hover:bg-[#F7F7F5] transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#6366F1]/10 flex items-center justify-center text-[#818CF8]">
-                      {doc.file_type === "photo" ? <ImageIcon size={20} /> : <FileText size={20} />}
+                    <div className="w-9 h-9 bg-[#F7F7F5] border border-[#E5E5E3] flex items-center justify-center text-[#7A7A78]">
+                      {doc.file_type === "photo" ? <ImageIcon size={17} /> : <FileText size={17} />}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-200 truncate max-w-[150px]">{doc.file_name}</p>
-                      <p className="text-[10px] text-slate-600 font-mono mt-0.5">
-                        {new Date(doc.uploaded_at).toLocaleDateString()}
-                      </p>
+                      <p className="text-[13px] font-semibold text-black truncate max-w-[160px]">{doc.file_name}</p>
+                      <p className="text-[10px] text-[#AEAEAC] font-mono">{new Date(doc.uploaded_at).toLocaleDateString()}</p>
                     </div>
                   </div>
-                  <button 
+                  <button
                     onClick={() => handleOpenDoc(doc.file_id)}
                     disabled={downloading === doc.file_id}
-                    className="w-8 h-8 rounded-lg bg-[#6366F1]/10 text-[#818CF8] flex items-center justify-center hover:bg-[#6366F1]/20 transition-colors disabled:opacity-50"
+                    className="w-8 h-8 border border-[#E5E5E3] text-[#7A7A78] flex items-center justify-center hover:border-black hover:text-black transition-colors disabled:opacity-40"
                   >
-                     {downloading === doc.file_id ? (
-                        <div className="w-4 h-4 border-2 border-[#818CF8] border-t-transparent rounded-full animate-spin" />
-                     ) : (
-                        <Download size={15} />
-                     )}
+                    {downloading === doc.file_id
+                      ? <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                      : <Download size={14} />}
                   </button>
                 </div>
               ))}
@@ -208,6 +174,7 @@ function DocumentsModal({ telegramId, studentName, onClose }) {
   )
 }
 
+// ── Main Page ──────────────────────────────────────────────────────────────────
 export default function ServiceRequests() {
   const [requests, setRequests] = useState([])
   const [loading, setLoading] = useState(true)
@@ -218,103 +185,71 @@ export default function ServiceRequests() {
   const [stats, setStats] = useState({ total: 0, pending: 0 })
 
   const fetchRequests = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true); setError(null)
     try {
       const data = await getServiceRequests(filter)
       setRequests(data.requests || [])
       setStats({ total: data.total || 0, pending: data.pending || 0 })
     } catch {
-      setError("Failed to fetch requests. Check connection.")
-      setRequests([])
-    } finally {
-      setLoading(false)
-    }
+      setError("Failed to fetch requests."); setRequests([])
+    } finally { setLoading(false) }
   }, [filter])
 
   useEffect(() => { fetchRequests() }, [fetchRequests])
 
-  const handleSent = (requestId) => {
-    setRequests(prev =>
-      prev.map(r => r.id === requestId ? { ...r, status: "completed" } : r)
-    )
-  }
+  const handleSent = (id) => setRequests(prev => prev.map(r => r.id === id ? { ...r, status: "completed" } : r))
 
-  const formatTime = (dt) => {
-    const d = new Date(dt)
-    return d.toLocaleString("en-IN", {
-      day: "numeric", month: "short", hour: "2-digit", minute: "2-digit"
-    })
-  }
+  const formatTime = (dt) => new Date(dt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
+
+  const completed = stats.total - stats.pending
 
   return (
     <div className="space-y-6">
-      {selectedReq && (
-        <ReceiptModal
-          req={selectedReq}
-          onClose={() => setSelectedReq(null)}
-          onSent={handleSent}
-        />
-      )}
+      {selectedReq && <ReceiptModal req={selectedReq} onClose={() => setSelectedReq(null)} onSent={handleSent} />}
+      {selectedDocsReq && <DocumentsModal telegramId={selectedDocsReq.telegram_id} studentName={selectedDocsReq.student_name} onClose={() => setSelectedDocsReq(null)} />}
 
-      {selectedDocsReq && (
-        <DocumentsModal
-          telegramId={selectedDocsReq.telegram_id}
-          studentName={selectedDocsReq.student_name}
-          onClose={() => setSelectedDocsReq(null)}
-        />
-      )}
-
-      {/* Page Header */}
-      <div className="flex items-start justify-between">
+      {/* Header */}
+      <div className="flex items-start justify-between border-b border-[#E5E5E3] pb-6">
         <div>
-          <p className="text-[10px] text-[#818CF8] font-semibold tracking-[0.15em] uppercase mb-1">E-Mitra</p>
-          <h1 className="text-2xl font-bold text-white">Service Requests</h1>
-          <p className="text-sm text-slate-600 mt-0.5">Users ki pending seva requests dekho aur receipt bhejo.</p>
+          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC] mb-2">E-Mitra</p>
+          <h1 className="text-3xl font-light text-black tracking-tight">Service Requests</h1>
+          <p className="text-[13px] text-[#7A7A78] mt-1">Pending seva requests dekho aur receipt bhejo.</p>
         </div>
         <button
           onClick={fetchRequests}
-          className="flex items-center gap-2 px-3 py-2 bg-[#111119] border border-[#1D1D2D] rounded-lg text-xs text-slate-500 hover:text-slate-200 hover:border-[#2a2a3f] transition-all"
+          className="flex items-center gap-2 px-3 py-2 border border-[#E5E5E3] text-[12px] text-[#7A7A78] hover:border-black hover:text-black transition-colors"
         >
-          <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
+          <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
           Refresh
         </button>
       </div>
 
-      {/* Stats bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "Total Requests",  value: stats.total,   icon: ClipboardList, color: "#818CF8" },
-          { label: "Pending",         value: stats.pending, icon: Clock,          color: "#FBBF24" },
-          { label: "Completed",       value: stats.total - stats.pending, icon: CheckCircle, color: "#4ADE80" },
-        ].map(stat => (
-          <div key={stat.label} className="bg-[#111119] border border-[#1D1D2D] rounded-xl px-4 py-4 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-              style={{ background: `${stat.color}18`, border: `1px solid ${stat.color}30` }}>
-              <stat.icon size={16} style={{ color: stat.color }} />
-            </div>
-            <div>
-              <p className="text-xl font-bold text-white">{stat.value}</p>
-              <p className="text-[10px] text-slate-600 font-semibold uppercase tracking-wider">{stat.label}</p>
-            </div>
+          { label: "Total", value: stats.total },
+          { label: "Pending", value: stats.pending },
+          { label: "Completed", value: completed },
+        ].map(s => (
+          <div key={s.label} className="border border-[#E5E5E3] px-4 py-4 bg-white">
+            <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC] mb-1">{s.label}</p>
+            <p className="text-3xl font-light text-black">{s.value}</p>
           </div>
         ))}
       </div>
 
       {/* Filter tabs */}
-      <div className="flex gap-2">
+      <div className="flex border border-[#E5E5E3] w-fit">
         {[
-          { key: "pending",   label: "⏳ Pending"   },
-          { key: "completed", label: "✅ Completed"  },
-          { key: "",          label: "📋 All"        },
-        ].map(tab => (
+          { key: "pending", label: "Pending" },
+          { key: "completed", label: "Completed" },
+          { key: "", label: "All" },
+        ].map((tab, i) => (
           <button
             key={tab.key}
             onClick={() => setFilter(tab.key)}
-            className={`px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wider transition-all border ${
-              filter === tab.key
-                ? "bg-[#6366F1]/12 text-[#818CF8] border-[#6366F1]/25"
-                : "bg-[#111119] text-slate-600 border-[#1D1D2D] hover:text-slate-300"
+            className={`px-4 py-2 text-[12px] font-semibold transition-colors ${i > 0 ? "border-l border-[#E5E5E3]" : ""} ${
+              filter === tab.key ? "bg-black text-white" : "bg-white text-[#7A7A78] hover:text-black"
             }`}
           >
             {tab.label}
@@ -323,99 +258,81 @@ export default function ServiceRequests() {
       </div>
 
       {/* Table */}
-      <div className="bg-[#111119] border border-[#1D1D2D] rounded-xl overflow-hidden">
+      <div className="border border-[#E5E5E3] overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="w-5 h-5 border-2 border-[#6366F1] border-t-transparent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
           </div>
         ) : error ? (
-          <div className="py-20 text-center px-10">
-            <p className="text-red-400 mb-2 text-sm">{error}</p>
-            <button onClick={fetchRequests} className="text-xs text-[#818CF8] underline">
-              Try again
-            </button>
+          <div className="py-20 text-center px-8">
+            <p className="text-[#C62828] text-[13px] mb-2">{error}</p>
+            <button onClick={fetchRequests} className="text-[12px] text-black underline">Try again</button>
           </div>
         ) : requests.length === 0 ? (
           <div className="py-20 text-center">
-            <p className="text-sm text-slate-700">
-              {filter === "pending" ? "Koi pending request nahi hai. 🎉" : "Koi request nahi mili."}
+            <p className="text-[13px] text-[#AEAEAC]">
+              {filter === "pending" ? "Koi pending request nahi hai 🎉" : "Koi request nahi mili."}
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left min-w-[650px]">
+            <table className="w-full text-left min-w-[600px]">
               <thead>
-                <tr className="border-b border-[#1D1D2D]">
-                  {["Student", "Service", "Status", "Requested At", "Action"].map(h => (
-                    <th key={h} className="py-3.5 px-5 text-[10px] font-semibold text-slate-700 tracking-[0.15em] uppercase">
+                <tr className="border-b border-[#E5E5E3] bg-[#F7F7F5]">
+                  {["Student", "Service", "Status", "Requested At", "Actions"].map((h, i) => (
+                    <th key={h} className={`py-3 px-5 text-[10px] font-semibold text-[#AEAEAC] tracking-[0.18em] uppercase ${i === 4 ? "text-right" : ""}`}>
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {requests.map(req => {
-                  const s = STATUS_COLORS[req.status] || STATUS_COLORS.pending
-                  return (
-                    <tr
-                      key={req.id}
-                      className="border-b border-[#1D1D2D]/60 hover:bg-[#18182A] transition-colors last:border-0"
-                    >
-                      {/* Student */}
-                      <td className="py-4 px-5">
-                        <p className="text-sm font-semibold text-slate-200">{req.student_name}</p>
-                        {req.student_phone && (
-                          <p className="text-[11px] text-[#22D3EE] font-mono">{req.student_phone}</p>
-                        )}
-                      </td>
-
-                      {/* Service */}
-                      <td className="py-4 px-5">
-                        <p className="text-sm text-slate-300">
-                          {CATEGORY_EMOJI[req.category] || "📋"} {req.service_name}
-                        </p>
-                      </td>
-
-                      {/* Status */}
-                      <td className="py-4 px-5">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${s.bg} ${s.text} ${s.border}`}>
-                          {req.status === "pending" ? <Clock size={10} /> : <CheckCircle size={10} />}
-                          {req.status === "pending" ? "Pending" : "Completed"}
-                        </span>
-                      </td>
-
-                      {/* Time */}
-                      <td className="py-4 px-5">
-                        <span className="text-xs text-slate-600 font-mono">{formatTime(req.requested_at)}</span>
-                      </td>
-
-                      {/* Action */}
-                      <td className="py-4 px-5">
-                        <div className="flex items-center gap-2">
+                {requests.map(req => (
+                  <tr key={req.id} className="border-b border-[#E5E5E3] last:border-0 hover:bg-[#F7F7F5] transition-colors">
+                    <td className="py-4 px-5">
+                      <p className="text-[13px] font-semibold text-black">{req.student_name}</p>
+                      {req.student_phone && <p className="text-[11px] text-[#7A7A78] font-mono">{req.student_phone}</p>}
+                    </td>
+                    <td className="py-4 px-5">
+                      <p className="text-[13px] text-[#3D3D3D]">{CATEGORY_EMOJI[req.category] || "📋"} {req.service_name}</p>
+                    </td>
+                    <td className="py-4 px-5">
+                      <span className={`inline-flex items-center gap-1 text-[10px] font-semibold border px-2 py-0.5 ${
+                        req.status === "pending"
+                          ? "border-[#0A0A0A] text-[#0A0A0A]"
+                          : "border-[#2E7D32] text-[#2E7D32] bg-[#2E7D32]/5"
+                      }`}>
+                        {req.status === "pending" ? <Clock size={9} /> : <CheckCircle size={9} />}
+                        {req.status === "pending" ? "Pending" : "Completed"}
+                      </span>
+                    </td>
+                    <td className="py-4 px-5">
+                      <span className="text-[11px] text-[#AEAEAC] font-mono">{formatTime(req.requested_at)}</span>
+                    </td>
+                    <td className="py-4 px-5">
+                      <div className="flex items-center gap-2 justify-end">
+                        <button
+                          title="View Documents"
+                          onClick={() => setSelectedDocsReq(req)}
+                          className="w-8 h-8 border border-[#E5E5E3] text-[#7A7A78] flex items-center justify-center hover:border-black hover:text-black transition-colors"
+                        >
+                          <Paperclip size={13} />
+                        </button>
+                        {req.status === "pending" ? (
                           <button
-                            title="View Documents"
-                            onClick={() => setSelectedDocsReq(req)}
-                            className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex flex-shrink-0 items-center justify-center hover:bg-emerald-500/20 transition-colors"
+                            onClick={() => setSelectedReq(req)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[12px] font-semibold hover:bg-[#3D3D3D] transition-colors whitespace-nowrap"
                           >
-                            <Paperclip size={13} />
+                            <Send size={11} />
+                            Receipt
                           </button>
-                          
-                          {req.status === "pending" ? (
-                            <button
-                              onClick={() => setSelectedReq(req)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#6366F1]/10 text-[#818CF8] border border-[#6366F1]/20 text-xs font-semibold hover:bg-[#6366F1]/20 transition-colors whitespace-nowrap"
-                            >
-                              <Send size={11} />
-                              Receipt
-                            </button>
-                          ) : (
-                            <span className="text-xs text-slate-700 italic px-2">Done</span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
+                        ) : (
+                          <span className="text-[11px] text-[#AEAEAC] italic px-2">Done</span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
