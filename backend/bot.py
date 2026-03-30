@@ -15,50 +15,82 @@ import config
 # ── E-Mitra Services Catalog ─────────────────────────────────────────────────
 
 SERVICES = {
-    "documents": {
-        "label": "📄 Documents & Certificates",
+    "cert": {
+        "label": "📄 Pramaan Patra (Certificates)",
         "services": [
-            "Aadhar Card Update",
-            "PAN Card",
-            "Birth Certificate",
-            "Death Certificate",
-            "Caste Certificate",
-            "Income Certificate",
-            "Domicile Certificate",
-            "Marriage Certificate",
+            "Mool Niwas (Domicile)",
+            "Jati Pramaan (Caste SC/ST/OBC)",
+            "Aay Pramaan (Income)",
+            "Janma/Mrityu (Birth/Death)",
+            "Vivah Panjiyan (Marriage)",
+            "Charitra Pramaan (Character)",
+            "Minority Certificate",
+            "EWS Certificate"
         ],
     },
-    "utility": {
-        "label": "💡 Utility Bills",
+    "id": {
+        "label": "🪪 Pehchan (IDs & Updates)",
+        "services": [
+            "Aadhar Card (New/Update)",
+            "Jan Aadhar (New/Update)",
+            "PAN Card (New/Correction)",
+            "Voter ID (New/Correction)",
+            "PVC Aadhar Card Print",
+            "SSO ID Creation",
+            "Ration Card Correction",
+            "Passport Apply"
+        ],
+    },
+    "bills": {
+        "label": "💡 Bills, Recharge & Taxes",
         "services": [
             "Bijli Bill (Electricity)",
             "Pani Bill (Water)",
-            "Gas Connection",
+            "Mobile/DTH Recharge",
+            "Gas Cylinder Booking",
+            "FASTag Recharge",
+            "ITR (Income Tax Return)",
+            "CM Helpline Sikayat",
+            "Traffic Challan Pay"
+        ],
+    },
+    "forms": {
+        "label": "🎓 Siksha & Exams (Forms)",
+        "services": [
+            "Govt. Job Form (RPSC/RSMSSB)",
+            "College Admission Form",
+            "Scholarship (Chatravriti)",
+            "RTE Form (Free Education)",
+            "Gargi Puraskar Form",
+            "REET/CET/Police Form",
+            "Rojgar Panjiyan",
+            "Berojgari Bhatta"
         ],
     },
     "schemes": {
-        "label": "🏛️ Government Schemes",
+        "label": "🏛️ Yojana & Pension",
         "services": [
-            "Ration Card",
-            "Jan Aadhaar / Bhamashah",
-            "Scholarship Form",
+            "Vridhavastha Pension",
+            "Vidhwa Pension",
+            "Viklang Pension",
+            "Palanhar Yojana",
+            "Shramik/Labour Card",
             "PM Awas Yojana",
+            "PM Kisaan Samman Nidhi",
+            "Ayushman/Chiranjeevi Card"
         ],
     },
-    "license": {
-        "label": "🚗 License & Passport",
+    "land_auto": {
+        "label": "🌾 Krishi, Khata & Vahan",
         "services": [
-            "Driving License",
-            "Passport Apply",
-            "Vehicle RC",
-        ],
-    },
-    "land": {
-        "label": "🌾 Land Records",
-        "services": [
-            "Khasra / Jamabandi",
-            "Patta / Nakal",
-            "Mutation (Namantrann)",
+            "Khasra/Jamabandi Nakal",
+            "Tarbandi Subsidy",
+            "Fasal Bima (Crop Insurance)",
+            "Krishi Yantra Subsidy",
+            "Driving License (DL)",
+            "Vahan RC Print/Transfer",
+            "Police Verification",
+            "Hasiyat Pramaan (Solvency)"
         ],
     },
 }
