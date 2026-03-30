@@ -84,8 +84,8 @@ export function Sidebar() {
 export function BottomNav() {
   const location = useLocation()
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[#E5E5E3]">
-      <div className="flex items-center justify-around px-1 py-1">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[#E5E5E3] safe-bottom" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      <div className="flex items-center justify-around px-1 py-2">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path
           return (

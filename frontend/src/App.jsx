@@ -49,7 +49,7 @@ function App() {
         <CommandPalette onClose={() => setIsCommandPaletteOpen(false)} />
       )}
 
-      <main className={`flex-1 ${!isLoginPage ? "md:ml-[220px] pb-20 md:pb-0" : ""} min-h-screen flex flex-col`}>
+      <main className={`flex-1 ${!isLoginPage ? "md:ml-[220px] pb-24 md:pb-0" : ""} min-h-screen flex flex-col`}>
         {/* Mobile top bar */}
         {!isLoginPage && (
           <div className="md:hidden flex items-center gap-3 px-5 py-4 border-b border-[#E5E5E3] bg-white sticky top-0 z-40">
