@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from "react"
-import { Send, CheckCircle, Loader2, Bot, Users, MessageSquare, Clock, Calendar, X, Trash2 } from "lucide-react"
+import { Send, CheckCircle, Loader2, Bot, Users, MessageSquare, Clock, Calendar, Trash2, ArrowRight } from "lucide-react"
 import { getStats, sendNotification, scheduleBroadcast, getSchedules, deleteSchedule } from "../api"
-import { EXAM_COLORS } from "../constants/examColors"
 import Stepper, { Step } from "../components/Stepper"
 
 const EXAMS = ["JEE", "NEET", "SSC", "UPSC", "CUET"]
 const CHAR_LIMIT = 4096
 
+// ── Scheduled List Tab ─────────────────────────────────────────────────────────
 function ScheduledList() {
   const [schedules, setSchedules] = useState([])
   const [loading, setLoading] = useState(true)
@@ -27,48 +27,48 @@ function ScheduledList() {
       await deleteSchedule(id)
       fetchSchedules()
     } catch {
-      alert("Failed to delete schedule.")
+      alert("Failed to delete.")
     }
   }
 
   return (
-    <div className="bg-[#111119] border border-[#1D1D2D] rounded-xl overflow-hidden mt-6">
-      <div className="px-6 py-4 border-b border-[#1D1D2D] bg-[#0C0C12]">
-        <h2 className="text-sm font-bold text-white flex items-center gap-2">
-          <Calendar size={16} className="text-[#818CF8]" />
-          Upcoming Broadcasts
-        </h2>
+    <div className="border border-[#E5E5E3]">
+      <div className="px-6 py-4 border-b border-[#E5E5E3] bg-[#F7F7F5] flex items-center gap-2">
+        <Calendar size={14} className="text-[#7A7A78]" />
+        <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#7A7A78]">Upcoming Broadcasts</p>
       </div>
-      
+
       {loading ? (
-        <div className="py-20 flex justify-center"><Loader2 className="animate-spin text-[#6366F1]" /></div>
+        <div className="py-16 flex justify-center">
+          <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+        </div>
       ) : schedules.length === 0 ? (
-        <div className="py-20 text-center text-sm text-slate-500">Koi scheduled broadcast nahi hai.</div>
+        <div className="py-16 text-center">
+          <p className="text-[13px] text-[#AEAEAC]">No scheduled broadcasts.</p>
+        </div>
       ) : (
-        <div className="divide-y divide-[#1D1D2D]">
+        <div>
           {schedules.map(s => (
-            <div key={s.id} className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[#18182A] transition-colors">
+            <div key={s.id} className="flex items-start justify-between px-6 py-4 border-b border-[#E5E5E3] last:border-0 hover:bg-[#F7F7F5] transition-colors">
               <div className="space-y-1 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-[#818CF8] bg-[#6366F1]/10 px-2 py-0.5 rounded border border-[#6366F1]/20">
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] font-bold tracking-wider uppercase border border-[#0A0A0A] px-2 py-0.5 text-[#0A0A0A]">
                     {s.target_exam === "ALL" ? "All Students" : s.target_exam}
                   </span>
-                  <span className="text-xs text-slate-500 flex items-center gap-1">
-                    <Clock size={12} />
+                  <span className="text-[11px] text-[#7A7A78] flex items-center gap-1 font-mono">
+                    <Clock size={11} />
                     {new Date(s.run_at + "Z").toLocaleString()}
                   </span>
                 </div>
-                <p className="text-sm text-slate-300 line-clamp-2 max-w-2xl">{s.message_text}</p>
+                <p className="text-[13px] text-[#3D3D3D] line-clamp-2 max-w-xl">{s.message_text}</p>
               </div>
-              <div>
-                <button
-                  onClick={() => handleDelete(s.id)}
-                  className="w-8 h-8 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500/20 transition-colors"
-                  title="Delete Schedule"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
+              <button
+                onClick={() => handleDelete(s.id)}
+                className="ml-4 w-8 h-8 flex items-center justify-center border border-[#E5E5E3] text-[#AEAEAC] hover:border-black hover:text-black transition-colors flex-shrink-0"
+                title="Delete"
+              >
+                <Trash2 size={13} />
+              </button>
             </div>
           ))}
         </div>
@@ -77,8 +77,9 @@ function ScheduledList() {
   )
 }
 
+// ── Main Component ─────────────────────────────────────────────────────────────
 export default function SendNotification() {
-  const [activeTab, setActiveTab] = useState("new") // "new" or "scheduled"
+  const [activeTab, setActiveTab] = useState("new")
   const [stats, setStats] = useState(null)
   const [selectedExams, setSelectedExams] = useState([])
   const [message, setMessage] = useState("")
@@ -92,12 +93,9 @@ export default function SendNotification() {
   }, [])
 
   const toggleExam = (exam) => {
-    if (selectedExams.includes("ALL")) {
-      setSelectedExams([exam])
-      return
-    }
-    setSelectedExams((prev) =>
-      prev.includes(exam) ? prev.filter((item) => item !== exam) : [...prev, exam]
+    if (selectedExams.includes("ALL")) { setSelectedExams([exam]); return }
+    setSelectedExams(prev =>
+      prev.includes(exam) ? prev.filter(e => e !== exam) : [...prev, exam]
     )
   }
 
@@ -113,32 +111,25 @@ export default function SendNotification() {
     if (!message.trim() || targetCount === 0 || status === "sending") return
     setStatus("sending")
     setErrorMsg("")
-
     try {
       const targets = selectedExams.includes("ALL") ? ["ALL"] : selectedExams
-
       for (const exam of targets) {
         let response
         if (runAt) {
-          // Convert local datetime to UTC string for backend storage
-          const utcDateStr = new Date(runAt).toISOString().slice(0, 19).replace('T', ' ')
+          const utcDateStr = new Date(runAt).toISOString().slice(0, 19).replace("T", " ")
           response = await scheduleBroadcast(exam, message, utcDateStr)
         } else {
           response = await sendNotification(exam, message)
         }
-        
-        if (!response.success) {
-          throw new Error(response.error || `Failed for ${exam}`)
-        }
+        if (!response.success) throw new Error(response.error || `Failed for ${exam}`)
       }
-
       setStatus("success")
       setTimeout(() => {
         setStatus("idle")
         setMessage("")
         setSelectedExams([])
         setRunAt("")
-        setStepperKey((key) => key + 1)
+        setStepperKey(k => k + 1)
       }, 2500)
     } catch (error) {
       setStatus("error")
@@ -146,35 +137,40 @@ export default function SendNotification() {
     }
   }
 
-  // Calculate local minimum datetime for date-picker
   const getMinDateTime = () => {
     const d = new Date()
-    d.setMinutes(d.getMinutes() - d.getTimezoneOffset() + 5) // +5 mins buffer
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset() + 5)
     return d.toISOString().slice(0, 16)
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      {/* Header */}
+      <div className="flex items-end justify-between border-b border-[#E5E5E3] pb-6">
         <div>
-          <p className="text-[10px] text-[#818CF8] font-semibold tracking-[0.15em] uppercase mb-1">Broadcast</p>
-          <h1 className="text-2xl font-bold text-white">Send Notification</h1>
-          <p className="text-sm text-slate-600 mt-0.5">Broadcast instantly or schedule for later.</p>
+          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC] mb-2">Broadcast</p>
+          <h1 className="text-3xl font-light text-black tracking-tight">Send Notification</h1>
+          <p className="text-[13px] text-[#7A7A78] mt-1">Send instantly or schedule for later.</p>
         </div>
-        
-        <div className="flex bg-[#111119] border border-[#1D1D2D] rounded-lg p-1">
+
+        {/* Tabs */}
+        <div className="flex border border-[#E5E5E3]">
           <button
             onClick={() => setActiveTab("new")}
-            className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-              activeTab === "new" ? "bg-[#6366F1] text-white" : "text-slate-500 hover:text-slate-300"
+            className={`px-4 py-2 text-[12px] font-semibold transition-colors ${
+              activeTab === "new"
+                ? "bg-black text-white"
+                : "bg-white text-[#7A7A78] hover:text-black"
             }`}
           >
-            New Broadcast
+            New
           </button>
           <button
             onClick={() => setActiveTab("scheduled")}
-            className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-              activeTab === "scheduled" ? "bg-[#6366F1] text-white" : "text-slate-500 hover:text-slate-300"
+            className={`px-4 py-2 text-[12px] font-semibold transition-colors border-l border-[#E5E5E3] ${
+              activeTab === "scheduled"
+                ? "bg-black text-white"
+                : "bg-white text-[#7A7A78] hover:text-black"
             }`}
           >
             Schedules
@@ -189,207 +185,190 @@ export default function SendNotification() {
           key={stepperKey}
           initialStep={1}
           backButtonText="Back"
-          nextButtonText="Next"
+          nextButtonText="Continue"
           onFinalStepCompleted={handleSend}
         >
+          {/* ── Step 1: Audience + Schedule ─────────────────── */}
           <Step>
-             <div className="space-y-8">
-               {/* Audience */}
-               <div className="space-y-5">
-                 <div className="flex items-center gap-2">
-                   <Users size={15} className="text-[#818CF8]" />
-                   <h2 className="text-base font-bold text-white">Select Target Audience</h2>
-                 </div>
-                 <div className="flex flex-wrap gap-2">
-                   <button
-                     onClick={selectAll}
-                     className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-all ${
-                       selectedExams.includes("ALL")
-                         ? "bg-[#6366F1]/15 border-[#6366F1]/35 text-[#818CF8]"
-                         : "bg-[#1D1D2D] border-[#1D1D2D] text-slate-600 hover:text-slate-300 hover:border-[#2a2a3f]"
-                     }`}
-                   >
-                     All Students
-                   </button>
-                   {EXAMS.map((exam) => {
-                     const active = selectedExams.includes("ALL") || selectedExams.includes(exam)
-                     const color = EXAM_COLORS[exam]
-
-                     return (
-                       <button
-                         key={exam}
-                         onClick={() => toggleExam(exam)}
-                         className="px-4 py-2 rounded-lg text-sm font-semibold border transition-all"
-                         style={{
-                           backgroundColor: active ? `${color}15` : "#1D1D2D",
-                           borderColor: active ? `${color}45` : "#1D1D2D",
-                           color: active ? color : "#475569",
-                         }}
-                       >
-                         {exam}
-                       </button>
-                     )
-                   })}
-                 </div>
-                 <div className="flex items-center gap-2 p-3 bg-[#0C0C12] border border-[#1D1D2D] rounded-lg">
-                   <div className="w-1.5 h-1.5 rounded-full bg-[#6366F1]"></div>
-                   <span className="text-sm text-slate-500">
-                     <span className="font-bold text-white">{targetCount}</span> students will receive this message
-                   </span>
-                 </div>
-               </div>
-
-               {/* Schedule Option */}
-               <div className="space-y-3 pt-6 border-t border-[#1D1D2D]">
-                 <div className="flex items-center gap-2">
-                   <Clock size={15} className="text-emerald-400" />
-                   <h2 className="text-base font-bold text-white">Schedule Time (Optional)</h2>
-                 </div>
-                 <p className="text-xs text-slate-500 mb-2">Agar turant bhejna hai to isko khaali chhod dein.</p>
-                 <div className="flex items-center gap-3">
-                    <input
-                      type="datetime-local"
-                      min={getMinDateTime()}
-                      value={runAt}
-                      onChange={(e) => setRunAt(e.target.value)}
-                      className="bg-[#0C0C12] border border-[#1D1D2D] rounded-lg px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-[#6366F1]/40"
-                    />
-                    {runAt && (
-                      <button onClick={() => setRunAt("")} className="text-xs text-red-400 hover:underline">Clear</button>
-                    )}
-                 </div>
-               </div>
-             </div>
-          </Step>
-
-          <Step>
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <MessageSquare size={15} className="text-[#818CF8]" />
-                <h2 className="text-base font-bold text-white">Write Your Message</h2>
-              </div>
-              <textarea
-                value={message}
-                onChange={(event) => {
-                  if (event.target.value.length <= CHAR_LIMIT) {
-                    setMessage(event.target.value)
-                  }
-                }}
-                placeholder={"Important Update!\n\nAaj ka Mock Test raat 8 baje hoga.\n\n- E-Mitra Team"}
-                rows={7}
-                className={`w-full bg-[#0C0C12] border rounded-lg p-4 text-sm text-slate-200 placeholder:text-slate-700 focus:outline-none resize-none transition-colors ${
-                  message.length > CHAR_LIMIT * 0.9
-                    ? "border-red-500/40 focus:border-red-500/60"
-                    : "border-[#1D1D2D] focus:border-[#6366F1]/40"
-                }`}
-              />
-              <div className="flex justify-between items-center text-xs">
-                <span className={message.trim() ? "text-[#4ADE80]" : "text-slate-700"}>
-                  {message.trim() ? "Ready" : "Write a message above"}
-                </span>
+            <div className="space-y-8">
+              {/* Audience */}
+              <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  {message.length > CHAR_LIMIT * 0.9 && (
-                    <span className="text-red-400 text-[10px] font-medium animate-pulse">
-                      {CHAR_LIMIT - message.length} left
-                    </span>
-                  )}
-                  <span
-                    className={`font-mono ${
-                      message.length > CHAR_LIMIT * 0.9
-                        ? "text-red-400"
-                        : message.length > CHAR_LIMIT * 0.75
-                          ? "text-yellow-500"
-                          : "text-slate-700"
+                  <Users size={14} className="text-[#7A7A78]" />
+                  <h2 className="text-[13px] font-semibold text-black tracking-wide uppercase">Target Audience</h2>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {/* All Students */}
+                  <button
+                    onClick={selectAll}
+                    className={`px-4 py-2 text-[13px] font-semibold border transition-colors ${
+                      selectedExams.includes("ALL")
+                        ? "bg-black text-white border-black"
+                        : "bg-white text-[#7A7A78] border-[#E5E5E3] hover:border-black hover:text-black"
                     }`}
                   >
-                    {message.length} / {CHAR_LIMIT}
+                    All Students
+                  </button>
+
+                  {EXAMS.map(exam => {
+                    const active = selectedExams.includes("ALL") || selectedExams.includes(exam)
+                    return (
+                      <button
+                        key={exam}
+                        onClick={() => toggleExam(exam)}
+                        className={`px-4 py-2 text-[13px] font-semibold border transition-colors ${
+                          active
+                            ? "bg-black text-white border-black"
+                            : "bg-white text-[#7A7A78] border-[#E5E5E3] hover:border-black hover:text-black"
+                        }`}
+                      >
+                        {exam}
+                      </button>
+                    )
+                  })}
+                </div>
+
+                {/* Recipient count */}
+                <div className="flex items-center gap-2 px-4 py-3 bg-[#F7F7F5] border border-[#E5E5E3]">
+                  <div className="w-1.5 h-1.5 bg-black" />
+                  <span className="text-[13px] text-[#3D3D3D]">
+                    <span className="font-semibold text-black">{targetCount}</span> students will receive this
                   </span>
+                </div>
+              </div>
+
+              {/* Schedule time */}
+              <div className="space-y-3 pt-6 border-t border-[#E5E5E3]">
+                <div className="flex items-center gap-2">
+                  <Clock size={14} className="text-[#7A7A78]" />
+                  <h2 className="text-[13px] font-semibold text-black tracking-wide uppercase">Schedule Time</h2>
+                  <span className="text-[10px] text-[#AEAEAC] font-medium border border-[#E5E5E3] px-1.5 py-0.5">Optional</span>
+                </div>
+                <p className="text-[12px] text-[#AEAEAC]">Leave blank to send immediately.</p>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="datetime-local"
+                    min={getMinDateTime()}
+                    value={runAt}
+                    onChange={e => setRunAt(e.target.value)}
+                    className="border border-[#E5E5E3] px-4 py-2.5 text-[13px] text-black bg-white focus:outline-none focus:border-black transition-colors"
+                  />
+                  {runAt && (
+                    <button onClick={() => setRunAt("")} className="text-[12px] text-[#7A7A78] hover:text-black border-b border-dashed border-[#AEAEAC] hover:border-black transition-colors">
+                      Clear
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           </Step>
 
+          {/* ── Step 2: Message ──────────────────────────────── */}
           <Step>
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <Bot size={15} className="text-[#818CF8]" />
-                <h2 className="text-base font-bold text-white">Preview & {runAt ? "Schedule" : "Send"}</h2>
+                <MessageSquare size={14} className="text-[#7A7A78]" />
+                <h2 className="text-[13px] font-semibold text-black tracking-wide uppercase">Message</h2>
+              </div>
+              <textarea
+                value={message}
+                onChange={e => { if (e.target.value.length <= CHAR_LIMIT) setMessage(e.target.value) }}
+                placeholder={"Important Update!\n\nAaj ka Mock Test raat 8 baje hoga.\n\n— E-Mitra Team"}
+                rows={8}
+                className={`w-full border px-4 py-3 text-[13px] text-black placeholder:text-[#AEAEAC] bg-white focus:outline-none resize-none transition-colors leading-relaxed ${
+                  message.length > CHAR_LIMIT * 0.9 ? "border-[#C62828]" : "border-[#E5E5E3] focus:border-black"
+                }`}
+              />
+              <div className="flex justify-between items-center">
+                <span className={`text-[11px] font-medium ${message.trim() ? "text-[#2E7D32]" : "text-[#AEAEAC]"}`}>
+                  {message.trim() ? "✓ Ready" : "Write a message above"}
+                </span>
+                <span className={`text-[11px] font-mono ${
+                  message.length > CHAR_LIMIT * 0.9 ? "text-[#C62828]" : "text-[#AEAEAC]"
+                }`}>
+                  {message.length} / {CHAR_LIMIT}
+                </span>
+              </div>
+            </div>
+          </Step>
+
+          {/* ── Step 3: Preview & Send ───────────────────────── */}
+          <Step>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Bot size={14} className="text-[#7A7A78]" />
+                <h2 className="text-[13px] font-semibold text-black tracking-wide uppercase">
+                  Preview & {runAt ? "Schedule" : "Send"}
+                </h2>
               </div>
 
-              <div className="bg-[#17212B] rounded-xl border border-[#2a3b5c] p-4">
-                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-[#2a3b5c]/60">
-                  <div className="w-8 h-8 bg-[#6366F1] rounded-full flex items-center justify-center">
-                    <Bot size={15} className="text-white" />
+              {/* Telegram-style preview */}
+              <div className="border border-[#E5E5E3] p-4 bg-[#F7F7F5]">
+                <div className="flex items-center gap-2 mb-3 pb-3 border-b border-[#E5E5E3]">
+                  <div className="w-7 h-7 bg-black flex items-center justify-center">
+                    <Bot size={13} className="text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-white">E-Mitra Seva</p>
-                    <p className="text-[11px] text-[#8ca4d4]">bot</p>
+                    <p className="text-[12px] font-semibold text-black">E-Mitra Seva</p>
+                    <p className="text-[10px] text-[#AEAEAC]">bot</p>
                   </div>
                 </div>
-                <div className="bg-[#182533] border border-[#2a3b5c] rounded-xl rounded-tl-none px-4 py-3 max-w-[90%] text-sm text-white">
+                <div className="bg-white border border-[#E5E5E3] px-4 py-3 max-w-[88%] text-[13px] text-black leading-relaxed">
                   {message.trim() ? (
-                    message.split("\n").map((line, index) => <div key={index}>{line || <br />}</div>)
+                    message.split("\n").map((line, i) => <div key={i}>{line || <br />}</div>)
                   ) : (
-                    <span className="text-[#8ca4d4] italic text-xs">No message yet...</span>
+                    <span className="text-[#AEAEAC] italic text-[12px]">No message yet...</span>
                   )}
-                  <div className="text-[10px] text-[#8ca4d4] text-right mt-1.5">
+                  <div className="text-[10px] text-[#AEAEAC] text-right mt-2 font-mono">
                     {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-xs text-slate-600 px-1">
+              {/* Meta info */}
+              <div className="flex items-center justify-between text-[11px] text-[#7A7A78] px-1">
                 <span>
-                  To:{" "}
-                  <span className="text-slate-400 font-semibold">
+                  To: <span className="text-black font-semibold">
                     {selectedExams.includes("ALL") ? "All Students" : selectedExams.join(", ") || "None"}
                   </span>
                 </span>
-                <span className="flex items-center gap-3">
+                <div className="flex items-center gap-3">
                   {runAt && (
-                      <span className="flex items-center gap-1 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                          <Clock size={10} />
-                          {new Date(runAt).toLocaleString()}
-                      </span>
+                    <span className="flex items-center gap-1 text-[#3D3D3D] border border-[#E5E5E3] px-2 py-0.5">
+                      <Clock size={10} />
+                      {new Date(runAt).toLocaleString()}
+                    </span>
                   )}
-                  <span>
-                    <span className="text-white font-bold">{targetCount}</span> recipients
-                  </span>
-                </span>
+                  <span><span className="text-black font-semibold">{targetCount}</span> recipients</span>
+                </div>
               </div>
 
               {errorMsg && (
-                <div className="text-red-400 text-xs bg-red-400/8 border border-red-400/20 p-3 rounded-lg">
+                <div className="text-[#C62828] text-[12px] border border-[#FECACA] bg-[#FEF2F2] p-3">
                   {errorMsg}
                 </div>
               )}
 
+              {/* Send button */}
               <button
                 onClick={handleSend}
                 disabled={!message.trim() || targetCount === 0 || status === "sending"}
-                className={`w-full py-3 rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+                className={`w-full py-3 font-semibold text-[13px] flex items-center justify-center gap-2 transition-colors ${
                   !message.trim() || targetCount === 0
-                    ? "bg-[#1D1D2D] text-slate-700 cursor-not-allowed"
+                    ? "bg-[#F7F7F5] text-[#AEAEAC] cursor-not-allowed border border-[#E5E5E3]"
                     : status === "success"
-                      ? "bg-[#4ADE80] text-black"
+                      ? "bg-[#2E7D32] text-white border border-[#2E7D32]"
                       : status === "sending"
-                        ? "bg-[#6366F1]/60 text-white cursor-wait"
-                        : "bg-[#6366F1] text-white hover:bg-[#5558E3]"
+                        ? "bg-[#3D3D3D] text-white cursor-wait border border-[#3D3D3D]"
+                        : "bg-black text-white hover:bg-[#3D3D3D] border border-black"
                 }`}
               >
-                {status === "sending" && (
-                  <>
-                    <Loader2 size={16} className="animate-spin" /> {runAt ? "Scheduling..." : "Sending..."}
-                  </>
-                )}
-                {status === "success" && (
-                  <>
-                    <CheckCircle size={16} /> {runAt ? "Scheduled Successfully!" : "Sent Successfully!"}
-                  </>
-                )}
+                {status === "sending" && <><Loader2 size={15} className="animate-spin" /> {runAt ? "Scheduling..." : "Sending..."}</>}
+                {status === "success" && <><CheckCircle size={15} /> {runAt ? "Scheduled!" : "Sent!"}</>}
                 {(status === "idle" || status === "error") && (
                   <>
-                    {runAt ? <Clock size={16} /> : <Send size={16} />} 
+                    {runAt ? <Clock size={15} /> : <ArrowRight size={15} />}
                     {runAt ? "Schedule for Later" : `Send to ${targetCount} Students`}
                   </>
                 )}

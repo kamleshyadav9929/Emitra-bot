@@ -7,9 +7,8 @@
 
 .step-circle-container {
   width: 100%;
-  border-radius: 1rem;
-  background-color: #0F0F17;
-  border: 1px solid #1A1A28;
+  background-color: #FFFFFF;
+  border: 1px solid #E5E5E3;
   overflow: hidden;
 }
 
@@ -17,9 +16,9 @@
   display: flex;
   width: 100%;
   align-items: center;
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid #1A1A28;
-  background-color: #09090E;
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid #E5E5E3;
+  background-color: #F7F7F5;
 }
 
 .step-content-default {
@@ -32,9 +31,9 @@
 }
 
 .footer-container {
-  padding: 1.25rem 2rem;
-  border-top: 1px solid #1A1A28;
-  background-color: #09090E;
+  padding: 1rem 2rem;
+  border-top: 1px solid #E5E5E3;
+  background-color: #F7F7F5;
 }
 
 .footer-nav {
@@ -50,50 +49,51 @@
 }
 
 .back-button {
-  transition: all 200ms;
-  border-radius: 0.5rem;
+  transition: all 150ms;
   padding: 0.5rem 1.25rem;
-  color: #64748b;
+  color: #7A7A78;
   cursor: pointer;
   background: transparent;
-  border: 1px solid #1A1A28;
-  font-size: 0.875rem;
+  border: 1px solid #E5E5E3;
+  font-size: 0.8125rem;
   font-weight: 500;
+  font-family: inherit;
 }
 
 .back-button:hover {
-  color: #e2e8f0;
-  border-color: #2a2a3a;
-  background: #1A1A28;
+  color: #0A0A0A;
+  border-color: #0A0A0A;
+  background: transparent;
 }
 
 .back-button.inactive {
   pointer-events: none;
-  opacity: 0.4;
+  opacity: 0.35;
 }
 
 .next-button {
-  transition: all 200ms;
+  transition: all 150ms;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  border-radius: 0.5rem;
-  background-color: #6366F1;
-  color: #fff;
+  background-color: #0A0A0A;
+  color: #FFFFFF;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   padding: 0.5rem 1.5rem;
   cursor: pointer;
-  border: none;
+  border: 1px solid #0A0A0A;
+  font-family: inherit;
 }
 
 .next-button:hover {
-  background-color: #5558E3;
+  background-color: #3D3D3D;
+  border-color: #3D3D3D;
 }
 
 .next-button:active {
-  background-color: #4547C9;
+  background-color: #000000;
 }
 
 .step-indicator {
@@ -113,26 +113,25 @@
 }
 
 .active-dot {
-  height: 0.6rem;
-  width: 0.6rem;
+  height: 0.55rem;
+  width: 0.55rem;
   border-radius: 9999px;
   background-color: #fff;
 }
 
 .step-number {
   font-size: 0.8rem;
-  color: #64748b;
+  color: #AEAEAC;
 }
 
 .step-connector {
   position: relative;
   margin-left: 0.5rem;
   margin-right: 0.5rem;
-  height: 2px;
+  height: 1px;
   flex: 1;
   overflow: hidden;
-  border-radius: 0.25rem;
-  background-color: #1A1A28;
+  background-color: #E5E5E3;
 }
 
 .step-connector-inner {
