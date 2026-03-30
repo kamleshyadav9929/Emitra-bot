@@ -39,6 +39,12 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+html {
+  height: 100%;
+  /* Prevent iOS bounce/overscroll causing layout shift */
+  overscroll-behavior: none;
+}
+
 body {
   background-color: #FFFFFF;
   color: #0A0A0A;
@@ -47,6 +53,16 @@ body {
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Prevent extra height from mobile browser chrome */
+  min-height: 100%;
+  min-height: 100dvh;
+}
+
+#root {
+  /* Root takes at least full viewport, never more than needed */
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }
