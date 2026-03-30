@@ -7,5 +7,6 @@ load_dotenv(env_path)
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 ADMIN_SECRET_KEY = os.getenv("ADMIN_SECRET_KEY", "emitra2025")
+WHATSAPP_NUMBER = os.getenv("WHATSAPP_NUMBER", "916377964293")
 # Render automatically injects the PORT environment variable
 FLASK_PORT = int(os.getenv("PORT", os.getenv("FLASK_PORT", 5000)))

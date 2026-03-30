@@ -1,16 +1,26 @@
 import sqlite3
 import os
+import threading
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "emitra.db")
 
+# Thread-local storage for connections (safe for multi-threaded Flask)
+_local = threading.local()
+
+
 def get_connection():
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    return conn
+    """Return a thread-local SQLite connection (avoids repeated open/close overhead)."""
+    if not hasattr(_local, "conn") or _local.conn is None:
+        _local.conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+        _local.conn.row_factory = sqlite3.Row
+        _local.conn.execute("PRAGMA journal_mode=WAL")
+    return _local.conn
+
 
 def init_db():
     conn = get_connection()
     cursor = conn.cursor()
+
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS students (
             telegram_id     TEXT PRIMARY KEY,
@@ -23,30 +33,47 @@ def init_db():
             last_active     DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-    # Migration: add phone_number column if it doesn't exist (for existing databases)
+
+    # Migration: add phone_number column if it doesn't exist
     try:
         cursor.execute("ALTER TABLE students ADD COLUMN phone_number TEXT")
     except Exception:
-        pass  # Column already exists, ignore
+        pass
+
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS message_logs (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
-            target_exam     TEXT NOT NULL,
-            message_text    TEXT NOT NULL,
+            id               INTEGER PRIMARY KEY AUTOINCREMENT,
+            target_exam      TEXT NOT NULL,
+            message_text     TEXT NOT NULL,
             total_recipients INTEGER DEFAULT 0,
-            sent_at         DATETIME DEFAULT CURRENT_TIMESTAMP
+            sent_at          DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+
+    # ── NEW: Service Requests table ──────────────────────────────────────────
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS service_requests (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            telegram_id  TEXT NOT NULL,
+            service_name TEXT NOT NULL,
+            category     TEXT NOT NULL,
+            status       TEXT DEFAULT 'pending',
+            requested_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            completed_at DATETIME
+        )
+    ''')
+
     conn.commit()
-    conn.close()
+
+
+# ── Student helpers ──────────────────────────────────────────────────────────
 
 def is_new_user(telegram_id):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT 1 FROM students WHERE telegram_id = ?", (str(telegram_id),))
-    result = cursor.fetchone()
-    conn.close()
-    return result is None
+    return cursor.fetchone() is None
+
 
 def register_user(telegram_id, name, username):
     conn = get_connection()
@@ -56,7 +83,7 @@ def register_user(telegram_id, name, username):
         VALUES (?, ?, ?, 1)
     ''', (str(telegram_id), name, username))
     conn.commit()
-    conn.close()
+
 
 def update_phone_number(telegram_id, phone_number):
     conn = get_connection()
@@ -67,7 +94,7 @@ def update_phone_number(telegram_id, phone_number):
         WHERE telegram_id = ?
     ''', (phone_number, str(telegram_id)))
     conn.commit()
-    conn.close()
+
 
 def update_exam_preference(telegram_id, exam):
     conn = get_connection()
@@ -78,48 +105,66 @@ def update_exam_preference(telegram_id, exam):
         WHERE telegram_id = ?
     ''', (exam, str(telegram_id)))
     conn.commit()
-    conn.close()
+
+
+def get_student(telegram_id):
+    """Fetch a single student by telegram_id."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM students WHERE telegram_id = ?", (str(telegram_id),))
+    row = cursor.fetchone()
+    return dict(row) if row else None
+
 
 def get_students_by_exam(exam):
+    """
+    Returns students to notify for a given exam target.
+    - exam = "ALL"  → everyone who has selected ANY exam (excludes NONE)
+    - exam = "JEE"  → JEE students + students who opted into ALL
+    """
     conn = get_connection()
     cursor = conn.cursor()
     if exam == "ALL":
-        cursor.execute("SELECT * FROM students")
+        cursor.execute("SELECT * FROM students WHERE exam_preference != 'NONE'")
     else:
-        cursor.execute("SELECT * FROM students WHERE exam_preference = ?", (exam,))
-    students = [dict(row) for row in cursor.fetchall()]
-    conn.close()
-    return students
+        cursor.execute(
+            "SELECT * FROM students WHERE exam_preference = ? OR exam_preference = 'ALL'",
+            (exam,),
+        )
+    return [dict(row) for row in cursor.fetchall()]
+
 
 def get_all_students():
-    return get_students_by_exam("ALL")
+    """Returns every student (for admin listing, includes NONE)."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM students")
+    return [dict(row) for row in cursor.fetchall()]
+
 
 def get_stats():
     conn = get_connection()
     cursor = conn.cursor()
+
     cursor.execute("SELECT COUNT(*) as total FROM students")
     total_row = cursor.fetchone()
-    total = total_row['total'] if total_row else 0
-    
-    cursor.execute("SELECT exam_preference, COUNT(*) as count FROM students GROUP BY exam_preference")
+    total = total_row["total"] if total_row else 0
+
+    cursor.execute(
+        "SELECT exam_preference, COUNT(*) as count FROM students GROUP BY exam_preference"
+    )
     rows = cursor.fetchall()
-    
-    by_exam = {
-        "JEE": 0, "NEET": 0, "SSC": 0, "UPSC": 0, "CUET": 0, "ALL": 0, "NONE": 0
-    }
+
+    by_exam = {"JEE": 0, "NEET": 0, "SSC": 0, "UPSC": 0, "CUET": 0, "ALL": 0, "NONE": 0}
     for row in rows:
-        by_exam[row['exam_preference']] = row['count']
-    
-    # "ALL" button in Telegram allows receiving updates for all exams, they also count as students.
-    # Total overall includes everyone.
-    by_exam["ALL"] = by_exam.get("ALL", 0) 
-    
-    stats = {
-        "total_students": total,
-        "by_exam": by_exam
-    }
-    conn.close()
-    return stats
+        pref = row["exam_preference"]
+        if pref in by_exam:
+            by_exam[pref] = row["count"]
+
+    return {"total_students": total, "by_exam": by_exam}
+
+
+# ── Message log helpers ──────────────────────────────────────────────────────
 
 def log_message(target_exam, message_text, count):
     conn = get_connection()
@@ -129,12 +174,56 @@ def log_message(target_exam, message_text, count):
         VALUES (?, ?, ?)
     ''', (target_exam, message_text, count))
     conn.commit()
-    conn.close()
+
 
 def get_logs():
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM message_logs ORDER BY sent_at DESC")
-    logs = [dict(row) for row in cursor.fetchall()]
-    conn.close()
-    return logs
+    return [dict(row) for row in cursor.fetchall()]
+
+
+# ── Service Request helpers ──────────────────────────────────────────────────
+
+def add_service_request(telegram_id, service_name, category):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO service_requests (telegram_id, service_name, category)
+        VALUES (?, ?, ?)
+    ''', (str(telegram_id), service_name, category))
+    conn.commit()
+    return cursor.lastrowid
+
+
+def get_service_requests(status=None):
+    """Fetch all service requests, optionally filtered by status."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    if status:
+        cursor.execute(
+            "SELECT * FROM service_requests WHERE status = ? ORDER BY requested_at DESC",
+            (status,)
+        )
+    else:
+        cursor.execute("SELECT * FROM service_requests ORDER BY requested_at DESC")
+    return [dict(row) for row in cursor.fetchall()]
+
+
+def get_pending_count():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) as cnt FROM service_requests WHERE status = 'pending'")
+    row = cursor.fetchone()
+    return row["cnt"] if row else 0
+
+
+def complete_service_request(request_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE service_requests
+        SET status = 'completed', completed_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+    ''', (request_id,))
+    conn.commit()

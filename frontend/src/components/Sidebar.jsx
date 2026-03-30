@@ -1,12 +1,30 @@
 import { Link, useLocation } from "react-router-dom"
-import { Home, Send, Users, History, Layers } from "lucide-react"
+import { Home, Send, Users, History, Layers, ClipboardList } from "lucide-react"
+import { useEffect, useState } from "react"
+import { getServiceRequests } from "../api"
 
 const navItems = [
-  { name: "Dashboard",        path: "/",         icon: Home    },
-  { name: "Send Notification",path: "/send",     icon: Send    },
-  { name: "Students",         path: "/students", icon: Users   },
-  { name: "Logs",             path: "/logs",     icon: History },
+  { name: "Dashboard",        path: "/",         icon: Home          },
+  { name: "Send Notification",path: "/send",     icon: Send          },
+  { name: "Students",         path: "/students", icon: Users         },
+  { name: "Service Requests", path: "/requests", icon: ClipboardList },
+  { name: "Logs",             path: "/logs",     icon: History       },
 ]
+
+function PendingBadge() {
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    getServiceRequests("pending")
+      .then(d => setCount(d.pending || 0))
+      .catch(() => {})
+  }, [])
+  if (!count) return null
+  return (
+    <span className="ml-auto min-w-[18px] h-[18px] rounded-full bg-amber-500 text-[10px] font-bold text-black flex items-center justify-center px-1">
+      {count > 99 ? "99+" : count}
+    </span>
+  )
+}
 
 export function Sidebar() {
   const location = useLocation()
@@ -42,6 +60,7 @@ export function Sidebar() {
             >
               <item.icon size={18} strokeWidth={isActive ? 2.5 : 2} className="flex-shrink-0" />
               <span className="flex-1">{item.name}</span>
+              {item.path === "/requests" && <PendingBadge />}
             </Link>
           )
         })}
@@ -59,8 +78,8 @@ export function Sidebar() {
             <p className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Shortcuts</p>
             <kbd className="px-1.5 py-0.5 rounded bg-[#1D1D2D] text-[#818CF8] text-[9px] font-mono border border-[#6366F1]/20">^K</kbd>
           </div>
-          <div className="grid grid-cols-4 gap-1">
-            {[1,2,3,4].map(n => (
+          <div className="grid grid-cols-5 gap-1">
+            {[1,2,3,4,5].map(n => (
               <div key={n} className="flex flex-col items-center">
                 <kbd className="px-1.5 py-0.5 rounded bg-[#1D1D2D] text-[#818CF8] text-[9px] font-mono border border-[#6366F1]/20">{n}</kbd>
               </div>
@@ -83,22 +102,35 @@ export function BottomNav() {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex flex-col items-center justify-center gap-1 min-w-[64px] py-1.5 rounded-xl transition-all ${
+              className={`relative flex flex-col items-center justify-center gap-1 min-w-[56px] py-1.5 rounded-xl transition-all ${
                 isActive ? "text-[#818CF8]" : "text-slate-700 hover:text-slate-400"
               }`}
             >
               <div className={`p-1 rounded-lg transition-colors ${isActive ? "bg-[#6366F1]/10" : ""}`}>
                 <item.icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
               </div>
-              <span className={`text-[9px] font-bold uppercase tracking-wider ${isActive ? "text-[#818CF8]" : "text-slate-700 text-opacity-50"}`}>
+              <span className={`text-[9px] font-bold uppercase tracking-wider ${isActive ? "text-[#818CF8]" : "text-slate-700"}`}>
                 {item.name.split(" ")[0]}
               </span>
+              {/* Pending dot for mobile */}
+              {item.path === "/requests" && <PendingDot />}
             </Link>
           )
         })}
       </div>
     </nav>
   )
+}
+
+function PendingDot() {
+  const [has, setHas] = useState(false)
+  useEffect(() => {
+    getServiceRequests("pending")
+      .then(d => setHas((d.pending || 0) > 0))
+      .catch(() => {})
+  }, [])
+  if (!has) return null
+  return <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-amber-500" />
 }
 
 export default Sidebar

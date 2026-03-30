@@ -2,7 +2,8 @@ import { useEffect, useState, useCallback } from "react"
 import { Users, Send, Target, TrendingUp, RefreshCw, Cpu, Activity, Globe } from "lucide-react"
 import { motion } from "motion/react"
 import StatCard from "../components/StatCard"
-import ExamBadge, { EXAM_COLORS } from "../components/ExamBadge"
+import ExamBadge from "../components/ExamBadge"
+import { EXAM_COLORS } from "../constants/examColors"
 import { getStats, getStudents, getLogs } from "../api"
 
 export default function Dashboard() {
