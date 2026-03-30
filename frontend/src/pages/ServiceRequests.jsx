@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
-import { getServiceRequests, sendReceipt } from "../api"
-import { ClipboardList, Clock, CheckCircle, Send, X, Phone, MessageSquare, RefreshCw } from "lucide-react"
+import { getServiceRequests, sendReceipt, getStudentDocuments, getDocumentUrl } from "../api"
+import { ClipboardList, Clock, CheckCircle, Send, X, Phone, MessageSquare, RefreshCw, Paperclip, FileText, Image as ImageIcon, Download } from "lucide-react"
 
 const STATUS_COLORS = {
   pending:   { bg: "bg-amber-500/10",  text: "text-amber-400",  border: "border-amber-500/20"  },
@@ -120,12 +120,101 @@ function ReceiptModal({ req, onClose, onSent }) {
   )
 }
 
+function DocumentsModal({ telegramId, studentName, onClose }) {
+  const [docs, setDocs] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [downloading, setDownloading] = useState(null)
+
+  useEffect(() => {
+    getStudentDocuments(telegramId).then(data => {
+      setDocs(data.documents || [])
+      setLoading(false)
+    }).catch(() => setLoading(false))
+  }, [telegramId])
+
+  const handleOpenDoc = async (fileId) => {
+    setDownloading(fileId)
+    try {
+      const res = await getDocumentUrl(fileId)
+      if (res.url) window.open(res.url, "_blank")
+      else alert("Could not fetch file link")
+    } catch {
+      alert("Network error")
+    } finally {
+      setDownloading(null)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-[#111119] border border-[#1D1D2D] rounded-2xl shadow-2xl flex flex-col max-h-[80vh]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#1D1D2D]">
+          <div className="flex items-center gap-2">
+            <Paperclip size={18} className="text-[#818CF8]" />
+            <h2 className="text-base font-bold text-white tracking-tight">Documents</h2>
+          </div>
+          <button onClick={onClose} className="text-slate-600 hover:text-slate-300 transition-colors">
+            <X size={18} />
+          </button>
+        </div>
+        
+        <div className="px-6 py-3 bg-[#0C0C12] border-b border-[#1D1D2D]">
+          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Student</p>
+          <p className="text-sm font-bold text-white mt-0.5">{studentName}</p>
+        </div>
+
+        <div className="p-6 overflow-y-auto flex-1">
+          {loading ? (
+             <div className="flex justify-center py-10">
+               <div className="w-5 h-5 border-2 border-[#6366F1] border-t-transparent rounded-full animate-spin" />
+             </div>
+          ) : docs.length === 0 ? (
+            <div className="text-center py-10">
+              <p className="text-sm text-slate-500">Is student ne abhi tak koi document nahi bheja hai.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {docs.map(doc => (
+                <div key={doc.id} className="bg-[#0C0C12] border border-[#1D1D2D] rounded-xl p-3 flex items-center justify-between group hover:border-[#2a2a3f] transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-[#6366F1]/10 flex items-center justify-center text-[#818CF8]">
+                      {doc.file_type === "photo" ? <ImageIcon size={20} /> : <FileText size={20} />}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-200 truncate max-w-[150px]">{doc.file_name}</p>
+                      <p className="text-[10px] text-slate-600 font-mono mt-0.5">
+                        {new Date(doc.uploaded_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => handleOpenDoc(doc.file_id)}
+                    disabled={downloading === doc.file_id}
+                    className="w-8 h-8 rounded-lg bg-[#6366F1]/10 text-[#818CF8] flex items-center justify-center hover:bg-[#6366F1]/20 transition-colors disabled:opacity-50"
+                  >
+                     {downloading === doc.file_id ? (
+                        <div className="w-4 h-4 border-2 border-[#818CF8] border-t-transparent rounded-full animate-spin" />
+                     ) : (
+                        <Download size={15} />
+                     )}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function ServiceRequests() {
   const [requests, setRequests] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [filter, setFilter] = useState("pending")
   const [selectedReq, setSelectedReq] = useState(null)
+  const [selectedDocsReq, setSelectedDocsReq] = useState(null)
   const [stats, setStats] = useState({ total: 0, pending: 0 })
 
   const fetchRequests = useCallback(async () => {
@@ -165,6 +254,14 @@ export default function ServiceRequests() {
           req={selectedReq}
           onClose={() => setSelectedReq(null)}
           onSent={handleSent}
+        />
+      )}
+
+      {selectedDocsReq && (
+        <DocumentsModal
+          telegramId={selectedDocsReq.telegram_id}
+          studentName={selectedDocsReq.student_name}
+          onClose={() => setSelectedDocsReq(null)}
         />
       )}
 
@@ -294,17 +391,27 @@ export default function ServiceRequests() {
 
                       {/* Action */}
                       <td className="py-4 px-5">
-                        {req.status === "pending" ? (
+                        <div className="flex items-center gap-2">
                           <button
-                            onClick={() => setSelectedReq(req)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#6366F1]/10 text-[#818CF8] border border-[#6366F1]/20 text-xs font-semibold hover:bg-[#6366F1]/20 transition-colors"
+                            title="View Documents"
+                            onClick={() => setSelectedDocsReq(req)}
+                            className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex flex-shrink-0 items-center justify-center hover:bg-emerald-500/20 transition-colors"
                           >
-                            <Send size={11} />
-                            Receipt Bhejo
+                            <Paperclip size={13} />
                           </button>
-                        ) : (
-                          <span className="text-xs text-slate-700 italic">Done</span>
-                        )}
+                          
+                          {req.status === "pending" ? (
+                            <button
+                              onClick={() => setSelectedReq(req)}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#6366F1]/10 text-[#818CF8] border border-[#6366F1]/20 text-xs font-semibold hover:bg-[#6366F1]/20 transition-colors whitespace-nowrap"
+                            >
+                              <Send size={11} />
+                              Receipt
+                            </button>
+                          ) : (
+                            <span className="text-xs text-slate-700 italic px-2">Done</span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   )

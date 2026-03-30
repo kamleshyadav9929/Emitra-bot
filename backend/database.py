@@ -63,6 +63,30 @@ def init_db():
         )
     ''')
 
+    # ── NEW: User Documents table ──────────────────────────────────────────
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_documents (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            telegram_id  TEXT NOT NULL,
+            file_id      TEXT NOT NULL,
+            file_type    TEXT NOT NULL,
+            file_name    TEXT,
+            uploaded_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # ── NEW: Scheduled Broadcasts table ──────────────────────────────────────────
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS scheduled_broadcasts (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            target_exam  TEXT NOT NULL,
+            message_text TEXT NOT NULL,
+            run_at       DATETIME NOT NULL,
+            status       TEXT DEFAULT 'pending',
+            created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
     conn.commit()
 
 
@@ -226,4 +250,63 @@ def complete_service_request(request_id):
         SET status = 'completed', completed_at = CURRENT_TIMESTAMP
         WHERE id = ?
     ''', (request_id,))
+    conn.commit()
+
+
+# ── Document Handling ────────────────────────────────────────────────────────
+
+def save_document(telegram_id, file_id, file_type, file_name=""):
+    conn = get_connection()
+    conn.execute(
+        "INSERT INTO user_documents (telegram_id, file_id, file_type, file_name) VALUES (?, ?, ?, ?)",
+        (str(telegram_id), str(file_id), str(file_type), str(file_name))
+    )
+    conn.commit()
+
+def get_user_documents(telegram_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM user_documents WHERE telegram_id = ? ORDER BY uploaded_at DESC",
+        (str(telegram_id),)
+    )
+    return [dict(row) for row in cursor.fetchall()]
+
+
+# ── Scheduled Broadcasts Handling ────────────────────────────────────────────
+
+def add_scheduled_broadcast(target_exam, message_text, run_at):
+    conn = get_connection()
+    conn.execute(
+        "INSERT INTO scheduled_broadcasts (target_exam, message_text, run_at) VALUES (?, ?, ?)",
+        (target_exam, message_text, run_at)
+    )
+    conn.commit()
+
+def get_pending_broadcasts():
+    conn = get_connection()
+    cursor = conn.cursor()
+    # Find broadcasts where run_at time has passed and still pending
+    cursor.execute(
+        "SELECT * FROM scheduled_broadcasts WHERE status = 'pending' AND run_at <= datetime('now', 'localtime') ORDER BY run_at ASC"
+    )
+    return [dict(row) for row in cursor.fetchall()]
+
+def get_all_schedules():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM scheduled_broadcasts ORDER BY run_at DESC")
+    return [dict(row) for row in cursor.fetchall()]
+
+def mark_broadcast_complete(schedule_id):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE scheduled_broadcasts SET status = 'completed' WHERE id = ?",
+        (schedule_id,)
+    )
+    conn.commit()
+
+def delete_schedule(schedule_id):
+    conn = get_connection()
+    conn.execute("DELETE FROM scheduled_broadcasts WHERE id = ?", (schedule_id,))
     conn.commit()

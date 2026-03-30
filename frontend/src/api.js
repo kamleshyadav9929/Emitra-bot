@@ -1,28 +1,65 @@
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000"
-const SECRET = import.meta.env.VITE_SECRET_KEY || "emitra2025"
+
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("emitra_token")
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { "Authorization": `Bearer ${token}` } : {})
+  }
+}
+
+export const loginAdmin = (password) =>
+  fetch(`${BASE_URL}/api/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password })
+  }).then(r => r.json())
 
 export const getStats = () =>
-  fetch(`${BASE_URL}/api/stats`).then(r => r.json())
+  fetch(`${BASE_URL}/api/stats`, { headers: getAuthHeaders() }).then(r => r.json())
 
 export const getStudents = (exam = "ALL") =>
-  fetch(`${BASE_URL}/api/students?exam=${exam}`).then(r => r.json())
+  fetch(`${BASE_URL}/api/students?exam=${exam}`, { headers: getAuthHeaders() }).then(r => r.json())
 
 export const sendNotification = (exam, message) =>
   fetch(`${BASE_URL}/api/send-notification`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ exam, message, secret_key: SECRET })
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ exam, message })
   }).then(r => r.json())
 
 export const getLogs = () =>
-  fetch(`${BASE_URL}/api/logs`).then(r => r.json())
+  fetch(`${BASE_URL}/api/logs`, { headers: getAuthHeaders() }).then(r => r.json())
 
 export const getServiceRequests = (status = "") =>
-  fetch(`${BASE_URL}/api/service-requests${status ? `?status=${status}` : ""}`).then(r => r.json())
+  fetch(`${BASE_URL}/api/service-requests${status ? `?status=${status}` : ""}`, { headers: getAuthHeaders() }).then(r => r.json())
 
-export const sendReceipt = (telegram_id, message, request_id) =>
+export const sendReceipt = (telegramId, message, requestId) =>
   fetch(`${BASE_URL}/api/send-receipt`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ telegram_id, message, request_id, secret_key: SECRET })
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ telegram_id: telegramId, message, request_id: requestId })
   }).then(r => r.json())
+
+export const getStudentDocuments = (telegramId) =>
+  fetch(`${BASE_URL}/api/documents/${telegramId}`, { headers: getAuthHeaders() }).then(r => r.json())
+
+export const getDocumentUrl = (fileId) =>
+  fetch(`${BASE_URL}/api/document-url/${fileId}`, { headers: getAuthHeaders() }).then(r => r.json())
+
+export const scheduleBroadcast = (exam, message, runAt) =>
+  fetch(`${BASE_URL}/api/schedule`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ exam, message, run_at: runAt })
+  }).then(r => r.json())
+
+export const getSchedules = () =>
+  fetch(`${BASE_URL}/api/schedules`, { headers: getAuthHeaders() }).then(r => r.json())
+
+export const deleteSchedule = (id) =>
+  fetch(`${BASE_URL}/api/schedules/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders()
+  }).then(r => r.json())
+

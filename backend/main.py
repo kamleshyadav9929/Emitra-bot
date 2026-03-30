@@ -2,17 +2,90 @@ import asyncio
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from telegram import Update, Bot
+from apscheduler.schedulers.background import BackgroundScheduler
 
 import config
 import database
 import notifier
 import bot as bot_handlers
 
+import jwt
+from functools import wraps
+from datetime import datetime, timedelta, timezone
+
 app = Flask(__name__)
 CORS(app)
 
 # Initialize database on startup
 database.init_db()
+
+
+# ── Background Scheduler ──────────────────────────────────────────────────────
+
+def check_scheduled_broadcasts():
+    """Runs periodically to check and send due broadcasts."""
+    pending = database.get_pending_broadcasts()
+    for p in pending:
+        exam = p["target_exam"]
+        message = p["message_text"]
+        
+        if exam == "ALL":
+            students = database.get_all_students()
+        else:
+            students = database.get_students_by_exam(exam)
+            
+        success_count = notifier.broadcast(config.TELEGRAM_BOT_TOKEN, students, message)
+        database.log_message(exam, message, success_count)
+        database.mark_broadcast_complete(p["id"])
+
+scheduler = BackgroundScheduler()
+# Run the job every 60 seconds
+scheduler.add_job(func=check_scheduled_broadcasts, trigger="interval", seconds=60)
+scheduler.start()
+
+
+# ── Authentication ─────────────────────────────────────────────────────────────
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if "Authorization" in request.headers:
+            auth_header = request.headers["Authorization"]
+            if auth_header.startswith("Bearer "):
+                token = auth_header.split(" ")[1]
+        
+        if not token:
+            return jsonify({"error": "Token is missing. Please log in again."}), 401
+            
+        try:
+            data = jwt.decode(token, config.JWT_SECRET_KEY, algorithms=["HS256"])
+        except Exception as e:
+            return jsonify({"error": "Token is invalid or expired."}), 401
+            
+        return f(*args, **kwargs)
+    # Important: Flask decorators need to retain the correct endpoint name
+    # @wraps handles this, but since we are modifying multiple routes, wraps solves the AssertionError.
+    return decorated
+
+@app.route("/api/login", methods=["POST"])
+def login():
+    data = request.json
+    if not data or not data.get("password"):
+        return jsonify({"error": "Missing password"}), 400
+        
+    password = data.get("password")
+    
+    # We use ADMIN_SECRET_KEY as the master admin password
+    if password == config.ADMIN_SECRET_KEY:
+        token = jwt.encode({
+            "admin": True,
+            "exp": datetime.now(timezone.utc) + timedelta(days=7)
+        }, config.JWT_SECRET_KEY, algorithm="HS256")
+        return jsonify({"token": token, "success": True})
+    
+    return jsonify({"error": "Invalid administrative password"}), 401
+
 
 
 def run_async(coro):
@@ -48,6 +121,9 @@ def webhook():
             if update.message and update.message.contact:
                 await bot_handlers.contact_handler(update, None)
 
+            elif update.message and (update.message.photo or update.message.document):
+                await bot_handlers.document_handler(update, None)
+
             elif update.message and update.message.text:
                 text = update.message.text
                 if text.startswith("/start"):
@@ -75,6 +151,7 @@ def webhook():
 # ── Students API ──────────────────────────────────────────────────────────────
 
 @app.route("/api/students", methods=["GET"])
+@token_required
 def get_students():
     exam = request.args.get("exam", "ALL")
     if exam == "ALL":
@@ -85,6 +162,7 @@ def get_students():
 
 
 @app.route("/api/stats", methods=["GET"])
+@token_required
 def get_stats():
     stats = database.get_stats()
     stats["pending_requests"] = database.get_pending_count()
@@ -94,14 +172,11 @@ def get_stats():
 # ── Broadcast API ─────────────────────────────────────────────────────────────
 
 @app.route("/api/send-notification", methods=["POST"])
+@token_required
 def send_notification():
     data = request.json
     if not data:
         return jsonify({"success": False, "error": "Invalid JSON"}), 400
-
-    secret = data.get("secret_key")
-    if secret != config.ADMIN_SECRET_KEY:
-        return jsonify({"success": False, "error": "Unauthorized"}), 401
 
     exam = data.get("exam")
     message = data.get("message")
@@ -127,9 +202,34 @@ def send_notification():
     })
 
 
+@app.route("/api/schedule", methods=["POST"])
+@token_required
+def schedule_broadcast():
+    data = request.json
+    if not data or not data.get("exam") or not data.get("message") or not data.get("run_at"):
+        return jsonify({"success": False, "error": "Missing required fields"}), 400
+        
+    database.add_scheduled_broadcast(data["exam"], data["message"], data["run_at"])
+    return jsonify({"success": True})
+
+
+@app.route("/api/schedules", methods=["GET"])
+@token_required
+def get_schedules():
+    return jsonify({"schedules": database.get_all_schedules()})
+
+
+@app.route("/api/schedules/<int:schedule_id>", methods=["DELETE"])
+@token_required
+def delete_schedule(schedule_id):
+    database.delete_schedule(schedule_id)
+    return jsonify({"success": True})
+
+
 # ── Service Requests API ──────────────────────────────────────────────────────
 
 @app.route("/api/service-requests", methods=["GET"])
+@token_required
 def get_service_requests():
     status = request.args.get("status")  # optional: pending / completed
     requests_list = database.get_service_requests(status=status)
@@ -153,15 +253,12 @@ def get_service_requests():
 
 
 @app.route("/api/send-receipt", methods=["POST"])
+@token_required
 def send_receipt():
     """Allows admin to send a receipt/message to a specific student via Telegram."""
     data = request.json
     if not data:
         return jsonify({"success": False, "error": "Invalid JSON"}), 400
-
-    secret = data.get("secret_key")
-    if secret != config.ADMIN_SECRET_KEY:
-        return jsonify({"success": False, "error": "Unauthorized"}), 401
 
     telegram_id = data.get("telegram_id")
     message = data.get("message")
@@ -183,9 +280,37 @@ def send_receipt():
 # ── Logs API ──────────────────────────────────────────────────────────────────
 
 @app.route("/api/logs", methods=["GET"])
+@token_required
 def get_logs_api():
     logs = database.get_logs()
     return jsonify({"logs": logs})
+
+
+# ── User Documents API ────────────────────────────────────────────────────────
+
+@app.route("/api/documents/<telegram_id>", methods=["GET"])
+@token_required
+def get_student_documents(telegram_id):
+    docs = database.get_user_documents(telegram_id)
+    return jsonify({"documents": docs})
+
+@app.route("/api/document-url/<file_id>", methods=["GET"])
+@token_required
+def get_document_url(file_id):
+    try:
+        def fetch_url():
+            bot = Bot(token=config.TELEGRAM_BOT_TOKEN)
+            telegram_file = loop.run_until_complete(bot.get_file(file_id))
+            return telegram_file.file_path
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        url = fetch_url()
+        loop.close()
+
+        return jsonify({"url": url})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # ── Health Check ──────────────────────────────────────────────────────────────

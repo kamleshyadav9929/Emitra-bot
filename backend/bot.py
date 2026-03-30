@@ -356,3 +356,37 @@ async def message_handler(update: Update, context):
             "📌 E-Mitra ki kisi seva ke liye type karein: /services\n"
             "📢 Jab updates aayenge, hum aapko notify karenge."
         )
+
+
+# ── Document Handler ──────────────────────────────────────────────────────────
+
+async def document_handler(update: Update, context):
+    """Handles incoming photos and documents."""
+    chat_id = update.effective_chat.id
+    student = database.get_student(chat_id)
+    
+    if not student:
+        await update.message.reply_text(
+            "❌ Aap register nahi hain. Start karne ke liye /start type karein."
+        )
+        return
+
+    file_id = None
+    file_type = "document"
+    file_name = "Upload"
+
+    if update.message.document:
+        file_id = update.message.document.file_id
+        file_name = update.message.document.file_name or "document"
+        file_type = "document"
+    elif update.message.photo:
+        file_id = update.message.photo[-1].file_id # get highest resolution
+        file_name = f"photo_{file_id[-6:]}.jpg"
+        file_type = "photo"
+
+    if file_id:
+        database.save_document(chat_id, file_id, file_type, file_name)
+        await update.message.reply_text(
+            f"✅ Aapka document (*{file_name}*) successfully receive ho gaya hai. Hum jaldi hi isko check karenge!",
+            parse_mode="Markdown"
+        )
