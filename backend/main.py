@@ -19,6 +19,11 @@ from functools import wraps
 from datetime import datetime, timedelta, timezone
 from collections import defaultdict
 import time as _time
+import threading
+
+# ── In-memory broadcast job tracker ──────────────────────────────────────────
+# Stores status of background broadcast jobs so the frontend can poll.
+_broadcast_jobs = {}  # job_id -> {"status": "running"|"done", "sent": N, "total": N, "exam": ...}
 
 app = Flask(__name__)
 CORS(app)
@@ -216,7 +221,16 @@ def delete_student(telegram_id):
     return jsonify({"success": True, "action": "deleted", "telegram_id": telegram_id})
 
 
-# ── Broadcast API ─────────────────────────────────────────────────────────────
+def _run_broadcast_in_background(job_id, exam, message, students, token):
+    """Runs in a daemon thread — broadcasts to all students without blocking the HTTP response."""
+    _broadcast_jobs[job_id]["status"] = "running"
+    try:
+        success_count = notifier.broadcast(token, students, message)
+        database.log_message(exam, message, success_count)
+        _broadcast_jobs[job_id].update({"status": "done", "sent": success_count})
+    except Exception as e:
+        _broadcast_jobs[job_id].update({"status": "error", "error": str(e)})
+
 
 @app.route("/api/send-notification", methods=["POST"])
 @token_required
@@ -225,7 +239,7 @@ def send_notification():
     if not data:
         return jsonify({"success": False, "error": "Invalid JSON"}), 400
 
-    exam = data.get("exam")
+    exam    = data.get("exam")
     message = data.get("message")
 
     if not exam or not message:
@@ -233,20 +247,42 @@ def send_notification():
 
     students = database.get_students_by_exam(exam)
     if not students:
-        return jsonify({
-            "success": True, "sent_to": 0, "exam": exam,
-            "message": "No eligible students found",
-        })
+        return jsonify({"success": True, "sent_to": 0, "exam": exam, "queued": False,
+                        "message": "No eligible students found"})
 
-    success_count = notifier.broadcast(config.TELEGRAM_BOT_TOKEN, students, message)
-    database.log_message(exam, message, success_count)
+    total = len(students)
+
+    # FIX: Run in background thread so the HTTP request returns immediately.
+    # Without this, 4000 students × 50ms = 200s → guaranteed timeout on PythonAnywhere.
+    import uuid
+    job_id = str(uuid.uuid4())[:8]
+    _broadcast_jobs[job_id] = {"status": "queued", "sent": 0, "total": total, "exam": exam}
+
+    t = threading.Thread(
+        target=_run_broadcast_in_background,
+        args=(job_id, exam, message, students, config.TELEGRAM_BOT_TOKEN),
+        daemon=True,
+    )
+    t.start()
 
     return jsonify({
-        "success": True,
-        "sent_to": success_count,
-        "total_eligible": len(students),
-        "exam": exam,
+        "success":        True,
+        "queued":         True,
+        "job_id":         job_id,
+        "total_eligible": total,
+        "exam":           exam,
+        "message":        f"Broadcast started for {total} students.",
     })
+
+
+@app.route("/api/broadcast-status/<job_id>", methods=["GET"])
+@token_required
+def broadcast_status(job_id):
+    """Frontend polls this to show real-time broadcast progress."""
+    job = _broadcast_jobs.get(job_id)
+    if not job:
+        return jsonify({"error": "Job not found"}), 404
+    return jsonify(job)
 
 
 @app.route("/api/schedule", methods=["POST"])
