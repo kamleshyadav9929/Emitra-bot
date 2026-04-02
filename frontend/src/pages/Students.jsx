@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { getStudents } from "../api"
 import ExamBadge from "../components/ExamBadge"
-import { Phone, MessagesSquare, Search, X, Download } from "lucide-react"
+import { Phone, MessagesSquare, Search, X, Download, ChevronDown } from "lucide-react"
 
 const FILTERS = ["ALL", "JEE", "NEET", "SSC", "UPSC", "CUET"]
 
@@ -17,6 +17,8 @@ export default function Students() {
   const [error, setError] = useState(null)
   const [activeFilter, setActiveFilter] = useState("ALL")
   const [search, setSearch] = useState("")
+  const [changingExam, setChangingExam] = useState(null) // telegram_id of student being edited
+  const changeRef = useRef(null)
 
   useEffect(() => {
     let cancelled = false
@@ -50,6 +52,13 @@ export default function Students() {
     a.href = url; a.download = `emitra_${activeFilter}_${new Date().toISOString().slice(0,10)}.csv`
     a.click(); URL.revokeObjectURL(url)
   }
+
+  // Close change-exam dropdown when clicking outside
+  useEffect(() => {
+    const handler = (e) => { if (changeRef.current && !changeRef.current.contains(e.target)) setChangingExam(null) }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -151,9 +160,41 @@ export default function Students() {
                         </div>
                       </div>
                     </td>
-                    {/* Exam */}
+                    {/* Exam + Change button */}
                     <td className="py-4 px-5">
-                      <ExamBadge exam={student.exam_preference} />
+                      <div className="relative inline-block" ref={changingExam === student.telegram_id ? changeRef : null}>
+                        <div className="flex items-center gap-1.5">
+                          <ExamBadge exam={student.exam_preference} />
+                          <button
+                            onClick={() => setChangingExam(changingExam === student.telegram_id ? null : student.telegram_id)}
+                            className="flex items-center gap-0.5 text-[10px] text-[#AEAEAC] hover:text-black transition-colors"
+                            title="Change Exam"
+                          >
+                            <ChevronDown size={11} />
+                          </button>
+                        </div>
+                        {changingExam === student.telegram_id && (
+                          <div className="absolute left-0 top-full mt-1 z-30 bg-white border border-[#E5E5E3] shadow-lg py-1 min-w-[120px]">
+                            <p className="px-3 py-1.5 text-[9px] font-semibold text-[#AEAEAC] tracking-[0.15em] uppercase border-b border-[#E5E5E3]">Change Exam</p>
+                            {["JEE", "NEET", "SSC", "UPSC", "CUET"].map(exam => (
+                              <button
+                                key={exam}
+                                className={`w-full text-left px-3 py-2 text-[12px] font-semibold hover:bg-[#F7F7F5] transition-colors ${
+                                  student.exam_preference === exam ? "text-black" : "text-[#7A7A78]"
+                                }`}
+                                onClick={() => {
+                                  setStudents(prev => prev.map(s =>
+                                    s.telegram_id === student.telegram_id ? { ...s, exam_preference: exam } : s
+                                  ))
+                                  setChangingExam(null)
+                                }}
+                              >
+                                {student.exam_preference === exam ? `✓ ${exam}` : exam}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     {/* Phone */}
                     <td className="py-4 px-5">

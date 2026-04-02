@@ -4,12 +4,21 @@ import { useEffect, useState } from "react"
 import { getServiceRequests } from "../api"
 
 const navItems = [
-  { name: "Dashboard",        path: "/",         icon: Home          },
-  { name: "Send",             path: "/send",     icon: Send          },
-  { name: "Students",         path: "/students", icon: Users         },
-  { name: "Requests",         path: "/requests", icon: ClipboardList },
-  { name: "Logs",             path: "/logs",     icon: History       },
+  { name: "Dashboard", path: "/",         icon: Home          },
+  { name: "Send",      path: "/send",     icon: Send          },
+  { name: "Students",  path: "/students", icon: Users         },
+  { name: "E-Mitra",  path: "/requests", icon: ClipboardList },
+  { name: "Activity",  path: "/logs",     icon: History       },
 ]
+
+// Accent colors per route for the active left-border
+const ROUTE_ACCENT = {
+  "/":         "#0A0A0A",
+  "/send":     "#3B82F6",
+  "/students": "#22C55E",
+  "/requests": "#EF4444",
+  "/logs":     "#A855F7",
+}
 
 function usePendingCount() {
   const [count, setCount] = useState(0)
@@ -46,18 +55,33 @@ export function Sidebar() {
         {navItems.map((item) => {
           const isActive = location.pathname === item.path
           const showBadge = item.path === "/requests" && pendingCount > 0
+          const accent = ROUTE_ACCENT[item.path] || "#0A0A0A"
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-3 py-2.5 text-[13px] font-medium transition-all ${
-                isActive ? "bg-black text-white" : "text-[#3D3D3D] hover:text-black hover:bg-[#F2F2F0]"
+              className={`relative flex items-center gap-3 px-3 py-2.5 text-[13px] font-medium transition-all ${
+                isActive
+                  ? "bg-[#F7F7F5] text-black"
+                  : "text-[#3D3D3D] hover:text-black hover:bg-[#F2F2F0]"
               }`}
             >
-              <item.icon size={15} strokeWidth={isActive ? 2.5 : 2} className="flex-shrink-0" />
+              {/* Colored left-border accent when active */}
+              {isActive && (
+                <span
+                  className="absolute left-0 top-1 bottom-1 w-[3px] rounded-r-sm"
+                  style={{ backgroundColor: accent }}
+                />
+              )}
+              <item.icon
+                size={15}
+                strokeWidth={isActive ? 2.5 : 2}
+                className="flex-shrink-0"
+                style={isActive ? { color: accent } : {}}
+              />
               <span className="flex-1">{item.name}</span>
               {showBadge && (
-                <span className="min-w-[18px] h-[18px] bg-black text-white text-[10px] font-bold flex items-center justify-center px-1">
+                <span className="min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1 rounded-full">
                   {pendingCount > 99 ? "99+" : pendingCount}
                 </span>
               )}
@@ -85,18 +109,19 @@ export function BottomNav() {
     <nav
       className="md:hidden bg-white border-t border-[#E5E5E3]"
       style={{
-        position: 'fixed',
+        position: "fixed",
         bottom: 0,
         left: 0,
         right: 0,
         zIndex: 9999,
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >
       <div className="flex items-stretch justify-around">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path
           const showBadge = item.path === "/requests" && pendingCount > 0
+          const accent = ROUTE_ACCENT[item.path] || "#0A0A0A"
           return (
             <Link
               key={item.path}
@@ -106,14 +131,23 @@ export function BottomNav() {
               }`}
             >
               {isActive && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-black" />
+                <span
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5"
+                  style={{ backgroundColor: accent }}
+                />
               )}
-              <item.icon size={18} strokeWidth={isActive ? 2.5 : 2} />
-              <span className={`text-[9px] font-semibold uppercase tracking-wider ${isActive ? "text-black" : "text-[#AEAEAC]"}`}>
+              <item.icon
+                size={18}
+                strokeWidth={isActive ? 2.5 : 2}
+                style={isActive ? { color: accent } : {}}
+              />
+              <span
+                className={`text-[9px] font-semibold uppercase tracking-wider ${isActive ? "text-black" : "text-[#AEAEAC]"}`}
+              >
                 {item.name}
               </span>
               {showBadge && (
-                <span className="absolute top-1.5 right-1/4 w-2 h-2 rounded-full bg-black" />
+                <span className="absolute top-1.5 right-1/4 w-2 h-2 rounded-full bg-red-500" />
               )}
             </Link>
           )

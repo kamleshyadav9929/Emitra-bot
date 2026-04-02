@@ -212,7 +212,7 @@ export default function ServiceRequests() {
       <div className="flex items-start justify-between border-b border-[#E5E5E3] pb-6">
         <div>
           <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC] mb-2">E-Mitra</p>
-          <h1 className="text-3xl font-light text-black tracking-tight">Service Requests</h1>
+          <h1 className="text-3xl font-light text-black tracking-tight">E-Mitra Requests</h1>
           <p className="text-[13px] text-[#7A7A78] mt-1">Pending seva requests dekho aur receipt bhejo.</p>
         </div>
         <button

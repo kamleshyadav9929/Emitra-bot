@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
-import { Send, CheckCircle, Loader2, Bot, Users, MessageSquare, Clock, Calendar, Trash2, ArrowRight } from "lucide-react"
+import { useLocation } from "react-router-dom"
+import { Send, CheckCircle, Loader2, Bot, Users, MessageSquare, Clock, Calendar, Trash2, ArrowRight, CheckCircle2 } from "lucide-react"
 import { getStats, sendNotification, scheduleBroadcast, getSchedules, deleteSchedule } from "../api"
 import Stepper, { Step } from "../components/Stepper"
 
@@ -77,8 +78,23 @@ function ScheduledList() {
   )
 }
 
+// ── Toast notification ─────────────────────────────────────────────────────────
+function Toast({ visible, message }) {
+  return (
+    <div
+      className={`fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 px-5 py-3 bg-[#1a1a1a] text-white text-[13px] font-medium shadow-xl transition-all duration-300 ${
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
+      }`}
+    >
+      <CheckCircle2 size={16} className="text-[#4ade80]" />
+      {message}
+    </div>
+  )
+}
+
 // ── Main Component ─────────────────────────────────────────────────────────────
 export default function SendNotification() {
+  const location = useLocation()
   const [activeTab, setActiveTab] = useState("new")
   const [stats, setStats] = useState(null)
   const [selectedExams, setSelectedExams] = useState([])
@@ -87,10 +103,27 @@ export default function SendNotification() {
   const [status, setStatus] = useState("idle")
   const [errorMsg, setErrorMsg] = useState("")
   const [stepperKey, setStepperKey] = useState(0)
+  const [toastVisible, setToastVisible] = useState(false)
+  const [toastMsg, setToastMsg] = useState("")
+
+  // Pre-select exam from URL param e.g. /send?exam=JEE
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const examParam = params.get("exam")
+    if (examParam && ["JEE", "NEET", "SSC", "UPSC", "CUET"].includes(examParam)) {
+      setSelectedExams([examParam])
+    }
+  }, [location.search])
 
   useEffect(() => {
     getStats().then(setStats).catch(console.error)
   }, [])
+
+  const showToast = (msg) => {
+    setToastMsg(msg)
+    setToastVisible(true)
+    setTimeout(() => setToastVisible(false), 3000)
+  }
 
   const toggleExam = (exam) => {
     if (selectedExams.includes("ALL")) { setSelectedExams([exam]); return }
@@ -124,6 +157,7 @@ export default function SendNotification() {
         if (!response.success) throw new Error(response.error || `Failed for ${exam}`)
       }
       setStatus("success")
+      showToast(runAt ? `✓ Broadcast scheduled!` : `✓ Sent to ${targetCount} students!`)
       setTimeout(() => {
         setStatus("idle")
         setMessage("")
@@ -145,6 +179,7 @@ export default function SendNotification() {
 
   return (
     <div className="space-y-6">
+      <Toast visible={toastVisible} message={toastMsg} />
       {/* Header */}
       <div className="flex items-end justify-between border-b border-[#E5E5E3] pb-6">
         <div>
