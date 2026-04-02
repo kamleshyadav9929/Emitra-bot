@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
-import { getStudents } from "../api"
+import { getStudents, blockStudent, deleteStudent } from "../api"
 import ExamBadge from "../components/ExamBadge"
-import { Phone, MessagesSquare, Search, X, Download, ChevronDown } from "lucide-react"
+import { Phone, MessagesSquare, Search, X, Download, ChevronDown, Trash2 } from "lucide-react"
 
 const FILTERS = ["ALL", "JEE", "NEET", "SSC", "UPSC", "CUET"]
 
@@ -146,7 +146,7 @@ export default function Students() {
                 {filtered.map(student => (
                   <tr
                     key={student.telegram_id}
-                    className="border-b border-[#E5E5E3] last:border-0 hover:bg-[#F7F7F5] transition-colors"
+                    className="group border-b border-[#E5E5E3] last:border-0 hover:bg-[#F7F7F5] transition-colors"
                   >
                     {/* Student */}
                     <td className="py-4 px-5">
@@ -218,17 +218,50 @@ export default function Students() {
                         <span className="text-[12px] text-[#AEAEAC] italic">—</span>
                       )}
                     </td>
-                    {/* Joined */}
-                    <td className="py-4 px-5 text-right">
-                      <span className="text-[11px] text-[#AEAEAC] font-mono">
-                        {new Date(student.joined_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                      </span>
+                    {/* Joined & Actions */}
+                    <td className="py-4 px-5 pr-8">
+                      <div className="flex items-center justify-end gap-3">
+                        <span className="text-[11px] text-[#AEAEAC] font-mono mr-2">
+                          {new Date(student.joined_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                        </span>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {student.exam_preference !== "BLOCKED" && (
+                            <button
+                              onClick={() => {
+                                if (window.confirm("Block this student from receiving broadcasts?")) {
+                                  blockStudent(student.telegram_id).then(() => {
+                                    setStudents(prev => prev.map(s => s.telegram_id === student.telegram_id ? { ...s, exam_preference: "BLOCKED" } : s))
+                                  })
+                                }
+                              }}
+                              className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors"
+                              title="Block"
+                            >
+                              <X size={13} />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => {
+                              if (window.confirm("Permanently delete this student?")) {
+                                deleteStudent(student.telegram_id).then(() => {
+                                  setStudents(prev => prev.filter(s => s.telegram_id !== student.telegram_id))
+                                })
+                              }
+                            }}
+                            className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 ))}
                 {filtered.length === 0 && (
                   <tr>
                     <td colSpan="5" className="py-16 text-center">
+
                       <p className="text-[13px] text-[#AEAEAC]">
                         {search ? `No results for "${search}"` : `No students in ${activeFilter}.`}
                       </p>

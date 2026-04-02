@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useLocation } from "react-router-dom"
 import { Send, CheckCircle, Loader2, Bot, Users, MessageSquare, Clock, Calendar, Trash2, ArrowRight, CheckCircle2 } from "lucide-react"
 import { getStats, sendNotification, scheduleBroadcast, getSchedules, deleteSchedule } from "../api"
@@ -6,6 +6,9 @@ import Stepper, { Step } from "../components/Stepper"
 
 const EXAMS = ["JEE", "NEET", "SSC", "UPSC", "CUET"]
 const CHAR_LIMIT = 4096
+const BASE_URL = import.meta.env.VITE_API_URL || ""
+const getAuthHeaders = () => ({ "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` })
+
 
 // ── Scheduled List Tab ─────────────────────────────────────────────────────────
 function ScheduledList() {
@@ -100,11 +103,13 @@ export default function SendNotification() {
   const [selectedExams, setSelectedExams] = useState([])
   const [message, setMessage] = useState("")
   const [runAt, setRunAt] = useState("")
-  const [status, setStatus] = useState("idle")
+  const [status, setStatus] = useState("idle") // idle | sending | polling | success | error
   const [errorMsg, setErrorMsg] = useState("")
   const [stepperKey, setStepperKey] = useState(0)
   const [toastVisible, setToastVisible] = useState(false)
   const [toastMsg, setToastMsg] = useState("")
+  const [jobProgress, setJobProgress] = useState(null) // { sent, total, status }
+  const pollRef = useRef(null)
 
   // Pre-select exam from URL param e.g. /send?exam=JEE
   useEffect(() => {
@@ -119,10 +124,38 @@ export default function SendNotification() {
     getStats().then(setStats).catch(console.error)
   }, [])
 
+  // Cleanup polling on unmount
+  useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current) }, [])
+
   const showToast = (msg) => {
     setToastMsg(msg)
     setToastVisible(true)
-    setTimeout(() => setToastVisible(false), 3000)
+    setTimeout(() => setToastVisible(false), 4000)
+  }
+
+  const pollJob = (jobId, total) => {
+    setStatus("polling")
+    setJobProgress({ sent: 0, total, status: "running" })
+    pollRef.current = setInterval(async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/api/broadcast-status/${jobId}`, { headers: getAuthHeaders() })
+        const data = await res.json()
+        setJobProgress(data)
+        if (data.status === "done" || data.status === "error") {
+          clearInterval(pollRef.current)
+          if (data.status === "done") {
+            setStatus("success")
+            showToast(`✓ ${data.sent} students ko message mil gaya!`)
+            setTimeout(() => {
+              setStatus("idle"); setMessage(""); setSelectedExams([]); setRunAt("")
+              setStepperKey(k => k + 1); setJobProgress(null)
+            }, 3000)
+          } else {
+            setStatus("error"); setErrorMsg(data.error || "Broadcast failed")
+          }
+        }
+      } catch { /* network glitch, keep polling */ }
+    }, 2000)
   }
 
   const toggleExam = (exam) => {
@@ -141,7 +174,7 @@ export default function SendNotification() {
     : 0
 
   const handleSend = async () => {
-    if (!message.trim() || targetCount === 0 || status === "sending") return
+    if (!message.trim() || targetCount === 0 || status === "sending" || status === "polling") return
     setStatus("sending")
     setErrorMsg("")
     try {
@@ -151,18 +184,22 @@ export default function SendNotification() {
         if (runAt) {
           const utcDateStr = new Date(runAt).toISOString().slice(0, 19).replace("T", " ")
           response = await scheduleBroadcast(exam, message, utcDateStr)
+          if (!response.success) throw new Error(response.error || `Failed for ${exam}`)
         } else {
           response = await sendNotification(exam, message)
+          if (!response.success) throw new Error(response.error || `Failed for ${exam}`)
+          // New API returns job_id for background processing
+          if (response.queued && response.job_id) {
+            pollJob(response.job_id, response.total_eligible)
+            return // polling handles the rest
+          }
         }
-        if (!response.success) throw new Error(response.error || `Failed for ${exam}`)
       }
+      // Scheduled path (immediate response)
       setStatus("success")
-      showToast(runAt ? `✓ Broadcast scheduled!` : `✓ Sent to ${targetCount} students!`)
+      showToast(`✓ Broadcast scheduled!`)
       setTimeout(() => {
-        setStatus("idle")
-        setMessage("")
-        setSelectedExams([])
-        setRunAt("")
+        setStatus("idle"); setMessage(""); setSelectedExams([]); setRunAt("")
         setStepperKey(k => k + 1)
       }, 2500)
     } catch (error) {
@@ -385,21 +422,44 @@ export default function SendNotification() {
                 </div>
               )}
 
+              {/* Live progress bar during polling */}
+              {(status === "polling" || status === "sending") && jobProgress && (
+                <div className="border border-[#E5E5E3] p-4 space-y-2">
+                  <div className="flex justify-between text-[11px]">
+                    <span className="text-[#7A7A78] flex items-center gap-1.5">
+                      <Loader2 size={11} className="animate-spin" /> Bhej raha hai...
+                    </span>
+                    <span className="font-mono text-black">
+                      {jobProgress.sent || 0} / {jobProgress.total || targetCount}
+                    </span>
+                  </div>
+                  <div className="w-full bg-[#F7F7F5] h-1.5 overflow-hidden">
+                    <div
+                      className="h-full bg-black transition-all duration-500"
+                      style={{ width: `${jobProgress.total ? Math.round(((jobProgress.sent || 0) / jobProgress.total) * 100) : 5}%` }}
+                    />
+                  </div>
+                  <p className="text-[10px] text-[#AEAEAC] font-mono">
+                    {jobProgress.total ? Math.round(((jobProgress.sent || 0) / jobProgress.total) * 100) : 0}% complete · Yeh page band mat karein
+                  </p>
+                </div>
+              )}
+
               {/* Send button */}
               <button
                 onClick={handleSend}
-                disabled={!message.trim() || targetCount === 0 || status === "sending"}
+                disabled={!message.trim() || targetCount === 0 || status === "sending" || status === "polling"}
                 className={`w-full py-3 font-semibold text-[13px] flex items-center justify-center gap-2 transition-colors ${
                   !message.trim() || targetCount === 0
                     ? "bg-[#F7F7F5] text-[#AEAEAC] cursor-not-allowed border border-[#E5E5E3]"
                     : status === "success"
                       ? "bg-[#2E7D32] text-white border border-[#2E7D32]"
-                      : status === "sending"
+                      : status === "sending" || status === "polling"
                         ? "bg-[#3D3D3D] text-white cursor-wait border border-[#3D3D3D]"
                         : "bg-black text-white hover:bg-[#3D3D3D] border border-black"
                 }`}
               >
-                {status === "sending" && <><Loader2 size={15} className="animate-spin" /> {runAt ? "Scheduling..." : "Sending..."}</>}
+                {(status === "sending" || status === "polling") && <><Loader2 size={15} className="animate-spin" /> {runAt ? "Scheduling..." : "Bhej raha hai..."}</>}
                 {status === "success" && <><CheckCircle size={15} /> {runAt ? "Scheduled!" : "Sent!"}</>}
                 {(status === "idle" || status === "error") && (
                   <>
@@ -408,6 +468,7 @@ export default function SendNotification() {
                   </>
                 )}
               </button>
+
             </div>
           </Step>
         </Stepper>

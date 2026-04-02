@@ -63,6 +63,13 @@ def build_services_keyboard(category_key):
     return InlineKeyboardMarkup(buttons)
 
 
+# ── Message helpers (read from DB, fall back to default) ─────────────────────
+
+def get_msg(key, default):
+    """Read a message from bot_settings DB, return default if not set."""
+    val = database.get_bot_setting(key)
+    return val if val and val.strip() else default
+
 # ── Existing Registration Handlers ────────────────────────────────────────────
 
 async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -74,17 +81,18 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         name = user.first_name + (f" {user.last_name}" if user.last_name else "")
         database.register_user(chat_id, name, username)
 
+    welcome_msg = get_msg(
+        "welcome_message",
+        "🙏 Namaste! E-Mitra Seva mein aapka swagat hai.\n\n"
+        "Pehle apna mobile number share karein taaki hum aapko updates bhi bhej sakein:\n"
+        "(Neeche button dabayein)"
+    )
+
     contact_button = KeyboardButton("Apna Number Share Karein", request_contact=True)
     reply_markup = ReplyKeyboardMarkup(
         [[contact_button]], resize_keyboard=True, one_time_keyboard=True
     )
-
-    await update.message.reply_text(
-        "🙏 Namaste! E-Mitra Seva mein aapka swagat hai.\n\n"
-        "Pehle apna mobile number share karein taaki hum aapko updates bhi bhej sakein:\n"
-        "(Neeche button dabayein)",
-        reply_markup=reply_markup,
-    )
+    await update.message.reply_text(welcome_msg, reply_markup=reply_markup)
 
 
 async def prompt_exam_selection(update: Update):
@@ -104,7 +112,8 @@ async def prompt_exam_selection(update: Update):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    welcome_text = (
+    welcome_text = get_msg(
+        "exam_select_message",
         "✅ Number save ho gaya!\n\n"
         "Ab bataiye — aap kis exam ki taiyari kar rahe hain?\n"
         "Neeche se select karein:"

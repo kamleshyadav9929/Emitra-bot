@@ -237,13 +237,13 @@ def get_student(telegram_id):
 def get_students_by_exam(exam):
     """
     Returns students to notify for a given exam target.
-    - exam = "ALL"  → everyone who has selected ANY exam (excludes NONE)
+    - exam = "ALL"  → everyone who has selected ANY exam (excludes NONE and BLOCKED)
     - exam = "JEE"  → JEE students + students who opted into ALL
     """
     conn = get_connection()
     cursor = conn.cursor()
     if exam == "ALL":
-        cursor.execute("SELECT * FROM students WHERE exam_preference != 'NONE'")
+        cursor.execute("SELECT * FROM students WHERE exam_preference != 'NONE' AND exam_preference != 'BLOCKED'")
     else:
         cursor.execute(
             "SELECT * FROM students WHERE exam_preference = ? OR exam_preference = 'ALL'",
