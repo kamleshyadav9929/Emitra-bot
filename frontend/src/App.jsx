@@ -7,6 +7,7 @@ import SendNotification from "./pages/SendNotification"
 import Students from "./pages/Students"
 import Logs from "./pages/Logs"
 import ServiceRequests from "./pages/ServiceRequests"
+import BotManager from "./pages/BotManager"
 import Login from "./pages/Login"
 import { Layers } from "lucide-react"
 
@@ -34,7 +35,7 @@ function App() {
       if (event.key === "2") navigate("/send")
       if (event.key === "3") navigate("/students")
       if (event.key === "4") navigate("/requests")
-      if (event.key === "5") navigate("/logs")
+      if (event.key === "5") navigate("/bot-manager")
     }
     window.addEventListener("keydown", handleKeys)
     return () => window.removeEventListener("keydown", handleKeys)
@@ -72,6 +73,7 @@ function App() {
             <Route path="/students" element={<PrivateRoute><Students /></PrivateRoute>} />
             <Route path="/requests" element={<PrivateRoute><ServiceRequests /></PrivateRoute>} />
             <Route path="/logs" element={<PrivateRoute><Logs /></PrivateRoute>} />
+            <Route path="/bot-manager" element={<PrivateRoute><BotManager /></PrivateRoute>} />
           </Routes>
         </div>
       </main>

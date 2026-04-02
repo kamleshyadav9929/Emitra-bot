@@ -1,23 +1,23 @@
 import { Link, useLocation } from "react-router-dom"
-import { Home, Send, Users, History, Layers, ClipboardList } from "lucide-react"
+import { Home, Send, Users, Layers, ClipboardList, Bot } from "lucide-react"
 import { useEffect, useState } from "react"
 import { getServiceRequests } from "../api"
 
 const navItems = [
-  { name: "Dashboard", path: "/",         icon: Home          },
-  { name: "Send",      path: "/send",     icon: Send          },
-  { name: "Students",  path: "/students", icon: Users         },
-  { name: "E-Mitra",  path: "/requests", icon: ClipboardList },
-  { name: "Activity",  path: "/logs",     icon: History       },
+  { name: "Dashboard", path: "/",            icon: Home          },
+  { name: "Send",      path: "/send",        icon: Send          },
+  { name: "Students",  path: "/students",    icon: Users         },
+  { name: "E-Mitra",  path: "/requests",    icon: ClipboardList },
+  { name: "Bot Manager", path: "/bot-manager", icon: Bot         },
 ]
 
 // Accent colors per route for the active left-border
 const ROUTE_ACCENT = {
-  "/":         "#0A0A0A",
-  "/send":     "#3B82F6",
-  "/students": "#22C55E",
-  "/requests": "#EF4444",
-  "/logs":     "#A855F7",
+  "/":             "#0A0A0A",
+  "/send":         "#3B82F6",
+  "/students":     "#22C55E",
+  "/requests":     "#EF4444",
+  "/bot-manager":  "#F97316",
 }
 
 function usePendingCount() {
