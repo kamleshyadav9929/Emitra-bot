@@ -65,3 +65,26 @@ export const deleteSchedule = (id) =>
     headers: getAuthHeaders()
   }).then(r => r.json())
 
+// ── Bot Settings API ──────────────────────────────────────────────────────────
+export const getBotSettings = () =>
+  fetch(`${BASE_URL}/api/bot-settings`, { headers: getAuthHeaders() }).then(r => r.json())
+
+export const saveBotSettings = (settings) =>
+  fetch(`${BASE_URL}/api/bot-settings`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(settings)
+  }).then(r => r.json())
+
+// ── Student management ────────────────────────────────────────────────────────
+export const blockStudent = (telegramId) =>
+  fetch(`${BASE_URL}/api/students/${telegramId}/block`, {
+    method: "POST",
+    headers: getAuthHeaders()
+  }).then(r => r.json())
+
+export const deleteStudent = (telegramId) =>
+  fetch(`${BASE_URL}/api/students/${telegramId}`, {
+    method: "DELETE",
+    headers: getAuthHeaders()
+  }).then(r => r.json())

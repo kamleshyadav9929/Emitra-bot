@@ -338,8 +338,28 @@ async def status_handler(update: Update, context):
 
 
 async def change_handler(update: Update, context):
-    """Handles /change command — re-prompts exam selection."""
-    await prompt_exam_selection(update)
+    """
+    Handles /change command — re-prompts exam selection.
+    FIX #11: Previously called prompt_exam_selection directly which
+    showed the contact button again even for registered users.
+    Now checks if phone is already on file and skips that step.
+    """
+    chat_id = update.effective_chat.id
+    student = database.get_student(chat_id)
+
+    if student and student.get("phone_number"):
+        # Already registered — just show exam selector
+        await prompt_exam_selection(update)
+    else:
+        # First time or missing phone — ask for contact first
+        contact_button = KeyboardButton("Apna Number Share Karein", request_contact=True)
+        reply_markup = ReplyKeyboardMarkup(
+            [[contact_button]], resize_keyboard=True, one_time_keyboard=True
+        )
+        await update.message.reply_text(
+            "📱 Pehle apna number share karein taaki hum aapko update bhej sakein:",
+            reply_markup=reply_markup,
+        )
 
 
 # ── Default Message Handler ───────────────────────────────────────────────────

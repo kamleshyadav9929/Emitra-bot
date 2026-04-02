@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
-import { Users, Send, Target, TrendingUp, RefreshCw, Cpu, Activity, Globe, Megaphone, ClipboardList } from "lucide-react"
+import { TrendingUp, RefreshCw, Cpu, Activity, Globe, Megaphone, ClipboardList } from "lucide-react"
 import ExamBadge from "../components/ExamBadge"
 import { getStats, getStudents, getLogs, getServiceRequests } from "../api"
 

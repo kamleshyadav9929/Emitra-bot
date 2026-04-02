@@ -2,8 +2,8 @@ import { useState, useEffect } from "react"
 import {
   MessageSquare, Wrench, Megaphone, Settings,
   Plus, Pencil, Trash2, ToggleLeft, ToggleRight,
-  Save, CheckCircle2, Clock, Globe, BotMessageSquare,
-  ChevronDown, X, Bell, Languages, Hash,
+  Save, CheckCircle2, Clock, BotMessageSquare,
+  X, Bell, Languages,
 } from "lucide-react"
 
 // ── Local storage helpers ───────────────────────────────────────────────────────
@@ -547,7 +547,6 @@ export default function BotManager() {
     setTimeout(() => setToastVisible(false), 2500)
   }
 
-  const activeTabDef = TABS.find(t => t.id === activeTab)
 
   return (
     <div className="space-y-6">

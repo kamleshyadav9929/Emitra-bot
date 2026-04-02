@@ -87,6 +87,14 @@ def init_db():
         )
     ''')
 
+    # ── Bot Settings table ────────────────────────────────────────────────────
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS bot_settings (
+            key   TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )
+    ''')
+
     conn.commit()
 
 
@@ -162,8 +170,28 @@ def get_all_students():
     """Returns every student (for admin listing, includes NONE)."""
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM students")
+    cursor.execute("SELECT * FROM students ORDER BY joined_at DESC")
     return [dict(row) for row in cursor.fetchall()]
+
+
+def block_student(telegram_id):
+    """Marks a student as blocked — they stay in DB but won't receive broadcasts."""
+    conn = get_connection()
+    conn.execute(
+        "UPDATE students SET exam_preference = 'BLOCKED', is_registered = 0 WHERE telegram_id = ?",
+        (str(telegram_id),)
+    )
+    conn.commit()
+
+
+def delete_student(telegram_id):
+    """Permanently removes a student and all their associated data."""
+    conn = get_connection()
+    tid = str(telegram_id)
+    conn.execute("DELETE FROM service_requests WHERE telegram_id = ?", (tid,))
+    conn.execute("DELETE FROM user_documents WHERE telegram_id = ?", (tid,))
+    conn.execute("DELETE FROM students WHERE telegram_id = ?", (tid,))
+    conn.commit()
 
 
 def get_stats():
@@ -221,16 +249,28 @@ def add_service_request(telegram_id, service_name, category):
 
 
 def get_service_requests(status=None):
-    """Fetch all service requests, optionally filtered by status."""
+    """
+    Fetch service requests with student info via a single JOIN query.
+    FIX: Replaced N+1 loop (one DB call per request) with one JOIN query.
+    """
     conn = get_connection()
     cursor = conn.cursor()
+    query = '''
+        SELECT
+            sr.id, sr.telegram_id, sr.service_name, sr.category,
+            sr.status, sr.requested_at, sr.completed_at,
+            COALESCE(s.name, 'Unknown')      AS student_name,
+            COALESCE(s.phone_number, '')     AS student_phone,
+            COALESCE(s.username, '')         AS student_username
+        FROM service_requests sr
+        LEFT JOIN students s ON s.telegram_id = sr.telegram_id
+        {where}
+        ORDER BY sr.requested_at DESC
+    '''
     if status:
-        cursor.execute(
-            "SELECT * FROM service_requests WHERE status = ? ORDER BY requested_at DESC",
-            (status,)
-        )
+        cursor.execute(query.format(where="WHERE sr.status = ?"), (status,))
     else:
-        cursor.execute("SELECT * FROM service_requests ORDER BY requested_at DESC")
+        cursor.execute(query.format(where=""))
     return [dict(row) for row in cursor.fetchall()]
 
 
@@ -286,9 +326,10 @@ def add_scheduled_broadcast(target_exam, message_text, run_at):
 def get_pending_broadcasts():
     conn = get_connection()
     cursor = conn.cursor()
-    # Find broadcasts where run_at time has passed and still pending
+    # FIX: Use datetime('now') — PythonAnywhere runs UTC, 'localtime' was IST on dev only.
+    # Store run_at as UTC strings; frontend converts local→UTC before storing.
     cursor.execute(
-        "SELECT * FROM scheduled_broadcasts WHERE status = 'pending' AND run_at <= datetime('now', 'localtime') ORDER BY run_at ASC"
+        "SELECT * FROM scheduled_broadcasts WHERE status = 'pending' AND run_at <= datetime('now') ORDER BY run_at ASC"
     )
     return [dict(row) for row in cursor.fetchall()]
 
@@ -309,4 +350,41 @@ def mark_broadcast_complete(schedule_id):
 def delete_schedule(schedule_id):
     conn = get_connection()
     conn.execute("DELETE FROM scheduled_broadcasts WHERE id = ?", (schedule_id,))
+    conn.commit()
+
+
+# ── Bot Settings CRUD ────────────────────────────────────────────────────────
+
+def get_bot_setting(key, default=None):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT value FROM bot_settings WHERE key = ?", (key,))
+    row = cursor.fetchone()
+    return row["value"] if row else default
+
+
+def get_all_bot_settings():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT key, value FROM bot_settings")
+    return {row["key"]: row["value"] for row in cursor.fetchall()}
+
+
+def set_bot_setting(key, value):
+    conn = get_connection()
+    conn.execute(
+        "INSERT OR REPLACE INTO bot_settings (key, value) VALUES (?, ?)",
+        (str(key), str(value))
+    )
+    conn.commit()
+
+
+def set_bot_settings_bulk(settings_dict):
+    """Upsert multiple settings at once."""
+    conn = get_connection()
+    for k, v in settings_dict.items():
+        conn.execute(
+            "INSERT OR REPLACE INTO bot_settings (key, value) VALUES (?, ?)",
+            (str(k), str(v))
+        )
     conn.commit()
