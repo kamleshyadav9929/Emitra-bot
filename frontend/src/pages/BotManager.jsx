@@ -5,6 +5,10 @@ import {
   Save, CheckCircle2, Clock, BotMessageSquare,
   X, Bell, Languages,
 } from "lucide-react"
+import {
+  getServices, createService, updateService,
+  toggleService, deleteServiceApi,
+} from "../api"
 
 // ── Local storage helpers ───────────────────────────────────────────────────────
 const LS = {
@@ -129,12 +133,40 @@ function MessagesTab({ toast }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// TAB 2 — Services Manager
+// TAB 2 — Services Manager (API-driven — changes reflect in bot immediately)
 // ══════════════════════════════════════════════════════════════════════════════
-function ServiceModal({ service, onSave, onClose }) {
-  const [form, setForm] = useState(service || { name: "", desc: "", price: "", enabled: true })
+
+const CATEGORY_OPTIONS = [
+  { key: "cert",       label: "📄 Pramaan Patra (Certificates)" },
+  { key: "id",         label: "🪪 Pehchan (IDs & Updates)"      },
+  { key: "bills",      label: "💡 Bills, Recharge & Taxes"       },
+  { key: "forms",      label: "🎓 Siksha & Exams (Forms)"        },
+  { key: "schemes",    label: "🏛️ Yojana & Pension"              },
+  { key: "land_auto",  label: "🌾 Krishi, Khata & Vahan"         },
+]
+
+function ServiceModal({ service, onSave, onClose, loading }) {
+  const defaultForm = {
+    name: "", description: "", price: "",
+    category_key: "cert",
+    category_label: "📄 Pramaan Patra (Certificates)",
+    enabled: true,
+  }
+  const [form, setForm] = useState(service
+    ? { name: service.name, description: service.description || "", price: service.price || "",
+        category_key: service.category_key || "cert",
+        category_label: service.category_label || CATEGORY_OPTIONS[0].label,
+        enabled: Boolean(service.enabled) }
+    : defaultForm
+  )
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
   const valid = form.name.trim().length > 0
+
+  const handleCategoryChange = (key) => {
+    const cat = CATEGORY_OPTIONS.find(c => c.key === key)
+    set("category_key", key)
+    set("category_label", cat?.label || key)
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4">
@@ -147,6 +179,18 @@ function ServiceModal({ service, onSave, onClose }) {
           <button onClick={onClose} className="text-[#AEAEAC] hover:text-black transition-colors"><X size={18} /></button>
         </div>
         <div className="px-6 py-5 space-y-4">
+          {/* Category */}
+          <div>
+            <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase block mb-1.5">Category *</label>
+            <select
+              value={form.category_key}
+              onChange={e => handleCategoryChange(e.target.value)}
+              className="w-full border border-[#E5E5E3] px-4 py-2.5 text-[13px] text-black bg-white focus:outline-none focus:border-black transition-colors"
+            >
+              {CATEGORY_OPTIONS.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
+            </select>
+          </div>
+          {/* Name */}
           <div>
             <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase block mb-1.5">Service Name *</label>
             <input
@@ -155,14 +199,16 @@ function ServiceModal({ service, onSave, onClose }) {
               placeholder="e.g. Aadhar Update"
             />
           </div>
+          {/* Description */}
           <div>
             <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase block mb-1.5">Description</label>
             <input
-              type="text" value={form.desc} onChange={e => set("desc", e.target.value)}
+              type="text" value={form.description} onChange={e => set("description", e.target.value)}
               className="w-full border border-[#E5E5E3] px-4 py-2.5 text-[13px] text-black focus:outline-none focus:border-black transition-colors"
-              placeholder="Short description"
+              placeholder="Short description (optional)"
             />
           </div>
+          {/* Price */}
           <div>
             <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase block mb-1.5">Price (optional)</label>
             <input
@@ -171,24 +217,25 @@ function ServiceModal({ service, onSave, onClose }) {
               placeholder="e.g. ₹50 or Free"
             />
           </div>
+          {/* Toggle */}
           <div className="flex items-center gap-3">
-            <label className="text-[12px] font-semibold text-black">Active</label>
+            <label className="text-[12px] font-semibold text-black">Active in Bot</label>
             <button onClick={() => set("enabled", !form.enabled)} className="transition-colors">
               {form.enabled
                 ? <ToggleRight size={26} className="text-[#2E7D32]" />
                 : <ToggleLeft size={26} className="text-[#AEAEAC]" />}
             </button>
-            <span className="text-[11px] text-[#7A7A78]">{form.enabled ? "Visible in bot" : "Hidden"}</span>
+            <span className="text-[11px] text-[#7A7A78]">{form.enabled ? "Visible in /services" : "Hidden from bot"}</span>
           </div>
         </div>
         <div className="px-6 pb-5 flex gap-3">
           <button onClick={onClose} className="flex-1 py-2.5 border border-[#E5E5E3] text-[13px] text-[#7A7A78] hover:border-black hover:text-black transition-colors">Cancel</button>
           <button
-            onClick={() => valid && onSave(form)}
-            disabled={!valid}
+            onClick={() => valid && !loading && onSave(form)}
+            disabled={!valid || loading}
             className="flex-1 py-2.5 bg-black text-white text-[13px] font-semibold hover:bg-[#3D3D3D] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
           >
-            {service ? "Update" : "Add Service"}
+            {loading ? "Saving..." : service ? "Update" : "Add Service"}
           </button>
         </div>
       </div>
@@ -197,31 +244,70 @@ function ServiceModal({ service, onSave, onClose }) {
 }
 
 function ServicesTab({ toast }) {
-  const [services, setServices] = useState(() => LS.get("bot_services", DEFAULT_SERVICES))
+  const [services, setServices] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [modal, setModal] = useState(null) // null | "add" | { ...service }
 
-  const persist = (updated) => { setServices(updated); LS.set("bot_services", updated) }
-
-  const toggle = (id) => persist(services.map(s => s.id === id ? { ...s, enabled: !s.enabled } : s))
-  const remove = (id) => { if (window.confirm("Is service ko delete karein?")) persist(services.filter(s => s.id !== id)) }
-
-  const handleSave = (form) => {
-    if (modal === "add") {
-      persist([...services, { ...form, id: Date.now() }])
-      toast("Service add ho gayi!")
-    } else {
-      persist(services.map(s => s.id === modal.id ? { ...s, ...form } : s))
-      toast("Service update ho gayi!")
-    }
-    setModal(null)
+  const load = () => {
+    setLoading(true)
+    getServices()
+      .then(d => setServices(d.services || []))
+      .catch(() => toast("Failed to load services"))
+      .finally(() => setLoading(false))
   }
+
+  useEffect(() => { load() }, [])
+
+  const handleToggle = async (id) => {
+    await toggleService(id)
+    setServices(prev => prev.map(s => s.id === id ? { ...s, enabled: s.enabled ? 0 : 1 } : s))
+  }
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Is service ko bot se hata dein?")) return
+    await deleteServiceApi(id)
+    setServices(prev => prev.filter(s => s.id !== id))
+    toast("Service delete ho gayi!")
+  }
+
+  const handleSave = async (form) => {
+    setSaving(true)
+    try {
+      if (modal === "add") {
+        await createService(form)
+        toast("✓ Service add ho gayi — bot mein live hai!")
+      } else {
+        await updateService(modal.id, form)
+        toast("✓ Service update ho gayi — bot mein live hai!")
+      }
+      setModal(null)
+      load()
+    } catch {
+      toast("Error: save nahi hua")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const grouped = services.reduce((acc, s) => {
+    const key = s.category_label || s.category_key
+    if (!acc[key]) acc[key] = []
+    acc[key].push(s)
+    return acc
+  }, {})
 
   return (
     <div className="space-y-4">
-      {modal && <ServiceModal service={modal === "add" ? null : modal} onSave={handleSave} onClose={() => setModal(null)} />}
+      {modal && <ServiceModal service={modal === "add" ? null : modal} onSave={handleSave} onClose={() => setModal(null)} loading={saving} />}
 
       <div className="flex items-center justify-between">
-        <p className="text-[11px] text-[#AEAEAC] font-mono">{services.length} services · {services.filter(s => s.enabled).length} active</p>
+        <div>
+          <p className="text-[11px] text-[#AEAEAC] font-mono">
+            {services.length} services · {services.filter(s => s.enabled).length} active in bot
+          </p>
+          <p className="text-[10px] text-[#22C55E] mt-0.5">✓ Changes reflect in Telegram bot immediately</p>
+        </div>
         <button
           onClick={() => setModal("add")}
           className="flex items-center gap-2 px-3 py-2 bg-black text-white text-[12px] font-semibold hover:bg-[#3D3D3D] transition-colors"
@@ -230,58 +316,55 @@ function ServicesTab({ toast }) {
         </button>
       </div>
 
-      <div className="border border-[#E5E5E3] bg-white divide-y divide-[#E5E5E3]">
-        {services.map(s => (
-          <div key={s.id} className="flex items-center gap-4 px-5 py-4 hover:bg-[#F7F7F5] transition-colors">
-            {/* Toggle */}
-            <button onClick={() => toggle(s.id)} className="flex-shrink-0 transition-colors">
-              {s.enabled
-                ? <ToggleRight size={22} className="text-[#2E7D32]" />
-                : <ToggleLeft size={22} className="text-[#AEAEAC]" />}
-            </button>
-
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className={`text-[13px] font-semibold ${s.enabled ? "text-black" : "text-[#AEAEAC]"}`}>{s.name}</p>
-                {s.price && (
-                  <span className="text-[10px] font-semibold border border-[#E5E5E3] px-1.5 py-0.5 text-[#7A7A78]">{s.price}</span>
-                )}
-                {!s.enabled && (
-                  <span className="text-[9px] font-bold tracking-wider uppercase bg-[#F7F7F5] border border-[#E5E5E3] px-1.5 py-0.5 text-[#AEAEAC]">OFF</span>
-                )}
+      {loading ? (
+        <div className="py-16 flex justify-center">
+          <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {Object.entries(grouped).map(([catLabel, items]) => (
+            <div key={catLabel} className="border border-[#E5E5E3] bg-white">
+              <div className="px-5 py-3 bg-[#F7F7F5] border-b border-[#E5E5E3]">
+                <p className="text-[11px] font-semibold text-[#3D3D3D]">{catLabel}</p>
               </div>
-              {s.desc && <p className="text-[11px] text-[#7A7A78] mt-0.5">{s.desc}</p>}
+              {items.map(s => (
+                <div key={s.id} className="flex items-center gap-4 px-5 py-3.5 border-b border-[#E5E5E3] last:border-0 hover:bg-[#F7F7F5] transition-colors">
+                  <button onClick={() => handleToggle(s.id)} className="flex-shrink-0 transition-colors">
+                    {s.enabled
+                      ? <ToggleRight size={22} className="text-[#2E7D32]" />
+                      : <ToggleLeft size={22} className="text-[#AEAEAC]" />}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className={`text-[13px] font-semibold ${s.enabled ? "text-black" : "text-[#AEAEAC]"}`}>{s.name}</p>
+                      {s.price && <span className="text-[10px] font-semibold border border-[#E5E5E3] px-1.5 py-0.5 text-[#7A7A78]">{s.price}</span>}
+                      {!s.enabled && <span className="text-[9px] font-bold tracking-wider uppercase bg-[#F7F7F5] border border-[#E5E5E3] px-1.5 py-0.5 text-[#AEAEAC]">OFF</span>}
+                    </div>
+                    {s.description && <p className="text-[11px] text-[#7A7A78] mt-0.5">{s.description}</p>}
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <button onClick={() => setModal(s)} className="w-8 h-8 border border-[#E5E5E3] flex items-center justify-center text-[#7A7A78] hover:border-black hover:text-black transition-colors" title="Edit">
+                      <Pencil size={13} />
+                    </button>
+                    <button onClick={() => handleDelete(s.id)} className="w-8 h-8 border border-[#E5E5E3] flex items-center justify-center text-[#7A7A78] hover:border-red-500 hover:text-red-500 hover:bg-red-50 transition-colors" title="Delete">
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <button
-                onClick={() => setModal(s)}
-                className="w-8 h-8 border border-[#E5E5E3] flex items-center justify-center text-[#7A7A78] hover:border-black hover:text-black transition-colors"
-                title="Edit"
-              >
-                <Pencil size={13} />
-              </button>
-              <button
-                onClick={() => remove(s.id)}
-                className="w-8 h-8 border border-[#E5E5E3] flex items-center justify-center text-[#7A7A78] hover:border-red-500 hover:text-red-500 hover:bg-red-50 transition-colors"
-                title="Delete"
-              >
-                <Trash2 size={13} />
-              </button>
+          ))}
+          {services.length === 0 && (
+            <div className="py-12 text-center border border-[#E5E5E3]">
+              <p className="text-[13px] text-[#AEAEAC]">Koi service nahi. "Add Service" se shuru karein.</p>
             </div>
-          </div>
-        ))}
-        {services.length === 0 && (
-          <div className="py-12 text-center">
-            <p className="text-[13px] text-[#AEAEAC]">Koi service nahi. "Add Service" se shuru karein.</p>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
+
 
 // ══════════════════════════════════════════════════════════════════════════════
 // TAB 3 — Auto Announcements

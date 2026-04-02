@@ -12,88 +12,15 @@ from telegram.ext import ContextTypes
 import database
 import config
 
-# ── E-Mitra Services Catalog ─────────────────────────────────────────────────
+# ── Services Catalog (loaded from DB, not hardcoded) ─────────────────────────
 
-SERVICES = {
-    "cert": {
-        "label": "📄 Pramaan Patra (Certificates)",
-        "services": [
-            "Mool Niwas (Domicile)",
-            "Jati Pramaan (Caste SC/ST/OBC)",
-            "Aay Pramaan (Income)",
-            "Janma/Mrityu (Birth/Death)",
-            "Vivah Panjiyan (Marriage)",
-            "Charitra Pramaan (Character)",
-            "Minority Certificate",
-            "EWS Certificate"
-        ],
-    },
-    "id": {
-        "label": "🪪 Pehchan (IDs & Updates)",
-        "services": [
-            "Aadhar Card (New/Update)",
-            "Jan Aadhar (New/Update)",
-            "PAN Card (New/Correction)",
-            "Voter ID (New/Correction)",
-            "PVC Aadhar Card Print",
-            "SSO ID Creation",
-            "Ration Card Correction",
-            "Passport Apply"
-        ],
-    },
-    "bills": {
-        "label": "💡 Bills, Recharge & Taxes",
-        "services": [
-            "Bijli Bill (Electricity)",
-            "Pani Bill (Water)",
-            "Mobile/DTH Recharge",
-            "Gas Cylinder Booking",
-            "FASTag Recharge",
-            "ITR (Income Tax Return)",
-            "CM Helpline Sikayat",
-            "Traffic Challan Pay"
-        ],
-    },
-    "forms": {
-        "label": "🎓 Siksha & Exams (Forms)",
-        "services": [
-            "Govt. Job Form (RPSC/RSMSSB)",
-            "College Admission Form",
-            "Scholarship (Chatravriti)",
-            "RTE Form (Free Education)",
-            "Gargi Puraskar Form",
-            "REET/CET/Police Form",
-            "Rojgar Panjiyan",
-            "Berojgari Bhatta"
-        ],
-    },
-    "schemes": {
-        "label": "🏛️ Yojana & Pension",
-        "services": [
-            "Vridhavastha Pension",
-            "Vidhwa Pension",
-            "Viklang Pension",
-            "Palanhar Yojana",
-            "Shramik/Labour Card",
-            "PM Awas Yojana",
-            "PM Kisaan Samman Nidhi",
-            "Ayushman/Chiranjeevi Card"
-        ],
-    },
-    "land_auto": {
-        "label": "🌾 Krishi, Khata & Vahan",
-        "services": [
-            "Khasra/Jamabandi Nakal",
-            "Tarbandi Subsidy",
-            "Fasal Bima (Crop Insurance)",
-            "Krishi Yantra Subsidy",
-            "Driving License (DL)",
-            "Vahan RC Print/Transfer",
-            "Police Verification",
-            "Hasiyat Pramaan (Solvency)"
-        ],
-    },
-}
+def load_services():
+    """
+    Load enabled services from the database, grouped by category.
+    Returns the same dict shape as the old hardcoded SERVICES constant
+    so all downstream keyboard builders work without changes.
+    """
+    return database.get_services_as_dict()
 
 # ── WhatsApp Link Generator ───────────────────────────────────────────────────
 
@@ -112,16 +39,18 @@ def generate_whatsapp_link(name, phone, service_name):
 # ── Service Menu Keyboards ────────────────────────────────────────────────────
 
 def build_categories_keyboard():
-    """Returns inline keyboard with all service categories."""
+    """Returns inline keyboard with all service categories (live from DB)."""
+    services = load_services()
     buttons = []
-    for key, data in SERVICES.items():
+    for key, data in services.items():
         buttons.append([InlineKeyboardButton(data["label"], callback_data=f"cat_{key}")])
     return InlineKeyboardMarkup(buttons)
 
 
 def build_services_keyboard(category_key):
-    """Returns inline keyboard with services for the selected category."""
-    category = SERVICES.get(category_key)
+    """Returns inline keyboard with services for the selected category (live from DB)."""
+    services = load_services()
+    category = services.get(category_key)
     if not category:
         return None
     buttons = []
@@ -264,7 +193,8 @@ async def button_callback_handler(update: Update, context):
     # ── Service category selected ───────────────────────────────
     elif data.startswith("cat_"):
         category_key = data[4:]
-        category = SERVICES.get(category_key)
+        services = load_services()
+        category = services.get(category_key)
         if not category:
             return
         keyboard = build_services_keyboard(category_key)
@@ -289,8 +219,9 @@ async def button_callback_handler(update: Update, context):
         phone = student.get("phone_number", "")
 
         # Find which category this service belongs to
-        category_label = "Other"
-        for key, cat in SERVICES.items():
+        category_label = "other"
+        services = load_services()
+        for key, cat in services.items():
             if service_name in cat["services"]:
                 category_label = key
                 break

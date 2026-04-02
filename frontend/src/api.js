@@ -88,3 +88,34 @@ export const deleteStudent = (telegramId) =>
     method: "DELETE",
     headers: getAuthHeaders()
   }).then(r => r.json())
+
+// ── Services API ──────────────────────────────────────────────────────────────
+export const getServices = () =>
+  fetch(`${BASE_URL}/api/services`, { headers: getAuthHeaders() }).then(r => r.json())
+
+export const createService = (data) =>
+  fetch(`${BASE_URL}/api/services`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data)
+  }).then(r => r.json())
+
+export const updateService = (id, data) =>
+  fetch(`${BASE_URL}/api/services/${id}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data)
+  }).then(r => r.json())
+
+export const toggleService = (id) =>
+  fetch(`${BASE_URL}/api/services/${id}/toggle`, {
+    method: "POST",
+    headers: getAuthHeaders()
+  }).then(r => r.json())
+
+export const deleteServiceApi = (id) =>
+  fetch(`${BASE_URL}/api/services/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders()
+  }).then(r => r.json())
+

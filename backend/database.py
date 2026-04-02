@@ -95,7 +95,93 @@ def init_db():
         )
     ''')
 
+    # ── Services table (Bot Manager ↔ actual bot) ─────────────────────────────
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS services (
+            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            category_key   TEXT NOT NULL,
+            category_label TEXT NOT NULL,
+            name           TEXT NOT NULL,
+            description    TEXT DEFAULT '',
+            price          TEXT DEFAULT '',
+            enabled        INTEGER DEFAULT 1,
+            sort_order     INTEGER DEFAULT 0
+        )
+    ''')
+
     conn.commit()
+
+    # Seed default services only if table is empty
+    cursor.execute("SELECT COUNT(*) as cnt FROM services")
+    if cursor.fetchone()["cnt"] == 0:
+        _seed_default_services(conn)
+
+
+def _seed_default_services(conn):
+    """Populate services table with the original hardcoded catalog."""
+    defaults = [
+        # (category_key, category_label, name, description, price)
+        ("cert", "📄 Pramaan Patra (Certificates)", "Mool Niwas (Domicile)",          "Niwas praman patra",          "₹30"),
+        ("cert", "📄 Pramaan Patra (Certificates)", "Jati Pramaan (Caste SC/ST/OBC)", "Jati praman patra",           "₹30"),
+        ("cert", "📄 Pramaan Patra (Certificates)", "Aay Pramaan (Income)",            "Aay praman patra",            "₹30"),
+        ("cert", "📄 Pramaan Patra (Certificates)", "Janma/Mrityu (Birth/Death)",      "Janm/mrityu praman",          "₹20"),
+        ("cert", "📄 Pramaan Patra (Certificates)", "Vivah Panjiyan (Marriage)",        "Vivah panjiyan",              "₹50"),
+        ("cert", "📄 Pramaan Patra (Certificates)", "Charitra Pramaan (Character)",    "Charitra praman patra",       "₹30"),
+        ("cert", "📄 Pramaan Patra (Certificates)", "Minority Certificate",             "Alpasankhyak praman patra",   "₹30"),
+        ("cert", "📄 Pramaan Patra (Certificates)", "EWS Certificate",                 "EWS praman patra",            "₹30"),
+
+        ("id",   "🪪 Pehchan (IDs & Updates)",      "Aadhar Card (New/Update)",        "Aadhar naam/address update",  "₹50"),
+        ("id",   "🪪 Pehchan (IDs & Updates)",      "Jan Aadhar (New/Update)",         "Jan Aadhar card",             "₹0"),
+        ("id",   "🪪 Pehchan (IDs & Updates)",      "PAN Card (New/Correction)",       "Naye PAN ke liye apply",      "₹110"),
+        ("id",   "🪪 Pehchan (IDs & Updates)",      "Voter ID (New/Correction)",       "Voter ID banwao ya sudhar",   "₹0"),
+        ("id",   "🪪 Pehchan (IDs & Updates)",      "PVC Aadhar Card Print",           "PVC Aadhar card print",       "₹50"),
+        ("id",   "🪪 Pehchan (IDs & Updates)",      "SSO ID Creation",                 "Rajasthan SSO ID banao",      "₹0"),
+        ("id",   "🪪 Pehchan (IDs & Updates)",      "Ration Card Correction",          "Ration card mein sudhar",     "₹0"),
+        ("id",   "🪪 Pehchan (IDs & Updates)",      "Passport Apply",                  "Passport ke liye apply",      "₹1500"),
+
+        ("bills","💡 Bills, Recharge & Taxes",       "Bijli Bill (Electricity)",        "Bijli bill payment",          "Free"),
+        ("bills","💡 Bills, Recharge & Taxes",       "Pani Bill (Water)",               "Pani bill payment",           "Free"),
+        ("bills","💡 Bills, Recharge & Taxes",       "Mobile/DTH Recharge",             "Mobile ya DTH recharge",      "Free"),
+        ("bills","💡 Bills, Recharge & Taxes",       "Gas Cylinder Booking",            "LPG cylinder booking",        "Free"),
+        ("bills","💡 Bills, Recharge & Taxes",       "FASTag Recharge",                 "FASTag recharge",             "Free"),
+        ("bills","💡 Bills, Recharge & Taxes",       "ITR (Income Tax Return)",         "Income tax return file karo", "₹200"),
+        ("bills","💡 Bills, Recharge & Taxes",       "CM Helpline Sikayat",             "CM helpline complaint",       "Free"),
+        ("bills","💡 Bills, Recharge & Taxes",       "Traffic Challan Pay",             "Traffic challan payment",     "Free"),
+
+        ("forms","🎓 Siksha & Exams (Forms)",        "Govt. Job Form (RPSC/RSMSSB)",   "Sarkari naukri form",         "₹100"),
+        ("forms","🎓 Siksha & Exams (Forms)",        "College Admission Form",          "College admission form",      "₹50"),
+        ("forms","🎓 Siksha & Exams (Forms)",        "Scholarship (Chatravriti)",       "Chatravriti ke liye apply",   "Free"),
+        ("forms","🎓 Siksha & Exams (Forms)",        "RTE Form (Free Education)",       "RTE ke liye form",            "Free"),
+        ("forms","🎓 Siksha & Exams (Forms)",        "Gargi Puraskar Form",             "Gargi puraskar form",         "Free"),
+        ("forms","🎓 Siksha & Exams (Forms)",        "REET/CET/Police Form",            "REET, CET, Police form",      "₹100"),
+        ("forms","🎓 Siksha & Exams (Forms)",        "Rojgar Panjiyan",                 "Rachayment panjiyan",         "Free"),
+        ("forms","🎓 Siksha & Exams (Forms)",        "Berojgari Bhatta",                "Berojgari bhatta ke liye",    "Free"),
+
+        ("schemes","🏛️ Yojana & Pension",            "Vridhavastha Pension",            "Budhape ki pension",          "Free"),
+        ("schemes","🏛️ Yojana & Pension",            "Vidhwa Pension",                  "Vidhwa pension",              "Free"),
+        ("schemes","🏛️ Yojana & Pension",            "Viklang Pension",                 "Viklang pension",             "Free"),
+        ("schemes","🏛️ Yojana & Pension",            "Palanhar Yojana",                 "Palanhar yojana form",        "Free"),
+        ("schemes","🏛️ Yojana & Pension",            "Shramik/Labour Card",             "Shramik card banao",          "Free"),
+        ("schemes","🏛️ Yojana & Pension",            "PM Awas Yojana",                  "PM Awas yojana",              "Free"),
+        ("schemes","🏛️ Yojana & Pension",            "PM Kisaan Samman Nidhi",          "PM Kisaan samman nidhi",      "Free"),
+        ("schemes","🏛️ Yojana & Pension",            "Ayushman/Chiranjeevi Card",       "Ayushman card banao",         "Free"),
+
+        ("land_auto","🌾 Krishi, Khata & Vahan",    "Khasra/Jamabandi Nakal",          "Khasra/jamabandi nakal",      "₹20"),
+        ("land_auto","🌾 Krishi, Khata & Vahan",    "Tarbandi Subsidy",                "Tarbandi subsidy",            "Free"),
+        ("land_auto","🌾 Krishi, Khata & Vahan",    "Fasal Bima (Crop Insurance)",     "Fasal bima",                  "Free"),
+        ("land_auto","🌾 Krishi, Khata & Vahan",    "Krishi Yantra Subsidy",           "Krishi yantra subsidy",       "Free"),
+        ("land_auto","🌾 Krishi, Khata & Vahan",    "Driving License (DL)",            "DL banao ya renew karo",      "₹200"),
+        ("land_auto","🌾 Krishi, Khata & Vahan",    "Vahan RC Print/Transfer",         "RC print ya transfer",        "₹100"),
+        ("land_auto","🌾 Krishi, Khata & Vahan",    "Police Verification",             "Police verification",         "₹50"),
+        ("land_auto","🌾 Krishi, Khata & Vahan",    "Hasiyat Pramaan (Solvency)",      "Hasiyat praman patra",        "₹30"),
+    ]
+    for i, row in enumerate(defaults):
+        conn.execute(
+            "INSERT INTO services (category_key, category_label, name, description, price, enabled, sort_order) VALUES (?,?,?,?,?,1,?)",
+            (row[0], row[1], row[2], row[3], row[4], i)
+        )
+    conn.commit()
+
 
 
 # ── Student helpers ──────────────────────────────────────────────────────────
@@ -388,3 +474,84 @@ def set_bot_settings_bulk(settings_dict):
             (str(k), str(v))
         )
     conn.commit()
+
+
+# ── Services CRUD ─────────────────────────────────────────────────────────────
+
+def get_all_services():
+    """Returns all services ordered by category and sort_order."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM services ORDER BY sort_order ASC, id ASC")
+    return [dict(row) for row in cursor.fetchall()]
+
+
+def get_services_as_dict():
+    """
+    Returns services grouped by category — same structure as the old hardcoded
+    SERVICES dict in bot.py, but driven by the database.
+    Only returns enabled services.
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM services WHERE enabled = 1 ORDER BY sort_order ASC, id ASC"
+    )
+    rows = cursor.fetchall()
+
+    # Build ordered dict preserving category order
+    result = {}
+    for row in rows:
+        key = row["category_key"]
+        if key not in result:
+            result[key] = {
+                "label": row["category_label"],
+                "services": [],
+            }
+        result[key]["services"].append(row["name"])
+    return result
+
+
+def add_service(category_key, category_label, name, description="", price="", enabled=True):
+    conn = get_connection()
+    cursor = conn.cursor()
+    # Place at end of its category
+    cursor.execute("SELECT MAX(sort_order) as m FROM services WHERE category_key = ?", (category_key,))
+    row = cursor.fetchone()
+    next_order = (row["m"] or 0) + 1
+    conn.execute(
+        "INSERT INTO services (category_key, category_label, name, description, price, enabled, sort_order) VALUES (?,?,?,?,?,?,?)",
+        (category_key, category_label, name, description, price, 1 if enabled else 0, next_order)
+    )
+    conn.commit()
+    return cursor.lastrowid
+
+
+def update_service(service_id, **fields):
+    """Update any combination of: name, description, price, category_key, category_label, enabled."""
+    allowed = {"name", "description", "price", "category_key", "category_label", "enabled"}
+    updates = {k: v for k, v in fields.items() if k in allowed}
+    if not updates:
+        return
+    conn = get_connection()
+    clauses = ", ".join(f"{k} = ?" for k in updates)
+    values = list(updates.values()) + [service_id]
+    conn.execute(f"UPDATE services SET {clauses} WHERE id = ?", values)
+    conn.commit()
+
+
+def toggle_service(service_id):
+    """Flip enabled ↔ disabled."""
+    conn = get_connection()
+    conn.execute(
+        "UPDATE services SET enabled = CASE WHEN enabled = 1 THEN 0 ELSE 1 END WHERE id = ?",
+        (service_id,)
+    )
+    conn.commit()
+
+
+def delete_service(service_id):
+    conn = get_connection()
+    conn.execute("DELETE FROM services WHERE id = ?", (service_id,))
+    conn.commit()
+

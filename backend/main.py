@@ -390,6 +390,72 @@ def get_single_bot_setting(key):
     return jsonify({"key": key, "value": value})
 
 
+
+# ── Services API (Bot Manager ↔ actual bot) ────────────────────────────────────
+
+# Category metadata used for validation
+CATEGORY_MAP = {
+    "cert":       "📄 Pramaan Patra (Certificates)",
+    "id":         "🪪 Pehchan (IDs & Updates)",
+    "bills":      "💡 Bills, Recharge & Taxes",
+    "forms":      "🎓 Siksha & Exams (Forms)",
+    "schemes":    "🏛️ Yojana & Pension",
+    "land_auto":  "🌾 Krishi, Khata & Vahan",
+}
+
+@app.route("/api/services", methods=["GET"])
+@token_required
+def get_services():
+    return jsonify({"services": database.get_all_services()})
+
+
+@app.route("/api/services", methods=["POST"])
+@token_required
+def create_service():
+    data = request.json or {}
+    name         = data.get("name", "").strip()
+    category_key = data.get("category_key", "").strip()
+    if not name or not category_key:
+        return jsonify({"success": False, "error": "name and category_key are required"}), 400
+    if category_key not in CATEGORY_MAP:
+        return jsonify({"success": False, "error": f"Invalid category_key. Use: {list(CATEGORY_MAP)}"}), 400
+
+    category_label = data.get("category_label") or CATEGORY_MAP[category_key]
+    desc  = data.get("description", "")
+    price = data.get("price", "")
+    database.add_service(category_key, category_label, name, desc, price)
+    return jsonify({"success": True})
+
+
+@app.route("/api/services/<int:service_id>", methods=["PUT"])
+@token_required
+def update_service(service_id):
+    data = request.json or {}
+    allowed = {"name", "description", "price", "category_key", "category_label", "enabled"}
+    fields = {k: v for k, v in data.items() if k in allowed}
+    if "category_key" in fields and fields["category_key"] not in CATEGORY_MAP:
+        return jsonify({"success": False, "error": "Invalid category_key"}), 400
+    # Auto-set label if category_key changed
+    if "category_key" in fields and "category_label" not in fields:
+        fields["category_label"] = CATEGORY_MAP[fields["category_key"]]
+    database.update_service(service_id, **fields)
+    return jsonify({"success": True})
+
+
+@app.route("/api/services/<int:service_id>/toggle", methods=["POST"])
+@token_required
+def toggle_service(service_id):
+    database.toggle_service(service_id)
+    return jsonify({"success": True})
+
+
+@app.route("/api/services/<int:service_id>", methods=["DELETE"])
+@token_required
+def delete_service(service_id):
+    database.delete_service(service_id)
+    return jsonify({"success": True})
+
+
 # ── Health Check ──────────────────────────────────────────────────────────────
 
 @app.route("/ping", methods=["GET"])
