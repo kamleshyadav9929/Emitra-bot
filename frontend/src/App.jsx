@@ -44,7 +44,7 @@ function App() {
   const isLoginPage = location.pathname === "/login"
 
   return (
-    <div className="flex bg-white text-black" style={{ minHeight: '100dvh' }}>
+    <div className="flex flex-col md:flex-row bg-white text-black" style={{ minHeight: '100dvh' }}>
       {!isLoginPage && <Sidebar />}
       {!isLoginPage && isCommandPaletteOpen && (
         <CommandPalette onClose={() => setIsCommandPaletteOpen(false)} />
