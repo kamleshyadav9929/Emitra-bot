@@ -119,3 +119,20 @@ export const deleteServiceApi = (id) =>
     headers: getAuthHeaders()
   }).then(r => r.json())
 
+// ── Exams API ─────────────────────────────────────────────────────────────────
+export const getExams = () =>
+  fetch(`${BASE_URL}/api/exams`, { headers: getAuthHeaders() }).then(r => r.json())
+
+export const createExam = (data) =>
+  fetch(`${BASE_URL}/api/exams`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data)
+  }).then(r => r.json())
+
+export const deleteExamApi = (id) =>
+  fetch(`${BASE_URL}/api/exams/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders()
+  }).then(r => r.json())
+

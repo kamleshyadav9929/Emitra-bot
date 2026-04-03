@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useLocation } from "react-router-dom"
 import { Send, CheckCircle, Loader2, Bot, Users, MessageSquare, Clock, Calendar, Trash2, ArrowRight, CheckCircle2 } from "lucide-react"
-import { getStats, sendNotification, scheduleBroadcast, getSchedules, deleteSchedule } from "../api"
+import { getStats, sendNotification, scheduleBroadcast, getSchedules, deleteSchedule, getExams } from "../api"
 import Stepper, { Step } from "../components/Stepper"
 
-const EXAMS = ["JEE", "NEET", "SSC", "UPSC", "CUET"]
 const CHAR_LIMIT = 4096
 const BASE_URL = import.meta.env.VITE_API_URL || ""
 const getAuthHeaders = () => ({ "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` })
@@ -109,15 +108,20 @@ export default function SendNotification() {
   const [toastVisible, setToastVisible] = useState(false)
   const [toastMsg, setToastMsg] = useState("")
   const [jobProgress, setJobProgress] = useState(null) // { sent, total, status }
+  const [availableExams, setAvailableExams] = useState([])
   const pollRef = useRef(null)
 
   // Pre-select exam from URL param e.g. /send?exam=JEE
   useEffect(() => {
-    const params = new URLSearchParams(location.search)
-    const examParam = params.get("exam")
-    if (examParam && ["JEE", "NEET", "SSC", "UPSC", "CUET"].includes(examParam)) {
-      setSelectedExams([examParam])
-    }
+    getExams().then(data => {
+      const examNames = data.exams.map(e => e.name)
+      setAvailableExams(examNames)
+      const params = new URLSearchParams(location.search)
+      const examParam = params.get("exam")
+      if (examParam && examNames.includes(examParam)) {
+        setSelectedExams([examParam])
+      }
+    }).catch(console.error)
   }, [location.search])
 
   useEffect(() => {
@@ -283,7 +287,7 @@ export default function SendNotification() {
                     All Students
                   </button>
 
-                  {EXAMS.map(exam => {
+                  {availableExams.map(exam => {
                     const active = selectedExams.includes("ALL") || selectedExams.includes(exam)
                     return (
                       <button

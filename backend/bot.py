@@ -96,20 +96,23 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def prompt_exam_selection(update: Update):
-    keyboard = [
-        [
-            InlineKeyboardButton("JEE", callback_data="exam_JEE"),
-            InlineKeyboardButton("NEET", callback_data="exam_NEET"),
-        ],
-        [
-            InlineKeyboardButton("SSC", callback_data="exam_SSC"),
-            InlineKeyboardButton("UPSC", callback_data="exam_UPSC"),
-        ],
-        [
-            InlineKeyboardButton("CUET", callback_data="exam_CUET"),
-            InlineKeyboardButton("Sabhi Exams", callback_data="exam_ALL"),
-        ],
-    ]
+    exams = database.get_all_exams()
+    keyboard = []
+    current_row = []
+    
+    for exam in exams:
+        name = exam["name"]
+        current_row.append(InlineKeyboardButton(name, callback_data=f"exam_{name}"))
+        if len(current_row) == 2:
+            keyboard.append(current_row)
+            current_row = []
+            
+    if current_row:
+        keyboard.append(current_row)
+        
+    # Always append "Sabhi Exams" at the end
+    keyboard.append([InlineKeyboardButton("Sabhi Exams", callback_data="exam_ALL")])
+    
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     welcome_text = get_msg(

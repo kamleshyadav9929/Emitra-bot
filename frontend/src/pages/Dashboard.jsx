@@ -162,7 +162,13 @@ export default function Dashboard() {
             ) : (
               examEntries.map(([exam, count]) => {
                 const pct   = total === 0 ? 0 : Math.round((count / total) * 100)
-                const color = EXAM_COLORS[exam] || { bar: "#0A0A0A", text: "#0A0A0A", bg: "#F7F7F5" }
+                let color = EXAM_COLORS[exam]
+                if (!color) {
+                  let hash = 0
+                  for (let i = 0; i < exam.length; i++) hash = exam.charCodeAt(i) + ((hash << 5) - hash)
+                  const h = Math.abs(hash) % 360
+                  color = { bar: `hsl(${h}, 70%, 50%)`, text: `hsl(${h}, 80%, 30%)`, bg: `hsl(${h}, 50%, 95%)` }
+                }
                 return (
                   <div
                     key={exam}

@@ -3,7 +3,7 @@ import { getStudents, blockStudent, deleteStudent } from "../api"
 import ExamBadge from "../components/ExamBadge"
 import { Phone, MessagesSquare, Search, X, Download, ChevronDown, Trash2 } from "lucide-react"
 
-const FILTERS = ["ALL", "JEE", "NEET", "SSC", "UPSC", "CUET"]
+const DEFAULT_FILTERS = ["ALL", "JEE", "NEET", "SSC", "UPSC", "CUET"]
 
 function getInitials(name) {
   if (!name?.trim()) return "?"
@@ -18,7 +18,17 @@ export default function Students() {
   const [activeFilter, setActiveFilter] = useState("ALL")
   const [search, setSearch] = useState("")
   const [changingExam, setChangingExam] = useState(null) // telegram_id of student being edited
+  const [examList, setExamList] = useState(DEFAULT_FILTERS)
   const changeRef = useRef(null)
+
+  useEffect(() => {
+    import("../api").then(api => {
+      api.getExams().then(d => {
+         const names = d.exams.map(e => e.name)
+         setExamList(["ALL", ...names])
+      }).catch(console.error)
+    })
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -82,7 +92,7 @@ export default function Students() {
       {/* Filters + Search */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex gap-2 flex-wrap flex-1">
-          {FILTERS.map(f => (
+          {examList.map(f => (
             <button
               key={f}
               onClick={() => setActiveFilter(f)}
@@ -176,7 +186,7 @@ export default function Students() {
                         {changingExam === student.telegram_id && (
                           <div className="absolute left-0 top-full mt-1 z-30 bg-white border border-[#E5E5E3] shadow-lg py-1 min-w-[120px]">
                             <p className="px-3 py-1.5 text-[9px] font-semibold text-[#AEAEAC] tracking-[0.15em] uppercase border-b border-[#E5E5E3]">Change Exam</p>
-                            {["JEE", "NEET", "SSC", "UPSC", "CUET"].map(exam => (
+                            {examList.filter(e => e !== "ALL").map(exam => (
                               <button
                                 key={exam}
                                 className={`w-full text-left px-3 py-2 text-[12px] font-semibold hover:bg-[#F7F7F5] transition-colors ${

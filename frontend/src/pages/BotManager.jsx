@@ -8,7 +8,9 @@ import {
 import {
   getServices, createService, updateService,
   toggleService, deleteServiceApi,
+  getExams, createExam, deleteExamApi
 } from "../api"
+import { getExamColor } from "../constants/examColors"
 
 // ── Local storage helpers ───────────────────────────────────────────────────────
 const LS = {
@@ -73,6 +75,7 @@ function TabBtn({ id, label, icon: Icon, active, onClick, accent }) {
 const TABS = [
   { id: "messages",      label: "Default Messages",    icon: MessageSquare, accent: "#3B82F6" },
   { id: "services",      label: "Services",            icon: Wrench,        accent: "#22C55E" },
+  { id: "exams",         label: "Exams",               icon: Plus,          accent: "#EF4444" },
   { id: "announcements", label: "Auto Announcements",  icon: Megaphone,     accent: "#F97316" },
   { id: "settings",      label: "Bot Settings",        icon: Settings,      accent: "#A855F7" },
 ]
@@ -369,10 +372,8 @@ function ServicesTab({ toast }) {
 // ══════════════════════════════════════════════════════════════════════════════
 // TAB 3 — Auto Announcements
 // ══════════════════════════════════════════════════════════════════════════════
-const EXAM_OPTS = ["ALL", "JEE", "NEET", "SSC", "UPSC", "CUET"]
-const EXAM_BAR = { JEE: "#3B82F6", NEET: "#22C55E", SSC: "#F97316", UPSC: "#EF4444", CUET: "#A855F7", ALL: "#0A0A0A" }
 
-function AnnouncementModal({ ann, onSave, onClose }) {
+function AnnouncementModal({ ann, onSave, onClose, examOpts }) {
   const [form, setForm] = useState(ann || { exam: "ALL", message: "", runAt: "" })
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
   const valid = form.message.trim() && form.runAt
@@ -393,12 +394,12 @@ function AnnouncementModal({ ann, onSave, onClose }) {
           <div>
             <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase block mb-1.5">Target Exam</label>
             <div className="flex flex-wrap gap-2">
-              {EXAM_OPTS.map(e => (
+              {examOpts.map(e => (
                 <button
                   key={e}
                   onClick={() => set("exam", e)}
                   className={`px-3 py-1.5 text-[12px] font-bold border transition-colors ${form.exam === e ? "text-white border-transparent" : "bg-white text-[#7A7A78] border-[#E5E5E3] hover:border-black hover:text-black"}`}
-                  style={form.exam === e ? { backgroundColor: EXAM_BAR[e], borderColor: EXAM_BAR[e] } : {}}
+                  style={form.exam === e ? { backgroundColor: getExamColor(e), borderColor: getExamColor(e) } : {}}
                 >
                   {e}
                 </button>
@@ -439,6 +440,11 @@ function AnnouncementModal({ ann, onSave, onClose }) {
 function AnnouncementsTab({ toast }) {
   const [anns, setAnns] = useState(() => LS.get("bot_announcements", DEFAULT_ANNOUNCEMENTS))
   const [modal, setModal] = useState(null)
+  const [examOpts, setExamOpts] = useState(["ALL"])
+
+  useEffect(() => {
+    getExams().then(d => setExamOpts(["ALL", ...d.exams.map(e => e.name)])).catch(console.error)
+  }, [])
 
   const persist = (updated) => { setAnns(updated); LS.set("bot_announcements", updated) }
   const remove = (id) => { if (window.confirm("Delete this scheduled announcement?")) persist(anns.filter(a => a.id !== id)) }
@@ -453,7 +459,7 @@ function AnnouncementsTab({ toast }) {
 
   return (
     <div className="space-y-4">
-      {modal && <AnnouncementModal ann={modal === "add" ? null : modal} onSave={handleSave} onClose={() => setModal(null)} />}
+      {modal && <AnnouncementModal ann={modal === "add" ? null : modal} onSave={handleSave} onClose={() => setModal(null)} examOpts={examOpts} />}
 
       <div className="flex items-center justify-between">
         <p className="text-[11px] text-[#AEAEAC] font-mono">{anns.filter(a => !isPast(a.runAt)).length} upcoming · {anns.filter(a => isPast(a.runAt) || a.sent).length} done</p>
@@ -478,7 +484,7 @@ function AnnouncementsTab({ toast }) {
               {/* Exam pill */}
               <span
                 className="flex-shrink-0 mt-0.5 px-2 py-0.5 text-[10px] font-bold text-white"
-                style={{ backgroundColor: EXAM_BAR[ann.exam] || "#0A0A0A" }}
+                style={{ backgroundColor: getExamColor(ann.exam) }}
               >
                 {ann.exam}
               </span>
@@ -513,6 +519,109 @@ function AnnouncementsTab({ toast }) {
             </div>
           )
         })}
+      </div>
+    </div>
+  )
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TAB 3.5 — Exams Manager
+// ══════════════════════════════════════════════════════════════════════════════
+function ExamsTab({ toast }) {
+  const [exams, setExams] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [newExam, setNewExam] = useState("")
+  const [saving, setSaving] = useState(false)
+
+  const load = () => {
+    setLoading(true)
+    getExams()
+      .then(d => setExams(d.exams || []))
+      .catch(() => toast("Failed to load exams"))
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(() => { load() }, [])
+
+  const handleAdd = async () => {
+    const val = newExam.trim()
+    if (!val) return
+    setSaving(true)
+    try {
+      const res = await createExam({ name: val })
+      if (res.success) {
+        toast("✓ Exam added!")
+        setNewExam("")
+        load()
+      } else {
+        toast(res.error || "Error adding exam")
+      }
+    } catch {
+      toast("Request failed")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDelete = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to delete ${name}? Students will keep their current preference but won't be able to select it again.`)) return
+    await deleteExamApi(id)
+    toast("Exam deleted")
+    load()
+  }
+
+  return (
+    <div className="space-y-6 max-w-xl">
+      <div className="border border-[#E5E5E3] bg-white p-5">
+        <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase block mb-1.5">Add New Exam</label>
+        <div className="flex gap-3">
+          <input
+            type="text"
+            value={newExam}
+            onChange={e => setNewExam(e.target.value.toUpperCase())}
+            onKeyDown={e => e.key === "Enter" && handleAdd()}
+            placeholder="e.g. GATE"
+            className="flex-1 border border-[#E5E5E3] px-4 py-2.5 text-[13px] text-black focus:outline-none focus:border-black transition-colors"
+          />
+          <button
+            onClick={handleAdd}
+            disabled={!newExam.trim() || saving}
+            className="px-6 py-2.5 bg-black text-white text-[13px] font-semibold hover:bg-[#3D3D3D] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            {saving ? "Adding..." : "Add"}
+          </button>
+        </div>
+      </div>
+
+      <div className="border border-[#E5E5E3] bg-white divide-y divide-[#E5E5E3]">
+        {loading ? (
+          <div className="py-8 flex justify-center">
+             <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : exams.length === 0 ? (
+          <div className="py-8 text-center text-[13px] text-[#7A7A78]">No exams found</div>
+        ) : (
+          exams.map(exam => {
+            const color = getExamColor(exam.name)
+            return (
+              <div key={exam.id} className="flex items-center justify-between px-5 py-4 hover:bg-[#F7F7F5] transition-colors">
+                <span
+                   className="inline-flex items-center px-3 py-1 text-[11px] font-bold tracking-wider uppercase text-white"
+                   style={{ backgroundColor: color }}
+                >
+                  {exam.name}
+                </span>
+                <button
+                  onClick={() => handleDelete(exam.id, exam.name)}
+                  className="w-8 h-8 border border-[#E5E5E3] flex items-center justify-center text-[#7A7A78] hover:border-red-500 hover:text-red-500 hover:bg-red-50 transition-colors"
+                  title="Delete"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            )
+          })
+        )}
       </div>
     </div>
   )
@@ -661,6 +770,7 @@ export default function BotManager() {
       <div>
         {activeTab === "messages"      && <MessagesTab      toast={showToast} />}
         {activeTab === "services"      && <ServicesTab      toast={showToast} />}
+        {activeTab === "exams"         && <ExamsTab         toast={showToast} />}
         {activeTab === "announcements" && <AnnouncementsTab toast={showToast} />}
         {activeTab === "settings"      && <SettingsTab      toast={showToast} />}
       </div>

@@ -492,6 +492,33 @@ def delete_service(service_id):
     return jsonify({"success": True})
 
 
+# ── Exams API ─────────────────────────────────────────────────────────────────
+
+@app.route("/api/exams", methods=["GET"])
+@token_required
+def get_exams():
+    return jsonify({"exams": database.get_all_exams()})
+
+@app.route("/api/exams", methods=["POST"])
+@token_required
+def create_exam():
+    data = request.json or {}
+    name = data.get("name", "").strip()
+    if not name:
+        return jsonify({"success": False, "error": "Exam name is required"}), 400
+    success, result = database.add_exam(name)
+    if success:
+        return jsonify({"success": True, "id": result})
+    else:
+        return jsonify({"success": False, "error": result}), 400
+
+@app.route("/api/exams/<int:exam_id>", methods=["DELETE"])
+@token_required
+def delete_exam(exam_id):
+    database.delete_exam(exam_id)
+    return jsonify({"success": True})
+
+
 # ── Health Check ──────────────────────────────────────────────────────────────
 
 @app.route("/ping", methods=["GET"])

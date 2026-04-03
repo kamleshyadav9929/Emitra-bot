@@ -109,12 +109,26 @@ def init_db():
         )
     ''')
 
+    # ── Exams table ──────────────────────────────────────────────────────────
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS exams (
+            id      INTEGER PRIMARY KEY AUTOINCREMENT,
+            name    TEXT UNIQUE NOT NULL,
+            enabled INTEGER DEFAULT 1
+        )
+    ''')
+
     conn.commit()
 
     # Seed default services only if table is empty
     cursor.execute("SELECT COUNT(*) as cnt FROM services")
     if cursor.fetchone()["cnt"] == 0:
         _seed_default_services(conn)
+
+    # Seed default exams only if table is empty
+    cursor.execute("SELECT COUNT(*) as cnt FROM exams")
+    if cursor.fetchone()["cnt"] == 0:
+        _seed_default_exams(conn)
 
 
 def _seed_default_services(conn):
@@ -180,6 +194,13 @@ def _seed_default_services(conn):
             "INSERT INTO services (category_key, category_label, name, description, price, enabled, sort_order) VALUES (?,?,?,?,?,1,?)",
             (row[0], row[1], row[2], row[3], row[4], i)
         )
+    conn.commit()
+
+
+def _seed_default_exams(conn):
+    defaults = ["JEE", "NEET", "SSC", "UPSC", "CUET"]
+    for exam in defaults:
+        conn.execute("INSERT OR IGNORE INTO exams (name) VALUES (?)", (exam,))
     conn.commit()
 
 
@@ -553,5 +574,30 @@ def toggle_service(service_id):
 def delete_service(service_id):
     conn = get_connection()
     conn.execute("DELETE FROM services WHERE id = ?", (service_id,))
+    conn.commit()
+
+
+# ── Exams Management ─────────────────────────────────────────────────────────
+
+def get_all_exams():
+    """Returns list of enabled exams."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM exams WHERE enabled = 1 ORDER BY id ASC")
+    return [dict(row) for row in cursor.fetchall()]
+
+def add_exam(name):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT INTO exams (name) VALUES (?)", (name.strip(),))
+        conn.commit()
+        return True, cursor.lastrowid
+    except sqlite3.IntegrityError:
+        return False, "Exam already exists"
+
+def delete_exam(exam_id):
+    conn = get_connection()
+    conn.execute("DELETE FROM exams WHERE id = ?", (exam_id,))
     conn.commit()
 
