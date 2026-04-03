@@ -49,21 +49,6 @@ export const getStudentDocuments = (telegramId) =>
 export const getDocumentUrl = (fileId) =>
   fetch(`${BASE_URL}/api/document-url/${fileId}`, { headers: getAuthHeaders() }).then(r => r.json())
 
-export const scheduleBroadcast = (exam, message, runAt) =>
-  fetch(`${BASE_URL}/api/schedule`, {
-    method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ exam, message, run_at: runAt })
-  }).then(r => r.json())
-
-export const getSchedules = () =>
-  fetch(`${BASE_URL}/api/schedules`, { headers: getAuthHeaders() }).then(r => r.json())
-
-export const deleteSchedule = (id) =>
-  fetch(`${BASE_URL}/api/schedules/${id}`, {
-    method: "DELETE",
-    headers: getAuthHeaders()
-  }).then(r => r.json())
 
 // ── Bot Settings API ──────────────────────────────────────────────────────────
 export const getBotSettings = () =>

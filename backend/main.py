@@ -1,13 +1,16 @@
 import asyncio
+import re
+import threading
+from functools import wraps
+from datetime import datetime, timedelta, timezone
+from collections import defaultdict
+import time as _time
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from telegram import Update, Bot
-try:
-    from apscheduler.schedulers.background import BackgroundScheduler
-    APSCHEDULER_AVAILABLE = True
-except ImportError:
-    APSCHEDULER_AVAILABLE = False
-    print("WARNING: apscheduler not installed. Scheduled broadcasts will not run automatically.")
 
 import config
 import database
@@ -15,11 +18,6 @@ import notifier
 import bot as bot_handlers
 
 import jwt
-from functools import wraps
-from datetime import datetime, timedelta, timezone
-from collections import defaultdict
-import time as _time
-import threading
 
 # ── In-memory broadcast job tracker ──────────────────────────────────────────
 # Stores status of background broadcast jobs so the frontend can poll.
@@ -28,34 +26,17 @@ _broadcast_jobs = {}  # job_id -> {"status": "running"|"done", "sent": N, "total
 app = Flask(__name__)
 CORS(app)
 
+# ── Rate Limiter Setup ────────────────────────────────────────────────────────
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://",
+)
+
 # Initialize database on startup
 database.init_db()
 
-
-# ── Background Scheduler ──────────────────────────────────────────────────────
-
-def check_scheduled_broadcasts():
-    """Runs periodically to check and send due broadcasts."""
-    pending = database.get_pending_broadcasts()
-    for p in pending:
-        exam = p["target_exam"]
-        message = p["message_text"]
-
-        # FIX #3: Always use get_students_by_exam — it correctly handles ALL
-        # (excludes NONE) and specific exams. Never call get_all_students()
-        # for broadcasts because that includes unregistered NONE students.
-        students = database.get_students_by_exam(exam)
-
-        success_count = notifier.broadcast(config.TELEGRAM_BOT_TOKEN, students, message)
-        database.log_message(exam, message, success_count)
-        database.mark_broadcast_complete(p["id"])
-
-if APSCHEDULER_AVAILABLE:
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(func=check_scheduled_broadcasts, trigger="interval", seconds=60)
-    scheduler.start()
-else:
-    print("Scheduler not started. Run: pip install apscheduler")
 
 
 # ── Authentication ─────────────────────────────────────────────────────────────
@@ -180,6 +161,87 @@ def webhook():
     except Exception as e:
         print("Webhook processing error:", str(e))
         return jsonify({"ok": False, "error": str(e)}), 500
+# ── Public API (Unprotected / Rate-Limited) ───────────────────────────────────
+
+@app.route("/api/public/services", methods=["GET"])
+def get_public_services():
+    return jsonify({"services": database.get_services_as_dict()})
+
+
+@app.route("/api/public/exams", methods=["GET"])
+def get_public_exams():
+    return jsonify({"exams": database.get_all_exams()})
+
+
+@app.route("/api/public/announcements", methods=["GET"])
+def get_public_announcements():
+    return jsonify({"announcements": database.get_announcements()})
+
+
+@app.route("/api/public/config", methods=["GET"])
+def get_public_config():
+    """Serves front-facing configuration (WA Number, TG Link) to avoid hardcoding on Client."""
+    return jsonify({
+        "success": True,
+        "whatsapp_number": "916377964293",
+        "telegram_bot_url": "https://t.me/Kamlesh6377_bot"
+    })
+
+
+@app.route("/api/public/stats", methods=["GET"])
+def get_public_stats():
+    """Public stats for the landing page (e.g., student counts)."""
+    return jsonify({"success": True, "stats": database.get_public_stats()})
+
+
+@app.route("/api/public/register", methods=["POST"])
+@limiter.limit("5 per minute")
+def public_register():
+    data = request.json or {}
+    name = data.get("name", "").strip()
+    phone = data.get("phone", "").strip()
+    exam = data.get("exam", "NONE")
+
+    if not name or not phone:
+        return jsonify({"success": False, "error": "Name and Phone are required"}), 400
+
+    # Indian Phone Validation: 10 digits, starts with 6-9
+    if not re.match(r"^[6-9]\d{9}$", phone):
+        return jsonify({"success": False, "error": "Invalid Indian phone number"}), 400
+
+    success, result = database.register_student_web(name, phone, exam)
+    if success:
+        return jsonify({"success": True, "message": "Registered successfully!", "id": result})
+    else:
+        return jsonify({"success": False, "error": result}), 409
+
+
+@app.route("/api/public/check-status", methods=["POST"])
+@limiter.limit("10 per minute")
+def public_check_status():
+    data = request.json or {}
+    phone = data.get("phone", "").strip()
+    if not phone:
+        return jsonify({"success": False, "error": "Phone number required"}), 400
+
+    history = database.get_student_history(phone)
+    return jsonify({"success": True, "history": history})
+
+
+@app.route("/api/public/log-intent", methods=["POST"])
+@limiter.limit("10 per minute")
+def public_log_intent():
+    """Logs a user's intent to apply for a service via WhatsApp from the web portal."""
+    data = request.json or {}
+    phone    = data.get("phone", "WEB_ANONYMOUS")
+    service  = data.get("service_name")
+    category = data.get("category")
+
+    if not service or not category:
+        return jsonify({"success": False, "error": "Missing service info"}), 400
+
+    database.log_service_intent(phone, service, category)
+    return jsonify({"success": True})
 
 
 # ── Students API ──────────────────────────────────────────────────────────────
@@ -284,29 +346,6 @@ def broadcast_status(job_id):
         return jsonify({"error": "Job not found"}), 404
     return jsonify(job)
 
-
-@app.route("/api/schedule", methods=["POST"])
-@token_required
-def schedule_broadcast():
-    data = request.json
-    if not data or not data.get("exam") or not data.get("message") or not data.get("run_at"):
-        return jsonify({"success": False, "error": "Missing required fields"}), 400
-
-    database.add_scheduled_broadcast(data["exam"], data["message"], data["run_at"])
-    return jsonify({"success": True})
-
-
-@app.route("/api/schedules", methods=["GET"])
-@token_required
-def get_schedules():
-    return jsonify({"schedules": database.get_all_schedules()})
-
-
-@app.route("/api/schedules/<int:schedule_id>", methods=["DELETE"])
-@token_required
-def delete_schedule(schedule_id):
-    database.delete_schedule(schedule_id)
-    return jsonify({"success": True})
 
 
 # ── Service Requests API ──────────────────────────────────────────────────────

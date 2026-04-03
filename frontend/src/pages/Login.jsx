@@ -19,7 +19,7 @@ export default function Login() {
       const data = await login(password)
       if (data.token) {
         localStorage.setItem("admin_token", data.token)
-        navigate("/")
+        navigate("/admin")
       } else {
         setError(data.error || "Invalid password.")
       }
@@ -35,7 +35,7 @@ export default function Login() {
       {/* Left panel — editorial masthead */}
       <div className="hidden md:flex w-1/2 flex-col justify-between p-12 bg-[#0A0A0A] text-white">
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 border border-white flex items-center justify-center">
+          <div className="w-7 h-7 border border-white flex items-center justify-center rounded-lg">
             <Layers size={14} className="text-white" />
           </div>
           <span className="text-[13px] font-semibold tracking-wide">E-Mitra</span>
@@ -63,7 +63,7 @@ export default function Login() {
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="flex md:hidden items-center gap-3 mb-10">
-            <div className="w-7 h-7 bg-black flex items-center justify-center">
+            <div className="w-7 h-7 bg-black flex items-center justify-center rounded-lg">
               <Layers size={14} className="text-white" />
             </div>
             <span className="text-[14px] font-semibold text-black">E-Mitra Admin</span>
@@ -83,7 +83,7 @@ export default function Login() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="Enter secret key"
-                  className={`w-full border px-4 py-3 text-[14px] text-black placeholder:text-[#AEAEAC] bg-white outline-none focus:border-black transition-colors pr-10 ${
+                  className={`w-full border px-4 py-3 text-[14px] text-black placeholder:text-[#AEAEAC] bg-white outline-none focus:border-black transition-colors pr-10 rounded-xl ${
                     error ? "border-[#C62828]" : "border-[#E5E5E3]"
                   }`}
                 />
@@ -103,7 +103,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading || !password.trim()}
-              className={`w-full flex items-center justify-center gap-2 py-3 text-[14px] font-semibold transition-colors ${
+              className={`w-full flex items-center justify-center gap-2 py-3 text-[14px] font-semibold transition-colors rounded-xl ${
                 loading || !password.trim()
                   ? "bg-[#F7F7F5] text-[#AEAEAC] cursor-not-allowed"
                   : "bg-black text-white hover:bg-[#3D3D3D]"

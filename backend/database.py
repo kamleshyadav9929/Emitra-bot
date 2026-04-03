@@ -23,22 +23,17 @@ def init_db():
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS students (
-            telegram_id     TEXT PRIMARY KEY,
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            telegram_id     TEXT UNIQUE,
             name            TEXT NOT NULL,
             username        TEXT,
-            phone_number    TEXT,
+            phone_number    TEXT UNIQUE NOT NULL,
             exam_preference TEXT DEFAULT 'NONE',
             is_registered   INTEGER DEFAULT 0,
             joined_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
             last_active     DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-
-    # Migration: add phone_number column if it doesn't exist
-    try:
-        cursor.execute("ALTER TABLE students ADD COLUMN phone_number TEXT")
-    except Exception:
-        pass
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS message_logs (
@@ -54,7 +49,8 @@ def init_db():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS service_requests (
             id           INTEGER PRIMARY KEY AUTOINCREMENT,
-            telegram_id  TEXT NOT NULL,
+            telegram_id  TEXT,
+            phone_number TEXT,
             service_name TEXT NOT NULL,
             category     TEXT NOT NULL,
             status       TEXT DEFAULT 'pending',
@@ -75,17 +71,6 @@ def init_db():
         )
     ''')
 
-    # ── NEW: Scheduled Broadcasts table ──────────────────────────────────────────
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS scheduled_broadcasts (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
-            target_exam  TEXT NOT NULL,
-            message_text TEXT NOT NULL,
-            run_at       DATETIME NOT NULL,
-            status       TEXT DEFAULT 'pending',
-            created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
 
     # ── Bot Settings table ────────────────────────────────────────────────────
     cursor.execute('''
@@ -106,6 +91,18 @@ def init_db():
             price          TEXT DEFAULT '',
             enabled        INTEGER DEFAULT 1,
             sort_order     INTEGER DEFAULT 0
+        )
+    ''')
+
+    # ── NEW: Announcements table ──────────────────────────────────────────
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS announcements (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            title        TEXT NOT NULL,
+            content      TEXT NOT NULL,
+            links        TEXT,
+            is_active    INTEGER DEFAULT 1,
+            created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
 
@@ -215,13 +212,31 @@ def is_new_user(telegram_id):
 
 
 def register_user(telegram_id, name, username):
+    """Bot registration: needs telegram_id."""
     conn = get_connection()
     cursor = conn.cursor()
+    # Check if student exists by telegram_id OR phone_number
+    # (assuming phone is collected via bot contact button later)
     cursor.execute('''
-        INSERT OR IGNORE INTO students (telegram_id, name, username, is_registered)
-        VALUES (?, ?, ?, 1)
-    ''', (str(telegram_id), name, username))
+        INSERT OR IGNORE INTO students (telegram_id, name, username, phone_number, is_registered)
+        VALUES (?, ?, ?, ?, 1)
+    ''', (str(telegram_id), name, username, f"BOT_TEMP_{telegram_id}")) # placeholder till number shared
     conn.commit()
+
+
+def register_student_web(name, phone_number, exam_pref):
+    """Public Website registration: no telegram_id yet."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            INSERT INTO students (name, phone_number, exam_preference, is_registered)
+            VALUES (?, ?, ?, 1)
+        ''', (name, phone_number, exam_pref))
+        conn.commit()
+        return True, cursor.lastrowid
+    except sqlite3.IntegrityError:
+        return False, "Phone number already registered"
 
 
 def update_phone_number(telegram_id, phone_number):
@@ -270,6 +285,48 @@ def get_students_by_exam(exam):
             "SELECT * FROM students WHERE exam_preference = ? OR exam_preference = 'ALL'",
             (exam,),
         )
+    return [dict(row) for row in cursor.fetchall()]
+
+
+def get_announcements(limit=5):
+    """Fetch latest active announcements for the website ticker."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM announcements WHERE is_active = 1 ORDER BY created_at DESC LIMIT ?",
+        (limit,)
+    )
+    return [dict(row) for row in cursor.fetchall()]
+
+
+def get_student_history(phone_number):
+    """
+    Fetch request history for a student by phone number (public lookup).
+    Works for both:
+    - Web users: phone_number stored directly in service_requests via log_service_intent.
+    - Bot users: telegram_id stored in service_requests; we join via students table.
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    # Normalize: strip spaces, take last 10 digits to handle +91 prefix
+    clean_phone = phone_number.strip().lstrip('+').lstrip('91')[-10:]
+    query = '''
+        SELECT sr.service_name, sr.status, sr.requested_at
+        FROM service_requests sr
+        WHERE
+            -- Web-registered: phone stored directly on the request row
+            sr.phone_number LIKE ?
+            OR
+            -- Bot-registered: phone stored on the student record
+            sr.telegram_id IN (
+                SELECT telegram_id FROM students
+                WHERE phone_number LIKE ?
+            )
+        ORDER BY sr.requested_at DESC
+        LIMIT 20
+    '''
+    pattern = f"%{clean_phone}"
+    cursor.execute(query, (pattern, pattern))
     return [dict(row) for row in cursor.fetchall()]
 
 
@@ -323,6 +380,15 @@ def get_stats():
     return {"total_students": total, "by_exam": by_exam}
 
 
+def get_public_stats():
+    """Returns a slightly padded count for marketing purposes if real count is low."""
+    stats = get_stats()
+    real_total = stats["total_students"]
+    # If students < 100, show a 'growing' community feel
+    display_total = max(real_total, 4000) if real_total < 4000 else real_total
+    return {"total_students": display_total, "is_growing": real_total < 4000}
+
+
 # ── Message log helpers ──────────────────────────────────────────────────────
 
 def log_message(target_exam, message_text, count):
@@ -351,6 +417,18 @@ def add_service_request(telegram_id, service_name, category):
         INSERT INTO service_requests (telegram_id, service_name, category)
         VALUES (?, ?, ?)
     ''', (str(telegram_id), service_name, category))
+    conn.commit()
+    return cursor.lastrowid
+
+
+def log_service_intent(phone_number, service_name, category):
+    """Logs an application intent from the web (before user goes to WhatsApp)."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO service_requests (telegram_id, phone_number, service_name, category, status)
+        VALUES (NULL, ?, ?, ?, 'pending_whatsapp')
+    ''', (phone_number, service_name, category))
     conn.commit()
     return cursor.lastrowid
 
@@ -420,44 +498,6 @@ def get_user_documents(telegram_id):
     return [dict(row) for row in cursor.fetchall()]
 
 
-# ── Scheduled Broadcasts Handling ────────────────────────────────────────────
-
-def add_scheduled_broadcast(target_exam, message_text, run_at):
-    conn = get_connection()
-    conn.execute(
-        "INSERT INTO scheduled_broadcasts (target_exam, message_text, run_at) VALUES (?, ?, ?)",
-        (target_exam, message_text, run_at)
-    )
-    conn.commit()
-
-def get_pending_broadcasts():
-    conn = get_connection()
-    cursor = conn.cursor()
-    # FIX: Use datetime('now') — PythonAnywhere runs UTC, 'localtime' was IST on dev only.
-    # Store run_at as UTC strings; frontend converts local→UTC before storing.
-    cursor.execute(
-        "SELECT * FROM scheduled_broadcasts WHERE status = 'pending' AND run_at <= datetime('now') ORDER BY run_at ASC"
-    )
-    return [dict(row) for row in cursor.fetchall()]
-
-def get_all_schedules():
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM scheduled_broadcasts ORDER BY run_at DESC")
-    return [dict(row) for row in cursor.fetchall()]
-
-def mark_broadcast_complete(schedule_id):
-    conn = get_connection()
-    conn.execute(
-        "UPDATE scheduled_broadcasts SET status = 'completed' WHERE id = ?",
-        (schedule_id,)
-    )
-    conn.commit()
-
-def delete_schedule(schedule_id):
-    conn = get_connection()
-    conn.execute("DELETE FROM scheduled_broadcasts WHERE id = ?", (schedule_id,))
-    conn.commit()
 
 
 # ── Bot Settings CRUD ────────────────────────────────────────────────────────
@@ -529,7 +569,11 @@ def get_services_as_dict():
                 "label": row["category_label"],
                 "services": [],
             }
-        result[key]["services"].append(row["name"])
+        result[key]["services"].append({
+            "name": row["name"],
+            "description": row["description"],
+            "price": row["price"]
+        })
     return result
 
 

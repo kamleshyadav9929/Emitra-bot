@@ -75,7 +75,7 @@ export default function Dashboard() {
           <button
             onClick={() => fetchAll(true)}
             disabled={refreshing}
-            className="flex items-center gap-2 px-3 py-2 border border-[#E5E5E3] text-[12px] text-[#3D3D3D] hover:border-black hover:text-black transition-colors disabled:opacity-40"
+            className="flex items-center gap-2 px-3 py-2 border border-[#E5E5E3] text-[12px] text-[#3D3D3D] hover:border-black hover:text-black transition-colors disabled:opacity-40 rounded-lg"
           >
             <RefreshCw size={12} className={refreshing ? "animate-spin" : ""} />
             {refreshing ? "Refreshing..." : "Refresh"}
@@ -90,7 +90,7 @@ export default function Dashboard() {
         {/* Total Students */}
         <div
           onClick={() => navigate("/students")}
-          className="border border-[#E5E5E3] p-6 bg-white cursor-pointer hover:border-black hover:shadow-md transition-all group"
+          className="border border-[#E5E5E3] p-6 bg-white cursor-pointer hover:border-black hover:shadow-md transition-all group rounded-2xl"
         >
           <div className="flex items-center justify-between mb-4">
             <Users size={16} className="text-[#AEAEAC] group-hover:text-black transition-colors" />
@@ -103,7 +103,7 @@ export default function Dashboard() {
         {/* Messages Sent */}
         <div
           onClick={() => navigate("/logs")}
-          className="border border-[#E5E5E3] p-6 bg-white cursor-pointer hover:border-black hover:shadow-md transition-all group"
+          className="border border-[#E5E5E3] p-6 bg-white cursor-pointer hover:border-black hover:shadow-md transition-all group rounded-2xl"
         >
           <div className="flex items-center justify-between mb-4">
             <Send size={16} className="text-[#AEAEAC] group-hover:text-black transition-colors" />
@@ -116,7 +116,7 @@ export default function Dashboard() {
         {/* Pending Requests */}
         <div
           onClick={() => navigate("/requests")}
-          className="border border-[#E5E5E3] p-6 bg-white cursor-pointer hover:border-black hover:shadow-md transition-all group"
+          className="border border-[#E5E5E3] p-6 bg-white cursor-pointer hover:border-black hover:shadow-md transition-all group rounded-2xl"
         >
           <div className="flex items-center justify-between mb-4">
             <AlertCircle size={16} className={pendingCount > 0 ? "text-red-500" : "text-[#AEAEAC]"} />
@@ -136,7 +136,7 @@ export default function Dashboard() {
         </div>
 
         {/* Exam Categories */}
-        <div className="border border-[#E5E5E3] p-6 bg-white">
+        <div className="border border-[#E5E5E3] p-6 bg-white rounded-2xl">
           <div className="flex items-center justify-between mb-4">
             <BookOpen size={16} className="text-[#AEAEAC]" />
           </div>
@@ -149,7 +149,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
 
         {/* Distribution Chart — 3/5 */}
-        <div className="border border-[#E5E5E3] p-5 bg-white lg:col-span-3">
+        <div className="border border-[#E5E5E3] p-5 bg-white lg:col-span-3 rounded-2xl">
           <div className="flex items-center justify-between mb-5 pb-4 border-b border-[#E5E5E3]">
             <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC]">Distribution</p>
             <TrendingUp size={13} className="text-[#AEAEAC]" />
@@ -182,8 +182,8 @@ export default function Dashboard() {
                       </span>
                       <span className="text-[11px] text-[#7A7A78] font-mono">{count} · {pct}%</span>
                     </div>
-                    <div className="w-full bg-[#F7F7F5] h-2 overflow-hidden rounded-sm">
-                      <div className="h-full transition-all duration-700 rounded-sm" style={{ width: `${pct}%`, backgroundColor: color.bar }} />
+                    <div className="w-full bg-[#F7F7F5] h-2 overflow-hidden rounded-full">
+                      <div className="h-full transition-all duration-700 rounded-full" style={{ width: `${pct}%`, backgroundColor: color.bar }} />
                     </div>
                   </div>
                 )
@@ -193,7 +193,7 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions — 2/5 */}
-        <div className="border border-[#E5E5E3] p-5 bg-white lg:col-span-2">
+        <div className="border border-[#E5E5E3] p-5 bg-white lg:col-span-2 rounded-2xl">
           <div className="mb-5 pb-4 border-b border-[#E5E5E3]">
             <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC]">Quick Actions</p>
           </div>
@@ -207,7 +207,7 @@ export default function Dashboard() {
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className="w-full flex items-center justify-between px-4 py-3 border border-[#E5E5E3] hover:border-black hover:bg-[#F7F7F5] transition-all text-left group"
+                className="w-full flex items-center justify-between px-4 py-3 border border-[#E5E5E3] hover:border-black hover:bg-[#F7F7F5] transition-all text-left group rounded-xl"
               >
                 <div>
                   <p className="text-[13px] font-semibold text-black">{item.label}</p>
@@ -223,8 +223,7 @@ export default function Dashboard() {
       {/* ── Row 3: Big Send Broadcast Button ── */}
       <button
         onClick={() => navigate("/send")}
-        className="w-full flex items-center justify-center gap-3 py-5 bg-black text-white hover:bg-[#1A1A1A] active:scale-[0.99] transition-all"
-        style={{ boxShadow: "4px 4px 0px #E5E5E3" }}
+        className="w-full flex items-center justify-center gap-3 py-5 bg-black text-white hover:bg-[#1A1A1A] active:scale-[0.99] transition-all rounded-2xl shadow-xl shadow-black/10"
       >
         <Megaphone size={20} />
         <span className="text-[16px] font-semibold tracking-wide">📢 Send Broadcast</span>

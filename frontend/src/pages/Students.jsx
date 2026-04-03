@@ -82,7 +82,7 @@ export default function Students() {
         <button
           onClick={exportCSV}
           disabled={filtered.length === 0}
-          className="flex items-center gap-2 px-3 py-2 border border-[#E5E5E3] text-[12px] text-[#7A7A78] hover:border-black hover:text-black transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-3 py-2 border border-[#E5E5E3] text-[12px] text-[#7A7A78] hover:border-black hover:text-black transition-colors disabled:opacity-30 disabled:cursor-not-allowed rounded-lg"
         >
           <Download size={13} />
           Export CSV
@@ -96,7 +96,7 @@ export default function Students() {
             <button
               key={f}
               onClick={() => setActiveFilter(f)}
-              className={`px-3 py-1.5 text-[12px] font-semibold border transition-colors ${
+              className={`px-4 py-1.5 text-[12px] font-semibold border transition-colors rounded-full ${
                 activeFilter === f
                   ? "bg-black text-white border-black"
                   : "bg-white text-[#7A7A78] border-[#E5E5E3] hover:border-black hover:text-black"
@@ -113,7 +113,7 @@ export default function Students() {
             placeholder="Search students..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full sm:w-52 border border-[#E5E5E3] pl-8 pr-8 py-1.5 text-[13px] text-black placeholder:text-[#AEAEAC] bg-white focus:outline-none focus:border-black transition-colors"
+            className="w-full sm:w-64 border border-[#E5E5E3] pl-8 pr-8 py-2 text-[13px] text-black placeholder:text-[#AEAEAC] bg-white focus:outline-none focus:border-black transition-colors rounded-xl"
           />
           {search && (
             <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#AEAEAC] hover:text-black">
@@ -128,7 +128,7 @@ export default function Students() {
       </p>
 
       {/* Table (Desktop) & Cards (Mobile) */}
-      <div className="border border-[#E5E5E3] bg-white overflow-hidden">
+      <div className="border border-[#E5E5E3] bg-white overflow-hidden rounded-2xl shadow-sm">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
@@ -148,7 +148,7 @@ export default function Students() {
                 <div key={student.telegram_id} className="p-4 hover:bg-[#F7F7F5] transition-colors relative group">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-[#F7F7F5] border border-[#E5E5E3] flex items-center justify-center text-black text-[11px] font-semibold flex-shrink-0">
+                      <div className="w-8 h-8 bg-[#F7F7F5] border border-[#E5E5E3] flex items-center justify-center text-black text-[11px] font-semibold flex-shrink-0 rounded-lg">
                         {getInitials(student.name)}
                       </div>
                       <div>
@@ -168,7 +168,7 @@ export default function Students() {
                         </button>
                       </div>
                       {changingExam === student.telegram_id && (
-                        <div className="absolute right-0 top-full mt-1 z-30 bg-white border border-[#E5E5E3] shadow-lg py-1 min-w-[120px]">
+                        <div className="absolute right-0 top-full mt-1 z-30 bg-white border border-[#E5E5E3] shadow-lg py-1 min-w-[140px] rounded-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                           <p className="px-3 py-1.5 text-[9px] font-semibold text-[#AEAEAC] tracking-[0.15em] uppercase border-b border-[#E5E5E3]">Change Exam</p>
                           {examList.filter(e => e !== "ALL").map(exam => (
                             <button
@@ -224,7 +224,7 @@ export default function Students() {
                               })
                             }
                           }}
-                          className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors"
+                          className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors rounded-lg"
                           title="Block"
                         >
                           <X size={13} />
@@ -277,7 +277,7 @@ export default function Students() {
                       {/* Student */}
                       <td className="py-4 px-5">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-[#F7F7F5] border border-[#E5E5E3] flex items-center justify-center text-black text-[11px] font-semibold flex-shrink-0">
+                          <div className="w-8 h-8 bg-[#F7F7F5] border border-[#E5E5E3] flex items-center justify-center text-black text-[11px] font-semibold flex-shrink-0 rounded-lg">
                             {getInitials(student.name)}
                           </div>
                           <div>
@@ -300,7 +300,7 @@ export default function Students() {
                             </button>
                           </div>
                           {changingExam === student.telegram_id && (
-                            <div className="absolute left-0 top-full mt-1 z-30 bg-white border border-[#E5E5E3] shadow-lg py-1 min-w-[120px]">
+                            <div className="absolute left-0 top-full mt-1 z-30 bg-white border border-[#E5E5E3] shadow-lg py-1 min-w-[140px] rounded-xl overflow-hidden">
                               <p className="px-3 py-1.5 text-[9px] font-semibold text-[#AEAEAC] tracking-[0.15em] uppercase border-b border-[#E5E5E3]">Change Exam</p>
                               {examList.filter(e => e !== "ALL").map(exam => (
                                 <button
@@ -360,7 +360,7 @@ export default function Students() {
                                     })
                                   }
                                 }}
-                                className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors"
+                                className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors rounded-lg"
                                 title="Block"
                               >
                                 <X size={13} />
@@ -374,7 +374,7 @@ export default function Students() {
                                   })
                                 }
                               }}
-                              className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors"
+                              className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors rounded-lg"
                               title="Delete"
                             >
                               <Trash2 size={13} />

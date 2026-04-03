@@ -4,20 +4,20 @@ import { useEffect, useState } from "react"
 import { getServiceRequests } from "../api"
 
 const navItems = [
-  { name: "Dashboard", path: "/",            icon: Home          },
-  { name: "Send",      path: "/send",        icon: Send          },
-  { name: "Students",  path: "/students",    icon: Users         },
-  { name: "E-Mitra",  path: "/requests",    icon: ClipboardList },
-  { name: "Bot Manager", path: "/bot-manager", icon: Bot         },
+  { name: "Dashboard", path: "/admin",             icon: Home          },
+  { name: "Send",      path: "/admin/send",        icon: Send          },
+  { name: "Students",  path: "/admin/students",    icon: Users         },
+  { name: "E-Mitra",  path: "/admin/requests",    icon: ClipboardList },
+  { name: "Bot Manager", path: "/admin/bot-manager", icon: Bot         },
 ]
 
 // Accent colors per route for the active left-border
 const ROUTE_ACCENT = {
-  "/":             "#0A0A0A",
-  "/send":         "#3B82F6",
-  "/students":     "#22C55E",
-  "/requests":     "#EF4444",
-  "/bot-manager":  "#F97316",
+  "/admin":             "#0A0A0A",
+  "/admin/send":        "#3B82F6",
+  "/admin/students":    "#22C55E",
+  "/admin/requests":    "#EF4444",
+  "/admin/bot-manager": "#F97316",
 }
 
 function usePendingCount() {
@@ -39,7 +39,7 @@ export function Sidebar() {
       {/* Logo */}
       <div className="px-6 py-6 border-b border-[#E5E5E3]">
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 bg-black flex items-center justify-center flex-shrink-0">
+          <div className="w-7 h-7 bg-black flex items-center justify-center flex-shrink-0 rounded-lg">
             <Layers size={14} className="text-white" />
           </div>
           <div>
@@ -60,7 +60,7 @@ export function Sidebar() {
             <Link
               key={item.path}
               to={item.path}
-              className={`relative flex items-center gap-3 px-3 py-2.5 text-[13px] font-medium transition-all ${
+              className={`relative flex items-center gap-3 px-3 py-2.5 text-[13px] font-medium transition-all mx-1 rounded-xl ${
                 isActive
                   ? "bg-[#F7F7F5] text-black"
                   : "text-[#3D3D3D] hover:text-black hover:bg-[#F2F2F0]"
@@ -92,7 +92,7 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="px-4 py-4 border-t border-[#E5E5E3]">
-        <div className="flex items-center gap-2 px-3 py-2 bg-[#F7F7F5] border border-[#E5E5E3]">
+        <div className="flex items-center gap-2 px-3 py-2 bg-[#F7F7F5] border border-[#E5E5E3] rounded-xl">
           <div className="w-1.5 h-1.5 rounded-full bg-[#2E7D32]"></div>
           <span className="text-[11px] text-[#3D3D3D] font-medium">System Online</span>
         </div>
