@@ -50,7 +50,7 @@ function App() {
         <CommandPalette onClose={() => setIsCommandPaletteOpen(false)} />
       )}
 
-      <main className={`flex-1 ${!isLoginPage ? "md:ml-[220px] pb-20 md:pb-0" : ""} flex flex-col`}>
+      <main className={`flex-1 min-w-0 flex flex-col ${!isLoginPage ? "md:ml-[220px]" : ""}`}>
         {/* Mobile top bar */}
         {!isLoginPage && (
           <div className="md:hidden flex items-center gap-3 px-5 py-4 border-b border-[#E5E5E3] bg-white sticky top-0 z-40">
@@ -65,7 +65,7 @@ function App() {
           </div>
         )}
 
-        <div className={`max-w-5xl mx-auto w-full ${!isLoginPage ? "px-5 md:px-8 py-8" : "flex-1 flex flex-col"}`}>
+        <div className={`max-w-5xl mx-auto w-full ${!isLoginPage ? "px-4 sm:px-5 md:px-8 py-6 md:py-8" : "flex-1 flex flex-col"}`}>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />

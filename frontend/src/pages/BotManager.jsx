@@ -331,21 +331,25 @@ function ServicesTab({ toast }) {
                 <p className="text-[11px] font-semibold text-[#3D3D3D]">{catLabel}</p>
               </div>
               {items.map(s => (
-                <div key={s.id} className="flex items-center gap-4 px-5 py-3.5 border-b border-[#E5E5E3] last:border-0 hover:bg-[#F7F7F5] transition-colors">
-                  <button onClick={() => handleToggle(s.id)} className="flex-shrink-0 transition-colors">
-                    {s.enabled
-                      ? <ToggleRight size={22} className="text-[#2E7D32]" />
-                      : <ToggleLeft size={22} className="text-[#AEAEAC]" />}
-                  </button>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className={`text-[13px] font-semibold ${s.enabled ? "text-black" : "text-[#AEAEAC]"}`}>{s.name}</p>
-                      {s.price && <span className="text-[10px] font-semibold border border-[#E5E5E3] px-1.5 py-0.5 text-[#7A7A78]">{s.price}</span>}
-                      {!s.enabled && <span className="text-[9px] font-bold tracking-wider uppercase bg-[#F7F7F5] border border-[#E5E5E3] px-1.5 py-0.5 text-[#AEAEAC]">OFF</span>}
+                <div key={s.id} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-5 py-3.5 border-b border-[#E5E5E3] last:border-0 hover:bg-[#F7F7F5] transition-colors">
+                  <div className="flex items-start justify-between w-full sm:w-auto flex-1 min-w-0">
+                    <div className="flex gap-3">
+                      <button onClick={() => handleToggle(s.id)} className="flex-shrink-0 transition-colors mt-0.5 sm:mt-0">
+                        {s.enabled
+                          ? <ToggleRight size={22} className="text-[#2E7D32]" />
+                          : <ToggleLeft size={22} className="text-[#AEAEAC]" />}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className={`text-[13px] font-semibold ${s.enabled ? "text-black" : "text-[#AEAEAC]"}`}>{s.name}</p>
+                          {s.price && <span className="text-[10px] font-semibold border border-[#E5E5E3] px-1.5 py-0.5 text-[#7A7A78] break-all">{s.price}</span>}
+                          {!s.enabled && <span className="text-[9px] font-bold tracking-wider uppercase bg-[#F7F7F5] border border-[#E5E5E3] px-1.5 py-0.5 text-[#AEAEAC]">OFF</span>}
+                        </div>
+                        {s.description && <p className="text-[11px] text-[#7A7A78] mt-0.5 break-words">{s.description}</p>}
+                      </div>
                     </div>
-                    {s.description && <p className="text-[11px] text-[#7A7A78] mt-0.5">{s.description}</p>}
                   </div>
-                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <div className="flex items-center gap-1.5 flex-shrink-0 self-end sm:self-auto mt-2 sm:mt-0">
                     <button onClick={() => setModal(s)} className="w-8 h-8 border border-[#E5E5E3] flex items-center justify-center text-[#7A7A78] hover:border-black hover:text-black transition-colors" title="Edit">
                       <Pencil size={13} />
                     </button>
@@ -480,10 +484,10 @@ function AnnouncementsTab({ toast }) {
         {[...anns].sort((a, b) => new Date(a.runAt) - new Date(b.runAt)).map(ann => {
           const past = isPast(ann.runAt)
           return (
-            <div key={ann.id} className={`flex items-start gap-4 px-5 py-4 hover:bg-[#F7F7F5] transition-colors ${past ? "opacity-60" : ""}`}>
+            <div key={ann.id} className={`flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4 px-5 py-4 hover:bg-[#F7F7F5] transition-colors ${past ? "opacity-60" : ""}`}>
               {/* Exam pill */}
               <span
-                className="flex-shrink-0 mt-0.5 px-2 py-0.5 text-[10px] font-bold text-white"
+                className="flex-shrink-0 mt-0.5 px-2 py-0.5 text-[10px] font-bold text-white w-fit"
                 style={{ backgroundColor: getExamColor(ann.exam) }}
               >
                 {ann.exam}
@@ -574,7 +578,7 @@ function ExamsTab({ toast }) {
     <div className="space-y-6 max-w-xl">
       <div className="border border-[#E5E5E3] bg-white p-5">
         <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase block mb-1.5">Add New Exam</label>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
             value={newExam}
@@ -604,9 +608,9 @@ function ExamsTab({ toast }) {
           exams.map(exam => {
             const color = getExamColor(exam.name)
             return (
-              <div key={exam.id} className="flex items-center justify-between px-5 py-4 hover:bg-[#F7F7F5] transition-colors">
+              <div key={exam.id} className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-4 hover:bg-[#F7F7F5] transition-colors gap-3">
                 <span
-                   className="inline-flex items-center px-3 py-1 text-[11px] font-bold tracking-wider uppercase text-white"
+                   className="inline-flex items-center justify-center px-3 py-1 text-[11px] font-bold tracking-wider uppercase text-white w-fit"
                    style={{ backgroundColor: color }}
                 >
                   {exam.name}
@@ -666,7 +670,7 @@ function SettingsTab({ toast }) {
           <p className="text-[12px] font-semibold text-black">Default Language</p>
         </div>
         <div className="px-5 py-4">
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             {[
               { val: "hindi",    label: "हिंदी",  sub: "Pure Hindi" },
               { val: "english",  label: "English", sub: "Pure English" },
@@ -696,8 +700,8 @@ function SettingsTab({ toast }) {
           <p className="text-[12px] font-semibold text-black">Notification Cooldown</p>
         </div>
         <div className="px-5 py-4">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3 flex-1">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex items-center gap-3 flex-wrap flex-1">
               <span className="text-[13px] text-[#3D3D3D]">Max</span>
               <input
                 type="number"

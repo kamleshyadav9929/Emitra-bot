@@ -107,13 +107,8 @@ export function BottomNav() {
 
   return (
     <nav
-      className="md:hidden bg-white border-t border-[#E5E5E3]"
+      className="md:hidden sticky bottom-0 mt-auto w-full z-50 bg-white border-t border-[#E5E5E3]"
       style={{
-        position: "fixed",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 9999,
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >

@@ -127,8 +127,8 @@ export default function Students() {
         {filtered.length} of {students.length} students
       </p>
 
-      {/* Table */}
-      <div className="border border-[#E5E5E3] overflow-hidden">
+      {/* Table (Desktop) & Cards (Mobile) */}
+      <div className="border border-[#E5E5E3] bg-white overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
@@ -141,146 +141,263 @@ export default function Students() {
             </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left min-w-[600px]">
-              <thead>
-                <tr className="border-b border-[#E5E5E3] bg-[#F7F7F5]">
-                  {["Student", "Exam", "Phone", "Telegram", "Joined"].map((h, i) => (
-                    <th key={h} className={`py-3 px-5 text-[10px] font-semibold text-[#AEAEAC] tracking-[0.18em] uppercase ${i === 4 ? "text-right" : ""}`}>
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(student => (
-                  <tr
-                    key={student.telegram_id}
-                    className="group border-b border-[#E5E5E3] last:border-0 hover:bg-[#F7F7F5] transition-colors"
-                  >
-                    {/* Student */}
-                    <td className="py-4 px-5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-[#F7F7F5] border border-[#E5E5E3] flex items-center justify-center text-black text-[11px] font-semibold flex-shrink-0">
-                          {getInitials(student.name)}
-                        </div>
-                        <div>
-                          <p className="text-[13px] font-semibold text-black">{student.name}</p>
-                          <p className="text-[11px] text-[#AEAEAC] font-mono">{student.telegram_id}</p>
-                        </div>
+          <>
+            {/* Mobile Cards */}
+            <div className="block md:hidden divide-y divide-[#E5E5E3]">
+              {filtered.map(student => (
+                <div key={student.telegram_id} className="p-4 hover:bg-[#F7F7F5] transition-colors relative group">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-[#F7F7F5] border border-[#E5E5E3] flex items-center justify-center text-black text-[11px] font-semibold flex-shrink-0">
+                        {getInitials(student.name)}
                       </div>
-                    </td>
-                    {/* Exam + Change button */}
-                    <td className="py-4 px-5">
-                      <div className="relative inline-block" ref={changingExam === student.telegram_id ? changeRef : null}>
-                        <div className="flex items-center gap-1.5">
-                          <ExamBadge exam={student.exam_preference} />
-                          <button
-                            onClick={() => setChangingExam(changingExam === student.telegram_id ? null : student.telegram_id)}
-                            className="flex items-center gap-0.5 text-[10px] text-[#AEAEAC] hover:text-black transition-colors"
-                            title="Change Exam"
-                          >
-                            <ChevronDown size={11} />
-                          </button>
+                      <div>
+                        <p className="text-[13px] font-semibold text-black">{student.name}</p>
+                        <p className="text-[11px] text-[#AEAEAC] font-mono">{student.telegram_id}</p>
+                      </div>
+                    </div>
+                    {/* Exam + Change button - Card Corner */}
+                    <div className="relative inline-block" ref={changingExam === student.telegram_id ? changeRef : null}>
+                      <div className="flex items-center gap-1.5">
+                        <ExamBadge exam={student.exam_preference} />
+                        <button
+                          onClick={() => setChangingExam(changingExam === student.telegram_id ? null : student.telegram_id)}
+                          className="flex items-center gap-0.5 text-[10px] text-[#AEAEAC] hover:text-black transition-colors"
+                        >
+                          <ChevronDown size={11} />
+                        </button>
+                      </div>
+                      {changingExam === student.telegram_id && (
+                        <div className="absolute right-0 top-full mt-1 z-30 bg-white border border-[#E5E5E3] shadow-lg py-1 min-w-[120px]">
+                          <p className="px-3 py-1.5 text-[9px] font-semibold text-[#AEAEAC] tracking-[0.15em] uppercase border-b border-[#E5E5E3]">Change Exam</p>
+                          {examList.filter(e => e !== "ALL").map(exam => (
+                            <button
+                              key={exam}
+                              className={`w-full text-left px-3 py-2 text-[12px] font-semibold hover:bg-[#F7F7F5] transition-colors ${
+                                student.exam_preference === exam ? "text-black" : "text-[#7A7A78]"
+                              }`}
+                              onClick={() => {
+                                setStudents(prev => prev.map(s =>
+                                  s.telegram_id === student.telegram_id ? { ...s, exam_preference: exam } : s
+                                ))
+                                setChangingExam(null)
+                              }}
+                            >
+                              {student.exam_preference === exam ? `✓ ${exam}` : exam}
+                            </button>
+                          ))}
                         </div>
-                        {changingExam === student.telegram_id && (
-                          <div className="absolute left-0 top-full mt-1 z-30 bg-white border border-[#E5E5E3] shadow-lg py-1 min-w-[120px]">
-                            <p className="px-3 py-1.5 text-[9px] font-semibold text-[#AEAEAC] tracking-[0.15em] uppercase border-b border-[#E5E5E3]">Change Exam</p>
-                            {examList.filter(e => e !== "ALL").map(exam => (
-                              <button
-                                key={exam}
-                                className={`w-full text-left px-3 py-2 text-[12px] font-semibold hover:bg-[#F7F7F5] transition-colors ${
-                                  student.exam_preference === exam ? "text-black" : "text-[#7A7A78]"
-                                }`}
-                                onClick={() => {
-                                  setStudents(prev => prev.map(s =>
-                                    s.telegram_id === student.telegram_id ? { ...s, exam_preference: exam } : s
-                                  ))
-                                  setChangingExam(null)
-                                }}
-                              >
-                                {student.exam_preference === exam ? `✓ ${exam}` : exam}
-                              </button>
-                            ))}
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 mb-3">
+                    {student.phone_number ? (
+                      <div className="flex items-center gap-2">
+                        <Phone size={12} className="text-[#AEAEAC]" />
+                        <span className="text-[12px] text-[#3D3D3D] font-mono">{student.phone_number}</span>
+                      </div>
+                    ) : (
+                      <span className="text-[11px] text-[#AEAEAC] italic">Phone not shared</span>
+                    )}
+                    {student.username ? (
+                      <div className="flex items-center gap-2">
+                        <MessagesSquare size={12} className="text-[#AEAEAC]" />
+                        <span className="text-[12px] text-[#3D3D3D] font-mono">{student.username}</span>
+                      </div>
+                    ) : (
+                      <span className="text-[11px] text-[#AEAEAC] italic">Telegram unshared</span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between border-t border-[#E5E5E3] pt-3">
+                    <span className="text-[11px] text-[#AEAEAC] font-mono">
+                      Joined: {new Date(student.joined_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      {student.exam_preference !== "BLOCKED" && (
+                        <button
+                          onClick={() => {
+                            if (window.confirm("Block this student from receiving broadcasts?")) {
+                              blockStudent(student.telegram_id).then(() => {
+                                setStudents(prev => prev.map(s => s.telegram_id === student.telegram_id ? { ...s, exam_preference: "BLOCKED" } : s))
+                              })
+                            }
+                          }}
+                          className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors"
+                          title="Block"
+                        >
+                          <X size={13} />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          if (window.confirm("Permanently delete this student?")) {
+                            deleteStudent(student.telegram_id).then(() => {
+                              setStudents(prev => prev.filter(s => s.telegram_id !== student.telegram_id))
+                            })
+                          }
+                        }}
+                        className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {filtered.length === 0 && (
+                <div className="py-12 text-center">
+                  <p className="text-[13px] text-[#AEAEAC]">
+                    {search ? `No results for "${search}"` : `No students in ${activeFilter}.`}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left min-w-[600px]">
+                <thead>
+                  <tr className="border-b border-[#E5E5E3] bg-[#F7F7F5]">
+                    {["Student", "Exam", "Phone", "Telegram", "Joined"].map((h, i) => (
+                      <th key={h} className={`py-3 px-5 text-[10px] font-semibold text-[#AEAEAC] tracking-[0.18em] uppercase ${i === 4 ? "text-right" : ""}`}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map(student => (
+                    <tr
+                      key={student.telegram_id}
+                      className="group border-b border-[#E5E5E3] last:border-0 hover:bg-[#F7F7F5] transition-colors"
+                    >
+                      {/* Student */}
+                      <td className="py-4 px-5">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-[#F7F7F5] border border-[#E5E5E3] flex items-center justify-center text-black text-[11px] font-semibold flex-shrink-0">
+                            {getInitials(student.name)}
                           </div>
+                          <div>
+                            <p className="text-[13px] font-semibold text-black">{student.name}</p>
+                            <p className="text-[11px] text-[#AEAEAC] font-mono">{student.telegram_id}</p>
+                          </div>
+                        </div>
+                      </td>
+                      {/* Exam + Change button */}
+                      <td className="py-4 px-5">
+                        <div className="relative inline-block" ref={changingExam === student.telegram_id ? changeRef : null}>
+                          <div className="flex items-center gap-1.5">
+                            <ExamBadge exam={student.exam_preference} />
+                            <button
+                              onClick={() => setChangingExam(changingExam === student.telegram_id ? null : student.telegram_id)}
+                              className="flex items-center gap-0.5 text-[10px] text-[#AEAEAC] hover:text-black transition-colors"
+                              title="Change Exam"
+                            >
+                              <ChevronDown size={11} />
+                            </button>
+                          </div>
+                          {changingExam === student.telegram_id && (
+                            <div className="absolute left-0 top-full mt-1 z-30 bg-white border border-[#E5E5E3] shadow-lg py-1 min-w-[120px]">
+                              <p className="px-3 py-1.5 text-[9px] font-semibold text-[#AEAEAC] tracking-[0.15em] uppercase border-b border-[#E5E5E3]">Change Exam</p>
+                              {examList.filter(e => e !== "ALL").map(exam => (
+                                <button
+                                  key={exam}
+                                  className={`w-full text-left px-3 py-2 text-[12px] font-semibold hover:bg-[#F7F7F5] transition-colors ${
+                                    student.exam_preference === exam ? "text-black" : "text-[#7A7A78]"
+                                  }`}
+                                  onClick={() => {
+                                    setStudents(prev => prev.map(s =>
+                                      s.telegram_id === student.telegram_id ? { ...s, exam_preference: exam } : s
+                                    ))
+                                    setChangingExam(null)
+                                  }}
+                                >
+                                  {student.exam_preference === exam ? `✓ ${exam}` : exam}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      {/* Phone */}
+                      <td className="py-4 px-5">
+                        {student.phone_number ? (
+                          <div className="flex items-center gap-1.5">
+                            <Phone size={12} className="text-[#7A7A78]" />
+                            <span className="text-[13px] text-[#3D3D3D] font-mono">{student.phone_number}</span>
+                          </div>
+                        ) : (
+                          <span className="text-[12px] text-[#AEAEAC] italic">Not shared</span>
                         )}
-                      </div>
-                    </td>
-                    {/* Phone */}
-                    <td className="py-4 px-5">
-                      {student.phone_number ? (
-                        <div className="flex items-center gap-1.5">
-                          <Phone size={12} className="text-[#7A7A78]" />
-                          <span className="text-[13px] text-[#3D3D3D] font-mono">{student.phone_number}</span>
-                        </div>
-                      ) : (
-                        <span className="text-[12px] text-[#AEAEAC] italic">Not shared</span>
-                      )}
-                    </td>
-                    {/* Telegram */}
-                    <td className="py-4 px-5">
-                      {student.username ? (
-                        <div className="flex items-center gap-1.5">
-                          <MessagesSquare size={12} className="text-[#7A7A78]" />
-                          <span className="text-[13px] text-[#3D3D3D] font-mono">{student.username}</span>
-                        </div>
-                      ) : (
-                        <span className="text-[12px] text-[#AEAEAC] italic">—</span>
-                      )}
-                    </td>
-                    {/* Joined & Actions */}
-                    <td className="py-4 px-5 pr-8">
-                      <div className="flex items-center justify-end gap-3">
-                        <span className="text-[11px] text-[#AEAEAC] font-mono mr-2">
-                          {new Date(student.joined_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                        </span>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          {student.exam_preference !== "BLOCKED" && (
+                      </td>
+                      {/* Telegram */}
+                      <td className="py-4 px-5">
+                        {student.username ? (
+                          <div className="flex items-center gap-1.5">
+                            <MessagesSquare size={12} className="text-[#7A7A78]" />
+                            <span className="text-[13px] text-[#3D3D3D] font-mono">{student.username}</span>
+                          </div>
+                        ) : (
+                          <span className="text-[12px] text-[#AEAEAC] italic">—</span>
+                        )}
+                      </td>
+                      {/* Joined & Actions */}
+                      <td className="py-4 px-5 pr-8">
+                        <div className="flex items-center justify-end gap-3">
+                          <span className="text-[11px] text-[#AEAEAC] font-mono mr-2">
+                            {new Date(student.joined_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                          </span>
+                          <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                            {student.exam_preference !== "BLOCKED" && (
+                              <button
+                                onClick={() => {
+                                  if (window.confirm("Block this student from receiving broadcasts?")) {
+                                    blockStudent(student.telegram_id).then(() => {
+                                      setStudents(prev => prev.map(s => s.telegram_id === student.telegram_id ? { ...s, exam_preference: "BLOCKED" } : s))
+                                    })
+                                  }
+                                }}
+                                className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors"
+                                title="Block"
+                              >
+                                <X size={13} />
+                              </button>
+                            )}
                             <button
                               onClick={() => {
-                                if (window.confirm("Block this student from receiving broadcasts?")) {
-                                  blockStudent(student.telegram_id).then(() => {
-                                    setStudents(prev => prev.map(s => s.telegram_id === student.telegram_id ? { ...s, exam_preference: "BLOCKED" } : s))
+                                if (window.confirm("Permanently delete this student?")) {
+                                  deleteStudent(student.telegram_id).then(() => {
+                                    setStudents(prev => prev.filter(s => s.telegram_id !== student.telegram_id))
                                   })
                                 }
                               }}
                               className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors"
-                              title="Block"
+                              title="Delete"
                             >
-                              <X size={13} />
+                              <Trash2 size={13} />
                             </button>
-                          )}
-                          <button
-                            onClick={() => {
-                              if (window.confirm("Permanently delete this student?")) {
-                                deleteStudent(student.telegram_id).then(() => {
-                                  setStudents(prev => prev.filter(s => s.telegram_id !== student.telegram_id))
-                                })
-                              }
-                            }}
-                            className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 size={13} />
-                          </button>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {filtered.length === 0 && (
-                  <tr>
-                    <td colSpan="5" className="py-16 text-center">
+                      </td>
+                    </tr>
+                  ))}
+                  {filtered.length === 0 && (
+                    <tr>
+                      <td colSpan="5" className="py-16 text-center">
 
-                      <p className="text-[13px] text-[#AEAEAC]">
-                        {search ? `No results for "${search}"` : `No students in ${activeFilter}.`}
-                      </p>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                        <p className="text-[13px] text-[#AEAEAC]">
+                          {search ? `No results for "${search}"` : `No students in ${activeFilter}.`}
+                        </p>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>
