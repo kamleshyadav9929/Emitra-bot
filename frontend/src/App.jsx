@@ -53,14 +53,7 @@ function AdminLayout({ children }) {
                 <CommandPalette onClose={() => setIsCommandPaletteOpen(false)} />
             )}
             <main className={`flex-1 min-w-0 flex flex-col ${!isLoginPage ? "md:ml-[220px]" : ""}`}>
-                {!isLoginPage && (
-                    <div className="md:hidden flex items-center gap-3 px-5 py-4 border-b border-[#A3A3A3] bg-white sticky top-0 z-40">
-                        <div className="w-7 h-7 bg-black flex items-center justify-center">
-                            <Layers size={14} className="text-white" />
-                        </div>
-                        <span className="text-[14px] font-semibold">Admin Panel</span>
-                    </div>
-                )}
+
                 <div className={`max-w-5xl mx-auto w-full ${!isLoginPage ? "px-4 sm:px-5 md:px-8 py-6 md:py-8" : "flex-1 flex flex-col"}`}>
                     {children}
                 </div>

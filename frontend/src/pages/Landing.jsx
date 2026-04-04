@@ -465,16 +465,31 @@ export default function Landing() {
                                     <h3 className="text-xl md:text-2xl font-display font-black tracking-tight uppercase">{cat.label}</h3>
                                     <div className="h-0.5 flex-1 bg-black/5"></div>
                                 </div>
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-                                    {cat.services?.map((svc, idx) => (
-                                        <ServiceCard 
-                                            key={`${key}-${idx}`} 
-                                            {...svc} 
-                                            category={key}
-                                            onClick={() => setSelectedService({...svc, category: cat.label})} 
-                                        />
-                                    ))}
-                                </div>
+                                {search ? (
+                                    <div className="flex flex-col gap-2">
+                                        {cat.services?.map((svc, idx) => (
+                                            <button
+                                                key={`${key}-${idx}`}
+                                                onClick={() => setSelectedService({...svc, category: cat.label})}
+                                                className="text-left py-3 px-4 bg-slate-50 hover:bg-slate-100 rounded-xl font-medium text-sm transition-colors border border-black/5 flex justify-between items-center group/btn"
+                                            >
+                                                <span>{svc.name}</span>
+                                                <ChevronRight size={16} className="text-ink-4 group-hover/btn:text-black transition-colors" />
+                                            </button>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+                                        {cat.services?.map((svc, idx) => (
+                                            <ServiceCard 
+                                                key={`${key}-${idx}`} 
+                                                {...svc} 
+                                                category={key}
+                                                onClick={() => setSelectedService({...svc, category: cat.label})} 
+                                            />
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
