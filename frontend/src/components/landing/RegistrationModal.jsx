@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from "motion/react";
 import { X, CheckCircle2, ArrowRight } from "lucide-react";
+import * as api from "../../api";
 
 const RegistrationModal = ({ isOpen, onClose, exams, config }) => {
     const [formData, setFormData] = useState({ name: '', phone: '', exam: 'NONE' })
@@ -15,12 +16,7 @@ const RegistrationModal = ({ isOpen, onClose, exams, config }) => {
         setLoading(true)
         setError('')
         try {
-            const res = await fetch('/api/public/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            })
-            const data = await res.json()
+            const data = await api.publicRegister(formData)
             if (data.success) {
                 setSuccess(true)
             } else {

@@ -16,6 +16,9 @@ import {
 // Hooks
 import useCountUp from "../hooks/useCountUp"
 
+// API
+import * as api from "../api"
+
 // Components
 import AnnouncementTicker from "../components/landing/AnnouncementTicker"
 import ServiceCard from "../components/landing/ServiceCard"
@@ -48,11 +51,11 @@ export default function Landing() {
         const fetchData = async () => {
             try {
                 const [svc, ex, ann, st, cfg] = await Promise.all([
-                    fetch('/api/public/services').then(r => r.json()),
-                    fetch('/api/public/exams').then(r => r.json()),
-                    fetch('/api/public/announcements').then(r => r.json()),
-                    fetch('/api/public/stats').then(r => r.json()),
-                    fetch('/api/public/config').then(r => r.json())
+                    api.getPublicServices(),
+                    api.getPublicExams(),
+                    api.getPublicAnnouncements(),
+                    api.getPublicStats(),
+                    api.getPublicConfig()
                 ])
                 setServices(svc.services || {})
                 setExams(ex.exams || [])
@@ -84,11 +87,7 @@ export default function Landing() {
 
     const handleApply = async (svc, category) => {
         try {
-            await fetch('/api/public/log-intent', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ service_name: svc.name, category })
-            })
+            await api.publicLogIntent(svc.name, category)
         } catch (e) {}
 
         const msg = `Namaste! Mein *${svc.name}* (${category}) ke liye apply karna chahta hoon.`
@@ -99,12 +98,7 @@ export default function Landing() {
         if (!/^[6-9]\d{9}$/.test(statusPhone)) return
         setIsSearching(true)
         try {
-            const res = await fetch('/api/public/check-status', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone: statusPhone })
-            })
-            const data = await res.json()
+            const data = await api.publicCheckStatus(statusPhone)
             setHistory(data.history || [])
         } catch (e) {
             setHistory([])

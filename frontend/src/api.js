@@ -121,3 +121,31 @@ export const deleteExamApi = (id) =>
     headers: getAuthHeaders()
   }).then(r => r.json())
 
+
+// ── Public API (No Auth Required) ─────────────────────────────────────────────
+export const getPublicServices      = () => fetch(`${BASE_URL}/api/public/services`).then(r => r.json())
+export const getPublicExams         = () => fetch(`${BASE_URL}/api/public/exams`).then(r => r.json())
+export const getPublicAnnouncements = () => fetch(`${BASE_URL}/api/public/announcements`).then(r => r.json())
+export const getPublicStats         = () => fetch(`${BASE_URL}/api/public/stats`).then(r => r.json())
+export const getPublicConfig        = () => fetch(`${BASE_URL}/api/public/config`).then(r => r.json())
+
+export const publicRegister = (data) =>
+  fetch(`${BASE_URL}/api/public/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  }).then(r => r.json())
+
+export const publicCheckStatus = (phone) =>
+  fetch(`${BASE_URL}/api/public/check-status`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ phone })
+  }).then(r => r.json())
+
+export const publicLogIntent = (service_name, category) =>
+  fetch(`${BASE_URL}/api/public/log-intent`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ service_name, category })
+  }).then(r => r.json())
