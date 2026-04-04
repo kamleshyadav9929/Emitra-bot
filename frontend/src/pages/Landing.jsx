@@ -13,7 +13,8 @@ import {
     FileText,
     ChevronRight,
     XCircle,
-    Layers
+    Layers,
+    Mic
 } from "lucide-react"
 
 // Hooks
@@ -43,6 +44,7 @@ export default function Landing() {
     
     const [search, setSearch] = useState("")
     const [activeTab, setActiveTab] = useState("ALL")
+    const [isListening, setIsListening] = useState(false)
     const [selectedService, setSelectedService] = useState(null)
     const [isRegOpen, setIsRegOpen] = useState(false)
 
@@ -113,6 +115,34 @@ export default function Landing() {
         })
         return result
     }, [services, activeTab])
+
+    const handleVoiceSearch = () => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Your browser does not support voice search.");
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-IN'; 
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => setIsListening(true);
+        recognition.onend = () => setIsListening(false);
+        recognition.onerror = (e) => {
+            console.error("Speech recognition error", e.error);
+            setIsListening(false);
+        };
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            const cleanText = transcript.replace(/\.$/, '');
+            setSearch(cleanText);
+            setShowSearchDropdown(true);
+        };
+
+        recognition.start();
+    }
 
     const handleApply = async (svc, category) => {
         try {
@@ -186,8 +216,17 @@ export default function Landing() {
                             onFocus={() => setShowSearchDropdown(true)}
                             onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
                             placeholder="Search services (e.g. janam praman).." 
-                            className="w-full bg-[#f1f3f4] hover:bg-[#e9eaec] focus:bg-white border border-transparent focus:border-black/10 focus:shadow-sm focus:ring-1 focus:ring-black/5 outline-none rounded-full py-2 md:py-2.5 pl-9 md:pl-12 pr-3 md:pr-4 text-xs md:text-sm font-medium transition-all"
+                            className="w-full bg-[#f1f3f4] hover:bg-[#e9eaec] focus:bg-white border border-transparent focus:border-black/10 focus:shadow-sm focus:ring-1 focus:ring-black/5 outline-none rounded-full py-2 md:py-2.5 pl-9 md:pl-12 pr-10 md:pr-14 text-xs md:text-sm font-medium transition-all"
                         />
+                        
+                        {/* Mic Icon */}
+                        <button
+                            onClick={handleVoiceSearch}
+                            className={`absolute right-1.5 md:right-2 top-1/2 -translate-y-1/2 w-7 h-7 md:w-[34px] md:h-[34px] flex items-center justify-center rounded-full transition-all duration-300 ${isListening ? 'bg-black text-white shadow-lg animate-pulse' : 'text-ink-3 hover:bg-black/5 hover:text-black'}`}
+                            title="Search with Voice"
+                        >
+                            <Mic size={16} className={isListening ? "scale-110" : "scale-100"} />
+                        </button>
                         
                         <AnimatePresence>
                             {showSearchDropdown && search.length > 0 && (

@@ -25,6 +25,10 @@ const ServiceCard = ({ id, name, description, price, category, onClick }) => {
 
     return (
         <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "0px 0px -50px 0px" }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
             whileHover={{ y: -5 }}
             onClick={onClick}
             className={`cursor-pointer group flex flex-col h-full bg-slate-50 border-2 border-black/10 hover:border-black/40 shadow-md shadow-black/5 hover:shadow-xl hover:shadow-black/10 hover:bg-white transition-all duration-300 rounded-2xl p-4 md:p-6`}
