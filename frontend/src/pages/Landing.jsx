@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react"
+import Fuse from "fuse.js"
 import { Helmet } from "react-helmet-async"
 import { motion, AnimatePresence } from "motion/react"
 import { 
@@ -79,20 +80,39 @@ export default function Landing() {
     }, [])
 
     // ── Logic ────────────────────────────────────────────────────────────────
+    const [showSearchDropdown, setShowSearchDropdown] = useState(false)
+
+    const allServices = useMemo(() => {
+        const flat = []
+        Object.entries(services).forEach(([catKey, cat]) => {
+            cat.services?.forEach(svc => {
+                flat.push({ ...svc, category: cat.label, catKey })
+            })
+        })
+        return flat
+    }, [services])
+
+    const fuse = useMemo(() => {
+        return new Fuse(allServices, {
+            keys: ['name', 'category'],
+            threshold: 0.4,
+            includeScore: true
+        })
+    }, [allServices])
+
+    const searchResults = useMemo(() => {
+        if (!search) return []
+        return fuse.search(search).map(result => result.item).slice(0, 8)
+    }, [search, fuse])
+
     const filteredServices = useMemo(() => {
         const result = {}
         Object.entries(services).forEach(([key, cat]) => {
             if (activeTab !== "ALL" && key !== activeTab) return
-            const filtered = (cat.services || []).filter(s => 
-                s.name.toLowerCase().includes(search.toLowerCase()) ||
-                cat.label.toLowerCase().includes(search.toLowerCase())
-            )
-          if (filtered.length > 0) {
-              result[key] = { ...cat, services: filtered }
-          }
+            result[key] = cat
         })
         return result
-    }, [services, search, activeTab])
+    }, [services, activeTab])
 
     const handleApply = async (svc, category) => {
         try {
@@ -161,11 +181,49 @@ export default function Landing() {
                             value={search}
                             onChange={(e) => {
                                 setSearch(e.target.value);
-                                if(e.target.value) document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+                                setShowSearchDropdown(true);
                             }}
-                            placeholder="Search services..." 
+                            onFocus={() => setShowSearchDropdown(true)}
+                            onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
+                            placeholder="Search services (e.g. janam praman).." 
                             className="w-full bg-[#f1f3f4] hover:bg-[#e9eaec] focus:bg-white border border-transparent focus:border-black/10 focus:shadow-sm focus:ring-1 focus:ring-black/5 outline-none rounded-full py-2 md:py-2.5 pl-9 md:pl-12 pr-3 md:pr-4 text-xs md:text-sm font-medium transition-all"
                         />
+                        
+                        <AnimatePresence>
+                            {showSearchDropdown && search.length > 0 && (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 10 }}
+                                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-black/10 overflow-hidden z-50 flex flex-col max-h-[60vh] overflow-y-auto"
+                                >
+                                    {searchResults.length > 0 ? (
+                                        searchResults.map((svc, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => {
+                                                    setSelectedService(svc)
+                                                    setShowSearchDropdown(false)
+                                                    setSearch("")
+                                                }}
+                                                className="text-left px-4 py-3 hover:bg-slate-50 transition-colors border-b border-black/5 last:border-0 flex items-center justify-between group"
+                                            >
+                                                <div>
+                                                    <div className="font-bold text-sm text-black">{svc.name}</div>
+                                                    <div className="text-[10px] text-ink-3 uppercase tracking-wider font-semibold">{svc.category}</div>
+                                                </div>
+                                                <ChevronRight size={16} className="text-ink-4 group-hover:text-black" />
+                                            </button>
+                                        ))
+                                    ) : (
+                                        <div className="px-4 py-6 text-center text-ink-3">
+                                            <p className="text-sm font-semibold">No services found for "{search}"</p>
+                                            <p className="text-[10px] uppercase tracking-widest mt-1">Try a different name</p>
+                                        </div>
+                                    )}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
 
                     <div className="flex items-center gap-4 shrink-0">
@@ -428,8 +486,49 @@ export default function Landing() {
                                 placeholder="Search services..."
                                 className="w-full bg-slate-50 border-2 border-black/5 p-5 pl-16 rounded-2xl outline-none focus:border-black focus:bg-white transition-all font-display font-semibold"
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setShowSearchDropdown(true);
+                                }}
+                                onFocus={() => setShowSearchDropdown(true)}
+                                onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
                             />
+                            
+                            <AnimatePresence>
+                                {showSearchDropdown && search.length > 0 && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-black/10 overflow-hidden z-50 flex flex-col max-h-[60vh] overflow-y-auto"
+                                    >
+                                        {searchResults.length > 0 ? (
+                                            searchResults.map((svc, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => {
+                                                        setSelectedService(svc)
+                                                        setShowSearchDropdown(false)
+                                                        setSearch("")
+                                                    }}
+                                                    className="text-left px-5 py-4 hover:bg-slate-50 transition-colors border-b border-black/5 last:border-0 flex items-center justify-between group"
+                                                >
+                                                    <div>
+                                                        <div className="font-bold text-base text-black">{svc.name}</div>
+                                                        <div className="text-xs text-ink-3 uppercase tracking-wider font-semibold">{svc.category}</div>
+                                                    </div>
+                                                    <ChevronRight size={18} className="text-ink-4 group-hover:text-black" />
+                                                </button>
+                                            ))
+                                        ) : (
+                                            <div className="px-5 py-8 text-center text-ink-3">
+                                                <p className="font-semibold text-lg">No services found</p>
+                                                <p className="text-xs uppercase tracking-widest mt-1">Try a different name</p>
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     </div>
 
@@ -465,31 +564,16 @@ export default function Landing() {
                                     <h3 className="text-xl md:text-2xl font-display font-black tracking-tight uppercase">{cat.label}</h3>
                                     <div className="h-0.5 flex-1 bg-black/5"></div>
                                 </div>
-                                {search ? (
-                                    <div className="flex flex-col gap-2">
-                                        {cat.services?.map((svc, idx) => (
-                                            <button
-                                                key={`${key}-${idx}`}
-                                                onClick={() => setSelectedService({...svc, category: cat.label})}
-                                                className="text-left py-3 px-4 bg-slate-50 hover:bg-slate-100 rounded-xl font-medium text-sm transition-colors border border-black/5 flex justify-between items-center group/btn"
-                                            >
-                                                <span>{svc.name}</span>
-                                                <ChevronRight size={16} className="text-ink-4 group-hover/btn:text-black transition-colors" />
-                                            </button>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-                                        {cat.services?.map((svc, idx) => (
-                                            <ServiceCard 
-                                                key={`${key}-${idx}`} 
-                                                {...svc} 
-                                                category={key}
-                                                onClick={() => setSelectedService({...svc, category: cat.label})} 
-                                            />
-                                        ))}
-                                    </div>
-                                )}
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+                                    {cat.services?.map((svc, idx) => (
+                                        <ServiceCard 
+                                            key={`${key}-${idx}`} 
+                                            {...svc} 
+                                            category={key}
+                                            onClick={() => setSelectedService({...svc, category: cat.label})} 
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         ))}
                     </div>
