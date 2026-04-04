@@ -10,7 +10,8 @@ import {
     TrendingUp,
     Star,
     FileText,
-    ChevronRight
+    ChevronRight,
+    XCircle
 } from "lucide-react"
 
 // Hooks
@@ -302,7 +303,44 @@ export default function Landing() {
                 </section>
             )}
 
-            {/* ── SERVICES BENTO GRID ────────────────────────────────────────── */}
+            {loading && (
+                <div className="max-w-7xl mx-auto px-6 py-24 text-center">
+                    <div className="inline-block w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mb-4" />
+                    <p className="text-ink-3 font-bold uppercase tracking-widest text-xs">Loading Services...</p>
+                </div>
+            )}
+
+            {error && (
+                <div className="max-w-7xl mx-auto px-6 py-24">
+                    <div className="bg-red-50 border-2 border-red-200 p-12 rounded-[40px] text-center space-y-4">
+                        <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <XCircle size={32} />
+                        </div>
+                        <h2 className="text-2xl font-display font-black uppercase tracking-tight">Connectivity Error</h2>
+                        <p className="text-red-700 max-w-md mx-auto">{error}</p>
+                        <div className="bg-red-100/50 p-4 rounded-xl font-mono text-[10px] text-red-800 break-all">
+                            Target API: {api.BASE_URL}
+                        </div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-red-400">Verify VITE_API_URL in your hosting dashboard</p>
+                        <button 
+                            onClick={() => window.location.reload()}
+                            className="mt-6 px-8 py-3 bg-red-600 text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-red-700 transition-all"
+                        >
+                            Retry Connection
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {!loading && !error && Object.keys(filteredServices).length === 0 && (
+                <div className="max-w-7xl mx-auto px-6 py-24 text-center space-y-4">
+                    <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Search size={32} />
+                    </div>
+                    <h2 className="text-2xl font-display font-black uppercase tracking-tight">No Services Found</h2>
+                    <p className="text-ink-3">Try searching for something else or contact support.</p>
+                </div>
+            )}
             <section id="services" className="px-6 py-32 bg-white">
                 <div className="max-w-7xl mx-auto space-y-16">
                     

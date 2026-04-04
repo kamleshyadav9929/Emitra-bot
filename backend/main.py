@@ -24,7 +24,8 @@ import jwt
 _broadcast_jobs = {}  # job_id -> {"status": "running"|"done", "sent": N, "total": N, "exam": ...}
 
 app = Flask(__name__)
-CORS(app)
+# Explicit CORS handling for development and production Vercel origins
+CORS(app, resources={r"/api/*": {"origins": ["https://emitra-bot.vercel.app", "http://localhost:5173", "http://localhost:3000", "http://localhost:5000"]}})
 
 # ── Rate Limiter Setup ────────────────────────────────────────────────────────
 limiter = Limiter(
