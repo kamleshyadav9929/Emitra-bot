@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom"
 import { Search, X, Home, Send, Users, ClipboardList, History } from "lucide-react"
 
 const commands = [
-  { id: "dashboard", label: "Dashboard",        path: "/",         icon: Home          },
-  { id: "send",      label: "Send Notification", path: "/send",     icon: Send          },
-  { id: "students",  label: "Students",          path: "/students", icon: Users         },
-  { id: "requests",  label: "Service Requests",  path: "/requests", icon: ClipboardList },
-  { id: "logs",      label: "Logs",              path: "/logs",     icon: History       },
+  { id: "dashboard", label: "Dashboard",        path: "/admin",              icon: Home          },
+  { id: "send",      label: "Send Notification", path: "/admin/send",        icon: Send          },
+  { id: "students",  label: "Students",          path: "/admin/students",    icon: Users         },
+  { id: "requests",  label: "Service Requests",  path: "/admin/requests",    icon: ClipboardList },
+  { id: "logs",      label: "Logs",              path: "/admin/logs",        icon: History       },
 ]
 
 export default function CommandPalette({ onClose }) {

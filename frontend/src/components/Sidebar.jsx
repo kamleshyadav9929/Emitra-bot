@@ -54,7 +54,7 @@ export function Sidebar() {
         <p className="text-[9px] text-[#AEAEAC] font-semibold tracking-[0.18em] uppercase px-3 mb-2">Navigate</p>
         {navItems.map((item) => {
           const isActive = location.pathname === item.path
-          const showBadge = item.path === "/requests" && pendingCount > 0
+          const showBadge = item.path === "/admin/requests" && pendingCount > 0
           const accent = ROUTE_ACCENT[item.path] || "#0A0A0A"
           return (
             <Link
@@ -115,7 +115,7 @@ export function BottomNav() {
       <div className="flex items-stretch justify-around">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path
-          const showBadge = item.path === "/requests" && pendingCount > 0
+          const showBadge = item.path === "/admin/requests" && pendingCount > 0
           const accent = ROUTE_ACCENT[item.path] || "#0A0A0A"
           return (
             <Link

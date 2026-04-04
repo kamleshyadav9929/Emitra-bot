@@ -89,7 +89,7 @@ export default function Dashboard() {
 
         {/* Total Students */}
         <div
-          onClick={() => navigate("/students")}
+          onClick={() => navigate("/admin/students")}
           className="border border-[#E5E5E3] p-6 bg-white cursor-pointer hover:border-black hover:shadow-md transition-all group rounded-2xl"
         >
           <div className="flex items-center justify-between mb-4">
@@ -102,7 +102,7 @@ export default function Dashboard() {
 
         {/* Messages Sent */}
         <div
-          onClick={() => navigate("/logs")}
+          onClick={() => navigate("/admin/logs")}
           className="border border-[#E5E5E3] p-6 bg-white cursor-pointer hover:border-black hover:shadow-md transition-all group rounded-2xl"
         >
           <div className="flex items-center justify-between mb-4">
@@ -115,7 +115,7 @@ export default function Dashboard() {
 
         {/* Pending Requests */}
         <div
-          onClick={() => navigate("/requests")}
+          onClick={() => navigate("/admin/requests")}
           className="border border-[#E5E5E3] p-6 bg-white cursor-pointer hover:border-black hover:shadow-md transition-all group rounded-2xl"
         >
           <div className="flex items-center justify-between mb-4">
@@ -173,7 +173,7 @@ export default function Dashboard() {
                   <div
                     key={exam}
                     className="cursor-pointer group"
-                    onClick={() => navigate(`/send?exam=${exam}`)}
+                    onClick={() => navigate(`/admin/send?exam=${exam}`)}
                     title={`Click to send to ${exam} students`}
                   >
                     <div className="flex justify-between items-center mb-1.5">
@@ -199,10 +199,10 @@ export default function Dashboard() {
           </div>
           <div className="space-y-2">
             {[
-              { label: "View All Students",    sub: `${total} registered`,          path: "/students"  },
-              { label: "E-Mitra Requests",     sub: pendingCount > 0 ? `${pendingCount} pending` : "No pending", path: "/requests", alert: pendingCount > 0 },
-              { label: "Broadcast History",    sub: `${totalSent} messages sent`,    path: "/logs"      },
-              { label: "Bot Manager",          sub: "Settings & services",           path: "/bot-manager" },
+              { label: "View All Students",    sub: `${total} registered`,          path: "/admin/students"  },
+              { label: "E-Mitra Requests",     sub: pendingCount > 0 ? `${pendingCount} pending` : "No pending", path: "/admin/requests", alert: pendingCount > 0 },
+              { label: "Broadcast History",    sub: `${totalSent} messages sent`,    path: "/admin/logs"      },
+              { label: "Bot Manager",          sub: "Settings & services",           path: "/admin/bot-manager" },
             ].map(item => (
               <button
                 key={item.path}
@@ -222,7 +222,7 @@ export default function Dashboard() {
 
       {/* ── Row 3: Big Send Broadcast Button ── */}
       <button
-        onClick={() => navigate("/send")}
+        onClick={() => navigate("/admin/send")}
         className="w-full flex items-center justify-center gap-3 py-5 bg-black text-white hover:bg-[#1A1A1A] active:scale-[0.99] transition-all rounded-2xl shadow-xl shadow-black/10"
       >
         <Megaphone size={20} />
