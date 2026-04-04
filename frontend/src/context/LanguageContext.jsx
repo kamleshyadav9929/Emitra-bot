@@ -40,7 +40,19 @@ export const LanguageProvider = ({ children }) => {
     const [lang, setLang] = useState('EN');
 
     const toggleLanguage = () => {
-        setLang(prev => prev === 'EN' ? 'HI' : 'EN');
+        const nextLang = lang === 'EN' ? 'HI' : 'EN';
+        setLang(nextLang);
+
+        // Programmatically trigger Google Translate
+        try {
+            const googleSelect = document.querySelector('.goog-te-combo');
+            if (googleSelect) {
+                googleSelect.value = nextLang === 'HI' ? 'hi' : 'en';
+                googleSelect.dispatchEvent(new Event('change'));
+            }
+        } catch (e) {
+            console.error('Google Translate intercept failed', e);
+        }
     };
 
     React.useEffect(() => {
