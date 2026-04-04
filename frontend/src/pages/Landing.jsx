@@ -347,7 +347,7 @@ export default function Landing() {
                     {/* Filter Header */}
                     <div className="flex flex-col md:flex-row gap-8 justify-between items-start md:items-end border-b-4 border-black pb-12">
                         <div className="space-y-4">
-                            <h2 className="text-4xl md:text-8xl font-display font-black tracking-tighter uppercase leading-none">Sevayen</h2>
+                            <h2 className="text-3xl md:text-6xl font-display font-black tracking-tighter uppercase leading-none">Sevayen</h2>
                             <p className="text-ink-2 font-medium">Browse our full range of 50+ government services.</p>
                         </div>
                         <div className="w-full md:w-96 relative group">
