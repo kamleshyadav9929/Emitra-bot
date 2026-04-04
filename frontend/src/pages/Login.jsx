@@ -69,7 +69,7 @@ export default function Login() {
             <span className="text-[14px] font-semibold text-black">E-Mitra Admin</span>
           </div>
 
-          <p className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.2em] uppercase mb-3">Sign In</p>
+          <p className="text-[10px] text-[#737373] font-semibold tracking-[0.2em] uppercase mb-3">Sign In</p>
           <h2 className="text-2xl font-semibold text-black leading-tight mb-8">Access your workspace</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -83,14 +83,14 @@ export default function Login() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="Enter secret key"
-                  className={`w-full border px-4 py-3 text-[14px] text-black placeholder:text-[#AEAEAC] bg-white outline-none focus:border-black transition-colors pr-10 rounded-xl ${
-                    error ? "border-[#C62828]" : "border-[#E5E5E3]"
+                  className={`w-full border px-4 py-3 text-[14px] text-black placeholder:text-[#737373] bg-white outline-none focus:border-black transition-colors pr-10 rounded-xl ${
+                    error ? "border-[#C62828]" : "border-[#A3A3A3]"
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPw(p => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#AEAEAC] hover:text-black"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#737373] hover:text-black"
                 >
                   {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -105,7 +105,7 @@ export default function Login() {
               disabled={loading || !password.trim()}
               className={`w-full flex items-center justify-center gap-2 py-3 text-[14px] font-semibold transition-colors rounded-xl ${
                 loading || !password.trim()
-                  ? "bg-[#F7F7F5] text-[#AEAEAC] cursor-not-allowed"
+                  ? "bg-[#F7F7F5] text-[#737373] cursor-not-allowed"
                   : "bg-black text-white hover:bg-[#3D3D3D]"
               }`}
             >
@@ -120,7 +120,7 @@ export default function Login() {
             </button>
           </form>
 
-          <p className="mt-8 text-[11px] text-[#AEAEAC] text-center">
+          <p className="mt-8 text-[11px] text-[#737373] text-center">
             Authorized personnel only
           </p>
         </div>

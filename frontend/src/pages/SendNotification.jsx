@@ -141,9 +141,9 @@ export default function SendNotification() {
     <div className="space-y-6">
       <Toast visible={toastVisible} message={toastMsg} />
       {/* Header */}
-      <div className="flex items-end justify-between border-b border-[#E5E5E3] pb-6">
+      <div className="flex items-end justify-between border-b border-[#A3A3A3] pb-6">
         <div>
-          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC] mb-2">Broadcast</p>
+          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#737373] mb-2">Broadcast</p>
           <h1 className="text-3xl font-light text-black tracking-tight">Send Notification</h1>
           <p className="text-[13px] text-[#7A7A78] mt-1">Send instantly to your students.</p>
         </div>
@@ -173,7 +173,7 @@ export default function SendNotification() {
                     className={`px-4 py-2 text-[13px] font-semibold border transition-colors rounded-xl ${
                       selectedExams.includes("ALL")
                         ? "bg-black text-white border-black"
-                        : "bg-white text-[#7A7A78] border-[#E5E5E3] hover:border-black hover:text-black"
+                        : "bg-white text-[#7A7A78] border-[#A3A3A3] hover:border-black hover:text-black"
                     }`}
                   >
                     All Students
@@ -188,7 +188,7 @@ export default function SendNotification() {
                         className={`px-4 py-2 text-[13px] font-semibold border transition-colors rounded-xl ${
                           active
                             ? "bg-black text-white border-black"
-                            : "bg-white text-[#7A7A78] border-[#E5E5E3] hover:border-black hover:text-black"
+                            : "bg-white text-[#7A7A78] border-[#A3A3A3] hover:border-black hover:text-black"
                         }`}
                       >
                         {exam}
@@ -198,7 +198,7 @@ export default function SendNotification() {
                 </div>
 
                 {/* Recipient count */}
-                <div className="flex items-center gap-2 px-4 py-3 bg-[#F7F7F5] border border-[#E5E5E3] rounded-xl">
+                <div className="flex items-center gap-2 px-4 py-3 bg-[#F7F7F5] border border-[#A3A3A3] rounded-xl">
                   <div className="w-1.5 h-1.5 bg-black rounded-full" />
                   <span className="text-[13px] text-[#3D3D3D]">
                     <span className="font-semibold text-black">{targetCount}</span> students will receive this
@@ -220,16 +220,16 @@ export default function SendNotification() {
                 onChange={e => { if (e.target.value.length <= CHAR_LIMIT) setMessage(e.target.value) }}
                 placeholder={"Important Update!\n\nAaj ka Mock Test raat 8 baje hoga.\n\n— E-Mitra Team"}
                 rows={8}
-                className={`w-full border px-4 py-3 text-[13px] text-black placeholder:text-[#AEAEAC] bg-white focus:outline-none resize-none transition-colors leading-relaxed rounded-2xl ${
-                  message.length > CHAR_LIMIT * 0.9 ? "border-[#C62828]" : "border-[#E5E5E3] focus:border-black"
+                className={`w-full border px-4 py-3 text-[13px] text-black placeholder:text-[#737373] bg-white focus:outline-none resize-none transition-colors leading-relaxed rounded-2xl ${
+                  message.length > CHAR_LIMIT * 0.9 ? "border-[#C62828]" : "border-[#A3A3A3] focus:border-black"
                 }`}
               />
               <div className="flex justify-between items-center">
-                <span className={`text-[11px] font-medium ${message.trim() ? "text-[#2E7D32]" : "text-[#AEAEAC]"}`}>
+                <span className={`text-[11px] font-medium ${message.trim() ? "text-[#2E7D32]" : "text-[#737373]"}`}>
                   {message.trim() ? "✓ Ready" : "Write a message above"}
                 </span>
                 <span className={`text-[11px] font-mono ${
-                  message.length > CHAR_LIMIT * 0.9 ? "text-[#C62828]" : "text-[#AEAEAC]"
+                  message.length > CHAR_LIMIT * 0.9 ? "text-[#C62828]" : "text-[#737373]"
                 }`}>
                   {message.length} / {CHAR_LIMIT}
                 </span>
@@ -248,23 +248,23 @@ export default function SendNotification() {
               </div>
 
               {/* Telegram-style preview */}
-              <div className="border border-[#E5E5E3] p-4 bg-[#F7F7F5] rounded-2xl overflow-hidden">
-                <div className="flex items-center gap-2 mb-3 pb-3 border-b border-[#E5E5E3]">
+              <div className="border border-[#A3A3A3] p-4 bg-[#F7F7F5] rounded-2xl overflow-hidden">
+                <div className="flex items-center gap-2 mb-3 pb-3 border-b border-[#A3A3A3]">
                   <div className="w-7 h-7 bg-black flex items-center justify-center rounded-lg">
                     <Bot size={13} className="text-white" />
                   </div>
                   <div>
                     <p className="text-[12px] font-semibold text-black">E-Mitra Seva</p>
-                    <p className="text-[10px] text-[#AEAEAC]">bot</p>
+                    <p className="text-[10px] text-[#737373]">bot</p>
                   </div>
                 </div>
-                <div className="bg-white border border-[#E5E5E3] px-4 py-3 max-w-[88%] text-[13px] text-black leading-relaxed rounded-2xl rounded-tl-none">
+                <div className="bg-white border border-[#A3A3A3] px-4 py-3 max-w-[88%] text-[13px] text-black leading-relaxed rounded-2xl rounded-tl-none">
                   {message.trim() ? (
                     message.split("\n").map((line, i) => <div key={i}>{line || <br />}</div>)
                   ) : (
-                    <span className="text-[#AEAEAC] italic text-[12px]">No message yet...</span>
+                    <span className="text-[#737373] italic text-[12px]">No message yet...</span>
                   )}
-                  <div className="text-[10px] text-[#AEAEAC] text-right mt-2 font-mono">
+                  <div className="text-[10px] text-[#737373] text-right mt-2 font-mono">
                     {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </div>
                 </div>
@@ -290,7 +290,7 @@ export default function SendNotification() {
 
               {/* Live progress bar during polling */}
               {(status === "polling" || status === "sending") && jobProgress && (
-                <div className="border border-[#E5E5E3] p-4 space-y-2 rounded-xl">
+                <div className="border border-[#A3A3A3] p-4 space-y-2 rounded-xl">
                   <div className="flex justify-between text-[11px]">
                     <span className="text-[#7A7A78] flex items-center gap-1.5">
                       <Loader2 size={11} className="animate-spin" /> Bhej raha hai...
@@ -305,7 +305,7 @@ export default function SendNotification() {
                       style={{ width: `${jobProgress.total ? Math.round(((jobProgress.sent || 0) / jobProgress.total) * 100) : 5}%` }}
                     />
                   </div>
-                  <p className="text-[10px] text-[#AEAEAC] font-mono">
+                  <p className="text-[10px] text-[#737373] font-mono">
                     {jobProgress.total ? Math.round(((jobProgress.sent || 0) / jobProgress.total) * 100) : 0}% complete · Yeh page band mat karein
                   </p>
                 </div>
@@ -317,7 +317,7 @@ export default function SendNotification() {
                 disabled={!message.trim() || targetCount === 0 || status === "sending" || status === "polling"}
                 className={`w-full py-3 font-semibold text-[13px] flex items-center justify-center gap-2 transition-colors ${
                   !message.trim() || targetCount === 0
-                    ? "bg-[#F7F7F5] text-[#AEAEAC] cursor-not-allowed border border-[#E5E5E3]"
+                    ? "bg-[#F7F7F5] text-[#737373] cursor-not-allowed border border-[#A3A3A3]"
                     : status === "success"
                       ? "bg-[#2E7D32] text-white border border-[#2E7D32]"
                       : status === "sending" || status === "polling"

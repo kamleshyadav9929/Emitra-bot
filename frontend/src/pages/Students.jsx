@@ -73,16 +73,16 @@ export default function Students() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between border-b border-[#E5E5E3] pb-6">
+      <div className="flex items-start justify-between border-b border-[#A3A3A3] pb-6">
         <div>
-          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC] mb-2">Students</p>
+          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#737373] mb-2">Students</p>
           <h1 className="text-3xl font-light text-black tracking-tight">Registered Students</h1>
           <p className="text-[13px] text-[#7A7A78] mt-1">View and filter all E-Mitra registered students.</p>
         </div>
         <button
           onClick={exportCSV}
           disabled={filtered.length === 0}
-          className="flex items-center gap-2 px-3 py-2 border border-[#E5E5E3] text-[12px] text-[#7A7A78] hover:border-black hover:text-black transition-colors disabled:opacity-30 disabled:cursor-not-allowed rounded-lg"
+          className="flex items-center gap-2 px-3 py-2 border border-[#A3A3A3] text-[12px] text-[#7A7A78] hover:border-black hover:text-black transition-colors disabled:opacity-30 disabled:cursor-not-allowed rounded-lg"
         >
           <Download size={13} />
           Export CSV
@@ -99,7 +99,7 @@ export default function Students() {
               className={`px-4 py-1.5 text-[12px] font-semibold border transition-colors rounded-full ${
                 activeFilter === f
                   ? "bg-black text-white border-black"
-                  : "bg-white text-[#7A7A78] border-[#E5E5E3] hover:border-black hover:text-black"
+                  : "bg-white text-[#7A7A78] border-[#A3A3A3] hover:border-black hover:text-black"
               }`}
             >
               {f}
@@ -107,28 +107,28 @@ export default function Students() {
           ))}
         </div>
         <div className="relative flex-shrink-0">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#AEAEAC]" />
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#737373]" />
           <input
             type="text"
             placeholder="Search students..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full sm:w-64 border border-[#E5E5E3] pl-8 pr-8 py-2 text-[13px] text-black placeholder:text-[#AEAEAC] bg-white focus:outline-none focus:border-black transition-colors rounded-xl"
+            className="w-full sm:w-64 border border-[#A3A3A3] pl-8 pr-8 py-2 text-[13px] text-black placeholder:text-[#737373] bg-white focus:outline-none focus:border-black transition-colors rounded-xl"
           />
           {search && (
-            <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#AEAEAC] hover:text-black">
+            <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#737373] hover:text-black">
               <X size={12} />
             </button>
           )}
         </div>
       </div>
 
-      <p className="text-[11px] text-[#AEAEAC] font-mono -mt-2">
+      <p className="text-[11px] text-[#737373] font-mono -mt-2">
         {filtered.length} of {students.length} students
       </p>
 
       {/* Table (Desktop) & Cards (Mobile) */}
-      <div className="border border-[#E5E5E3] bg-white overflow-hidden rounded-2xl shadow-sm">
+      <div className="border border-[#A3A3A3] bg-white overflow-hidden rounded-2xl shadow-sm">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
@@ -143,17 +143,17 @@ export default function Students() {
         ) : (
           <>
             {/* Mobile Cards */}
-            <div className="block md:hidden divide-y divide-[#E5E5E3]">
+            <div className="block md:hidden divide-y divide-[#A3A3A3]">
               {filtered.map(student => (
                 <div key={student.telegram_id} className="p-4 hover:bg-[#F7F7F5] transition-colors relative group">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-[#F7F7F5] border border-[#E5E5E3] flex items-center justify-center text-black text-[11px] font-semibold flex-shrink-0 rounded-lg">
+                      <div className="w-8 h-8 bg-[#F7F7F5] border border-[#A3A3A3] flex items-center justify-center text-black text-[11px] font-semibold flex-shrink-0 rounded-lg">
                         {getInitials(student.name)}
                       </div>
                       <div>
                         <p className="text-[13px] font-semibold text-black">{student.name}</p>
-                        <p className="text-[11px] text-[#AEAEAC] font-mono">{student.telegram_id}</p>
+                        <p className="text-[11px] text-[#737373] font-mono">{student.telegram_id}</p>
                       </div>
                     </div>
                     {/* Exam + Change button - Card Corner */}
@@ -162,14 +162,14 @@ export default function Students() {
                         <ExamBadge exam={student.exam_preference} />
                         <button
                           onClick={() => setChangingExam(changingExam === student.telegram_id ? null : student.telegram_id)}
-                          className="flex items-center gap-0.5 text-[10px] text-[#AEAEAC] hover:text-black transition-colors"
+                          className="flex items-center gap-0.5 text-[10px] text-[#737373] hover:text-black transition-colors"
                         >
                           <ChevronDown size={11} />
                         </button>
                       </div>
                       {changingExam === student.telegram_id && (
-                        <div className="absolute right-0 top-full mt-1 z-30 bg-white border border-[#E5E5E3] shadow-lg py-1 min-w-[140px] rounded-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                          <p className="px-3 py-1.5 text-[9px] font-semibold text-[#AEAEAC] tracking-[0.15em] uppercase border-b border-[#E5E5E3]">Change Exam</p>
+                        <div className="absolute right-0 top-full mt-1 z-30 bg-white border border-[#A3A3A3] shadow-lg py-1 min-w-[140px] rounded-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                          <p className="px-3 py-1.5 text-[9px] font-semibold text-[#737373] tracking-[0.15em] uppercase border-b border-[#A3A3A3]">Change Exam</p>
                           {examList.filter(e => e !== "ALL").map(exam => (
                             <button
                               key={exam}
@@ -194,24 +194,24 @@ export default function Students() {
                   <div className="flex flex-col gap-1.5 mb-3">
                     {student.phone_number ? (
                       <div className="flex items-center gap-2">
-                        <Phone size={12} className="text-[#AEAEAC]" />
+                        <Phone size={12} className="text-[#737373]" />
                         <span className="text-[12px] text-[#3D3D3D] font-mono">{student.phone_number}</span>
                       </div>
                     ) : (
-                      <span className="text-[11px] text-[#AEAEAC] italic">Phone not shared</span>
+                      <span className="text-[11px] text-[#737373] italic">Phone not shared</span>
                     )}
                     {student.username ? (
                       <div className="flex items-center gap-2">
-                        <MessagesSquare size={12} className="text-[#AEAEAC]" />
+                        <MessagesSquare size={12} className="text-[#737373]" />
                         <span className="text-[12px] text-[#3D3D3D] font-mono">{student.username}</span>
                       </div>
                     ) : (
-                      <span className="text-[11px] text-[#AEAEAC] italic">Telegram unshared</span>
+                      <span className="text-[11px] text-[#737373] italic">Telegram unshared</span>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-[#E5E5E3] pt-3">
-                    <span className="text-[11px] text-[#AEAEAC] font-mono">
+                  <div className="flex items-center justify-between border-t border-[#A3A3A3] pt-3">
+                    <span className="text-[11px] text-[#737373] font-mono">
                       Joined: {new Date(student.joined_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                     </span>
                     <div className="flex items-center gap-1">
@@ -224,7 +224,7 @@ export default function Students() {
                               })
                             }
                           }}
-                          className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors rounded-lg"
+                          className="w-7 h-7 flex items-center justify-center border border-[#A3A3A3] bg-white text-[#737373] hover:text-[#C62828] hover:border-[#C62828] transition-colors rounded-lg"
                           title="Block"
                         >
                           <X size={13} />
@@ -238,7 +238,7 @@ export default function Students() {
                             })
                           }
                         }}
-                        className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors"
+                        className="w-7 h-7 flex items-center justify-center border border-[#A3A3A3] bg-white text-[#737373] hover:text-[#C62828] hover:border-[#C62828] transition-colors"
                         title="Delete"
                       >
                         <Trash2 size={13} />
@@ -249,7 +249,7 @@ export default function Students() {
               ))}
               {filtered.length === 0 && (
                 <div className="py-12 text-center">
-                  <p className="text-[13px] text-[#AEAEAC]">
+                  <p className="text-[13px] text-[#737373]">
                     {search ? `No results for "${search}"` : `No students in ${activeFilter}.`}
                   </p>
                 </div>
@@ -260,9 +260,9 @@ export default function Students() {
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left min-w-[600px]">
                 <thead>
-                  <tr className="border-b border-[#E5E5E3] bg-[#F7F7F5]">
+                  <tr className="border-b border-[#A3A3A3] bg-[#F7F7F5]">
                     {["Student", "Exam", "Phone", "Telegram", "Joined"].map((h, i) => (
-                      <th key={h} className={`py-3 px-5 text-[10px] font-semibold text-[#AEAEAC] tracking-[0.18em] uppercase ${i === 4 ? "text-right" : ""}`}>
+                      <th key={h} className={`py-3 px-5 text-[10px] font-semibold text-[#737373] tracking-[0.18em] uppercase ${i === 4 ? "text-right" : ""}`}>
                         {h}
                       </th>
                     ))}
@@ -272,17 +272,17 @@ export default function Students() {
                   {filtered.map(student => (
                     <tr
                       key={student.telegram_id}
-                      className="group border-b border-[#E5E5E3] last:border-0 hover:bg-[#F7F7F5] transition-colors"
+                      className="group border-b border-[#A3A3A3] last:border-0 hover:bg-[#F7F7F5] transition-colors"
                     >
                       {/* Student */}
                       <td className="py-4 px-5">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-[#F7F7F5] border border-[#E5E5E3] flex items-center justify-center text-black text-[11px] font-semibold flex-shrink-0 rounded-lg">
+                          <div className="w-8 h-8 bg-[#F7F7F5] border border-[#A3A3A3] flex items-center justify-center text-black text-[11px] font-semibold flex-shrink-0 rounded-lg">
                             {getInitials(student.name)}
                           </div>
                           <div>
                             <p className="text-[13px] font-semibold text-black">{student.name}</p>
-                            <p className="text-[11px] text-[#AEAEAC] font-mono">{student.telegram_id}</p>
+                            <p className="text-[11px] text-[#737373] font-mono">{student.telegram_id}</p>
                           </div>
                         </div>
                       </td>
@@ -293,15 +293,15 @@ export default function Students() {
                             <ExamBadge exam={student.exam_preference} />
                             <button
                               onClick={() => setChangingExam(changingExam === student.telegram_id ? null : student.telegram_id)}
-                              className="flex items-center gap-0.5 text-[10px] text-[#AEAEAC] hover:text-black transition-colors"
+                              className="flex items-center gap-0.5 text-[10px] text-[#737373] hover:text-black transition-colors"
                               title="Change Exam"
                             >
                               <ChevronDown size={11} />
                             </button>
                           </div>
                           {changingExam === student.telegram_id && (
-                            <div className="absolute left-0 top-full mt-1 z-30 bg-white border border-[#E5E5E3] shadow-lg py-1 min-w-[140px] rounded-xl overflow-hidden">
-                              <p className="px-3 py-1.5 text-[9px] font-semibold text-[#AEAEAC] tracking-[0.15em] uppercase border-b border-[#E5E5E3]">Change Exam</p>
+                            <div className="absolute left-0 top-full mt-1 z-30 bg-white border border-[#A3A3A3] shadow-lg py-1 min-w-[140px] rounded-xl overflow-hidden">
+                              <p className="px-3 py-1.5 text-[9px] font-semibold text-[#737373] tracking-[0.15em] uppercase border-b border-[#A3A3A3]">Change Exam</p>
                               {examList.filter(e => e !== "ALL").map(exam => (
                                 <button
                                   key={exam}
@@ -330,7 +330,7 @@ export default function Students() {
                             <span className="text-[13px] text-[#3D3D3D] font-mono">{student.phone_number}</span>
                           </div>
                         ) : (
-                          <span className="text-[12px] text-[#AEAEAC] italic">Not shared</span>
+                          <span className="text-[12px] text-[#737373] italic">Not shared</span>
                         )}
                       </td>
                       {/* Telegram */}
@@ -341,13 +341,13 @@ export default function Students() {
                             <span className="text-[13px] text-[#3D3D3D] font-mono">{student.username}</span>
                           </div>
                         ) : (
-                          <span className="text-[12px] text-[#AEAEAC] italic">—</span>
+                          <span className="text-[12px] text-[#737373] italic">—</span>
                         )}
                       </td>
                       {/* Joined & Actions */}
                       <td className="py-4 px-5 pr-8">
                         <div className="flex items-center justify-end gap-3">
-                          <span className="text-[11px] text-[#AEAEAC] font-mono mr-2">
+                          <span className="text-[11px] text-[#737373] font-mono mr-2">
                             {new Date(student.joined_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                           </span>
                           <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
@@ -360,7 +360,7 @@ export default function Students() {
                                     })
                                   }
                                 }}
-                                className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors rounded-lg"
+                                className="w-7 h-7 flex items-center justify-center border border-[#A3A3A3] bg-white text-[#737373] hover:text-[#C62828] hover:border-[#C62828] transition-colors rounded-lg"
                                 title="Block"
                               >
                                 <X size={13} />
@@ -374,7 +374,7 @@ export default function Students() {
                                   })
                                 }
                               }}
-                              className="w-7 h-7 flex items-center justify-center border border-[#E5E5E3] bg-white text-[#AEAEAC] hover:text-[#C62828] hover:border-[#C62828] transition-colors rounded-lg"
+                              className="w-7 h-7 flex items-center justify-center border border-[#A3A3A3] bg-white text-[#737373] hover:text-[#C62828] hover:border-[#C62828] transition-colors rounded-lg"
                               title="Delete"
                             >
                               <Trash2 size={13} />
@@ -388,7 +388,7 @@ export default function Students() {
                     <tr>
                       <td colSpan="5" className="py-16 text-center">
 
-                        <p className="text-[13px] text-[#AEAEAC]">
+                        <p className="text-[13px] text-[#737373]">
                           {search ? `No results for "${search}"` : `No students in ${activeFilter}.`}
                         </p>
                       </td>

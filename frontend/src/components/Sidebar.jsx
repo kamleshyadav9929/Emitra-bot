@@ -35,9 +35,9 @@ export function Sidebar() {
   const pendingCount = usePendingCount()
 
   return (
-    <aside className="hidden md:flex w-[220px] h-screen fixed top-0 left-0 flex-col border-r border-[#E5E5E3] bg-white z-30">
+    <aside className="hidden md:flex w-[220px] h-screen fixed top-0 left-0 flex-col border-r border-[#A3A3A3] bg-white z-30">
       {/* Logo */}
-      <div className="px-6 py-6 border-b border-[#E5E5E3]">
+      <div className="px-6 py-6 border-b border-[#A3A3A3]">
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 bg-black flex items-center justify-center flex-shrink-0 rounded-lg">
             <Layers size={14} className="text-white" />
@@ -51,7 +51,7 @@ export function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-px overflow-y-auto">
-        <p className="text-[9px] text-[#AEAEAC] font-semibold tracking-[0.18em] uppercase px-3 mb-2">Navigate</p>
+        <p className="text-[9px] text-[#737373] font-semibold tracking-[0.18em] uppercase px-3 mb-2">Navigate</p>
         {navItems.map((item) => {
           const isActive = location.pathname === item.path
           const showBadge = item.path === "/admin/requests" && pendingCount > 0
@@ -91,8 +91,8 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-4 py-4 border-t border-[#E5E5E3]">
-        <div className="flex items-center gap-2 px-3 py-2 bg-[#F7F7F5] border border-[#E5E5E3] rounded-xl">
+      <div className="px-4 py-4 border-t border-[#A3A3A3]">
+        <div className="flex items-center gap-2 px-3 py-2 bg-[#F7F7F5] border border-[#A3A3A3] rounded-xl">
           <div className="w-1.5 h-1.5 rounded-full bg-[#2E7D32]"></div>
           <span className="text-[11px] text-[#3D3D3D] font-medium">System Online</span>
         </div>
@@ -107,7 +107,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="md:hidden sticky bottom-0 mt-auto w-full z-50 bg-white border-t border-[#E5E5E3]"
+      className="md:hidden sticky bottom-0 mt-auto w-full z-50 bg-white border-t border-[#A3A3A3]"
       style={{
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
@@ -122,7 +122,7 @@ export function BottomNav() {
               key={item.path}
               to={item.path}
               className={`relative flex flex-col items-center justify-center gap-0.5 flex-1 py-2.5 transition-all ${
-                isActive ? "text-black" : "text-[#AEAEAC]"
+                isActive ? "text-black" : "text-[#737373]"
               }`}
             >
               {isActive && (
@@ -137,7 +137,7 @@ export function BottomNav() {
                 style={isActive ? { color: accent } : {}}
               />
               <span
-                className={`text-[9px] font-semibold uppercase tracking-wider ${isActive ? "text-black" : "text-[#AEAEAC]"}`}
+                className={`text-[9px] font-semibold uppercase tracking-wider ${isActive ? "text-black" : "text-[#737373]"}`}
               >
                 {item.name}
               </span>

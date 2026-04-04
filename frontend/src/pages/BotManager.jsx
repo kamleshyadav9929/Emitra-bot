@@ -62,7 +62,7 @@ function TabBtn({ id, label, icon: Icon, active, onClick, accent }) {
       className={`flex items-center gap-2 px-4 py-2.5 text-[12px] font-semibold border-b-2 transition-all whitespace-nowrap ${
         active
           ? "border-b-2 text-black"
-          : "border-transparent text-[#7A7A78] hover:text-black hover:border-[#E5E5E3]"
+          : "border-transparent text-[#7A7A78] hover:text-black hover:border-[#A3A3A3]"
       }`}
       style={active ? { borderBottomColor: accent } : {}}
     >
@@ -103,11 +103,11 @@ function MessagesTab({ toast }) {
   return (
     <div className="space-y-6">
       {DEFS.map(({ key, label, sub }) => (
-        <div key={key} className="border border-[#E5E5E3] bg-white">
-          <div className="px-5 py-4 border-b border-[#E5E5E3] flex items-start justify-between gap-4">
+        <div key={key} className="border border-[#A3A3A3] bg-white">
+          <div className="px-5 py-4 border-b border-[#A3A3A3] flex items-start justify-between gap-4">
             <div>
               <p className="text-[13px] font-semibold text-black">{label}</p>
-              <p className="text-[11px] text-[#AEAEAC] mt-0.5">{sub}</p>
+              <p className="text-[11px] text-[#737373] mt-0.5">{sub}</p>
             </div>
             <button
               onClick={() => save(key)}
@@ -124,10 +124,10 @@ function MessagesTab({ toast }) {
               rows={5}
               value={msgs[key]}
               onChange={e => setMsgs(p => ({ ...p, [key]: e.target.value }))}
-              className="w-full border border-[#E5E5E3] px-4 py-3 text-[13px] text-black bg-white focus:outline-none focus:border-black resize-none transition-colors leading-relaxed font-mono"
+              className="w-full border border-[#A3A3A3] px-4 py-3 text-[13px] text-black bg-white focus:outline-none focus:border-black resize-none transition-colors leading-relaxed font-mono"
               placeholder="Message yahan likhein..."
             />
-            <p className="text-[10px] text-[#AEAEAC] font-mono mt-1">{msgs[key].length} chars</p>
+            <p className="text-[10px] text-[#737373] font-mono mt-1">{msgs[key].length} chars</p>
           </div>
         </div>
       ))}
@@ -174,49 +174,49 @@ function ServiceModal({ service, onSave, onClose, loading }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white border border-[#0A0A0A] shadow-[4px_4px_0px_#0A0A0A]">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E5E3] bg-[#F7F7F5]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#A3A3A3] bg-[#F7F7F5]">
           <div>
-            <p className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.18em] uppercase">{service ? "Edit Service" : "Add Service"}</p>
+            <p className="text-[10px] text-[#737373] font-semibold tracking-[0.18em] uppercase">{service ? "Edit Service" : "Add Service"}</p>
             <h2 className="text-[15px] font-semibold text-black mt-0.5">{service?.name || "New Service"}</h2>
           </div>
-          <button onClick={onClose} className="text-[#AEAEAC] hover:text-black transition-colors"><X size={18} /></button>
+          <button onClick={onClose} className="text-[#737373] hover:text-black transition-colors"><X size={18} /></button>
         </div>
         <div className="px-6 py-5 space-y-4">
           {/* Category */}
           <div>
-            <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase block mb-1.5">Category *</label>
+            <label className="text-[10px] text-[#737373] font-semibold tracking-[0.15em] uppercase block mb-1.5">Category *</label>
             <select
               value={form.category_key}
               onChange={e => handleCategoryChange(e.target.value)}
-              className="w-full border border-[#E5E5E3] px-4 py-2.5 text-[13px] text-black bg-white focus:outline-none focus:border-black transition-colors"
+              className="w-full border border-[#A3A3A3] px-4 py-2.5 text-[13px] text-black bg-white focus:outline-none focus:border-black transition-colors"
             >
               {CATEGORY_OPTIONS.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
             </select>
           </div>
           {/* Name */}
           <div>
-            <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase block mb-1.5">Service Name *</label>
+            <label className="text-[10px] text-[#737373] font-semibold tracking-[0.15em] uppercase block mb-1.5">Service Name *</label>
             <input
               type="text" value={form.name} onChange={e => set("name", e.target.value)}
-              className="w-full border border-[#E5E5E3] px-4 py-2.5 text-[13px] text-black focus:outline-none focus:border-black transition-colors"
+              className="w-full border border-[#A3A3A3] px-4 py-2.5 text-[13px] text-black focus:outline-none focus:border-black transition-colors"
               placeholder="e.g. Aadhar Update"
             />
           </div>
           {/* Description */}
           <div>
-            <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase block mb-1.5">Description</label>
+            <label className="text-[10px] text-[#737373] font-semibold tracking-[0.15em] uppercase block mb-1.5">Description</label>
             <input
               type="text" value={form.description} onChange={e => set("description", e.target.value)}
-              className="w-full border border-[#E5E5E3] px-4 py-2.5 text-[13px] text-black focus:outline-none focus:border-black transition-colors"
+              className="w-full border border-[#A3A3A3] px-4 py-2.5 text-[13px] text-black focus:outline-none focus:border-black transition-colors"
               placeholder="Short description (optional)"
             />
           </div>
           {/* Price */}
           <div>
-            <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase block mb-1.5">Price (optional)</label>
+            <label className="text-[10px] text-[#737373] font-semibold tracking-[0.15em] uppercase block mb-1.5">Price (optional)</label>
             <input
               type="text" value={form.price} onChange={e => set("price", e.target.value)}
-              className="w-full border border-[#E5E5E3] px-4 py-2.5 text-[13px] text-black focus:outline-none focus:border-black transition-colors"
+              className="w-full border border-[#A3A3A3] px-4 py-2.5 text-[13px] text-black focus:outline-none focus:border-black transition-colors"
               placeholder="e.g. ₹50 or Free"
             />
           </div>
@@ -226,13 +226,13 @@ function ServiceModal({ service, onSave, onClose, loading }) {
             <button onClick={() => set("enabled", !form.enabled)} className="transition-colors">
               {form.enabled
                 ? <ToggleRight size={26} className="text-[#2E7D32]" />
-                : <ToggleLeft size={26} className="text-[#AEAEAC]" />}
+                : <ToggleLeft size={26} className="text-[#737373]" />}
             </button>
             <span className="text-[11px] text-[#7A7A78]">{form.enabled ? "Visible in /services" : "Hidden from bot"}</span>
           </div>
         </div>
         <div className="px-6 pb-5 flex gap-3">
-          <button onClick={onClose} className="flex-1 py-2.5 border border-[#E5E5E3] text-[13px] text-[#7A7A78] hover:border-black hover:text-black transition-colors">Cancel</button>
+          <button onClick={onClose} className="flex-1 py-2.5 border border-[#A3A3A3] text-[13px] text-[#7A7A78] hover:border-black hover:text-black transition-colors">Cancel</button>
           <button
             onClick={() => valid && !loading && onSave(form)}
             disabled={!valid || loading}
@@ -306,7 +306,7 @@ function ServicesTab({ toast }) {
 
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[11px] text-[#AEAEAC] font-mono">
+          <p className="text-[11px] text-[#737373] font-mono">
             {services.length} services · {services.filter(s => s.enabled).length} active in bot
           </p>
           <p className="text-[10px] text-[#22C55E] mt-0.5">✓ Changes reflect in Telegram bot immediately</p>
@@ -326,34 +326,34 @@ function ServicesTab({ toast }) {
       ) : (
         <div className="space-y-4">
           {Object.entries(grouped).map(([catLabel, items]) => (
-            <div key={catLabel} className="border border-[#E5E5E3] bg-white">
-              <div className="px-5 py-3 bg-[#F7F7F5] border-b border-[#E5E5E3]">
+            <div key={catLabel} className="border border-[#A3A3A3] bg-white">
+              <div className="px-5 py-3 bg-[#F7F7F5] border-b border-[#A3A3A3]">
                 <p className="text-[11px] font-semibold text-[#3D3D3D]">{catLabel}</p>
               </div>
               {items.map(s => (
-                <div key={s.id} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-5 py-3.5 border-b border-[#E5E5E3] last:border-0 hover:bg-[#F7F7F5] transition-colors">
+                <div key={s.id} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-5 py-3.5 border-b border-[#A3A3A3] last:border-0 hover:bg-[#F7F7F5] transition-colors">
                   <div className="flex items-start justify-between w-full sm:w-auto flex-1 min-w-0">
                     <div className="flex gap-3">
                       <button onClick={() => handleToggle(s.id)} className="flex-shrink-0 transition-colors mt-0.5 sm:mt-0">
                         {s.enabled
                           ? <ToggleRight size={22} className="text-[#2E7D32]" />
-                          : <ToggleLeft size={22} className="text-[#AEAEAC]" />}
+                          : <ToggleLeft size={22} className="text-[#737373]" />}
                       </button>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <p className={`text-[13px] font-semibold ${s.enabled ? "text-black" : "text-[#AEAEAC]"}`}>{s.name}</p>
-                          {s.price && <span className="text-[10px] font-semibold border border-[#E5E5E3] px-1.5 py-0.5 text-[#7A7A78] break-all">{s.price}</span>}
-                          {!s.enabled && <span className="text-[9px] font-bold tracking-wider uppercase bg-[#F7F7F5] border border-[#E5E5E3] px-1.5 py-0.5 text-[#AEAEAC]">OFF</span>}
+                          <p className={`text-[13px] font-semibold ${s.enabled ? "text-black" : "text-[#737373]"}`}>{s.name}</p>
+                          {s.price && <span className="text-[10px] font-semibold border border-[#A3A3A3] px-1.5 py-0.5 text-[#7A7A78] break-all">{s.price}</span>}
+                          {!s.enabled && <span className="text-[9px] font-bold tracking-wider uppercase bg-[#F7F7F5] border border-[#A3A3A3] px-1.5 py-0.5 text-[#737373]">OFF</span>}
                         </div>
                         {s.description && <p className="text-[11px] text-[#7A7A78] mt-0.5 break-words">{s.description}</p>}
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0 self-end sm:self-auto mt-2 sm:mt-0">
-                    <button onClick={() => setModal(s)} className="w-8 h-8 border border-[#E5E5E3] flex items-center justify-center text-[#7A7A78] hover:border-black hover:text-black transition-colors" title="Edit">
+                    <button onClick={() => setModal(s)} className="w-8 h-8 border border-[#A3A3A3] flex items-center justify-center text-[#7A7A78] hover:border-black hover:text-black transition-colors" title="Edit">
                       <Pencil size={13} />
                     </button>
-                    <button onClick={() => handleDelete(s.id)} className="w-8 h-8 border border-[#E5E5E3] flex items-center justify-center text-[#7A7A78] hover:border-red-500 hover:text-red-500 hover:bg-red-50 transition-colors" title="Delete">
+                    <button onClick={() => handleDelete(s.id)} className="w-8 h-8 border border-[#A3A3A3] flex items-center justify-center text-[#7A7A78] hover:border-red-500 hover:text-red-500 hover:bg-red-50 transition-colors" title="Delete">
                       <Trash2 size={13} />
                     </button>
                   </div>
@@ -362,8 +362,8 @@ function ServicesTab({ toast }) {
             </div>
           ))}
           {services.length === 0 && (
-            <div className="py-12 text-center border border-[#E5E5E3]">
-              <p className="text-[13px] text-[#AEAEAC]">Koi service nahi. "Add Service" se shuru karein.</p>
+            <div className="py-12 text-center border border-[#A3A3A3]">
+              <p className="text-[13px] text-[#737373]">Koi service nahi. "Add Service" se shuru karein.</p>
             </div>
           )}
         </div>
@@ -387,22 +387,22 @@ function AnnouncementModal({ ann, onSave, onClose, examOpts }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white border border-[#0A0A0A] shadow-[4px_4px_0px_#0A0A0A]">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E5E3] bg-[#F7F7F5]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#A3A3A3] bg-[#F7F7F5]">
           <div>
-            <p className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.18em] uppercase">{ann ? "Edit" : "Schedule"}</p>
+            <p className="text-[10px] text-[#737373] font-semibold tracking-[0.18em] uppercase">{ann ? "Edit" : "Schedule"}</p>
             <h2 className="text-[15px] font-semibold text-black mt-0.5">Auto Announcement</h2>
           </div>
-          <button onClick={onClose} className="text-[#AEAEAC] hover:text-black transition-colors"><X size={18} /></button>
+          <button onClick={onClose} className="text-[#737373] hover:text-black transition-colors"><X size={18} /></button>
         </div>
         <div className="px-6 py-5 space-y-4">
           <div>
-            <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase block mb-1.5">Target Exam</label>
+            <label className="text-[10px] text-[#737373] font-semibold tracking-[0.15em] uppercase block mb-1.5">Target Exam</label>
             <div className="flex flex-wrap gap-2">
               {examOpts.map(e => (
                 <button
                   key={e}
                   onClick={() => set("exam", e)}
-                  className={`px-3 py-1.5 text-[12px] font-bold border transition-colors ${form.exam === e ? "text-white border-transparent" : "bg-white text-[#7A7A78] border-[#E5E5E3] hover:border-black hover:text-black"}`}
+                  className={`px-3 py-1.5 text-[12px] font-bold border transition-colors ${form.exam === e ? "text-white border-transparent" : "bg-white text-[#7A7A78] border-[#A3A3A3] hover:border-black hover:text-black"}`}
                   style={form.exam === e ? { backgroundColor: getExamColor(e), borderColor: getExamColor(e) } : {}}
                 >
                   {e}
@@ -411,23 +411,23 @@ function AnnouncementModal({ ann, onSave, onClose, examOpts }) {
             </div>
           </div>
           <div>
-            <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase block mb-1.5">Message *</label>
+            <label className="text-[10px] text-[#737373] font-semibold tracking-[0.15em] uppercase block mb-1.5">Message *</label>
             <textarea
               rows={4} value={form.message} onChange={e => set("message", e.target.value)}
-              className="w-full border border-[#E5E5E3] px-4 py-3 text-[13px] text-black focus:outline-none focus:border-black resize-none transition-colors"
+              className="w-full border border-[#A3A3A3] px-4 py-3 text-[13px] text-black focus:outline-none focus:border-black resize-none transition-colors"
               placeholder="JEE exam 30 din baad hai! Tayaari karo..."
             />
           </div>
           <div>
-            <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase block mb-1.5">Send At *</label>
+            <label className="text-[10px] text-[#737373] font-semibold tracking-[0.15em] uppercase block mb-1.5">Send At *</label>
             <input
               type="datetime-local" min={getMin()} value={form.runAt} onChange={e => set("runAt", e.target.value)}
-              className="border border-[#E5E5E3] px-4 py-2.5 text-[13px] text-black bg-white focus:outline-none focus:border-black transition-colors"
+              className="border border-[#A3A3A3] px-4 py-2.5 text-[13px] text-black bg-white focus:outline-none focus:border-black transition-colors"
             />
           </div>
         </div>
         <div className="px-6 pb-5 flex gap-3">
-          <button onClick={onClose} className="flex-1 py-2.5 border border-[#E5E5E3] text-[13px] text-[#7A7A78] hover:border-black hover:text-black transition-colors">Cancel</button>
+          <button onClick={onClose} className="flex-1 py-2.5 border border-[#A3A3A3] text-[13px] text-[#7A7A78] hover:border-black hover:text-black transition-colors">Cancel</button>
           <button
             onClick={() => valid && onSave(form)}
             disabled={!valid}
@@ -466,7 +466,7 @@ function AnnouncementsTab({ toast }) {
       {modal && <AnnouncementModal ann={modal === "add" ? null : modal} onSave={handleSave} onClose={() => setModal(null)} examOpts={examOpts} />}
 
       <div className="flex items-center justify-between">
-        <p className="text-[11px] text-[#AEAEAC] font-mono">{anns.filter(a => !isPast(a.runAt)).length} upcoming · {anns.filter(a => isPast(a.runAt) || a.sent).length} done</p>
+        <p className="text-[11px] text-[#737373] font-mono">{anns.filter(a => !isPast(a.runAt)).length} upcoming · {anns.filter(a => isPast(a.runAt) || a.sent).length} done</p>
         <button
           onClick={() => setModal("add")}
           className="flex items-center gap-2 px-3 py-2 bg-black text-white text-[12px] font-semibold hover:bg-[#3D3D3D] transition-colors"
@@ -475,10 +475,10 @@ function AnnouncementsTab({ toast }) {
         </button>
       </div>
 
-      <div className="border border-[#E5E5E3] bg-white divide-y divide-[#E5E5E3]">
+      <div className="border border-[#A3A3A3] bg-white divide-y divide-[#A3A3A3]">
         {anns.length === 0 && (
           <div className="py-12 text-center">
-            <p className="text-[13px] text-[#AEAEAC]">Koi scheduled announcement nahi hai.</p>
+            <p className="text-[13px] text-[#737373]">Koi scheduled announcement nahi hai.</p>
           </div>
         )}
         {[...anns].sort((a, b) => new Date(a.runAt) - new Date(b.runAt)).map(ann => {
@@ -496,10 +496,10 @@ function AnnouncementsTab({ toast }) {
               {/* Content */}
               <div className="flex-1 min-w-0">
                 <p className="text-[13px] text-[#3D3D3D] line-clamp-2">{ann.message}</p>
-                <div className="flex items-center gap-1.5 mt-1.5 text-[11px] text-[#AEAEAC] font-mono">
+                <div className="flex items-center gap-1.5 mt-1.5 text-[11px] text-[#737373] font-mono">
                   <Clock size={11} />
                   <span>{fmt(ann.runAt)}</span>
-                  {past && <span className="text-[10px] font-semibold text-[#AEAEAC] border border-[#E5E5E3] px-1.5 py-0.5 ml-1">DONE</span>}
+                  {past && <span className="text-[10px] font-semibold text-[#737373] border border-[#A3A3A3] px-1.5 py-0.5 ml-1">DONE</span>}
                 </div>
               </div>
 
@@ -508,14 +508,14 @@ function AnnouncementsTab({ toast }) {
                 {!past && (
                   <button
                     onClick={() => setModal(ann)}
-                    className="w-8 h-8 border border-[#E5E5E3] flex items-center justify-center text-[#7A7A78] hover:border-black hover:text-black transition-colors"
+                    className="w-8 h-8 border border-[#A3A3A3] flex items-center justify-center text-[#7A7A78] hover:border-black hover:text-black transition-colors"
                   >
                     <Pencil size={13} />
                   </button>
                 )}
                 <button
                   onClick={() => remove(ann.id)}
-                  className="w-8 h-8 border border-[#E5E5E3] flex items-center justify-center text-[#7A7A78] hover:border-red-500 hover:text-red-500 hover:bg-red-50 transition-colors"
+                  className="w-8 h-8 border border-[#A3A3A3] flex items-center justify-center text-[#7A7A78] hover:border-red-500 hover:text-red-500 hover:bg-red-50 transition-colors"
                 >
                   <Trash2 size={13} />
                 </button>
@@ -576,8 +576,8 @@ function ExamsTab({ toast }) {
 
   return (
     <div className="space-y-6 max-w-xl">
-      <div className="border border-[#E5E5E3] bg-white p-5">
-        <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase block mb-1.5">Add New Exam</label>
+      <div className="border border-[#A3A3A3] bg-white p-5">
+        <label className="text-[10px] text-[#737373] font-semibold tracking-[0.15em] uppercase block mb-1.5">Add New Exam</label>
         <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
@@ -585,7 +585,7 @@ function ExamsTab({ toast }) {
             onChange={e => setNewExam(e.target.value.toUpperCase())}
             onKeyDown={e => e.key === "Enter" && handleAdd()}
             placeholder="e.g. GATE"
-            className="flex-1 border border-[#E5E5E3] px-4 py-2.5 text-[13px] text-black focus:outline-none focus:border-black transition-colors"
+            className="flex-1 border border-[#A3A3A3] px-4 py-2.5 text-[13px] text-black focus:outline-none focus:border-black transition-colors"
           />
           <button
             onClick={handleAdd}
@@ -597,7 +597,7 @@ function ExamsTab({ toast }) {
         </div>
       </div>
 
-      <div className="border border-[#E5E5E3] bg-white divide-y divide-[#E5E5E3]">
+      <div className="border border-[#A3A3A3] bg-white divide-y divide-[#A3A3A3]">
         {loading ? (
           <div className="py-8 flex justify-center">
              <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
@@ -617,7 +617,7 @@ function ExamsTab({ toast }) {
                 </span>
                 <button
                   onClick={() => handleDelete(exam.id, exam.name)}
-                  className="w-8 h-8 border border-[#E5E5E3] flex items-center justify-center text-[#7A7A78] hover:border-red-500 hover:text-red-500 hover:bg-red-50 transition-colors"
+                  className="w-8 h-8 border border-[#A3A3A3] flex items-center justify-center text-[#7A7A78] hover:border-red-500 hover:text-red-500 hover:bg-red-50 transition-colors"
                   title="Delete"
                 >
                   <Trash2 size={13} />
@@ -646,8 +646,8 @@ function SettingsTab({ toast }) {
   return (
     <div className="max-w-xl space-y-6">
       {/* Bot Name */}
-      <div className="border border-[#E5E5E3] bg-white">
-        <div className="px-5 py-4 border-b border-[#E5E5E3] flex items-center gap-2">
+      <div className="border border-[#A3A3A3] bg-white">
+        <div className="px-5 py-4 border-b border-[#A3A3A3] flex items-center gap-2">
           <BotMessageSquare size={14} className="text-[#7A7A78]" />
           <p className="text-[12px] font-semibold text-black">Bot Name</p>
         </div>
@@ -656,16 +656,16 @@ function SettingsTab({ toast }) {
             type="text"
             value={settings.botName}
             onChange={e => set("botName", e.target.value)}
-            className="w-full border border-[#E5E5E3] px-4 py-2.5 text-[13px] text-black focus:outline-none focus:border-black transition-colors"
+            className="w-full border border-[#A3A3A3] px-4 py-2.5 text-[13px] text-black focus:outline-none focus:border-black transition-colors"
             placeholder="e.g. E-Mitra Seva"
           />
-          <p className="text-[11px] text-[#AEAEAC] mt-1.5">Ye naam broadcasts ke header mein dikhega.</p>
+          <p className="text-[11px] text-[#737373] mt-1.5">Ye naam broadcasts ke header mein dikhega.</p>
         </div>
       </div>
 
       {/* Language */}
-      <div className="border border-[#E5E5E3] bg-white">
-        <div className="px-5 py-4 border-b border-[#E5E5E3] flex items-center gap-2">
+      <div className="border border-[#A3A3A3] bg-white">
+        <div className="px-5 py-4 border-b border-[#A3A3A3] flex items-center gap-2">
           <Languages size={14} className="text-[#7A7A78]" />
           <p className="text-[12px] font-semibold text-black">Default Language</p>
         </div>
@@ -682,11 +682,11 @@ function SettingsTab({ toast }) {
                 className={`flex-1 border py-3 px-3 text-left transition-colors ${
                   settings.language === val
                     ? "border-black bg-black text-white"
-                    : "border-[#E5E5E3] bg-white text-[#3D3D3D] hover:border-black"
+                    : "border-[#A3A3A3] bg-white text-[#3D3D3D] hover:border-black"
                 }`}
               >
                 <p className="text-[13px] font-semibold">{label}</p>
-                <p className={`text-[10px] mt-0.5 ${settings.language === val ? "text-white/70" : "text-[#AEAEAC]"}`}>{sub}</p>
+                <p className={`text-[10px] mt-0.5 ${settings.language === val ? "text-white/70" : "text-[#737373]"}`}>{sub}</p>
               </button>
             ))}
           </div>
@@ -694,8 +694,8 @@ function SettingsTab({ toast }) {
       </div>
 
       {/* Notification Cooldown */}
-      <div className="border border-[#E5E5E3] bg-white">
-        <div className="px-5 py-4 border-b border-[#E5E5E3] flex items-center gap-2">
+      <div className="border border-[#A3A3A3] bg-white">
+        <div className="px-5 py-4 border-b border-[#A3A3A3] flex items-center gap-2">
           <Bell size={14} className="text-[#7A7A78]" />
           <p className="text-[12px] font-semibold text-black">Notification Cooldown</p>
         </div>
@@ -708,12 +708,12 @@ function SettingsTab({ toast }) {
                 min={1} max={20}
                 value={settings.maxMsgDay}
                 onChange={e => set("maxMsgDay", Number(e.target.value))}
-                className="w-20 border border-[#E5E5E3] px-3 py-2 text-[13px] text-black text-center focus:outline-none focus:border-black transition-colors"
+                className="w-20 border border-[#A3A3A3] px-3 py-2 text-[13px] text-black text-center focus:outline-none focus:border-black transition-colors"
               />
               <span className="text-[13px] text-[#3D3D3D]">messages per student per day</span>
             </div>
           </div>
-          <p className="text-[11px] text-[#AEAEAC] mt-2">Isse zyada messages ek din mein nahi jayenge.</p>
+          <p className="text-[11px] text-[#737373] mt-2">Isse zyada messages ek din mein nahi jayenge.</p>
         </div>
       </div>
 
@@ -749,14 +749,14 @@ export default function BotManager() {
       <Toast visible={toastVisible} message={toastMsg} />
 
       {/* Header */}
-      <div className="border-b border-[#E5E5E3] pb-6">
-        <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC] mb-2">Configuration</p>
+      <div className="border-b border-[#A3A3A3] pb-6">
+        <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#737373] mb-2">Configuration</p>
         <h1 className="text-3xl font-light text-black tracking-tight">Bot Manager</h1>
         <p className="text-[13px] text-[#7A7A78] mt-1">Bot ke messages, services, announcements aur settings manage karein.</p>
       </div>
 
       {/* Tab bar */}
-      <div className="flex border-b border-[#E5E5E3] -mb-px overflow-x-auto">
+      <div className="flex border-b border-[#A3A3A3] -mb-px overflow-x-auto">
         {TABS.map(tab => (
           <TabBtn
             key={tab.id}

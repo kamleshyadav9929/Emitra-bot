@@ -50,7 +50,7 @@ export default function Dashboard() {
     <div className="flex items-center justify-center h-64">
       <div className="flex flex-col items-center gap-3">
         <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-        <p className="text-[11px] text-[#AEAEAC] font-medium tracking-wide uppercase">Loading</p>
+        <p className="text-[11px] text-[#737373] font-medium tracking-wide uppercase">Loading</p>
       </div>
     </div>
   )
@@ -66,21 +66,21 @@ export default function Dashboard() {
     <div className="space-y-6">
 
       {/* ── Header ── */}
-      <div className="flex items-center justify-between border-b border-[#E5E5E3] pb-5">
+      <div className="flex items-center justify-between border-b border-[#A3A3A3] pb-5">
         <div>
-          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC] mb-1">Overview</p>
+          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#737373] mb-1">Overview</p>
           <h1 className="text-3xl font-light text-black tracking-tight">Dashboard</h1>
         </div>
         <div className="flex flex-col items-end gap-2">
           <button
             onClick={() => fetchAll(true)}
             disabled={refreshing}
-            className="flex items-center gap-2 px-3 py-2 border border-[#E5E5E3] text-[12px] text-[#3D3D3D] hover:border-black hover:text-black transition-colors disabled:opacity-40 rounded-lg"
+            className="flex items-center gap-2 px-3 py-2 border border-[#A3A3A3] text-[12px] text-[#3D3D3D] hover:border-black hover:text-black transition-colors disabled:opacity-40 rounded-lg"
           >
             <RefreshCw size={12} className={refreshing ? "animate-spin" : ""} />
             {refreshing ? "Refreshing..." : "Refresh"}
           </button>
-          {lastUpdatedStr && <span className="text-[10px] text-[#AEAEAC] font-mono">{lastUpdatedStr}</span>}
+          {lastUpdatedStr && <span className="text-[10px] text-[#737373] font-mono">{lastUpdatedStr}</span>}
         </div>
       </div>
 
@@ -90,58 +90,58 @@ export default function Dashboard() {
         {/* Total Students */}
         <div
           onClick={() => navigate("/admin/students")}
-          className="border border-[#E5E5E3] p-6 bg-white cursor-pointer hover:border-black hover:shadow-md transition-all group rounded-2xl"
+          className="border border-[#A3A3A3] p-6 bg-white cursor-pointer hover:border-black hover:shadow-md transition-all group rounded-2xl"
         >
           <div className="flex items-center justify-between mb-4">
-            <Users size={16} className="text-[#AEAEAC] group-hover:text-black transition-colors" />
-            <ChevronRight size={12} className="text-[#E5E5E3] group-hover:text-black transition-colors" />
+            <Users size={16} className="text-[#737373] group-hover:text-black transition-colors" />
+            <ChevronRight size={12} className="text-[#A3A3A3] group-hover:text-black transition-colors" />
           </div>
           <p className="text-4xl font-light text-black tracking-tight">{total}</p>
-          <p className="text-[10px] font-semibold tracking-[0.16em] uppercase text-[#AEAEAC] mt-2">Total Students</p>
+          <p className="text-[10px] font-semibold tracking-[0.16em] uppercase text-[#737373] mt-2">Total Students</p>
         </div>
 
         {/* Messages Sent */}
         <div
           onClick={() => navigate("/admin/logs")}
-          className="border border-[#E5E5E3] p-6 bg-white cursor-pointer hover:border-black hover:shadow-md transition-all group rounded-2xl"
+          className="border border-[#A3A3A3] p-6 bg-white cursor-pointer hover:border-black hover:shadow-md transition-all group rounded-2xl"
         >
           <div className="flex items-center justify-between mb-4">
-            <Send size={16} className="text-[#AEAEAC] group-hover:text-black transition-colors" />
-            <ChevronRight size={12} className="text-[#E5E5E3] group-hover:text-black transition-colors" />
+            <Send size={16} className="text-[#737373] group-hover:text-black transition-colors" />
+            <ChevronRight size={12} className="text-[#A3A3A3] group-hover:text-black transition-colors" />
           </div>
           <p className="text-4xl font-light text-black tracking-tight">{totalSent}</p>
-          <p className="text-[10px] font-semibold tracking-[0.16em] uppercase text-[#AEAEAC] mt-2">Messages Sent</p>
+          <p className="text-[10px] font-semibold tracking-[0.16em] uppercase text-[#737373] mt-2">Messages Sent</p>
         </div>
 
         {/* Pending Requests */}
         <div
           onClick={() => navigate("/admin/requests")}
-          className="border border-[#E5E5E3] p-6 bg-white cursor-pointer hover:border-black hover:shadow-md transition-all group rounded-2xl"
+          className="border border-[#A3A3A3] p-6 bg-white cursor-pointer hover:border-black hover:shadow-md transition-all group rounded-2xl"
         >
           <div className="flex items-center justify-between mb-4">
-            <AlertCircle size={16} className={pendingCount > 0 ? "text-red-500" : "text-[#AEAEAC]"} />
+            <AlertCircle size={16} className={pendingCount > 0 ? "text-red-500" : "text-[#737373]"} />
             <div className="flex items-center gap-1.5">
               {pendingCount > 0 && (
                 <span className="min-w-[20px] h-5 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1.5 rounded-full">
                   {pendingCount > 99 ? "99+" : pendingCount}
                 </span>
               )}
-              <ChevronRight size={12} className="text-[#E5E5E3] group-hover:text-black transition-colors" />
+              <ChevronRight size={12} className="text-[#A3A3A3] group-hover:text-black transition-colors" />
             </div>
           </div>
           <p className={`text-4xl font-light tracking-tight ${pendingCount > 0 ? "text-red-600" : "text-black"}`}>
             {pendingCount}
           </p>
-          <p className="text-[10px] font-semibold tracking-[0.16em] uppercase text-[#AEAEAC] mt-2">Pending Requests</p>
+          <p className="text-[10px] font-semibold tracking-[0.16em] uppercase text-[#737373] mt-2">Pending Requests</p>
         </div>
 
         {/* Exam Categories */}
-        <div className="border border-[#E5E5E3] p-6 bg-white rounded-2xl">
+        <div className="border border-[#A3A3A3] p-6 bg-white rounded-2xl">
           <div className="flex items-center justify-between mb-4">
-            <BookOpen size={16} className="text-[#AEAEAC]" />
+            <BookOpen size={16} className="text-[#737373]" />
           </div>
           <p className="text-4xl font-light text-black tracking-tight">{examCount}</p>
-          <p className="text-[10px] font-semibold tracking-[0.16em] uppercase text-[#AEAEAC] mt-2">Exam Categories</p>
+          <p className="text-[10px] font-semibold tracking-[0.16em] uppercase text-[#737373] mt-2">Exam Categories</p>
         </div>
       </div>
 
@@ -149,15 +149,15 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
 
         {/* Distribution Chart — 3/5 */}
-        <div className="border border-[#E5E5E3] p-5 bg-white lg:col-span-3 rounded-2xl">
-          <div className="flex items-center justify-between mb-5 pb-4 border-b border-[#E5E5E3]">
-            <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC]">Distribution</p>
-            <TrendingUp size={13} className="text-[#AEAEAC]" />
+        <div className="border border-[#A3A3A3] p-5 bg-white lg:col-span-3 rounded-2xl">
+          <div className="flex items-center justify-between mb-5 pb-4 border-b border-[#A3A3A3]">
+            <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#737373]">Distribution</p>
+            <TrendingUp size={13} className="text-[#737373]" />
           </div>
           <div className="space-y-4">
             {examEntries.length === 0 ? (
               <div className="py-8 text-center">
-                <p className="text-[13px] text-[#AEAEAC]">No students yet</p>
+                <p className="text-[13px] text-[#737373]">No students yet</p>
               </div>
             ) : (
               examEntries.map(([exam, count]) => {
@@ -193,9 +193,9 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions — 2/5 */}
-        <div className="border border-[#E5E5E3] p-5 bg-white lg:col-span-2 rounded-2xl">
-          <div className="mb-5 pb-4 border-b border-[#E5E5E3]">
-            <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC]">Quick Actions</p>
+        <div className="border border-[#A3A3A3] p-5 bg-white lg:col-span-2 rounded-2xl">
+          <div className="mb-5 pb-4 border-b border-[#A3A3A3]">
+            <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#737373]">Quick Actions</p>
           </div>
           <div className="space-y-2">
             {[
@@ -207,13 +207,13 @@ export default function Dashboard() {
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className="w-full flex items-center justify-between px-4 py-3 border border-[#E5E5E3] hover:border-black hover:bg-[#F7F7F5] transition-all text-left group rounded-xl"
+                className="w-full flex items-center justify-between px-4 py-3 border border-[#A3A3A3] hover:border-black hover:bg-[#F7F7F5] transition-all text-left group rounded-xl"
               >
                 <div>
                   <p className="text-[13px] font-semibold text-black">{item.label}</p>
-                  <p className={`text-[11px] mt-0.5 ${item.alert ? "text-red-500" : "text-[#AEAEAC]"}`}>{item.sub}</p>
+                  <p className={`text-[11px] mt-0.5 ${item.alert ? "text-red-500" : "text-[#737373]"}`}>{item.sub}</p>
                 </div>
-                <ChevronRight size={14} className="text-[#E5E5E3] group-hover:text-black transition-colors flex-shrink-0" />
+                <ChevronRight size={14} className="text-[#A3A3A3] group-hover:text-black transition-colors flex-shrink-0" />
               </button>
             ))}
           </div>

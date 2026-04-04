@@ -11,7 +11,8 @@ import {
     Star,
     FileText,
     ChevronRight,
-    XCircle
+    XCircle,
+    Layers
 } from "lucide-react"
 
 // Hooks
@@ -115,20 +116,124 @@ export default function Landing() {
         }
     }
 
+    // ── Navbar State ───────────────────────────────────────────────
+    const [menuOpen, setMenuOpen] = useState(false)
+    const [scrolled, setScrolled] = useState(false)
+
+    useEffect(() => {
+        const onScroll = () => setScrolled(window.scrollY > 10)
+        window.addEventListener('scroll', onScroll)
+        return () => window.removeEventListener('scroll', onScroll)
+    }, [])
+
+    const navLinks = [
+        { label: 'Services', href: '#services' },
+        { label: 'Track Status', href: '#status' }
+    ]
+
     return (
-        <div className="bg-white scroll-smooth">
+        <div className="bg-white scroll-smooth pt-16">
             <Helmet>
                 <title>Krishna E-Mitra | Digital Government Services Portal</title>
                 <meta name="description" content="Apply for government certificates, IDs, and exams from the comfort of your home with Krishna E-Mitra." />
             </Helmet>
 
-            <AnnouncementTicker announcements={announcements} />
+            {/* ── NAVBAR ─────────────────────────────────────────────────────── */}
+            <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm shadow-black/5 border-b border-black/5' : 'bg-white border-b border-black/5'}`}>
+                <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-3 sm:gap-6">
+                    
+                    {/* Logo */}
+                    <a href="/" className="flex items-center gap-2.5 shrink-0">
+                        <div className="w-7 h-7 bg-black flex items-center justify-center rounded-md">
+                            <Layers size={13} className="text-white" />
+                        </div>
+                        <div className="hidden sm:flex flex-col leading-none">
+                            <span className="text-[13px] font-black tracking-tight uppercase">Krishna E-Mitra</span>
+                            <span className="text-[9px] font-bold text-ink-4 uppercase tracking-widest">Digital Seva Portal</span>
+                        </div>
+                    </a>
 
-            {/* ── HERO SECTION ───────────────────────────────────────────────── */}
-            <section className="relative px-6 py-12 lg:py-0 min-h-[calc(100vh-60px)] lg:h-[calc(100vh-40px)] flex flex-col justify-center overflow-hidden bg-white">
+                    {/* Google-like Search Bar */}
+                    <div className="flex-1 max-w-2xl mx-1 sm:mx-auto relative transition-all duration-300">
+                        <Search size={16} className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-ink-3 pointer-events-none w-4 h-4 md:w-[18px] md:h-[18px]" />
+                        <input 
+                            type="text" 
+                            value={search}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                                if(e.target.value) document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                            placeholder="Search services..." 
+                            className="w-full bg-[#f1f3f4] hover:bg-[#e9eaec] focus:bg-white border border-transparent focus:border-black/10 focus:shadow-sm focus:ring-1 focus:ring-black/5 outline-none rounded-full py-2 md:py-2.5 pl-9 md:pl-12 pr-3 md:pr-4 text-xs md:text-sm font-medium transition-all"
+                        />
+                    </div>
+
+                    <div className="flex items-center gap-4 shrink-0">
+                        {/* Desktop Nav Links */}
+                        <nav className="hidden md:flex items-center gap-1">
+                            {navLinks.map(({ label, href }) => (
+                                <a
+                                    key={label}
+                                    href={href}
+                                    className="px-4 py-2 text-[11px] font-bold tracking-widest uppercase text-ink-2 hover:text-black hover:bg-black/5 rounded-full transition-all"
+                                >
+                                    {label}
+                                </a>
+                            ))}
+                        </nav>
+
+                        {/* Mobile Hamburger & Desktop Contact */}
+                        <a
+                            href="https://wa.me/916377964293"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hidden md:flex items-center gap-2 bg-black text-white px-5 py-2 text-[11px] font-black uppercase tracking-widest rounded-full hover:bg-black/85 transition-all active:scale-95"
+                        >
+                            WhatsApp Help
+                        </a>
+                        
+                        <button
+                            onClick={() => setMenuOpen(!menuOpen)}
+                            className="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-full hover:bg-black/5 transition-colors"
+                        >
+                            <span className={`block w-5 h-0.5 bg-black transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+                            <span className={`block w-5 h-0.5 bg-black transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
+                            <span className={`block w-5 h-0.5 bg-black transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Mobile Drawer */}
+                <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${menuOpen ? 'max-h-[400px] border-t border-black/5' : 'max-h-0'}`}>
+                    <div className="px-6 py-4 space-y-4 bg-white border-t border-black/5 flex flex-col shadow-xl">
+
+                        <div className="space-y-1">
+                            {navLinks.map(({ label, href }) => (
+                                <a
+                                    key={label}
+                                    href={href}
+                                    onClick={() => setMenuOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-3 text-[12px] font-black uppercase tracking-widest text-ink-2 hover:text-black hover:bg-black/5 rounded-xl transition-all"
+                                >
+                                    {label}
+                                </a>
+                            ))}
+                        </div>
+                        <a
+                            href="https://wa.me/916377964293"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-2 w-full bg-black text-white px-5 py-3 text-[11px] font-black uppercase tracking-widest rounded-xl"
+                        >
+                            WhatsApp Help
+                        </a>
+                    </div>
+                </div>
+            </header>            {/* ── HERO SECTION ───────────────────────────────────────────────── */}
+            <section className="relative px-6 py-16 md:py-24 lg:py-0 lg:h-[calc(100vh-40px)] flex flex-col justify-center overflow-hidden bg-white">
                 
-                {/* Animated Background Elements */}
-                <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                {/* Animated Background Elements - Hidden on mobile for performance */}
+                <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none hidden lg:block">
                     <motion.div 
                         animate={{ 
                             x: [0, 150, 0], 
@@ -157,15 +262,15 @@ export default function Landing() {
                             <motion.h1 
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                className="text-5xl md:text-7xl lg:text-[100px] font-display font-black tracking-tight leading-[0.85] lg:leading-[0.8] uppercase"
+                                className="text-4xl md:text-5xl lg:text-7xl font-display font-black tracking-tight leading-[0.85] lg:leading-[0.8] uppercase"
                             >
-                                Sarkaari<br />
+                                Government<br />
                                 <span className="relative inline-block">
-                                    Seva
+                                    Services
                                     <span className="absolute -bottom-1 left-0 h-[3px] lg:h-[4px] w-full bg-black/10 rounded-full" />
                                 </span>
                                 ,<br />
-                                <span className="text-ink-3">Ab Ghar Se.</span>
+                                <span className="text-ink-3">From Home.</span>
                             </motion.h1>
 
                             <motion.p
@@ -174,7 +279,7 @@ export default function Landing() {
                                 transition={{ duration: 0.6, delay: 0.2 }}
                                 className="text-xs md:text-base text-ink-2 max-w-sm lg:max-w-md leading-relaxed font-sans"
                             >
-                                Krishna E-Mitra ki 50+ sarkari sevaen ab ek jagah — apply karein, track karein, aur real-time exam updates paaein.
+                                Access 50+ government services in one place — apply, track status, and get real-time exam updates with Krishna E-Mitra.
                             </motion.p>
                         </div>
 
@@ -267,41 +372,7 @@ export default function Landing() {
                 </motion.div>
             </section>
 
-            {announcements.length > 0 && (
-                <section id="updates" className="relative py-24 bg-white border-b border-black/5 overflow-hidden">
-                    <div className="max-w-7xl mx-auto px-6">
-                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
-                            <div className="space-y-4">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/[0.04] rounded-full text-[10px] font-black uppercase tracking-widest text-ink-3">
-                                    <Bell size={10} className="text-black" />
-                                    Notifications
-                                </div>
-                                <h2 className="text-4xl md:text-6xl font-display font-black tracking-tighter uppercase">Latest Updates</h2>
-                                <p className="text-ink-2 max-w-md">Stay ahead with real-time notifications for exams, results, and new government forms.</p>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <div className="hidden md:flex flex-col items-end leading-none">
-                                    <span className="text-[14px] font-black">{announcements.length}</span>
-                                    <span className="text-[10px] text-ink-4 font-bold uppercase tracking-widest">Active Alerts</span>
-                                </div>
-                                <div className="h-10 w-px bg-black/10 hidden md:block"></div>
-                                <a 
-                                    href={config.telegram_bot_url || "https://t.me/Kamlesh6377_bot"}
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="group flex items-center gap-2 text-[11px] font-black uppercase tracking-widest hover:text-ink-3 transition-colors"
-                                >
-                                    View all in Bot <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <div className="flex gap-4 overflow-x-auto pb-8 mask-fade scrollbar-hide -mx-6 px-6">
-                            {announcements.map(ann => <ExamUpdateCard key={ann.id} update={ann} />)}
-                        </div>
-                    </div>
-                </section>
-            )}
+
 
             {loading && (
                 <div className="max-w-7xl mx-auto px-6 py-24 text-center">
@@ -347,14 +418,14 @@ export default function Landing() {
                     {/* Filter Header */}
                     <div className="flex flex-col md:flex-row gap-8 justify-between items-start md:items-end border-b-4 border-black pb-12">
                         <div className="space-y-4">
-                            <h2 className="text-3xl md:text-6xl font-display font-black tracking-tighter uppercase leading-none">Sevayen</h2>
+                            <h2 className="text-2xl md:text-4xl font-display font-black tracking-tighter uppercase leading-none">Services</h2>
                             <p className="text-ink-2 font-medium">Browse our full range of 50+ government services.</p>
                         </div>
-                        <div className="w-full md:w-96 relative group">
+                        <div className="w-full md:w-96 relative group hidden md:block">
                             <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-ink-4 group-focus-within:text-black transition-colors" size={20} />
                             <input 
                                 type="text"
-                                placeholder="Search sarkaari sevaen..."
+                                placeholder="Search services..."
                                 className="w-full bg-slate-50 border-2 border-black/5 p-5 pl-16 rounded-2xl outline-none focus:border-black focus:bg-white transition-all font-display font-semibold"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
@@ -388,13 +459,13 @@ export default function Landing() {
                         {Object.entries(filteredServices).map(([key, cat]) => (
                             <div key={key} id={`category-${key}`} className="space-y-10 scroll-mt-32">
                                 <div className="flex items-center gap-6">
-                                    <span className="text-6xl font-display font-black opacity-10 leading-none">
+                                    <span className="text-4xl font-display font-black opacity-10 leading-none">
                                         {Object.keys(services).indexOf(key) + 1 < 10 ? `0${Object.keys(services).indexOf(key) + 1}` : Object.keys(services).indexOf(key) + 1}
                                     </span>
-                                    <h3 className="text-3xl font-display font-black tracking-tight uppercase">{cat.label}</h3>
+                                    <h3 className="text-xl md:text-2xl font-display font-black tracking-tight uppercase">{cat.label}</h3>
                                     <div className="h-0.5 flex-1 bg-black/5"></div>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                                     {cat.services?.map((svc, idx) => (
                                         <ServiceCard 
                                             key={`${key}-${idx}`} 

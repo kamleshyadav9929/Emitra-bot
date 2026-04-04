@@ -15,28 +15,28 @@ const StatusPortal = ({ phone, setPhone, history, onSearch, isSearching }) => {
                              Live Tracking
                         </div>
                         <h2 className="text-4xl md:text-6xl font-display font-black tracking-tighter uppercase leading-[0.9]">Track your Application</h2>
-                        <p className="text-ink-2 text-lg">Apne registered mobile number se status check karein.</p>
+                        <p className="text-ink-2 text-lg">Check status securely using your registered mobile number.</p>
                     </div>
 
                     <div className="space-y-4 max-w-md">
-                        <div className="relative group">
+                        <div className="flex flex-col gap-3 group max-w-sm">
                             <input 
                                 type="tel" 
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
                                 placeholder="91XXXXXXXXXX"
-                                className="w-full bg-slate-50 border-2 border-black/5 p-6 rounded-2xl text-xl font-display font-bold outline-none focus:border-black focus:bg-white transition-all group-hover:border-black/20"
+                                className="w-full bg-slate-50 border-2 border-black/5 p-5 md:p-6 rounded-2xl text-xl font-display font-bold outline-none focus:border-black focus:bg-white transition-all hover:border-black/20"
                             />
                             <button 
                                 onClick={onSearch}
                                 disabled={isSearching}
-                                className="absolute right-3 top-3 bottom-3 bg-black text-white px-8 rounded-xl font-black uppercase tracking-widest text-xs flex items-center gap-2 hover:bg-black/90 active:scale-95 transition-all disabled:opacity-50"
+                                className="w-full py-4 bg-black text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 hover:bg-black/90 active:scale-95 transition-all disabled:opacity-50"
                             >
                                 {isSearching ? <Loader2 className="animate-spin" size={16} /> : <Search size={16} />}
-                                {isSearching ? 'Checking...' : 'Track'}
+                                {isSearching ? 'Checking...' : 'Track Application'}
                             </button>
                         </div>
-                        <p className="text-[10px] font-bold text-ink-4 uppercase tracking-widest px-2">Kripya 10 ankon ka mobile number daalein</p>
+                        <p className="text-[10px] font-bold text-ink-4 uppercase tracking-widest px-2">Please enter a 10-digit mobile number</p>
                     </div>
                 </div>
 
@@ -52,7 +52,7 @@ const StatusPortal = ({ phone, setPhone, history, onSearch, isSearching }) => {
                                 </div>
                                 <div className="space-y-2">
                                     <h3 className="text-xl font-display font-bold">No History Loaded</h3>
-                                    <p className="text-sm text-ink-3 max-w-[240px]">Apna number upar box mein daalkar 'Track' par click karein.</p>
+                                    <p className="text-sm text-ink-3 max-w-[240px]">Enter your number in the box above and click 'Track Application'.</p>
                                 </div>
                             </motion.div>
                         ) : history.length === 0 ? (
@@ -65,7 +65,7 @@ const StatusPortal = ({ phone, setPhone, history, onSearch, isSearching }) => {
                                 </div>
                                 <div className="space-y-2">
                                     <h3 className="text-xl font-display font-bold">No Records Found</h3>
-                                    <p className="text-sm text-ink-3 max-w-[240px]">Humein is number se koi application nahi mili. Kya aapne sahi number dala hai?</p>
+                                    <p className="text-sm text-ink-3 max-w-[240px]">We couldn't find any applications for this number. Please check if the number is correct.</p>
                                 </div>
                             </motion.div>
                         ) : (
@@ -103,7 +103,7 @@ const StatusPortal = ({ phone, setPhone, history, onSearch, isSearching }) => {
                                     ))}
                                 </div>
                                 <div className="pt-8 text-center">
-                                    <p className="text-[10px] font-bold text-ink-3 uppercase italic">Detailed inquiry ke liye WhatsApp support ka use karein.</p>
+                                    <p className="text-[10px] font-bold text-ink-3 uppercase italic">For detailed inquiries, please use our WhatsApp support.</p>
                                 </div>
                             </motion.div>
                         )}

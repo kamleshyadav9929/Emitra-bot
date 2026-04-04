@@ -44,15 +44,15 @@ export default function ActivityLogs() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-end justify-between border-b border-[#E5E5E3] pb-6">
+      <div className="flex items-end justify-between border-b border-[#A3A3A3] pb-6">
         <div>
-          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC] mb-2">History</p>
+          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#737373] mb-2">History</p>
           <h1 className="text-3xl font-light text-black tracking-tight">Activity Logs</h1>
           <p className="text-[13px] text-[#7A7A78] mt-1">Audit log of all dispatched broadcasts and system events.</p>
         </div>
         <div className="text-right">
           <p className="text-3xl font-light text-black">{totalDelivered}</p>
-          <p className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.15em] uppercase">Total Delivered</p>
+          <p className="text-[10px] text-[#737373] font-semibold tracking-[0.15em] uppercase">Total Delivered</p>
         </div>
       </div>
 
@@ -65,7 +65,7 @@ export default function ActivityLogs() {
             className={`flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold border transition-colors ${
               activeFilter === f
                 ? "bg-black text-white border-black"
-                : "bg-white text-[#7A7A78] border-[#E5E5E3] hover:border-black hover:text-black"
+                : "bg-white text-[#7A7A78] border-[#A3A3A3] hover:border-black hover:text-black"
             }`}
           >
             {FILTER_ICON[f]}
@@ -79,23 +79,23 @@ export default function ActivityLogs() {
           <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
         </div>
       ) : filteredLogs.length === 0 ? (
-        <div className="border border-[#E5E5E3] py-20 text-center">
-          <Send size={24} className="mx-auto text-[#AEAEAC] mb-3" />
-          <p className="text-[13px] text-[#AEAEAC]">
+        <div className="border border-[#A3A3A3] py-20 text-center">
+          <Send size={24} className="mx-auto text-[#737373] mb-3" />
+          <p className="text-[13px] text-[#737373]">
             {activeFilter === "All" ? "No activity yet." : `No ${activeFilter.toLowerCase()} logged.`}
           </p>
         </div>
       ) : (
-        <div className="border border-[#E5E5E3]">
+        <div className="border border-[#A3A3A3]">
           {filteredLogs.map((log, i) => (
             <div
               key={log.id}
               className={`flex flex-col sm:flex-row sm:items-start gap-4 px-5 py-5 hover:bg-[#F7F7F5] transition-colors ${
-                i < filteredLogs.length - 1 ? "border-b border-[#E5E5E3]" : ""
+                i < filteredLogs.length - 1 ? "border-b border-[#A3A3A3]" : ""
               }`}
             >
               {/* Type icon column */}
-              <div className="flex-shrink-0 w-8 h-8 bg-[#F7F7F5] border border-[#E5E5E3] flex items-center justify-center">
+              <div className="flex-shrink-0 w-8 h-8 bg-[#F7F7F5] border border-[#A3A3A3] flex items-center justify-center">
                 <MessageSquare size={14} className="text-[#7A7A78]" />
               </div>
 
@@ -103,14 +103,14 @@ export default function ActivityLogs() {
               <div className="flex-1 min-w-0 space-y-3">
                 <div className="flex items-center gap-3 flex-wrap">
                   <ExamBadge exam={log.target_exam} />
-                  <div className="flex items-center gap-1.5 text-[11px] text-[#AEAEAC] font-mono">
+                  <div className="flex items-center gap-1.5 text-[11px] text-[#737373] font-mono">
                     <Clock size={11} />
                     <span title={formatTimestamp(log.sent_at)}>{formatRelativeTime(log.sent_at)}</span>
-                    <span className="text-[#E5E5E3] mx-1">·</span>
+                    <span className="text-[#A3A3A3] mx-1">·</span>
                     <span>{formatTimestamp(log.sent_at)}</span>
                   </div>
                 </div>
-                <p className="text-[13px] text-[#3D3D3D] whitespace-pre-wrap leading-relaxed bg-[#F7F7F5] border border-[#E5E5E3] px-4 py-3">
+                <p className="text-[13px] text-[#3D3D3D] whitespace-pre-wrap leading-relaxed bg-[#F7F7F5] border border-[#A3A3A3] px-4 py-3">
                   {log.message_text}
                 </p>
               </div>

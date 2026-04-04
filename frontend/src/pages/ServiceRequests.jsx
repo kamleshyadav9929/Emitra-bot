@@ -29,18 +29,18 @@ function ReceiptModal({ req, onClose, onSent }) {
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4">
       <div className="w-full max-w-lg bg-white border border-[#0A0A0A] shadow-[4px_4px_0px_#0A0A0A] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E5E3] bg-[#F7F7F5]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#A3A3A3] bg-[#F7F7F5]">
           <div>
-            <p className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.18em] uppercase">Send Receipt</p>
+            <p className="text-[10px] text-[#737373] font-semibold tracking-[0.18em] uppercase">Send Receipt</p>
             <h2 className="text-[15px] font-semibold text-black mt-0.5">{req.student_name}</h2>
           </div>
-          <button onClick={onClose} className="text-[#AEAEAC] hover:text-black transition-colors">
+          <button onClick={onClose} className="text-[#737373] hover:text-black transition-colors">
             <X size={18} />
           </button>
         </div>
 
         {/* Meta */}
-        <div className="px-6 py-3 border-b border-[#E5E5E3] flex flex-wrap gap-4">
+        <div className="px-6 py-3 border-b border-[#A3A3A3] flex flex-wrap gap-4">
           <div className="flex items-center gap-2 text-[12px] text-[#7A7A78]">
             <ClipboardList size={13} />
             <span>{CATEGORY_EMOJI[req.category] || "📋"} {req.service_name}</span>
@@ -61,23 +61,23 @@ function ReceiptModal({ req, onClose, onSent }) {
 
         {/* Textarea */}
         <div className="px-6 py-5">
-          <label className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.18em] uppercase block mb-2">
+          <label className="text-[10px] text-[#737373] font-semibold tracking-[0.18em] uppercase block mb-2">
             Receipt Message
           </label>
           <textarea
             value={message}
             onChange={e => setMessage(e.target.value)}
             rows={5}
-            className="w-full border border-[#E5E5E3] px-4 py-3 text-[13px] text-black placeholder:text-[#AEAEAC] bg-white focus:outline-none focus:border-black resize-none transition-colors font-mono"
+            className="w-full border border-[#A3A3A3] px-4 py-3 text-[13px] text-black placeholder:text-[#737373] bg-white focus:outline-none focus:border-black resize-none transition-colors font-mono"
           />
-          <p className="text-[10px] text-[#AEAEAC] mt-1 font-mono">{message.length} chars</p>
+          <p className="text-[10px] text-[#737373] mt-1 font-mono">{message.length} chars</p>
 
           {error && <p className="text-[12px] text-[#C62828] mt-2">{error}</p>}
 
           <div className="flex gap-3 mt-4">
             <button
               onClick={onClose}
-              className="flex-1 py-2.5 border border-[#E5E5E3] text-[13px] text-[#7A7A78] hover:border-black hover:text-black transition-colors"
+              className="flex-1 py-2.5 border border-[#A3A3A3] text-[13px] text-[#7A7A78] hover:border-black hover:text-black transition-colors"
             >
               Cancel
             </button>
@@ -120,15 +120,15 @@ function DocumentsModal({ telegramId, studentName, onClose }) {
   return (
     <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white border border-[#0A0A0A] shadow-[4px_4px_0px_#0A0A0A] flex flex-col max-h-[80vh]">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E5E3] bg-[#F7F7F5]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#A3A3A3] bg-[#F7F7F5]">
           <div className="flex items-center gap-2">
             <Paperclip size={15} className="text-[#7A7A78]" />
             <div>
-              <p className="text-[10px] text-[#AEAEAC] font-semibold tracking-[0.18em] uppercase">Documents</p>
+              <p className="text-[10px] text-[#737373] font-semibold tracking-[0.18em] uppercase">Documents</p>
               <h2 className="text-[14px] font-semibold text-black">{studentName}</h2>
             </div>
           </div>
-          <button onClick={onClose} className="text-[#AEAEAC] hover:text-black transition-colors">
+          <button onClick={onClose} className="text-[#737373] hover:text-black transition-colors">
             <X size={18} />
           </button>
         </div>
@@ -140,25 +140,25 @@ function DocumentsModal({ telegramId, studentName, onClose }) {
             </div>
           ) : docs.length === 0 ? (
             <div className="text-center py-10">
-              <p className="text-[13px] text-[#AEAEAC]">No documents uploaded yet.</p>
+              <p className="text-[13px] text-[#737373]">No documents uploaded yet.</p>
             </div>
           ) : (
             <div className="space-y-2">
               {docs.map(doc => (
-                <div key={doc.id} className="border border-[#E5E5E3] p-3 flex items-center justify-between hover:bg-[#F7F7F5] transition-colors">
+                <div key={doc.id} className="border border-[#A3A3A3] p-3 flex items-center justify-between hover:bg-[#F7F7F5] transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 bg-[#F7F7F5] border border-[#E5E5E3] flex items-center justify-center text-[#7A7A78]">
+                    <div className="w-9 h-9 bg-[#F7F7F5] border border-[#A3A3A3] flex items-center justify-center text-[#7A7A78]">
                       {doc.file_type === "photo" ? <ImageIcon size={17} /> : <FileText size={17} />}
                     </div>
                     <div>
                       <p className="text-[13px] font-semibold text-black truncate max-w-[160px]">{doc.file_name}</p>
-                      <p className="text-[10px] text-[#AEAEAC] font-mono">{new Date(doc.uploaded_at).toLocaleDateString()}</p>
+                      <p className="text-[10px] text-[#737373] font-mono">{new Date(doc.uploaded_at).toLocaleDateString()}</p>
                     </div>
                   </div>
                   <button
                     onClick={() => handleOpenDoc(doc.file_id)}
                     disabled={downloading === doc.file_id}
-                    className="w-8 h-8 border border-[#E5E5E3] text-[#7A7A78] flex items-center justify-center hover:border-black hover:text-black transition-colors disabled:opacity-40"
+                    className="w-8 h-8 border border-[#A3A3A3] text-[#7A7A78] flex items-center justify-center hover:border-black hover:text-black transition-colors disabled:opacity-40"
                   >
                     {downloading === doc.file_id
                       ? <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
@@ -209,15 +209,15 @@ export default function ServiceRequests() {
       {selectedDocsReq && <DocumentsModal telegramId={selectedDocsReq.telegram_id} studentName={selectedDocsReq.student_name} onClose={() => setSelectedDocsReq(null)} />}
 
       {/* Header */}
-      <div className="flex items-start justify-between border-b border-[#E5E5E3] pb-6">
+      <div className="flex items-start justify-between border-b border-[#A3A3A3] pb-6">
         <div>
-          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC] mb-2">E-Mitra</p>
+          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#737373] mb-2">E-Mitra</p>
           <h1 className="text-3xl font-light text-black tracking-tight">E-Mitra Requests</h1>
           <p className="text-[13px] text-[#7A7A78] mt-1">Pending seva requests dekho aur receipt bhejo.</p>
         </div>
         <button
           onClick={fetchRequests}
-          className="flex items-center gap-2 px-3 py-2 border border-[#E5E5E3] text-[12px] text-[#7A7A78] hover:border-black hover:text-black transition-colors"
+          className="flex items-center gap-2 px-3 py-2 border border-[#A3A3A3] text-[12px] text-[#7A7A78] hover:border-black hover:text-black transition-colors"
         >
           <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
           Refresh
@@ -231,15 +231,15 @@ export default function ServiceRequests() {
           { label: "Pending", value: stats.pending },
           { label: "Completed", value: completed },
         ].map(s => (
-          <div key={s.label} className="border border-[#E5E5E3] px-4 py-4 bg-white">
-            <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#AEAEAC] mb-1">{s.label}</p>
+          <div key={s.label} className="border border-[#A3A3A3] px-4 py-4 bg-white">
+            <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#737373] mb-1">{s.label}</p>
             <p className="text-3xl font-light text-black">{s.value}</p>
           </div>
         ))}
       </div>
 
       {/* Filter tabs */}
-      <div className="flex border border-[#E5E5E3] w-fit">
+      <div className="flex border border-[#A3A3A3] w-fit">
         {[
           { key: "pending", label: "Pending" },
           { key: "completed", label: "Completed" },
@@ -248,7 +248,7 @@ export default function ServiceRequests() {
           <button
             key={tab.key}
             onClick={() => setFilter(tab.key)}
-            className={`px-4 py-2 text-[12px] font-semibold transition-colors ${i > 0 ? "border-l border-[#E5E5E3]" : ""} ${
+            className={`px-4 py-2 text-[12px] font-semibold transition-colors ${i > 0 ? "border-l border-[#A3A3A3]" : ""} ${
               filter === tab.key ? "bg-black text-white" : "bg-white text-[#7A7A78] hover:text-black"
             }`}
           >
@@ -258,7 +258,7 @@ export default function ServiceRequests() {
       </div>
 
       {/* Table */}
-      <div className="border border-[#E5E5E3] overflow-hidden">
+      <div className="border border-[#A3A3A3] overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
@@ -270,7 +270,7 @@ export default function ServiceRequests() {
           </div>
         ) : requests.length === 0 ? (
           <div className="py-20 text-center">
-            <p className="text-[13px] text-[#AEAEAC]">
+            <p className="text-[13px] text-[#737373]">
               {filter === "pending" ? "Koi pending request nahi hai 🎉" : "Koi request nahi mili."}
             </p>
           </div>
@@ -278,9 +278,9 @@ export default function ServiceRequests() {
           <div className="overflow-x-auto">
             <table className="w-full text-left min-w-[600px]">
               <thead>
-                <tr className="border-b border-[#E5E5E3] bg-[#F7F7F5]">
+                <tr className="border-b border-[#A3A3A3] bg-[#F7F7F5]">
                   {["Student", "Service", "Status", "Requested At", "Actions"].map((h, i) => (
-                    <th key={h} className={`py-3 px-5 text-[10px] font-semibold text-[#AEAEAC] tracking-[0.18em] uppercase ${i === 4 ? "text-right" : ""}`}>
+                    <th key={h} className={`py-3 px-5 text-[10px] font-semibold text-[#737373] tracking-[0.18em] uppercase ${i === 4 ? "text-right" : ""}`}>
                       {h}
                     </th>
                   ))}
@@ -288,7 +288,7 @@ export default function ServiceRequests() {
               </thead>
               <tbody>
                 {requests.map(req => (
-                  <tr key={req.id} className="border-b border-[#E5E5E3] last:border-0 hover:bg-[#F7F7F5] transition-colors">
+                  <tr key={req.id} className="border-b border-[#A3A3A3] last:border-0 hover:bg-[#F7F7F5] transition-colors">
                     <td className="py-4 px-5">
                       <p className="text-[13px] font-semibold text-black">{req.student_name}</p>
                       {req.student_phone && <p className="text-[11px] text-[#7A7A78] font-mono">{req.student_phone}</p>}
@@ -307,14 +307,14 @@ export default function ServiceRequests() {
                       </span>
                     </td>
                     <td className="py-4 px-5">
-                      <span className="text-[11px] text-[#AEAEAC] font-mono">{formatTime(req.requested_at)}</span>
+                      <span className="text-[11px] text-[#737373] font-mono">{formatTime(req.requested_at)}</span>
                     </td>
                     <td className="py-4 px-5">
                       <div className="flex items-center gap-2 justify-end">
                         <button
                           title="View Documents"
                           onClick={() => setSelectedDocsReq(req)}
-                          className="w-8 h-8 border border-[#E5E5E3] text-[#7A7A78] flex items-center justify-center hover:border-black hover:text-black transition-colors"
+                          className="w-8 h-8 border border-[#A3A3A3] text-[#7A7A78] flex items-center justify-center hover:border-black hover:text-black transition-colors"
                         >
                           <Paperclip size={13} />
                         </button>
@@ -327,7 +327,7 @@ export default function ServiceRequests() {
                             Receipt
                           </button>
                         ) : (
-                          <span className="text-[11px] text-[#AEAEAC] italic px-2">Done</span>
+                          <span className="text-[11px] text-[#737373] italic px-2">Done</span>
                         )}
                       </div>
                     </td>

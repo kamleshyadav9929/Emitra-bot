@@ -187,7 +187,7 @@ function StepIndicator({ step, currentStep, onClickStep, disableStepIndicators }
     >
       <motion.div
         variants={{
-          inactive: { scale: 1, backgroundColor: '#F7F7F5', color: '#AEAEAC', border: '1px solid #E5E5E3' },
+          inactive: { scale: 1, backgroundColor: '#F7F7F5', color: '#737373', border: '1px solid #A3A3A3' },
           active:   { scale: 1, backgroundColor: '#0A0A0A', color: '#ffffff' },
           complete: { scale: 1, backgroundColor: '#0A0A0A', color: '#ffffff' }
         }}

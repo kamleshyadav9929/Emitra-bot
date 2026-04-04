@@ -4,7 +4,7 @@ const EXAM_STYLE = {
   SSC:  { bg: "#EBF2FB", text: "#0A52A3", border: "#9ABDE8" },
   UPSC: { bg: "#F3F7E9", text: "#5A7A0A", border: "#BBDD7F" },
   CUET: { bg: "#FBF7E9", text: "#A37A0A", border: "#E8D07F" },
-  ALL:  { bg: "#F7F7F5", text: "#0A0A0A", border: "#E5E5E3" },
+  ALL:  { bg: "#F7F7F5", text: "#0A0A0A", border: "#A3A3A3" },
 }
 
 function getDynamicStyle(examName) {

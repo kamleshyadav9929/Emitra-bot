@@ -28,7 +28,7 @@ export default function CommandPalette({ onClose }) {
         onClick={e => e.stopPropagation()}
       >
         {/* Search header */}
-        <div className="flex items-center border-b border-[#E5E5E3] px-4 py-3 gap-3">
+        <div className="flex items-center border-b border-[#A3A3A3] px-4 py-3 gap-3">
           <Search size={16} className="text-[#7A7A78] flex-shrink-0" />
           <input
             ref={inputRef}
@@ -36,9 +36,9 @@ export default function CommandPalette({ onClose }) {
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search pages..."
-            className="flex-1 text-sm text-black placeholder:text-[#AEAEAC] bg-transparent outline-none font-medium"
+            className="flex-1 text-sm text-black placeholder:text-[#737373] bg-transparent outline-none font-medium"
           />
-          <button onClick={onClose} className="text-[#AEAEAC] hover:text-black">
+          <button onClick={onClose} className="text-[#737373] hover:text-black">
             <X size={16} />
           </button>
         </div>
@@ -46,7 +46,7 @@ export default function CommandPalette({ onClose }) {
         {/* Results */}
         <div className="py-1 max-h-72 overflow-y-auto">
           {filtered.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-[#AEAEAC]">No results.</p>
+            <p className="px-4 py-6 text-center text-sm text-[#737373]">No results.</p>
           ) : (
             filtered.map((cmd) => (
               <button
@@ -56,14 +56,14 @@ export default function CommandPalette({ onClose }) {
               >
                 <cmd.icon size={15} strokeWidth={2} className="flex-shrink-0 text-[#7A7A78]" />
                 {cmd.label}
-                <span className="ml-auto text-[10px] text-[#AEAEAC] font-mono uppercase tracking-wider">Page</span>
+                <span className="ml-auto text-[10px] text-[#737373] font-mono uppercase tracking-wider">Page</span>
               </button>
             ))
           )}
         </div>
 
         {/* Footer */}
-        <div className="border-t border-[#E5E5E3] px-4 py-2 flex gap-4 text-[10px] text-[#AEAEAC] font-medium">
+        <div className="border-t border-[#A3A3A3] px-4 py-2 flex gap-4 text-[10px] text-[#737373] font-medium">
           <span><kbd className="font-mono">↵</kbd> open</span>
           <span><kbd className="font-mono">ESC</kbd> close</span>
         </div>
