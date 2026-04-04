@@ -19,6 +19,7 @@ import {
 
 // Hooks
 import useCountUp from "../hooks/useCountUp"
+import { useLanguage } from "../context/LanguageContext"
 
 // API
 import * as api from "../api"
@@ -34,6 +35,7 @@ import StatusPortal from "../components/landing/StatusPortal"
 
 export default function Landing() {
     // ── State ────────────────────────────────────────────────────────────────
+    const { t, lang, toggleLanguage } = useLanguage()
     const [services, setServices] = useState({})
     const [exams, setExams] = useState([])
     const [announcements, setAnnouncements] = useState([])
@@ -215,7 +217,7 @@ export default function Landing() {
                             }}
                             onFocus={() => setShowSearchDropdown(true)}
                             onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
-                            placeholder="Search services (e.g. janam praman).." 
+                            placeholder={t('search_placeholder')} 
                             className="w-full bg-[#f1f3f4] hover:bg-[#e9eaec] focus:bg-white border border-transparent focus:border-black/10 focus:shadow-sm focus:ring-1 focus:ring-black/5 outline-none rounded-full py-2 md:py-2.5 pl-9 md:pl-12 pr-10 md:pr-14 text-xs md:text-sm font-medium transition-all"
                         />
                         
@@ -266,6 +268,17 @@ export default function Landing() {
                     </div>
 
                     <div className="flex items-center gap-4 shrink-0">
+                        {/* Language Toggle */}
+                        <button
+                            onClick={toggleLanguage}
+                            className="flex items-center justify-center gap-1.5 px-3 py-1.5 border border-black/10 rounded-full text-[10px] font-black hover:bg-black/5 transition-all outline-none"
+                            title="Toggle Hindi/English"
+                        >
+                            <span className={`transition-opacity ${lang === 'EN' ? 'opacity-100' : 'opacity-40'}`}>EN</span>
+                            <span className="opacity-30">/</span>
+                            <span className={`transition-opacity ${lang === 'HI' ? 'opacity-100' : 'opacity-40'}`}>हि</span>
+                        </button>
+
                         {/* Desktop Nav Links */}
                         <nav className="hidden md:flex items-center gap-1">
                             {navLinks.map(({ label, href }) => (
@@ -274,7 +287,7 @@ export default function Landing() {
                                     href={href}
                                     className="px-4 py-2 text-[11px] font-bold tracking-widest uppercase text-ink-2 hover:text-black hover:bg-black/5 rounded-full transition-all"
                                 >
-                                    {label}
+                                    {label === 'Services' ? t('services_nav') : t('track_status')}
                                 </a>
                             ))}
                         </nav>
@@ -286,7 +299,7 @@ export default function Landing() {
                             rel="noopener noreferrer"
                             className="hidden md:flex items-center gap-2 bg-black text-white px-5 py-2 text-[11px] font-black uppercase tracking-widest rounded-full hover:bg-black/85 transition-all active:scale-95"
                         >
-                            WhatsApp Help
+                            {t('whatsapp_help')}
                         </a>
                         
                         <button
@@ -361,13 +374,27 @@ export default function Landing() {
                                 animate={{ opacity: 1, x: 0 }}
                                 className="text-4xl md:text-5xl lg:text-7xl font-display font-black tracking-tight leading-[0.85] lg:leading-[0.8] uppercase"
                             >
-                                Government<br />
-                                <span className="relative inline-block">
-                                    Services
-                                    <span className="absolute -bottom-1 left-0 h-[3px] lg:h-[4px] w-full bg-black/10 rounded-full" />
-                                </span>
-                                ,<br />
-                                <span className="text-ink-3">From Home.</span>
+                                {lang === 'EN' ? (
+                                    <>
+                                        Government<br />
+                                        <span className="relative inline-block">
+                                            Services
+                                            <span className="absolute -bottom-1 left-0 h-[3px] lg:h-[4px] w-full bg-black/10 rounded-full" />
+                                        </span>
+                                        ,<br />
+                                        <span className="text-ink-3">From Home.</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        सरकारी<br />
+                                        <span className="relative inline-block">
+                                            सेवाएँ
+                                            <span className="absolute -bottom-1 left-0 h-[3px] lg:h-[4px] w-full bg-black/10 rounded-full" />
+                                        </span>
+                                        ,<br />
+                                        <span className="text-ink-3">अब घर बैठे।</span>
+                                    </>
+                                )}
                             </motion.h1>
 
                             <motion.p
@@ -376,7 +403,7 @@ export default function Landing() {
                                 transition={{ duration: 0.6, delay: 0.2 }}
                                 className="text-xs md:text-base text-ink-2 max-w-sm lg:max-w-md leading-relaxed font-sans"
                             >
-                                Access 50+ government services in one place — apply, track status, and get real-time exam updates with Krishna E-Mitra.
+                                {t('services_subtitle')}
                             </motion.p>
                         </div>
 
