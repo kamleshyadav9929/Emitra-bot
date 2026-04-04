@@ -474,65 +474,14 @@ export default function Landing() {
                 <div className="max-w-7xl mx-auto space-y-16">
                     
                     {/* Filter Header */}
-                    <div className="flex flex-col md:flex-row gap-8 justify-between items-start md:items-end border-b-4 border-black pb-12">
-                        <div className="space-y-4">
+                    <div className="flex flex-col md:flex-row gap-8 justify-between items-start md:items-end border-b-4 border-black pb-8 md:pb-12">
+                        <div className="space-y-3 md:space-y-4">
                             <h2 className="text-2xl md:text-4xl font-display font-black tracking-tighter uppercase leading-none">Services</h2>
-                            <p className="text-ink-2 font-medium">Browse our full range of 50+ government services.</p>
-                        </div>
-                        <div className="w-full md:w-96 relative group hidden md:block">
-                            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-ink-4 group-focus-within:text-black transition-colors" size={20} />
-                            <input 
-                                type="text"
-                                placeholder="Search services..."
-                                className="w-full bg-slate-50 border-2 border-black/5 p-5 pl-16 rounded-2xl outline-none focus:border-black focus:bg-white transition-all font-display font-semibold"
-                                value={search}
-                                onChange={(e) => {
-                                    setSearch(e.target.value);
-                                    setShowSearchDropdown(true);
-                                }}
-                                onFocus={() => setShowSearchDropdown(true)}
-                                onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
-                            />
-                            
-                            <AnimatePresence>
-                                {showSearchDropdown && search.length > 0 && (
-                                    <motion.div 
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 10 }}
-                                        className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-black/10 overflow-hidden z-50 flex flex-col max-h-[60vh] overflow-y-auto"
-                                    >
-                                        {searchResults.length > 0 ? (
-                                            searchResults.map((svc, idx) => (
-                                                <button
-                                                    key={idx}
-                                                    onClick={() => {
-                                                        setSelectedService(svc)
-                                                        setShowSearchDropdown(false)
-                                                        setSearch("")
-                                                    }}
-                                                    className="text-left px-5 py-4 hover:bg-slate-50 transition-colors border-b border-black/5 last:border-0 flex items-center justify-between group"
-                                                >
-                                                    <div>
-                                                        <div className="font-bold text-base text-black">{svc.name}</div>
-                                                        <div className="text-xs text-ink-3 uppercase tracking-wider font-semibold">{svc.category}</div>
-                                                    </div>
-                                                    <ChevronRight size={18} className="text-ink-4 group-hover:text-black" />
-                                                </button>
-                                            ))
-                                        ) : (
-                                            <div className="px-5 py-8 text-center text-ink-3">
-                                                <p className="font-semibold text-lg">No services found</p>
-                                                <p className="text-xs uppercase tracking-widest mt-1">Try a different name</p>
-                                            </div>
-                                        )}
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                            <p className="hidden md:block text-ink-2 font-medium">Browse our full range of 50+ government services.</p>
                         </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
+                    <div className="hidden md:flex flex-wrap gap-2">
                         <button 
                             onClick={() => setActiveTab("ALL")}
                             className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all rounded-full border-2 ${
