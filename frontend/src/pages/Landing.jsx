@@ -34,6 +34,8 @@ export default function Landing() {
     const [exams, setExams] = useState([])
     const [announcements, setAnnouncements] = useState([])
     const [stats, setStats] = useState({ total_students: 0, pending_requests: 0 })
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
     const [config, setConfig] = useState({})
     
     const [search, setSearch] = useState("")
@@ -49,6 +51,7 @@ export default function Landing() {
     // ── Data Fetching ────────────────────────────────────────────────────────
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true)
             try {
                 const [svc, ex, ann, st, cfg] = await Promise.all([
                     api.getPublicServices(),
@@ -62,8 +65,12 @@ export default function Landing() {
                 setAnnouncements(ann.announcements || [])
                 setStats(st.stats || { total_students: 0 })
                 setConfig(cfg || {})
+                setError(null)
             } catch (err) {
                 console.error("Failed to fetch landing data", err)
+                setError("Could not connect to the server. Please check your connection.")
+            } finally {
+                setLoading(false)
             }
         }
         fetchData()
@@ -78,9 +85,9 @@ export default function Landing() {
                 s.name.toLowerCase().includes(search.toLowerCase()) ||
                 cat.label.toLowerCase().includes(search.toLowerCase())
             )
-            if (filtered.length > 0) {
-                result[key] = { ...cat, items: filtered }
-            }
+          if (filtered.length > 0) {
+              result[key] = { ...cat, services: filtered }
+          }
         })
         return result
     }, [services, search, activeTab])
