@@ -21,20 +21,28 @@ export default function LoginModal({ isOpen, onClose }) {
         if (isOpen) {
             setStep(1); setPhone(""); setOtp(""); setName(""); setError("")
         } else {
-            if (recaptchaRef.current) {
-                try { recaptchaRef.current.clear() } catch (e) {}
-                recaptchaRef.current = null
-            }
+            clearVerifier()
         }
     }, [isOpen])
 
-    const getVerifier = () => {
-        if (!recaptchaRef.current) {
-            recaptchaRef.current = new RecaptchaVerifier(auth, "recaptcha-container", {
-                size: "invisible",
-                callback: () => {}
-            })
+    const clearVerifier = () => {
+        if (recaptchaRef.current) {
+            try { recaptchaRef.current.clear() } catch (e) {}
+            recaptchaRef.current = null
         }
+        // Also clear any leftover reCAPTCHA iframes from the DOM
+        const el = document.getElementById("recaptcha-container")
+        if (el) el.innerHTML = ""
+    }
+
+    const getVerifier = () => {
+        // Always create a fresh verifier to avoid stale token issues
+        clearVerifier()
+        recaptchaRef.current = new RecaptchaVerifier(auth, "recaptcha-container", {
+            size: "invisible",
+            callback: () => {},
+            "expired-callback": () => { clearVerifier() }
+        })
         return recaptchaRef.current
     }
 
@@ -94,6 +102,7 @@ export default function LoginModal({ isOpen, onClose }) {
     const StepIcon = steps[step - 1].icon
 
     return (
+        <>
         <AnimatePresence>
             {isOpen && (
                 <>
@@ -233,11 +242,12 @@ export default function LoginModal({ isOpen, onClose }) {
                             </AnimatePresence>
                         </div>
 
-                        {/* Invisible reCAPTCHA mount point */}
-                        <div id="recaptcha-container" />
                     </motion.div>
                 </>
             )}
         </AnimatePresence>
+        {/* reCAPTCHA container MUST be outside AnimatePresence — always in DOM */}
+        <div id="recaptcha-container" style={{ position: "fixed", bottom: 0, zIndex: 9999 }} />
+        </>
     )
 }

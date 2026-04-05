@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app"
-import { getAuth } from "firebase/auth"
+import { getAuth, initializeRecaptchaConfig } from "firebase/auth"
 
 const firebaseConfig = {
     apiKey: "AIzaSyDy_GIE1tTJIpQbupFoaDKIwxUHZmFHTRk",
@@ -13,4 +13,11 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
+
+// Initialize reCAPTCHA config — required for phone auth in Firebase SDK v10+
+// This tells Firebase whether to use reCAPTCHA Enterprise or legacy v2
+initializeRecaptchaConfig(auth).catch(() => {
+    // Silently ignore — falls back to legacy reCAPTCHA v2
+})
+
 export default app
