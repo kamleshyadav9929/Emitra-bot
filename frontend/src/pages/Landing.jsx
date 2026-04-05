@@ -359,7 +359,7 @@ export default function Landing() {
                 <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-8 lg:gap-24 items-center relative z-10">
                     
                     {/* LEFT: Branding & Text */}
-                    <div className="space-y-8 lg:space-y-12">
+                    <div className="space-y-8 lg:space-y-12 text-center lg:text-left">
                         <div className="space-y-4 lg:space-y-6">
                             <motion.h1 
                                 initial={{ opacity: 0, x: -20 }}
@@ -393,7 +393,7 @@ export default function Landing() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.6, delay: 0.2 }}
-                                className="text-xs md:text-base text-ink-2 max-w-sm lg:max-w-md leading-relaxed font-sans"
+                                className="text-xs md:text-base text-ink-2 max-w-sm lg:max-w-md leading-relaxed font-sans mx-auto lg:mx-0"
                             >
                                 {t('services_subtitle')}
                             </motion.p>
@@ -404,7 +404,7 @@ export default function Landing() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.5 }}
-                            className="flex flex-col sm:flex-row gap-3 mt-6 lg:mt-10"
+                            className="flex flex-col sm:flex-row gap-3 mt-6 lg:mt-10 justify-center lg:justify-start"
                         >
                             <button
                                 onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
