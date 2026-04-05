@@ -12,6 +12,7 @@ import Login from "./pages/Login"
 import Landing from "./pages/Landing" // [NEW] Public Landing
 import { Layers } from "lucide-react"
 import { LanguageProvider } from "./context/LanguageContext"
+import { AuthProvider } from "./context/AuthContext"
 
 // ── Shared Private Route Wrapper ─────────────────────────────────────────────
 function PrivateRoute({ children }) {
@@ -68,6 +69,7 @@ function AdminLayout({ children }) {
 function App() {
     return (
         <LanguageProvider>
+        <AuthProvider>
         <Routes>
             {/* ── Public Student Portal ─────────────────────────────────────── */}
             <Route path="/" element={<Landing />} />
@@ -86,6 +88,7 @@ function App() {
             {/* Fallback to Public Home */}
             <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </AuthProvider>
         </LanguageProvider>
     )
 }

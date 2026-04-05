@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "motion/react"
 import { 
     ArrowRight, 
     Search, 
-    Bell,
     Smartphone,
     Users,
     TrendingUp,
@@ -14,12 +13,15 @@ import {
     ChevronRight,
     XCircle,
     Layers,
-    Mic
+    Mic,
+    LogIn,
+    User
 } from "lucide-react"
 
 // Hooks
 import useCountUp from "../hooks/useCountUp"
 import { useLanguage } from "../context/LanguageContext"
+import { useAuth } from "../context/AuthContext"
 
 // API
 import * as api from "../api"
@@ -32,10 +34,14 @@ import RegistrationModal from "../components/landing/RegistrationModal"
 import StatCard from "../components/landing/StatCard"
 import ExamUpdateCard from "../components/landing/ExamUpdateCard"
 import StatusPortal from "../components/landing/StatusPortal"
+import LoginModal from "../components/landing/LoginModal"
+import LandingBottomNav from "../components/landing/LandingBottomNav"
+import StudentProfileDrawer from "../components/landing/StudentProfileDrawer"
 
 export default function Landing() {
     // ── State ────────────────────────────────────────────────────────────────
     const { t, lang, toggleLanguage } = useLanguage()
+    const { user, isLoggedIn } = useAuth()
     const [services, setServices] = useState({})
     const [exams, setExams] = useState([])
     const [announcements, setAnnouncements] = useState([])
@@ -49,6 +55,8 @@ export default function Landing() {
     const [isListening, setIsListening] = useState(false)
     const [selectedService, setSelectedService] = useState(null)
     const [isRegOpen, setIsRegOpen] = useState(false)
+    const [isLoginOpen, setIsLoginOpen] = useState(false)
+    const [isProfileOpen, setIsProfileOpen] = useState(false)
 
     // Status Tracking State
     const [statusPhone, setStatusPhone] = useState("")
@@ -169,7 +177,6 @@ export default function Landing() {
     }
 
     // ── Navbar State ───────────────────────────────────────────────
-    const [menuOpen, setMenuOpen] = useState(false)
     const [scrolled, setScrolled] = useState(false)
 
     useEffect(() => {
@@ -184,7 +191,7 @@ export default function Landing() {
     ]
 
     return (
-        <div className="bg-white scroll-smooth pt-16">
+        <div className="bg-white scroll-smooth pt-16 pb-20 md:pb-0">
             <Helmet>
                 <title>Krishna E-Mitra | Digital Government Services Portal</title>
                 <meta name="description" content="Apply for government certificates, IDs, and exams from the comfort of your home with Krishna E-Mitra." />
@@ -267,7 +274,7 @@ export default function Landing() {
                         </AnimatePresence>
                     </div>
 
-                    <div className="flex items-center gap-4 shrink-0">
+                    <div className="flex items-center gap-2 sm:gap-4 shrink-0">
                         {/* Language Toggle */}
                         <button
                             onClick={toggleLanguage}
@@ -292,7 +299,7 @@ export default function Landing() {
                             ))}
                         </nav>
 
-                        {/* Mobile Hamburger & Desktop Contact */}
+                        {/* Desktop WhatsApp */}
                         <a
                             href="https://wa.me/916377964293"
                             target="_blank"
@@ -301,44 +308,29 @@ export default function Landing() {
                         >
                             {t('whatsapp_help')}
                         </a>
-                        
+
+                        {/* Login / Avatar — visible on all screen sizes */}
                         <button
-                            onClick={() => setMenuOpen(!menuOpen)}
-                            className="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-full hover:bg-black/5 transition-colors"
+                            onClick={() => isLoggedIn ? setIsProfileOpen(true) : setIsLoginOpen(true)}
+                            className="flex items-center justify-center transition-all active:scale-95"
+                            title={isLoggedIn ? `Logged in as ${user?.name}` : "Log in"}
                         >
-                            <span className={`block w-5 h-0.5 bg-black transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-                            <span className={`block w-5 h-0.5 bg-black transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
-                            <span className={`block w-5 h-0.5 bg-black transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+                            {isLoggedIn ? (
+                                <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
+                                    <span className="text-white text-[11px] font-black leading-none">
+                                        {user?.name?.charAt(0)?.toUpperCase() || <User size={12} />}
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 border border-black/10 rounded-full hover:bg-black/5 transition-all">
+                                    <LogIn size={12} className="text-ink-2" />
+                                    <span className="text-[10px] font-black uppercase tracking-wider hidden sm:inline">Log In</span>
+                                </div>
+                            )}
                         </button>
                     </div>
                 </div>
 
-                {/* Mobile Drawer */}
-                <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${menuOpen ? 'max-h-[400px] border-t border-black/5' : 'max-h-0'}`}>
-                    <div className="px-6 py-4 space-y-4 bg-white border-t border-black/5 flex flex-col shadow-xl">
-
-                        <div className="space-y-1">
-                            {navLinks.map(({ label, href }) => (
-                                <a
-                                    key={label}
-                                    href={href}
-                                    onClick={() => setMenuOpen(false)}
-                                    className="flex items-center gap-3 px-4 py-3 text-[12px] font-black uppercase tracking-widest text-ink-2 hover:text-black hover:bg-black/5 rounded-xl transition-all"
-                                >
-                                    {label}
-                                </a>
-                            ))}
-                        </div>
-                        <a
-                            href="https://wa.me/916377964293"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-2 w-full bg-black text-white px-5 py-3 text-[11px] font-black uppercase tracking-widest rounded-xl"
-                        >
-                            WhatsApp Help
-                        </a>
-                    </div>
-                </div>
             </header>            {/* ── HERO SECTION ───────────────────────────────────────────────── */}
             <section className="relative px-6 py-16 md:py-24 lg:py-0 lg:h-[calc(100vh-40px)] flex flex-col justify-center overflow-hidden bg-white">
                 
@@ -646,6 +638,22 @@ export default function Landing() {
                 onClose={() => setIsRegOpen(false)} 
                 exams={exams}
                 config={config}
+            />
+
+            {/* ── Auth & Navigation ─────────────────────────────────── */}
+            <LoginModal
+                isOpen={isLoginOpen}
+                onClose={() => setIsLoginOpen(false)}
+            />
+
+            <StudentProfileDrawer
+                isOpen={isProfileOpen}
+                onClose={() => setIsProfileOpen(false)}
+            />
+
+            <LandingBottomNav
+                onLoginClick={() => setIsLoginOpen(true)}
+                onProfileClick={() => setIsProfileOpen(true)}
             />
         </div>
     )
