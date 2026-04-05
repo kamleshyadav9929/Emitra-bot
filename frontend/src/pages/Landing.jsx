@@ -610,7 +610,7 @@ export default function Landing() {
 
             {/* Footer / CTA */}
             <section className="px-6 py-24 bg-surface mt-24">
-                <div className="max-w-7xl mx-auto border border-black/5 bg-white p-12 md:p-24 flex flex-col items-center text-center space-y-12">
+                <div className="max-w-7xl mx-auto border border-black/5 bg-white p-12 md:p-24 flex flex-col items-center text-center space-y-12 rounded-[40px]">
                     <h2 className="text-4xl md:text-7xl font-display font-extrabold tracking-tighter uppercase leading-[0.9]">Ready to go digital?</h2>
                     <div className="flex flex-col md:flex-row gap-4 items-center">
                         <a 
