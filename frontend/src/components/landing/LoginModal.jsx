@@ -28,8 +28,14 @@ export default function LoginModal({ isOpen, onClose }) {
             try { recaptchaRef.current.clear() } catch (_) {}
             recaptchaRef.current = null
         }
-        const el = document.getElementById("recaptcha-container")
-        if (el) el.innerHTML = ""
+        // DELETE and RECREATE the element — clearing innerHTML is not enough.
+        // RecaptchaVerifier caches the widget ID inside the DOM node itself.
+        const old = document.getElementById("recaptcha-container")
+        if (old) {
+            const fresh = document.createElement("div")
+            fresh.id = "recaptcha-container"
+            old.parentNode.replaceChild(fresh, old)
+        }
     }
 
     const getVerifier = () => {
