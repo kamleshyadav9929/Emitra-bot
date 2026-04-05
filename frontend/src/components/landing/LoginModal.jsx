@@ -28,25 +28,19 @@ export default function LoginModal({ isOpen, onClose }) {
             try { recaptchaRef.current.clear() } catch (_) {}
             recaptchaRef.current = null
         }
-        // DELETE and RECREATE the element — clearing innerHTML is not enough.
-        // RecaptchaVerifier caches the widget ID inside the DOM node itself.
-        const old = document.getElementById("recaptcha-container")
-        if (old) {
-            const fresh = document.createElement("div")
-            fresh.id = "recaptcha-container"
-            old.parentNode.replaceChild(fresh, old)
-        }
+        // Simple innerHTML reset — safe after calling .clear() first
+        const el = document.getElementById("recaptcha-container")
+        if (el) el.innerHTML = ""
     }
 
     const getVerifier = () => {
-        // Always fresh — stale verifiers cause 401s on retry
         clearVerifier()
-        recaptchaRef.current = new RecaptchaVerifier(auth, "recaptcha-container", {
-            // "invisible" uses legacy reCAPTCHA v2 — FREE, no Enterprise billing
-            size: "invisible",
+        // Firebase v9 constructor: (containerOrId, parameters, auth) — NOT (auth, container, params)!
+        recaptchaRef.current = new RecaptchaVerifier("recaptcha-container", {
+            size: "invisible",      // free legacy reCAPTCHA v2
             callback: () => {},
             "expired-callback": () => clearVerifier(),
-        })
+        }, auth)
         return recaptchaRef.current
     }
 
