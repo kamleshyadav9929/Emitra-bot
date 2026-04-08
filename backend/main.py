@@ -478,12 +478,12 @@ def get_single_bot_setting(key):
 
 # Category metadata used for validation
 CATEGORY_MAP = {
-    "cert":       "📄 Pramaan Patra (Certificates)",
-    "id":         "🪪 Pehchan (IDs & Updates)",
-    "bills":      "💡 Bills, Recharge & Taxes",
-    "forms":      "🎓 Siksha & Exams (Forms)",
-    "schemes":    "🏛️ Yojana & Pension",
-    "land_auto":  "🌾 Krishi, Khata & Vahan",
+    "cert":       "Pramaan Patra (Certificates)",
+    "id":         "Pehchan (IDs & Updates)",
+    "bills":      "Bills, Recharge & Taxes",
+    "forms":      "Siksha & Exams (Forms)",
+    "schemes":    "Yojana & Pension",
+    "land_auto":  "Krishi, Khata & Vahan",
 }
 
 @app.route("/api/services", methods=["GET"])
