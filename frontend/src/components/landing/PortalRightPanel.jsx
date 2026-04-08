@@ -1,104 +1,90 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import {
-    MessageCircle,
-    Phone,
-    MapPin,
-    UserPlus,
-    Users,
-    FileText,
-    TrendingUp,
-    Star,
-    Radio,
-    ChevronDown,
-    ChevronUp,
-    Clock
+    Radio, ChevronDown, ChevronUp, Clock,
+    MessageCircle, Phone, MapPin, UserPlus,
+    Users, FileText, TrendingUp, Star,
+    ExternalLink, Megaphone
 } from "lucide-react"
-import useCountUp from "../../hooks/useCountUp"
 import * as api from "../../api"
 
-function MiniStat({ value, suffix, label, Icon, delay }) {
-    const { count, ref } = useCountUp(value)
+// Relative time
+function timeAgo(dateStr) {
+    if (!dateStr) return ""
+    const d = new Date(dateStr)
+    const diff = Math.floor((Date.now() - d) / 1000)
+    if (diff < 60) return "Just now"
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
+    return `${Math.floor(diff / 86400)}d ago`
+}
+
+// Exam label chip
+function ExamChip({ exam }) {
+    const colors = {
+        ALL: "bg-blue-100 text-blue-800",
+        JEE: "bg-purple-100 text-purple-800",
+        NEET: "bg-green-100 text-green-800",
+        SSC: "bg-orange-100 text-orange-800",
+        UPSC: "bg-red-100 text-red-800",
+        default: "bg-slate-100 text-slate-700",
+    }
+    const cls = colors[exam] || colors.default
+    return (
+        <span className={`text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${cls}`}>
+            {!exam || exam === "ALL" ? "All Students" : exam}
+        </span>
+    )
+}
+
+// Single news card
+function NewsCard({ item, index }) {
+    const [expanded, setExpanded] = useState(false)
+    const isLong = (item.message?.length || 0) > 100
+
     return (
         <motion.div
-            ref={ref}
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 15 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay }}
-            className="flex items-center gap-3 group"
+            transition={{ delay: index * 0.06, duration: 0.25 }}
+            className="border border-slate-100 rounded-xl overflow-hidden hover:border-slate-200 hover:shadow-sm transition-all"
         >
-            <div className="w-9 h-9 rounded-xl bg-black/[0.04] group-hover:bg-black group-hover:text-white flex items-center justify-center transition-all duration-300 shrink-0">
-                <Icon size={14} />
-            </div>
-            <div>
-                <div className="text-base font-black leading-none">{count}{suffix}</div>
-                <div className="text-[9px] font-bold text-black/35 uppercase tracking-widest mt-0.5">{label}</div>
+            <div className="p-3">
+                <div className="flex items-start justify-between gap-2 mb-1.5">
+                    <ExamChip exam={item.exam} />
+                    <span className="text-[8px] text-slate-400 flex items-center gap-0.5 shrink-0 font-medium">
+                        <Clock size={7} />
+                        {timeAgo(item.sent_at)}
+                    </span>
+                </div>
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                    {expanded ? item.message : item.preview}
+                </p>
+                {isLong && (
+                    <button
+                        onClick={() => setExpanded(!expanded)}
+                        className="mt-1.5 flex items-center gap-1 text-[9px] font-bold text-[var(--navy)] hover:underline"
+                    >
+                        {expanded ? <><ChevronUp size={9} />Less</> : <><ChevronDown size={9} />More</>}
+                    </button>
+                )}
             </div>
         </motion.div>
     )
 }
 
-// News item — collapsible
-function NewsItem({ item, index }) {
-    const [expanded, setExpanded] = useState(false)
-
-    const timeAgo = (dateStr) => {
-        if (!dateStr) return ""
-        const d = new Date(dateStr)
-        const now = new Date()
-        const diff = Math.floor((now - d) / 1000)
-        if (diff < 60) return "Just now"
-        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
-        if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
-        return `${Math.floor(diff / 86400)}d ago`
-    }
-
-    const examBadge = (exam) => {
-        if (!exam || exam === "ALL") return "All Students"
-        return exam
-    }
-
-    const isLong = item.message?.length > 120
-
+// Animated stat counter
+function StatRow({ value, label, icon: Icon, suffix = "" }) {
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 * index }}
-            className="border border-black/[0.07] rounded-xl overflow-hidden bg-black/[0.02] hover:bg-black/[0.04] transition-all"
-        >
-            <div className="p-3">
-                {/* Top: exam badge + time */}
-                <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-black text-white rounded-full">
-                        {examBadge(item.exam)}
-                    </span>
-                    <span className="text-[8px] font-bold text-black/30 flex items-center gap-1">
-                        <Clock size={8} />
-                        {timeAgo(item.sent_at)}
-                    </span>
-                </div>
-
-                {/* Message preview */}
-                <p className="text-[11px] text-black/70 leading-relaxed font-medium">
-                    {expanded ? item.message : item.preview}
-                </p>
-
-                {/* Expand/collapse if long */}
-                {isLong && (
-                    <button
-                        onClick={() => setExpanded(!expanded)}
-                        className="mt-1.5 flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-black/40 hover:text-black transition-colors"
-                    >
-                        {expanded ? (
-                            <><ChevronUp size={9} /> Show less</>
-                        ) : (
-                            <><ChevronDown size={9} /> Read more</>
-                        )}
-                    </button>
-                )}
+        <div className="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0">
+            <div className="w-8 h-8 rounded-lg bg-[var(--navy)]/5 flex items-center justify-center shrink-0">
+                <Icon size={13} className="text-[var(--navy)]" />
             </div>
-        </motion.div>
+            <div className="flex-1 min-w-0">
+                <p className="text-xs font-black text-slate-800">{value}{suffix}</p>
+                <p className="text-[9px] text-slate-400 font-medium uppercase tracking-wide">{label}</p>
+            </div>
+        </div>
     )
 }
 
@@ -108,151 +94,123 @@ export default function PortalRightPanel({ stats, config, onRegister, onTrack })
 
     useEffect(() => {
         api.getPublicNews()
-            .then(data => setNews(data.news || []))
+            .then(d => setNews(d.news || []))
             .catch(() => setNews([]))
             .finally(() => setNewsLoading(false))
     }, [])
 
     const quickLinks = [
-        {
-            label: "WhatsApp Help",
-            icon: MessageCircle,
-            action: () => window.open(`https://wa.me/${config?.whatsapp_number || "916377964293"}`, "_blank"),
-            desc: "Chat with us"
-        },
-        {
-            label: "Telegram Bot",
-            icon: Phone,
-            action: () => window.open(config?.telegram_bot_url || "https://t.me/Kamlesh6377_bot", "_blank"),
-            desc: "Auto apply"
-        },
-        {
-            label: "Track Status",
-            icon: MapPin,
-            action: onTrack,
-            desc: "Check progress"
-        },
-        {
-            label: "Register Now",
-            icon: UserPlus,
-            action: onRegister,
-            desc: "Join for free"
-        },
+        { label: "WhatsApp Help", icon: MessageCircle, desc: "Chat instantly", action: () => window.open(`https://wa.me/${config?.whatsapp_number || "916377964293"}`, "_blank"), color: "text-green-600" },
+        { label: "Telegram Bot", icon: Phone, desc: "Auto-apply bot", action: () => window.open(config?.telegram_bot_url || "https://t.me/Kamlesh6377_bot", "_blank"), color: "text-blue-600" },
+        { label: "Track Status", icon: MapPin, desc: "Check progress", action: onTrack, color: "text-amber-600" },
+        { label: "Register Free", icon: UserPlus, desc: "Join E-Mitra", action: onRegister, color: "text-[var(--navy)]" },
     ]
 
     return (
-        <aside className="hidden xl:flex flex-col w-64 shrink-0 border-l border-black/[0.06] bg-white h-[calc(100vh-56px)] sticky top-14 overflow-y-auto">
+        <aside
+            style={{ width: "var(--right-w)" }}
+            className="hidden xl:flex flex-col shrink-0 border-l border-[var(--border)] bg-white h-[calc(100vh-var(--header-h))] sticky top-[var(--header-h)] overflow-y-auto"
+        >
             <div className="p-4 space-y-5">
 
-                {/* ── LATEST NEWS ──────────────────────────────────────── */}
+                {/* ── LATEST NEWS ── */}
                 <div>
-                    <div className="flex items-center gap-2 mb-3">
+                    <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-1.5">
-                            <Radio size={11} className="text-black/60" />
-                            <p className="text-[9px] font-black uppercase tracking-widest text-black/40">Latest News</p>
+                            <Megaphone size={12} className="text-[var(--navy)]" />
+                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Latest Updates</span>
                         </div>
-                        {/* Live dot */}
-                        <span className="flex h-1.5 w-1.5 ml-auto">
-                            <span className="animate-ping absolute inline-flex h-1.5 w-1.5 rounded-full bg-black opacity-40"></span>
-                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-black opacity-60"></span>
+                        {/* Live indicator */}
+                        <span className="flex items-center gap-1 text-[8px] font-bold text-green-600">
+                            <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+                            </span>
+                            LIVE
                         </span>
                     </div>
 
                     {newsLoading ? (
                         <div className="space-y-2">
-                            {[...Array(3)].map((_, i) => (
-                                <div key={i} className="h-16 bg-black/[0.04] rounded-xl animate-pulse" />
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="skeleton h-16" />
                             ))}
                         </div>
                     ) : news.length === 0 ? (
-                        <div className="text-center py-6 border border-dashed border-black/10 rounded-xl">
-                            <Radio size={18} className="text-black/15 mx-auto mb-2" />
-                            <p className="text-[10px] font-bold text-black/25">No broadcasts yet</p>
-                            <p className="text-[9px] text-black/20 mt-0.5">Admin messages will appear here</p>
+                        <div className="border border-dashed border-slate-200 rounded-xl p-4 text-center">
+                            <Radio size={20} className="text-slate-200 mx-auto mb-2" />
+                            <p className="text-[10px] font-bold text-slate-300">No updates yet</p>
                         </div>
                     ) : (
                         <div className="space-y-2">
-                            <AnimatePresence>
-                                {news.map((item, i) => (
-                                    <NewsItem key={item.id} item={item} index={i} />
-                                ))}
-                            </AnimatePresence>
+                            {news.map((item, i) => <NewsCard key={item.id} item={item} index={i} />)}
                         </div>
                     )}
                 </div>
 
-                <div className="h-px bg-black/[0.05]" />
+                {/* ── DIVIDER ── */}
+                <div className="h-px bg-slate-100" />
 
-                {/* ── QUICK LINKS ───────────────────────────────────────── */}
+                {/* ── QUICK LINKS ── */}
                 <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-black/25 mb-3">Quick Links</p>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-3">Quick Links</p>
                     <div className="space-y-1">
-                        {quickLinks.map((link, i) => {
-                            const Icon = link.icon
-                            return (
-                                <motion.button
-                                    key={i}
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.25 + i * 0.05 }}
-                                    onClick={link.action}
-                                    className="w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-black/[0.04] transition-all duration-200"
-                                >
-                                    <Icon size={13} className="text-black/40 group-hover:text-black transition-colors shrink-0" />
-                                    <div className="min-w-0">
-                                        <p className="text-[10px] font-black uppercase tracking-wider text-black/70 group-hover:text-black transition-colors leading-none">
-                                            {link.label}
-                                        </p>
-                                        <p className="text-[8px] font-medium text-black/30 mt-0.5">{link.desc}</p>
-                                    </div>
-                                </motion.button>
-                            )
-                        })}
-                    </div>
-                </div>
-
-                <div className="h-px bg-black/[0.05]" />
-
-                {/* ── STATS ─────────────────────────────────────────────── */}
-                <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-black/25 mb-3">Platform Stats</p>
-                    <div className="space-y-3">
-                        <MiniStat value={stats?.total_students || 0} suffix="+" label="Students Registered" Icon={Users} delay={0.1} />
-                        <div className="h-px bg-black/[0.05]" />
-                        <MiniStat value={50} suffix="+" label="Sarkari Services" Icon={FileText} delay={0.15} />
-                        <div className="h-px bg-black/[0.05]" />
-                        <MiniStat value={100} suffix="%" label="Digital Process" Icon={TrendingUp} delay={0.2} />
-                    </div>
-                </div>
-
-                <div className="h-px bg-black/[0.05]" />
-
-                {/* ── TESTIMONIAL ───────────────────────────────────────── */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="p-4 bg-black rounded-2xl space-y-2 text-white"
-                >
-                    <div className="flex items-center gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                            <Star key={i} size={9} className="text-yellow-400 fill-yellow-400" />
+                        {quickLinks.map((link, i) => (
+                            <motion.button
+                                key={i}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={link.action}
+                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 group transition-colors"
+                            >
+                                <div className={`w-7 h-7 rounded-lg bg-slate-50 group-hover:bg-white flex items-center justify-center shrink-0 transition-colors ${link.color}`}>
+                                    <link.icon size={13} />
+                                </div>
+                                <div className="text-left min-w-0">
+                                    <p className="text-[11px] font-bold text-slate-700 group-hover:text-slate-900 leading-none">{link.label}</p>
+                                    <p className="text-[9px] text-slate-400 mt-0.5">{link.desc}</p>
+                                </div>
+                                <ExternalLink size={10} className="text-slate-300 ml-auto shrink-0 group-hover:text-slate-400" />
+                            </motion.button>
                         ))}
                     </div>
-                    <p className="text-[10px] font-semibold leading-snug opacity-90">
-                        "Kal apply kiya aaj certificate aa gaya!"
+                </div>
+
+                {/* ── DIVIDER ── */}
+                <div className="h-px bg-slate-100" />
+
+                {/* ── STATS ── */}
+                <div>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Platform Stats</p>
+                    <div className="bg-slate-50 rounded-xl p-3">
+                        <StatRow value={stats?.total_students?.toLocaleString() || "4,000"} suffix="+" label="Students Registered" icon={Users} />
+                        <StatRow value="50" suffix="+" label="Sarkari Services" icon={FileText} />
+                        <StatRow value="100" suffix="%" label="Digital Process" icon={TrendingUp} />
+                    </div>
+                </div>
+
+                {/* ── DIVIDER ── */}
+                <div className="h-px bg-slate-100" />
+
+                {/* ── TESTIMONIAL ── */}
+                <div className="bg-[var(--navy)] rounded-2xl p-4 space-y-3">
+                    <div className="flex gap-0.5">
+                        {[...Array(5)].map((_, i) => (
+                            <Star key={i} size={11} className="text-[var(--amber)] fill-[var(--amber)]" />
+                        ))}
+                    </div>
+                    <p className="text-[11px] text-white/80 leading-snug italic">
+                        "Mool Niwas certificate 24 ghante mein mil gaya. Bahut acha service!"
                     </p>
-                    <p className="text-[8px] text-white/30 font-bold uppercase tracking-wider">
-                        — Krishna E-Mitra User
-                    </p>
-                </motion.div>
+                    <p className="text-[9px] text-white/40 font-bold uppercase tracking-wider">— Ramesh Kumar, Bikaner</p>
+                </div>
 
                 {/* Contact */}
-                <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-black/25 mb-2">Contact</p>
-                    <a href="tel:916377964293" className="text-[10px] font-bold text-black/50 hover:text-black transition-colors block">
-                        +91 63779 64293
+                <div className="pb-2">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Contact Us</p>
+                    <a href="tel:+916377964293" className="flex items-center gap-2 text-[11px] font-bold text-[var(--navy)] hover:underline">
+                        <span>+91 63779 64293</span>
                     </a>
+                    <p className="text-[9px] text-slate-400 mt-0.5">Mon–Sat 9am–6pm</p>
                 </div>
             </div>
         </aside>
