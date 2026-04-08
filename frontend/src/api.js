@@ -128,6 +128,7 @@ export const getPublicExams         = () => fetch(`${BASE_URL}/api/public/exams`
 export const getPublicAnnouncements = () => fetch(`${BASE_URL}/api/public/announcements`).then(r => r.json())
 export const getPublicStats         = () => fetch(`${BASE_URL}/api/public/stats`).then(r => r.json())
 export const getPublicConfig        = () => fetch(`${BASE_URL}/api/public/config`).then(r => r.json())
+export const getPublicNews          = () => fetch(`${BASE_URL}/api/public/news`).then(r => r.json())
 
 export const publicRegister = (data) =>
   fetch(`${BASE_URL}/api/public/register`, {

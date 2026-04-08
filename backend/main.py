@@ -195,6 +195,13 @@ def get_public_stats():
     return jsonify({"success": True, "stats": database.get_public_stats()})
 
 
+@app.route("/api/public/news", methods=["GET"])
+def get_public_news():
+    """Returns the latest admin broadcasts as public news items for the portal sidebar."""
+    logs = database.get_public_news(limit=6)
+    return jsonify({"success": True, "news": logs})
+
+
 @app.route("/api/public/register", methods=["POST"])
 @limiter.limit("5 per minute")
 def public_register():

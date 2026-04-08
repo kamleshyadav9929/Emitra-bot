@@ -10,6 +10,7 @@ import ServiceRequests from "./pages/ServiceRequests"
 import BotManager from "./pages/BotManager"
 import Login from "./pages/Login"
 import Landing from "./pages/Landing" // [NEW] Public Landing
+import ServicesPage from "./pages/ServicesPage" // [NEW] Category Services Page
 import { Layers } from "lucide-react"
 import { LanguageProvider } from "./context/LanguageContext"
 import { AuthProvider } from "./context/AuthContext"
@@ -73,6 +74,7 @@ function App() {
         <Routes>
             {/* ── Public Student Portal ─────────────────────────────────────── */}
             <Route path="/" element={<Landing />} />
+            <Route path="/services/:category" element={<ServicesPage />} />
             
             {/* ── Admin Auth ────────────────────────────────────────────────── */}
             <Route path="/login" element={<AdminLayout><Login /></AdminLayout>} />

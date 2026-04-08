@@ -408,6 +408,35 @@ def get_logs():
     return [dict(row) for row in cursor.fetchall()]
 
 
+def get_public_news(limit=6):
+    """Returns latest admin broadcasted messages as public news items.
+    Strips excessively long messages to a preview length for the sidebar."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT id, target_exam, message_text, total_recipients, sent_at "
+        "FROM message_logs ORDER BY sent_at DESC LIMIT ?",
+        (limit,)
+    )
+    rows = cursor.fetchall()
+    news = []
+    for row in rows:
+        text = row["message_text"] or ""
+        # Clean up common Telegram markdown symbols for display
+        for sym in ["*", "_", "`", "~"]:
+            text = text.replace(sym, "")
+        news.append({
+            "id": row["id"],
+            "message": text,
+            "preview": text[:120] + ("..." if len(text) > 120 else ""),
+            "exam": row["target_exam"],
+            "recipients": row["total_recipients"],
+            "sent_at": row["sent_at"],
+        })
+    return news
+
+
+
 # ── Service Request helpers ──────────────────────────────────────────────────
 
 def add_service_request(telegram_id, service_name, category):
