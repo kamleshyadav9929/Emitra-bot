@@ -1,16 +1,13 @@
-import { motion } from "motion/react"
+import { useEffect, useId, useRef, useState } from "react"
+import { AnimatePresence, motion } from "motion/react"
 import {
-    CreditCard,
-    Zap,
-    GraduationCap,
-    Home,
-    Car,
-    FileSignature,
-    FileText,
-    ArrowUpRight
+    CreditCard, Zap, GraduationCap, Home, Car,
+    FileSignature, FileText, X, MessageCircle,
+    CheckCircle2, Clock, ArrowUpRight
 } from "lucide-react"
+import { useOutsideClick } from "../../hooks/useOutsideClick"
 
-const categoryIcons = {
+const CATEGORY_ICONS = {
     id: CreditCard,
     bills: Zap,
     forms: GraduationCap,
@@ -20,80 +17,256 @@ const categoryIcons = {
     default: FileText
 }
 
-// ── Individual Service Icon Tile ──────────────────────────────────────────────
-function ServiceIconTile({ name, description, price, category, delay, index = 0, onClick }) {
-    const Icon = categoryIcons[category] || categoryIcons.default
-
+// ── Close icon (animated) ─────────────────────────────────────────────────────
+function CloseIcon() {
     return (
-        <motion.button
-            initial={{ opacity: 0, scale: 0.9, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.22, delay: delay * 0.025, ease: "easeOut" }}
-            whileHover={{ y: -3, transition: { duration: 0.15 } }}
-            whileTap={{ scale: 0.96 }}
-            onClick={onClick}
-            className="group relative flex flex-col items-center gap-2 p-3 md:p-4 rounded-2xl bg-white border border-black/[0.07] hover:border-black/25 hover:shadow-lg hover:shadow-black/[0.07] transition-all duration-200 cursor-pointer text-center overflow-hidden"
+        <motion.svg
+            initial={{ opacity: 0, rotate: -90 }}
+            animate={{ opacity: 1, rotate: 0 }}
+            exit={{ opacity: 0, rotate: 90, transition: { duration: 0.1 } }}
+            xmlns="http://www.w3.org/2000/svg"
+            width="18" height="18"
+            viewBox="0 0 24 24"
+            fill="none" stroke="currentColor"
+            strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
         >
-            {/* Subtle index watermark */}
-            <span className="absolute top-1 right-2 text-[22px] font-black text-black/[0.04] leading-none select-none tabular-nums">
-                {String(index + 1).padStart(2, "0")}
-            </span>
-
-            {/* Left accent line appears on hover */}
-            <div className="absolute left-0 top-2 bottom-2 w-[2.5px] bg-black rounded-full scale-y-0 group-hover:scale-y-100 transition-transform duration-250 origin-bottom" />
-
-            {/* Icon */}
-            <div className="relative w-12 h-12 md:w-13 md:h-13 rounded-2xl bg-black/[0.04] group-hover:bg-black flex items-center justify-center transition-all duration-250 shrink-0">
-                <Icon size={17} className="text-black/50 group-hover:text-white transition-colors duration-250" strokeWidth={1.7} />
-            </div>
-
-            {/* Name */}
-            <p className="text-[10px] md:text-[11px] font-black uppercase tracking-wide leading-tight line-clamp-2 text-black/70 group-hover:text-black transition-colors">
-                {name}
-            </p>
-
-            {/* Price */}
-            {price && (
-                <span className="text-[8px] font-bold text-black/30 border border-black/[0.08] rounded-full px-2 py-0.5 group-hover:border-black/20 transition-colors">
-                    ₹{price}
-                </span>
-            )}
-
-            {/* Arrow — appears on hover */}
-            <ArrowUpRight
-                size={10}
-                className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-30 transition-opacity duration-200"
-            />
-        </motion.button>
+            <path d="M18 6l-12 12" />
+            <path d="M6 6l12 12" />
+        </motion.svg>
     )
 }
 
-// ── Category Section Header ───────────────────────────────────────────────────
+// ── Expandable service list for one category ──────────────────────────────────
+function ExpandableServiceList({ catKey, services, onApply }) {
+    const [active, setActive] = useState(null)
+    const ref = useRef(null)
+    const id = useId()
+    const Icon = CATEGORY_ICONS[catKey] || CATEGORY_ICONS.default
+
+    useOutsideClick(ref, () => setActive(null))
+
+    useEffect(() => {
+        const onKey = (e) => { if (e.key === "Escape") setActive(null) }
+        window.addEventListener("keydown", onKey)
+        return () => window.removeEventListener("keydown", onKey)
+    }, [])
+
+    useEffect(() => {
+        document.body.style.overflow = active ? "hidden" : "auto"
+        return () => { document.body.style.overflow = "auto" }
+    }, [active])
+
+    return (
+        <>
+            {/* ── BACKDROP ── */}
+            <AnimatePresence>
+                {active && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[80]"
+                    />
+                )}
+            </AnimatePresence>
+
+            {/* ── EXPANDED CARD OVERLAY ── */}
+            <AnimatePresence>
+                {active && (
+                    <div className="fixed inset-0 grid place-items-center z-[90] px-4">
+                        {/* Mobile close button */}
+                        <motion.button
+                            key={`close-btn-${active.name}-${id}`}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0, transition: { duration: 0.05 } }}
+                            className="absolute top-4 right-4 lg:hidden w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg z-[91]"
+                            onClick={() => setActive(null)}
+                        >
+                            <CloseIcon />
+                        </motion.button>
+
+                        <motion.div
+                            layoutId={`svc-card-${active.name}-${id}`}
+                            ref={ref}
+                            className="w-full max-w-[480px] bg-white rounded-3xl overflow-hidden shadow-2xl shadow-black/20"
+                        >
+                            {/* Card top bar */}
+                            <div className="px-6 pt-6 pb-5 border-b border-black/[0.06]">
+                                <div className="flex items-start justify-between gap-4">
+                                    <div className="flex items-center gap-4">
+                                        {/* Animated icon */}
+                                        <motion.div
+                                            layoutId={`svc-icon-${active.name}-${id}`}
+                                            className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center shrink-0"
+                                        >
+                                            <Icon size={24} className="text-white" strokeWidth={1.7} />
+                                        </motion.div>
+
+                                        <div className="min-w-0">
+                                            <motion.h2
+                                                layoutId={`svc-title-${active.name}-${id}`}
+                                                className="font-black text-black text-lg leading-tight"
+                                            >
+                                                {active.name}
+                                            </motion.h2>
+                                            {active.price && (
+                                                <motion.p
+                                                    layoutId={`svc-price-${active.name}-${id}`}
+                                                    className="text-[11px] text-black/40 font-bold mt-0.5"
+                                                >
+                                                    ₹{active.price}
+                                                </motion.p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Desktop close */}
+                                    <button
+                                        onClick={() => setActive(null)}
+                                        className="hidden lg:flex w-8 h-8 rounded-full bg-black/[0.05] hover:bg-black/10 items-center justify-center transition-colors shrink-0"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Card body */}
+                            <div className="px-6 py-5">
+                                <motion.div
+                                    layout
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="h-36 overflow-auto [mask:linear-gradient(to_bottom,white_70%,transparent)] [scrollbar-width:none] [-ms-overflow-style:none]"
+                                >
+                                    <p className="text-[13px] text-black/55 leading-relaxed">
+                                        {active.description || "Apply for this government service quickly and easily through Krishna E-Mitra. Our team will process your application and keep you updated via WhatsApp."}
+                                    </p>
+                                    <div className="mt-4 space-y-2">
+                                        <div className="flex items-center gap-2.5">
+                                            <CheckCircle2 size={14} className="text-black/40 shrink-0" />
+                                            <p className="text-[11px] font-semibold text-black/50">100% Digital Processing</p>
+                                        </div>
+                                        <div className="flex items-center gap-2.5">
+                                            <CheckCircle2 size={14} className="text-black/40 shrink-0" />
+                                            <p className="text-[11px] font-semibold text-black/50">Updates on WhatsApp & Telegram</p>
+                                        </div>
+                                        <div className="flex items-center gap-2.5">
+                                            <Clock size={14} className="text-black/40 shrink-0" />
+                                            <p className="text-[11px] font-semibold text-black/50">Priority processing available</p>
+                                        </div>
+                                    </div>
+                                </motion.div>
+
+                                {/* CTA */}
+                                <button
+                                    onClick={() => { onApply(active); setActive(null) }}
+                                    className="mt-5 w-full py-4 bg-black text-white rounded-2xl font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-2.5 hover:bg-black/85 active:scale-[0.98] transition-all shadow-lg shadow-black/10"
+                                >
+                                    <MessageCircle size={14} />
+                                    Apply via WhatsApp
+                                </button>
+                                <p className="text-[9px] text-center font-bold text-black/25 uppercase tracking-widest mt-2.5">
+                                    WhatsApp pe direct chat shuru hogi
+                                </p>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ── COMPACT LIST ── */}
+            <ul className="w-full space-y-2">
+                {services.map((svc, idx) => (
+                    <motion.li
+                        layoutId={`svc-card-${svc.name}-${id}`}
+                        key={`${catKey}-${idx}`}
+                        onClick={() => setActive(svc)}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.2, delay: idx * 0.025, ease: "easeOut" }}
+                        className="group relative flex items-center gap-3 px-4 py-3.5 bg-white border border-black/[0.07] hover:border-black/20 hover:bg-neutral-50 rounded-2xl cursor-pointer transition-all duration-200 overflow-hidden"
+                    >
+                        {/* Left accent stripe */}
+                        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-black scale-y-0 group-hover:scale-y-100 transition-transform duration-250 origin-bottom rounded-l-2xl" />
+
+                        {/* Index number */}
+                        <span className="text-[11px] font-black text-black/20 tabular-nums w-6 shrink-0 group-hover:text-black/40 transition-colors select-none">
+                            {String(idx + 1).padStart(2, "0")}
+                        </span>
+
+                        {/* Icon */}
+                        <motion.div
+                            layoutId={`svc-icon-${svc.name}-${id}`}
+                            className="w-9 h-9 rounded-xl bg-black/[0.04] group-hover:bg-black flex items-center justify-center shrink-0 transition-all duration-250"
+                        >
+                            <Icon
+                                size={15}
+                                className="text-black/40 group-hover:text-white transition-colors duration-250"
+                                strokeWidth={1.8}
+                            />
+                        </motion.div>
+
+                        {/* Text */}
+                        <div className="flex-1 min-w-0">
+                            <motion.p
+                                layoutId={`svc-title-${svc.name}-${id}`}
+                                className="text-[13px] font-bold text-black/80 leading-tight line-clamp-1 group-hover:text-black transition-colors"
+                            >
+                                {svc.name}
+                            </motion.p>
+                            {svc.description && (
+                                <p className="text-[10px] text-black/30 mt-0.5 line-clamp-1">{svc.description}</p>
+                            )}
+                        </div>
+
+                        {/* Price */}
+                        {svc.price && (
+                            <motion.span
+                                layoutId={`svc-price-${svc.name}-${id}`}
+                                className="hidden sm:block text-[9px] font-black px-2.5 py-1 rounded-full border border-black/[0.08] text-black/30 shrink-0 group-hover:border-black/20 group-hover:text-black/50 transition-all"
+                            >
+                                ₹{svc.price}
+                            </motion.span>
+                        )}
+
+                        {/* Expand hint */}
+                        <div className="shrink-0 opacity-0 group-hover:opacity-40 transition-opacity duration-200">
+                            <ArrowUpRight size={14} className="text-black" />
+                        </div>
+                    </motion.li>
+                ))}
+            </ul>
+        </>
+    )
+}
+
+// ── Category section header ───────────────────────────────────────────────────
 function CategoryHeader({ label, index, id }) {
     return (
-        <div id={id} className="mb-5 scroll-mt-16">
-            <div className="flex items-center gap-4">
-                {/* Big bold number */}
+        <div id={id} className="mb-4 scroll-mt-16">
+            <div className="flex items-center gap-3">
                 <span className="text-[11px] font-black text-black/20 tabular-nums tracking-widest">
                     {String(index + 1).padStart(2, "0")}
                 </span>
-                {/* Full-width rule */}
-                <div className="h-px flex-1 bg-black/[0.08]" />
+                <div className="h-px flex-1 bg-black/[0.07]" />
             </div>
-            <h2 className="mt-2 text-sm md:text-base font-black uppercase tracking-widest text-black/80">
+            <h2 className="mt-2 text-sm font-black uppercase tracking-widest text-black/75">
                 {label}
             </h2>
         </div>
     )
 }
 
-// ── Main Grid Export ──────────────────────────────────────────────────────────
+// ── Main export ───────────────────────────────────────────────────────────────
 export default function ServiceIconGrid({ services, activeCategory, onServiceClick }) {
     const filtered = activeCategory === "ALL"
         ? Object.entries(services)
         : Object.entries(services).filter(([key]) => key === activeCategory)
 
-    let globalIdx = 0
+    // onApply: wrap onServiceClick so it fires the WhatsApp flow
+    const handleApply = (svc) => onServiceClick(svc)
 
     return (
         <div className="space-y-10 md:space-y-14">
@@ -104,23 +277,11 @@ export default function ServiceIconGrid({ services, activeCategory, onServiceCli
                         index={catIdx}
                         id={`cat-${key}`}
                     />
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-3">
-                        {cat.services?.map((svc, svcIdx) => {
-                            const delay = globalIdx
-                            const tileIndex = globalIdx
-                            globalIdx++
-                            return (
-                                <ServiceIconTile
-                                    key={`${key}-${svcIdx}`}
-                                    {...svc}
-                                    category={key}
-                                    delay={delay}
-                                    index={tileIndex}
-                                    onClick={() => onServiceClick({ ...svc, category: cat.label, catKey: key })}
-                                />
-                            )
-                        })}
-                    </div>
+                    <ExpandableServiceList
+                        catKey={key}
+                        services={cat.services || []}
+                        onApply={(svc) => handleApply({ ...svc, category: cat.label, catKey: key })}
+                    />
                 </div>
             ))}
         </div>
