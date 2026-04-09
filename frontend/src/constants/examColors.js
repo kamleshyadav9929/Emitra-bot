@@ -1,10 +1,10 @@
 export const EXAM_COLORS = {
-  JEE: "#F97316",
-  NEET: "#2DD4BF",
-  SSC: "#38BDF8",
-  UPSC: "#A3E635",
-  CUET: "#FBBF24",
-  ALL: "#6366F1",
+  JEE:  "#E8500A",  // deep burnt orange
+  NEET: "#00A37A",  // deep teal-emerald
+  SSC:  "#2563EB",  // electric blue
+  UPSC: "#7C3AED",  // rich violet
+  CUET: "#D97706",  // deep amber
+  ALL:  "#0D1B2A",  // midnight (default)
 }
 
 export function getExamColor(examName) {

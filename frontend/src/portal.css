@@ -1,21 +1,47 @@
 /* ─────────────────────────────────────────────────────────────────────────
-   Krishna E-Mitra Portal — Design System
-   Color palette: Navy (#1e3a5f) as primary, white base, amber accent
+   Krishna E-Mitra Portal — Design System 2026
+   Palette: Midnight Slate primary · Emerald Teal accent · Warm off-white base
+   Inspired by: linear.app, stripe.com, 2026 Awwwards eco-digital trend
 ───────────────────────────────────────────────────────────────────────── */
 
 :root {
-  --navy:        #1e3a5f;
-  --navy-dark:   #152b47;
-  --navy-light:  #2a4d7f;
-  --amber:       #f59e0b;
-  --amber-light: #fbbf24;
-  --surface:     #f4f6f9;
-  --card:        #ffffff;
-  --border:      #e2e8f0;
-  --text:        #1a202c;
-  --muted:       #718096;
-  --green:       #10b981;
-  --red:         #ef4444;
+  /* ── Primary (sidebar / header) ── */
+  --navy:        #0D1B2A;   /* deep midnight slate   */
+  --navy-dark:   #070F18;   /* near-black depth      */
+  --navy-light:  #162236;   /* slightly lifted slate */
+  --navy-muted:  #1F3248;   /* hover states          */
+
+  /* ── Accent (CTAs, active, highlights) ── */
+  --emerald:       #00C896; /* vibrant teal-emerald  */
+  --emerald-dark:  #00A37A; /* pressed/hover shade   */
+  --emerald-light: #E6FAF5; /* tint for chips/badges */
+  --emerald-glow:  rgba(0, 200, 150, 0.18); /* soft glow */
+
+  /* ── Warm accent (secondary / alerts) ── */
+  --coral:       #FF6B6B;   /* warm coral — errors   */
+  --coral-light: #FFF0F0;   /* coral tint            */
+  --gold:        #F5A623;   /* premium warm gold     */
+  --gold-light:  #FFF8EC;   /* gold tint             */
+
+  /* ── Backgrounds & Surfaces ── */
+  --surface:     #F8F7F4;   /* warm off-white        */
+  --card:        #FFFFFF;
+  --card-alt:    #FAFAF8;   /* slightly warm card    */
+
+  /* ── Borders ── */
+  --border:      #E8E6E1;   /* warm neutral border   */
+  --border-strong: #D4D1CB;
+
+  /* ── Text ── */
+  --text:        #0D1B2A;   /* near-black            */
+  --muted:       #6B7685;   /* cool muted gray       */
+  --muted-light: #9BA8B5;   /* lighter muted         */
+
+  /* ── Status ── */
+  --green:       #00B87A;   /* success — matches emerald family */
+  --red:         #E84444;   /* error / danger        */
+
+  /* ── Layout ── */
   --sidebar-w:   240px;
   --right-w:     260px;
   --header-h:    58px;
@@ -29,9 +55,9 @@
 
 /* Portal service icon hover pulse ring */
 @keyframes ring-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(30, 58, 95, 0.25); }
-  70%  { box-shadow: 0 0 0 8px rgba(30, 58, 95, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(30, 58, 95, 0); }
+  0%   { box-shadow: 0 0 0 0 var(--emerald-glow); }
+  70%  { box-shadow: 0 0 0 9px rgba(0, 200, 150, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 200, 150, 0); }
 }
 
 .icon-pulse:hover { animation: ring-pulse 0.5s ease-out; }
@@ -57,7 +83,7 @@
   100% { background-position: 700px 0; }
 }
 .skeleton {
-  background: linear-gradient(90deg, #f0f4f8 25%, #e2e8f0 50%, #f0f4f8 75%);
+  background: linear-gradient(90deg, #F1F0EC 25%, #E8E6E1 50%, #F1F0EC 75%);
   background-size: 700px 100%;
   animation: shimmer 1.4s infinite;
   border-radius: 8px;

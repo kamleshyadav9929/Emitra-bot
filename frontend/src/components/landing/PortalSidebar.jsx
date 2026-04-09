@@ -28,11 +28,11 @@ export default function PortalSidebar({ services, activeCategory, onWhatsApp, on
         <aside style={{ width: "var(--sidebar-w)" }} className="hidden lg:flex flex-col shrink-0 bg-[var(--navy)] text-white h-[calc(100vh-var(--header-h))] sticky top-[var(--header-h)] overflow-y-auto">
 
             {/* User info strip */}
-            <div className="px-4 py-4 border-b border-white/10">
+            <div className="px-4 py-4 border-b border-white/[0.08]">
                 {isLoggedIn && user ? (
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center shrink-0 ring-2 ring-[var(--amber)] ring-offset-1 ring-offset-[var(--navy)]">
-                            <span className="text-sm font-black text-[var(--amber)]">{user?.name?.charAt(0)?.toUpperCase()}</span>
+                        <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center shrink-0 ring-2 ring-[var(--emerald)] ring-offset-1 ring-offset-[var(--navy)]">
+                            <span className="text-sm font-black text-[var(--emerald)]">{user?.name?.charAt(0)?.toUpperCase()}</span>
                         </div>
                         <div className="min-w-0">
                             <p className="text-[11px] font-black text-white truncate">{user?.name}</p>
@@ -42,9 +42,9 @@ export default function PortalSidebar({ services, activeCategory, onWhatsApp, on
                 ) : (
                     <button
                         onClick={onLoginClick}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 bg-white/10 hover:bg-white/15 rounded-xl transition-all duration-200"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 bg-white/[0.06] hover:bg-white/[0.1] rounded-xl transition-all duration-200"
                     >
-                        <User size={14} className="text-[var(--amber)]" />
+                        <User size={14} className="text-[var(--emerald)]" />
                         <div className="text-left">
                             <p className="text-[10px] font-black text-white">Login / Register</p>
                             <p className="text-[9px] text-white/40">Access your account</p>
@@ -111,15 +111,15 @@ function SidebarButton({ icon: Icon, label, active, onClick, count }) {
             onClick={onClick}
             className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all duration-200 group ${
                 active
-                    ? "bg-[var(--amber)] text-[var(--navy-dark)]"
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                    ? "bg-[var(--emerald)] text-[var(--navy-dark)] shadow-[0_2px_12px_rgba(0,200,150,0.3)]"
+                    : "text-white/65 hover:bg-[var(--navy-muted)] hover:text-white"
             }`}
         >
             <Icon size={14} className="shrink-0" />
             <span className="text-[11px] font-bold leading-tight line-clamp-1 flex-1">{label}</span>
             {count && (
                 <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full shrink-0 ${
-                    active ? "bg-[var(--navy)]/20 text-[var(--navy-dark)]" : "bg-white/10 text-white/50"
+                    active ? "bg-[var(--navy-dark)]/20 text-[var(--navy-dark)]" : "bg-white/10 text-white/50"
                 }`}>
                     {count}
                 </span>

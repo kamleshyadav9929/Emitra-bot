@@ -2,34 +2,45 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg:        #FFFFFF;
-  --color-surface:   #F7F7F5;
+  /* Backgrounds & Surfaces */
+  --color-bg:        #F8F7F4;   /* warm off-white        */
+  --color-surface:   #F2F1ED;   /* slightly deeper warm   */
   --color-card:      #FFFFFF;
-  --color-border:    #A3A3A3;
-  --color-hover:     #F2F2F0;
+  --color-border:    #E8E6E1;   /* warm neutral           */
+  --color-hover:     #EFEDE8;   /* warm hover             */
 
-  --color-ink:       #0A0A0A;
-  --color-ink-2:     #3D3D3D;
-  --color-ink-3:     #525252;
-  --color-ink-4:     #737373;
+  /* Ink / Text */
+  --color-ink:       #0D1B2A;   /* midnight slate         */
+  --color-ink-2:     #1F3248;   /* dark slate             */
+  --color-ink-3:     #3D5166;   /* medium slate           */
+  --color-ink-4:     #6B7685;   /* muted cool gray        */
 
-  --color-accent:    #0A0A0A;
-  --color-accent-lt: #3D3D3D;
+  /* Primary Accent (Emerald Teal) */
+  --color-accent:    #00C896;   /* vibrant emerald        */
+  --color-accent-lt: #E6FAF5;   /* emerald tint           */
 
-  --color-exam-jee:  #D4450C;
-  --color-exam-neet: #0A7A6B;
-  --color-exam-ssc:  #0A52A3;
-  --color-exam-upsc: #5A7A0A;
-  --color-exam-cuet: #A37A0A;
-  --color-exam-all:  #0A0A0A;
+  /* Secondary Accents */
+  --color-gold:      #F5A623;   /* warm gold              */
+  --color-coral:     #FF6B6B;   /* warm coral             */
 
-  --color-success:   #2E7D32;
-  --color-danger:    #C62828;
+  /* Exam Category Colors — vivid & distinct */
+  --color-exam-jee:  #E8500A;   /* deep burnt orange      */
+  --color-exam-neet: #00A37A;   /* deep teal-emerald      */
+  --color-exam-ssc:  #2563EB;   /* electric blue          */
+  --color-exam-upsc: #7C3AED;   /* rich violet            */
+  --color-exam-cuet: #D97706;   /* deep amber             */
+  --color-exam-all:  #0D1B2A;   /* midnight (default)     */
 
+  /* Status */
+  --color-success:   #00B87A;
+  --color-danger:    #E84444;
+
+  /* Typography */
   --font-sans: 'DM Sans', system-ui, sans-serif;
   --font-mono: 'DM Mono', 'Courier New', monospace;
   --font-display: 'Outfit', sans-serif;
   
+  /* Border Radius */
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
@@ -58,8 +69,8 @@ html {
 }
 
 body {
-  background-color: #FFFFFF;
-  color: #0A0A0A;
+  background-color: #F8F7F4;
+  color: #0D1B2A;
   font-family: 'DM Sans', system-ui, sans-serif;
   margin: 0;
   padding: 0;
@@ -121,15 +132,15 @@ body {
 
 @utility bento-card {
     background: #FFFFFF;
-    border: 1px solid #E5E5E3;
+    border: 1px solid #E8E6E1;
     padding: 2rem;
     position: relative;
     overflow: hidden;
     border-radius: var(--radius-2xl);
     transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
     &:hover {
-        border-color: #0A0A0A;
-        box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.15);
+        border-color: #00C896;
+        box-shadow: 0 10px 30px -15px rgba(0, 200, 150, 0.2);
     }
 }
 
