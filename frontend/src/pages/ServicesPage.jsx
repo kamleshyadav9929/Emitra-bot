@@ -33,50 +33,62 @@ const CATEGORY_META = {
 }
 
 // ── Service row card ──────────────────────────────────────────────────────────
-function ServiceRow({ name, description, price, catKey, delay, onApply, onClick }) {
+function ServiceRow({ name, description, price, catKey, delay, index = 0, onApply, onClick }) {
     const meta = CATEGORY_META[catKey] || CATEGORY_META.default
     const Icon = meta.icon
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.22, delay: delay * 0.035, ease: "easeOut" }}
-            className="bg-white border border-[var(--border)] hover:border-slate-300 hover:shadow-md rounded-xl p-4 flex items-center gap-4 transition-all duration-200 cursor-pointer group"
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.22, delay: delay * 0.03, ease: "easeOut" }}
+            className="group relative bg-white border border-black/[0.07] hover:border-black/20 hover:shadow-lg hover:shadow-black/[0.06] rounded-2xl transition-all duration-200 cursor-pointer overflow-hidden"
             onClick={onClick}
         >
-            {/* Icon */}
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${meta.bg}`}>
-                <Icon size={16} className={meta.text} strokeWidth={1.8} />
-            </div>
+            {/* Left accent bar */}
+            <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-black scale-y-0 group-hover:scale-y-100 transition-transform duration-250 origin-bottom rounded-l-2xl" />
 
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-bold text-slate-800 leading-tight line-clamp-1 group-hover:text-slate-900">{name}</p>
-                {description && (
-                    <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-1">{description}</p>
-                )}
-            </div>
-
-            {/* Price */}
-            {price && (
-                <span className={`hidden sm:block text-[10px] font-black px-2.5 py-1 rounded-lg shrink-0 ${meta.bg} ${meta.text}`}>
-                    {price}
+            <div className="flex items-center gap-3 px-4 py-3.5 pl-5">
+                {/* Sequential number */}
+                <span className="text-[11px] font-black text-black/20 tabular-nums w-6 shrink-0 group-hover:text-black/40 transition-colors">
+                    {String(index + 1).padStart(2, "0")}
                 </span>
-            )}
 
-            {/* Apply */}
-            <button
-                onClick={e => { e.stopPropagation(); onApply() }}
-                className="shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg text-white text-[10px] font-black uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all"
-                style={{ background: "var(--navy)" }}
-            >
-                <MessageCircle size={11} />
-                Apply
-            </button>
+                {/* Icon: square, inverts on hover */}
+                <div className="w-9 h-9 rounded-xl bg-black/[0.04] group-hover:bg-black flex items-center justify-center shrink-0 transition-all duration-250">
+                    <Icon size={15} className="text-black/40 group-hover:text-white transition-colors duration-250" strokeWidth={1.8} />
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-bold text-black/85 leading-tight line-clamp-1 group-hover:text-black transition-colors">
+                        {name}
+                    </p>
+                    {description && (
+                        <p className="text-[10px] text-black/35 mt-0.5 line-clamp-1">{description}</p>
+                    )}
+                </div>
+
+                {/* Price */}
+                {price && (
+                    <span className="hidden sm:block text-[9px] font-black px-2.5 py-1 rounded-full border border-black/[0.08] text-black/35 shrink-0 group-hover:border-black/20 group-hover:text-black/55 transition-all">
+                        ₹{price}
+                    </span>
+                )}
+
+                {/* Apply CTA */}
+                <button
+                    onClick={e => { e.stopPropagation(); onApply() }}
+                    className="shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl bg-black text-white text-[10px] font-black uppercase tracking-wider hover:bg-black/80 active:scale-95 transition-all"
+                >
+                    <MessageCircle size={11} />
+                    Apply
+                </button>
+            </div>
         </motion.div>
     )
 }
+
 
 export default function ServicesPage() {
     const { category: catKey } = useParams()
@@ -319,6 +331,7 @@ export default function ServicesPage() {
                                             {...svc}
                                             catKey={catKey}
                                             delay={idx}
+                                            index={idx}
                                             onClick={() => setSelectedService({ ...svc, category: currentCat.label, catKey })}
                                             onApply={() => handleApply(svc)}
                                         />

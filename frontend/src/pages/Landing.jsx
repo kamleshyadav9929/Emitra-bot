@@ -36,7 +36,7 @@ const CATEGORY_META = {
 }
 
 // ── Category tile ─────────────────────────────────────────────────────────────
-function CategoryTile({ catKey, label, serviceCount, delay, onClick }) {
+function CategoryTile({ catKey, label, serviceCount, delay, index = 0, onClick }) {
     const meta = CATEGORY_META[catKey] || CATEGORY_META.default
     const Icon = meta.icon
 
@@ -45,33 +45,42 @@ function CategoryTile({ catKey, label, serviceCount, delay, onClick }) {
             initial={{ opacity: 0, y: 14, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.28, delay: delay * 0.06, ease: "easeOut" }}
-            whileHover={{ y: -3, transition: { duration: 0.15 } }}
+            whileHover={{ y: -4, transition: { duration: 0.15 } }}
             whileTap={{ scale: 0.95 }}
             onClick={onClick}
-            className={`icon-pulse group relative flex flex-col items-center gap-2.5 p-4 rounded-2xl bg-white border border-[var(--border)] hover:border-transparent hover:shadow-lg hover:shadow-slate-200/80 transition-all duration-200 cursor-pointer text-center overflow-hidden`}
+            className="icon-pulse group relative flex flex-col items-center gap-2.5 p-4 rounded-2xl bg-white border border-black/[0.07] hover:border-black/25 hover:shadow-xl hover:shadow-black/[0.07] transition-all duration-200 cursor-pointer text-center overflow-hidden"
         >
-            {/* Icon circle */}
-            <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${meta.color} flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200 shrink-0`}>
-                <Icon size={22} className="text-white" strokeWidth={1.8} />
+            {/* Index watermark */}
+            <span className="absolute top-2 right-3 text-[28px] font-black text-black/[0.04] leading-none select-none tabular-nums group-hover:text-black/[0.07] transition-colors duration-300">
+                {String(index + 1).padStart(2, "0")}
+            </span>
+
+            {/* Bottom-left accent bar — grows on hover */}
+            <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-black rounded-l-2xl scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-bottom" />
+
+            {/* Icon: square with inverted fill on hover */}
+            <div className="relative w-14 h-14 rounded-2xl bg-black/[0.04] group-hover:bg-black flex items-center justify-center shadow-none group-hover:shadow-lg group-hover:shadow-black/20 transition-all duration-300 shrink-0">
+                <Icon size={22} className="text-black/50 group-hover:text-white transition-colors duration-300" strokeWidth={1.7} />
             </div>
 
-            {/* Name */}
-            <p className="text-[10px] font-bold text-slate-700 group-hover:text-slate-900 leading-tight line-clamp-2 transition-colors">
+            {/* Label */}
+            <p className="text-[10px] font-bold text-black/70 group-hover:text-black leading-tight line-clamp-2 transition-colors">
                 {label}
             </p>
 
-            {/* Count badge */}
-            <span className={`text-[8px] font-black px-2 py-0.5 rounded-full ${meta.bg} ${meta.text}`}>
+            {/* Count */}
+            <span className="text-[8px] font-black px-2 py-0.5 rounded-full border border-black/[0.08] text-black/30 group-hover:border-black/20 group-hover:text-black/50 transition-all">
                 {serviceCount} services
             </span>
 
-            {/* Hover arrow */}
-            <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <ArrowRight size={11} className={meta.text} />
+            {/* Arrow in corner */}
+            <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-40 transition-opacity duration-200">
+                <ArrowRight size={11} className="text-black" />
             </div>
         </motion.button>
     )
 }
+
 
 // ── Search result row ─────────────────────────────────────────────────────────
 function SearchResultRow({ svc, onSelect }) {
@@ -428,6 +437,7 @@ export default function Landing() {
                                     label={cat.label}
                                     serviceCount={cat.services?.length || 0}
                                     delay={idx}
+                                    index={idx}
                                     onClick={() => navigate(`/services/${key}`)}
                                 />
                             ))}
