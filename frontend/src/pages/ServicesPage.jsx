@@ -252,7 +252,7 @@ export default function ServicesPage() {
                     {/* Category not found */}
                     {!loading && !error && !currentCat && (
                         <div className="text-center py-24">
-                            <p className="text-5xl mb-4">🔍</p>
+                            <Search size={40} className="text-black/10 mx-auto mb-4" />
                             <h2 className="text-xl font-black text-slate-700 mb-2">Category Not Found</h2>
                             <p className="text-slate-500 text-sm mb-6">"{catKey}" doesn't exist.</p>
                             <button onClick={() => navigate("/")} className="px-5 py-2.5 rounded-xl text-white font-black text-[11px] uppercase tracking-wider" style={{ background: "var(--navy)" }}>← Back to Home</button>
