@@ -2,57 +2,93 @@ import { useEffect, useId, useRef, useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import {
     CreditCard, Zap, GraduationCap, Home, Car,
-    FileSignature, FileText, X, MessageCircle,
-    CheckCircle2, Clock, ArrowUpRight
+    FileSignature, FileText, CheckCircle2, Clock,
+    MessageCircle
 } from "lucide-react"
 import { useOutsideClick } from "../../hooks/useOutsideClick"
 
-const CATEGORY_ICONS = {
-    id: CreditCard,
-    bills: Zap,
-    forms: GraduationCap,
-    schemes: Home,
-    land_auto: Car,
-    cert: FileSignature,
-    default: FileText
+// ── Per-category icon + banner style ─────────────────────────────────────────
+const CATEGORY_META = {
+    id:        { icon: CreditCard,    bg: "bg-neutral-900",     pattern: "radial-gradient(circle at 30% 50%, rgba(255,255,255,0.07) 0%, transparent 60%)" },
+    bills:     { icon: Zap,           bg: "bg-neutral-800",     pattern: "radial-gradient(circle at 70% 30%, rgba(255,255,255,0.07) 0%, transparent 60%)" },
+    forms:     { icon: GraduationCap, bg: "bg-neutral-900",     pattern: "radial-gradient(circle at 50% 70%, rgba(255,255,255,0.06) 0%, transparent 60%)" },
+    schemes:   { icon: Home,          bg: "bg-neutral-800",     pattern: "radial-gradient(circle at 20% 60%, rgba(255,255,255,0.07) 0%, transparent 60%)" },
+    land_auto: { icon: Car,           bg: "bg-neutral-900",     pattern: "radial-gradient(circle at 80% 40%, rgba(255,255,255,0.07) 0%, transparent 60%)" },
+    cert:      { icon: FileSignature, bg: "bg-neutral-800",     pattern: "radial-gradient(circle at 40% 20%, rgba(255,255,255,0.06) 0%, transparent 60%)" },
+    default:   { icon: FileText,      bg: "bg-neutral-900",     pattern: "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 60%)" },
 }
 
-// ── Close icon (animated) ─────────────────────────────────────────────────────
+// ── Animated close icon ───────────────────────────────────────────────────────
 function CloseIcon() {
     return (
         <motion.svg
-            initial={{ opacity: 0, rotate: -90 }}
-            animate={{ opacity: 1, rotate: 0 }}
-            exit={{ opacity: 0, rotate: 90, transition: { duration: 0.1 } }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.05 } }}
             xmlns="http://www.w3.org/2000/svg"
-            width="18" height="18"
+            width="24" height="24"
             viewBox="0 0 24 24"
             fill="none" stroke="currentColor"
-            strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+            className="h-4 w-4 text-black"
         >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
             <path d="M18 6l-12 12" />
             <path d="M6 6l12 12" />
         </motion.svg>
     )
 }
 
-// ── Expandable service list for one category ──────────────────────────────────
-function ExpandableServiceList({ catKey, services, onApply }) {
+// ── Icon Banner — used as the "image" in both compact + expanded ──────────────
+function IconBanner({ svc, catKey, compact = false }) {
+    const meta = CATEGORY_META[catKey] || CATEGORY_META.default
+    const Icon = meta.icon
+    return (
+        <div
+            className={`${meta.bg} flex items-center justify-center relative overflow-hidden ${
+                compact
+                    ? "h-14 w-14 md:h-14 md:w-14 rounded-lg shrink-0"
+                    : "w-full h-72 sm:rounded-tr-xl sm:rounded-tl-xl"
+            }`}
+            style={{ backgroundImage: meta.pattern }}
+        >
+            {/* Subtle grid lines */}
+            <div className="absolute inset-0 opacity-[0.04]"
+                style={{
+                    backgroundImage: "linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)",
+                    backgroundSize: compact ? "8px 8px" : "24px 24px"
+                }}
+            />
+            <Icon
+                size={compact ? 22 : 56}
+                className="text-white relative z-10"
+                strokeWidth={1.4}
+            />
+            {!compact && (
+                <p className="absolute bottom-4 left-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
+                    {svc.category || "Government Service"}
+                </p>
+            )}
+        </div>
+    )
+}
+
+// ── Main expandable list ──────────────────────────────────────────────────────
+function ExpandableServiceList({ catKey, categoryLabel, services, onApply }) {
     const [active, setActive] = useState(null)
     const ref = useRef(null)
     const id = useId()
-    const Icon = CATEGORY_ICONS[catKey] || CATEGORY_ICONS.default
 
     useOutsideClick(ref, () => setActive(null))
 
     useEffect(() => {
-        const onKey = (e) => { if (e.key === "Escape") setActive(null) }
+        const onKey = (e) => { if (e.key === "Escape") setActive(false) }
         window.addEventListener("keydown", onKey)
         return () => window.removeEventListener("keydown", onKey)
-    }, [])
+    }, [active])
 
     useEffect(() => {
-        document.body.style.overflow = active ? "hidden" : "auto"
+        document.body.style.overflow = active && typeof active === "object" ? "hidden" : "auto"
         return () => { document.body.style.overflow = "auto" }
     }, [active])
 
@@ -60,182 +96,145 @@ function ExpandableServiceList({ catKey, services, onApply }) {
         <>
             {/* ── BACKDROP ── */}
             <AnimatePresence>
-                {active && (
+                {active && typeof active === "object" && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[80]"
+                        className="fixed inset-0 bg-black/20 h-full w-full z-10"
                     />
                 )}
             </AnimatePresence>
 
-            {/* ── EXPANDED CARD OVERLAY ── */}
+            {/* ── EXPANDED CARD ── */}
             <AnimatePresence>
-                {active && (
-                    <div className="fixed inset-0 grid place-items-center z-[90] px-4">
-                        {/* Mobile close button */}
+                {active && typeof active === "object" ? (
+                    <div className="fixed inset-0 grid place-items-center z-[100]">
+
+                        {/* Mobile close */}
                         <motion.button
-                            key={`close-btn-${active.name}-${id}`}
+                            key={`close-${active.name}-${id}`}
+                            layout
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0, transition: { duration: 0.05 } }}
-                            className="absolute top-4 right-4 lg:hidden w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg z-[91]"
+                            className="flex absolute top-2 right-2 lg:hidden items-center justify-center bg-white rounded-full h-6 w-6 shadow-md z-[101]"
                             onClick={() => setActive(null)}
                         >
                             <CloseIcon />
                         </motion.button>
 
                         <motion.div
-                            layoutId={`svc-card-${active.name}-${id}`}
+                            layoutId={`card-${active.name}-${id}`}
                             ref={ref}
-                            className="w-full max-w-[480px] bg-white rounded-3xl overflow-hidden shadow-2xl shadow-black/20"
+                            className="w-full max-w-[500px] h-full md:h-fit md:max-h-[90%] flex flex-col bg-white sm:rounded-3xl overflow-hidden shadow-2xl"
                         >
-                            {/* Card top bar */}
-                            <div className="px-6 pt-6 pb-5 border-b border-black/[0.06]">
-                                <div className="flex items-start justify-between gap-4">
-                                    <div className="flex items-center gap-4">
-                                        {/* Animated icon */}
-                                        <motion.div
-                                            layoutId={`svc-icon-${active.name}-${id}`}
-                                            className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center shrink-0"
+                            {/* Banner image (shared layoutId) */}
+                            <motion.div layoutId={`image-${active.name}-${id}`}>
+                                <IconBanner svc={{ ...active, category: categoryLabel }} catKey={catKey} compact={false} />
+                            </motion.div>
+
+                            <div>
+                                {/* Header row */}
+                                <div className="flex justify-between items-start p-4">
+                                    <div>
+                                        <motion.h3
+                                            layoutId={`title-${active.name}-${id}`}
+                                            className="font-bold text-neutral-700"
                                         >
-                                            <Icon size={24} className="text-white" strokeWidth={1.7} />
-                                        </motion.div>
-
-                                        <div className="min-w-0">
-                                            <motion.h2
-                                                layoutId={`svc-title-${active.name}-${id}`}
-                                                className="font-black text-black text-lg leading-tight"
-                                            >
-                                                {active.name}
-                                            </motion.h2>
-                                            {active.price && (
-                                                <motion.p
-                                                    layoutId={`svc-price-${active.name}-${id}`}
-                                                    className="text-[11px] text-black/40 font-bold mt-0.5"
-                                                >
-                                                    ₹{active.price}
-                                                </motion.p>
-                                            )}
-                                        </div>
+                                            {active.name}
+                                        </motion.h3>
+                                        <motion.p
+                                            layoutId={`description-${active.name}-${id}`}
+                                            className="text-neutral-600 text-sm"
+                                        >
+                                            {active.price ? `₹${active.price}` : "Free Service"}
+                                        </motion.p>
                                     </div>
 
-                                    {/* Desktop close */}
-                                    <button
-                                        onClick={() => setActive(null)}
-                                        className="hidden lg:flex w-8 h-8 rounded-full bg-black/[0.05] hover:bg-black/10 items-center justify-center transition-colors shrink-0"
+                                    <motion.button
+                                        layoutId={`button-${active.name}-${id}`}
+                                        onClick={() => { onApply(active); setActive(null) }}
+                                        className="px-4 py-3 text-sm rounded-full font-bold bg-black text-white flex items-center gap-1.5 shrink-0 hover:bg-neutral-800 active:scale-95 transition-all"
                                     >
-                                        <X size={14} />
-                                    </button>
+                                        <MessageCircle size={13} />
+                                        Apply
+                                    </motion.button>
                                 </div>
-                            </div>
 
-                            {/* Card body */}
-                            <div className="px-6 py-5">
-                                <motion.div
-                                    layout
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="h-36 overflow-auto [mask:linear-gradient(to_bottom,white_70%,transparent)] [scrollbar-width:none] [-ms-overflow-style:none]"
-                                >
-                                    <p className="text-[13px] text-black/55 leading-relaxed">
-                                        {active.description || "Apply for this government service quickly and easily through Krishna E-Mitra. Our team will process your application and keep you updated via WhatsApp."}
-                                    </p>
-                                    <div className="mt-4 space-y-2">
-                                        <div className="flex items-center gap-2.5">
-                                            <CheckCircle2 size={14} className="text-black/40 shrink-0" />
-                                            <p className="text-[11px] font-semibold text-black/50">100% Digital Processing</p>
+                                {/* Content */}
+                                <div className="pt-2 relative px-4">
+                                    <motion.div
+                                        layout
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="text-neutral-600 text-xs md:text-sm h-40 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none]"
+                                    >
+                                        <p>
+                                            {active.description || "Apply for this government service quickly and easily through Krishna E-Mitra. Our team will process your application and keep you updated."}
+                                        </p>
+                                        <div className="space-y-2 w-full">
+                                            <div className="flex items-center gap-2">
+                                                <CheckCircle2 size={14} className="text-neutral-400 shrink-0" />
+                                                <p className="text-xs font-semibold text-neutral-500">100% Digital Processing</p>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <CheckCircle2 size={14} className="text-neutral-400 shrink-0" />
+                                                <p className="text-xs font-semibold text-neutral-500">Updates on WhatsApp & Telegram</p>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Clock size={14} className="text-neutral-400 shrink-0" />
+                                                <p className="text-xs font-semibold text-neutral-500">Priority processing available</p>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-2.5">
-                                            <CheckCircle2 size={14} className="text-black/40 shrink-0" />
-                                            <p className="text-[11px] font-semibold text-black/50">Updates on WhatsApp & Telegram</p>
-                                        </div>
-                                        <div className="flex items-center gap-2.5">
-                                            <Clock size={14} className="text-black/40 shrink-0" />
-                                            <p className="text-[11px] font-semibold text-black/50">Priority processing available</p>
-                                        </div>
-                                    </div>
-                                </motion.div>
-
-                                {/* CTA */}
-                                <button
-                                    onClick={() => { onApply(active); setActive(null) }}
-                                    className="mt-5 w-full py-4 bg-black text-white rounded-2xl font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-2.5 hover:bg-black/85 active:scale-[0.98] transition-all shadow-lg shadow-black/10"
-                                >
-                                    <MessageCircle size={14} />
-                                    Apply via WhatsApp
-                                </button>
-                                <p className="text-[9px] text-center font-bold text-black/25 uppercase tracking-widest mt-2.5">
-                                    WhatsApp pe direct chat shuru hogi
-                                </p>
+                                    </motion.div>
+                                </div>
                             </div>
                         </motion.div>
                     </div>
-                )}
+                ) : null}
             </AnimatePresence>
 
-            {/* ── COMPACT LIST ── */}
-            <ul className="w-full space-y-2">
-                {services.map((svc, idx) => (
-                    <motion.li
-                        layoutId={`svc-card-${svc.name}-${id}`}
-                        key={`${catKey}-${idx}`}
+            {/* ── COMPACT LIST (exact Aceternity structure) ── */}
+            <ul className="w-full gap-4">
+                {services.map((svc) => (
+                    <motion.div
+                        layoutId={`card-${svc.name}-${id}`}
+                        key={`card-${svc.name}-${id}`}
                         onClick={() => setActive(svc)}
-                        initial={{ opacity: 0, x: -8 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.2, delay: idx * 0.025, ease: "easeOut" }}
-                        className="group relative flex items-center gap-3 px-4 py-3.5 bg-white border border-black/[0.07] hover:border-black/20 hover:bg-neutral-50 rounded-2xl cursor-pointer transition-all duration-200 overflow-hidden"
+                        className="p-4 flex flex-col md:flex-row justify-between items-center hover:bg-neutral-50 rounded-xl cursor-pointer"
                     >
-                        {/* Left accent stripe */}
-                        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-black scale-y-0 group-hover:scale-y-100 transition-transform duration-250 origin-bottom rounded-l-2xl" />
+                        {/* Left: icon banner + text */}
+                        <div className="flex gap-4 flex-col md:flex-row items-center md:items-center">
+                            <motion.div layoutId={`image-${svc.name}-${id}`}>
+                                <IconBanner svc={svc} catKey={catKey} compact={true} />
+                            </motion.div>
 
-                        {/* Index number */}
-                        <span className="text-[11px] font-black text-black/20 tabular-nums w-6 shrink-0 group-hover:text-black/40 transition-colors select-none">
-                            {String(idx + 1).padStart(2, "0")}
-                        </span>
+                            <div>
+                                <motion.h3
+                                    layoutId={`title-${svc.name}-${id}`}
+                                    className="font-medium text-neutral-800 text-center md:text-left"
+                                >
+                                    {svc.name}
+                                </motion.h3>
+                                <motion.p
+                                    layoutId={`description-${svc.name}-${id}`}
+                                    className="text-neutral-600 text-sm text-center md:text-left"
+                                >
+                                    {svc.price ? `₹${svc.price}` : categoryLabel}
+                                </motion.p>
+                            </div>
+                        </div>
 
-                        {/* Icon */}
-                        <motion.div
-                            layoutId={`svc-icon-${svc.name}-${id}`}
-                            className="w-9 h-9 rounded-xl bg-black/[0.04] group-hover:bg-black flex items-center justify-center shrink-0 transition-all duration-250"
+                        {/* Right: CTA button */}
+                        <motion.button
+                            layoutId={`button-${svc.name}-${id}`}
+                            className="px-4 py-2 text-sm rounded-full font-bold bg-gray-100 hover:bg-black hover:text-white text-black mt-4 md:mt-0 transition-colors"
                         >
-                            <Icon
-                                size={15}
-                                className="text-black/40 group-hover:text-white transition-colors duration-250"
-                                strokeWidth={1.8}
-                            />
-                        </motion.div>
-
-                        {/* Text */}
-                        <div className="flex-1 min-w-0">
-                            <motion.p
-                                layoutId={`svc-title-${svc.name}-${id}`}
-                                className="text-[13px] font-bold text-black/80 leading-tight line-clamp-1 group-hover:text-black transition-colors"
-                            >
-                                {svc.name}
-                            </motion.p>
-                            {svc.description && (
-                                <p className="text-[10px] text-black/30 mt-0.5 line-clamp-1">{svc.description}</p>
-                            )}
-                        </div>
-
-                        {/* Price */}
-                        {svc.price && (
-                            <motion.span
-                                layoutId={`svc-price-${svc.name}-${id}`}
-                                className="hidden sm:block text-[9px] font-black px-2.5 py-1 rounded-full border border-black/[0.08] text-black/30 shrink-0 group-hover:border-black/20 group-hover:text-black/50 transition-all"
-                            >
-                                ₹{svc.price}
-                            </motion.span>
-                        )}
-
-                        {/* Expand hint */}
-                        <div className="shrink-0 opacity-0 group-hover:opacity-40 transition-opacity duration-200">
-                            <ArrowUpRight size={14} className="text-black" />
-                        </div>
-                    </motion.li>
+                            Apply
+                        </motion.button>
+                    </motion.div>
                 ))}
             </ul>
         </>
@@ -265,9 +264,6 @@ export default function ServiceIconGrid({ services, activeCategory, onServiceCli
         ? Object.entries(services)
         : Object.entries(services).filter(([key]) => key === activeCategory)
 
-    // onApply: wrap onServiceClick so it fires the WhatsApp flow
-    const handleApply = (svc) => onServiceClick(svc)
-
     return (
         <div className="space-y-10 md:space-y-14">
             {filtered.map(([key, cat], catIdx) => (
@@ -279,8 +275,9 @@ export default function ServiceIconGrid({ services, activeCategory, onServiceCli
                     />
                     <ExpandableServiceList
                         catKey={key}
+                        categoryLabel={cat.label}
                         services={cat.services || []}
-                        onApply={(svc) => handleApply({ ...svc, category: cat.label, catKey: key })}
+                        onApply={(svc) => onServiceClick({ ...svc, category: cat.label, catKey: key })}
                     />
                 </div>
             ))}
