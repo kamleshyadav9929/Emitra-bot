@@ -119,7 +119,7 @@ export default function ServicesPage() {
             >
                 <div className="h-full flex items-center gap-3 px-4">
                     {/* Logo */}
-                    <div className="hidden lg:flex items-center gap-2 shrink-0" style={{ width: "calc(var(--sidebar-w) - 1rem)" }}>
+                    <div className="hidden lg:flex items-center gap-2 shrink-0" style={{ width: "calc(60px - 1rem)" }}>
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--navy)" }}>
                             <Layers size={14} className="text-white" />
                         </div>
