@@ -119,7 +119,7 @@ export default function ServicesPage() {
             >
                 <div className="h-full flex items-center gap-3 px-4">
                     {/* Logo */}
-                    <div className="hidden lg:flex items-center gap-2 shrink-0" style={{ width: "calc(60px - 1rem)" }}>
+                    <a href="/" className="flex items-center gap-2 shrink-0">
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--navy)" }}>
                             <Layers size={14} className="text-white" />
                         </div>
@@ -127,7 +127,7 @@ export default function ServicesPage() {
                             <p className="text-[11px] font-black uppercase tracking-tight" style={{ color: "var(--navy)" }}>Krishna E-Mitra</p>
                             <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Digital Seva Portal</p>
                         </div>
-                    </div>
+                    </a>
 
                     {/* Breadcrumb */}
                     <div className="flex items-center gap-2 shrink-0 min-w-0">
@@ -192,22 +192,10 @@ export default function ServicesPage() {
             </header>
 
             {/* ── BODY ──────────────────────────────────────────────────── */}
-            <div className="flex" style={{ paddingTop: "var(--header-h)" }}>
-
-                {/* Sidebar */}
-                <PortalSidebar
-                    services={services}
-                    activeCategory={catKey}
-                    config={config}
-                    isLoggedIn={isLoggedIn}
-                    user={user}
-                    onLoginClick={() => setIsLoginOpen(true)}
-                    onWhatsApp={() => window.open(`https://wa.me/${config.whatsapp_number || "916377964293"}`, "_blank")}
-                    onTrack={() => navigate("/")}
-                />
+            <div style={{ paddingTop: "var(--header-h)" }}>
 
                 {/* Main */}
-                <main className="flex-1 min-w-0 p-5 pb-24 md:pb-6">
+                <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 pb-24 md:pb-10">
 
                     {/* Category hero */}
                     {currentCat && !loading && (
@@ -301,9 +289,6 @@ export default function ServicesPage() {
                         </div>
                     )}
                 </main>
-
-                {/* Right panel */}
-                <PortalRightPanel stats={stats} config={config} onRegister={() => {}} onTrack={() => navigate("/")} />
             </div>
 
             {/* Modals */}

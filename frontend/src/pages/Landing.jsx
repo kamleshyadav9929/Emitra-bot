@@ -246,7 +246,7 @@ export default function Landing() {
             >
                 <div className="h-full flex items-center gap-3 px-4">
                     {/* Logo */}
-                    <a href="/" className="flex items-center gap-2 shrink-0" style={{ width: "calc(60px - 1rem)" }}>
+                    <a href="/" className="flex items-center gap-2 shrink-0">
 
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--navy)" }}>
                             <Layers size={14} className="text-white" />
@@ -352,24 +352,12 @@ export default function Landing() {
             </div>
 
             {/* ══════════════════════════════════════════════════════════════
-                BODY = Sidebar + Main + RightPanel
+                BODY — full width main
             ══════════════════════════════════════════════════════════════ */}
-            <div className="flex" style={{ paddingTop: `calc(var(--header-h) + ${announcements.length > 0 ? "28px" : "0px"})` }}>
-
-                {/* LEFT SIDEBAR */}
-                <PortalSidebar
-                    services={services}
-                    activeCategory="ALL"
-                    config={config}
-                    isLoggedIn={isLoggedIn}
-                    user={user}
-                    onLoginClick={() => setIsLoginOpen(true)}
-                    onWhatsApp={() => window.open(`https://wa.me/${config.whatsapp_number || "916377964293"}`, "_blank")}
-                    onTrack={() => setShowStatus(true)}
-                />
+            <div style={{ paddingTop: `calc(var(--header-h) + ${announcements.length > 0 ? "28px" : "0px"})` }}>
 
                 {/* MAIN CONTENT */}
-                <main className="flex-1 min-w-0 p-5 pb-24 md:pb-6">
+                <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 pb-24 md:pb-10">
 
                     {/* Welcome bar if logged in */}
                     {isLoggedIn && (
@@ -501,14 +489,6 @@ export default function Landing() {
                         </motion.div>
                     )}
                 </main>
-
-                {/* RIGHT PANEL */}
-                <PortalRightPanel
-                    stats={stats}
-                    config={config}
-                    onRegister={() => setIsRegOpen(true)}
-                    onTrack={() => setShowStatus(true)}
-                />
             </div>
 
             {/* Modals */}
