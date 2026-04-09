@@ -33,7 +33,7 @@ export default function LandingBottomNav({ onLoginClick, onProfileClick }) {
     ]
 
     return (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#F8F7F4]/95 backdrop-blur-md border-t border-[#E8E6E1] shadow-[0_-4px_24px_rgba(13,27,42,0.08)]">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/96 backdrop-blur-md border-t border-black/[0.06] shadow-[0_-4px_32px_rgba(0,0,0,0.07)]">
             <div className="flex items-stretch justify-around px-1 pt-2 pb-safe" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
                 {tabs.map(tab => {
                     const Icon = tab.icon
@@ -41,19 +41,19 @@ export default function LandingBottomNav({ onLoginClick, onProfileClick }) {
                         <button
                             key={tab.id}
                             onClick={tab.action}
-                            className="flex flex-col items-center gap-1 flex-1 py-1 px-2 rounded-2xl hover:bg-[#0D1B2A]/[0.04] active:scale-95 transition-all"
+                            className="flex flex-col items-center gap-1 flex-1 py-1 px-2 rounded-2xl hover:bg-black/[0.04] active:scale-95 transition-all"
                         >
                             {tab.isUser ? (
-                                <div className="w-6 h-6 bg-[#0D1B2A] rounded-full flex items-center justify-center shrink-0">
-                                    <span className="text-[#00C896] text-[10px] font-black leading-none">
+                                <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center shrink-0">
+                                    <span className="text-white text-[10px] font-black leading-none">
                                         {user?.name?.charAt(0)?.toUpperCase() || "?"}
                                     </span>
                                 </div>
                             ) : (
-                                <Icon size={19} className="text-[#3D5166] shrink-0" strokeWidth={1.8} />
+                                <Icon size={19} className="text-ink-2 shrink-0" strokeWidth={1.8} />
                             )}
                             <span className={`text-[9px] font-black uppercase tracking-wider leading-none truncate max-w-full ${
-                                tab.isUser ? "text-[#0D1B2A]" : "text-[#6B7685]"
+                                tab.isUser ? "text-black" : "text-ink-3"
                             }`}>
                                 {tab.label}
                             </span>
