@@ -92,15 +92,15 @@ function TopNavbar() {
     }
 
     return (
-        <header className="bg-[var(--color-surface-base)]/80 backdrop-blur-md border-b border-[var(--color-outline-variant)] h-[80px] flex items-center justify-between px-8 sticky top-0 z-20">
+        <header className="bg-[var(--color-surface-base)]/80 backdrop-blur-md border-b border-[var(--color-outline-variant)] h-[70px] md:h-[80px] flex items-center justify-between px-4 md:px-8 sticky top-0 z-20">
             {/* Nav Links */}
             <div className="flex items-center gap-10 h-full">
                 <div className="flex flex-col -mt-1 leading-none tracking-tight">
-                    <span className="text-[var(--color-primary)] font-black text-[22px] tracking-tight font-display">e-Mitra</span>
-                    <span className="text-gray-500 font-bold text-[11px] tracking-widest uppercase mt-0.5">Admin Panel</span>
+                    <span className="text-[var(--color-primary)] font-black text-[20px] md:text-[22px] tracking-tight font-display">e-Mitra</span>
+                    <span className="text-gray-500 font-bold text-[10px] md:text-[11px] tracking-widest uppercase mt-0.5">Admin Panel</span>
                 </div>
 
-                <nav className="flex h-full ml-4">
+                <nav className="hidden lg:flex h-full ml-4">
                     <Link to="/admin" className={getLinkClass("/admin")}>
                         Dashboard
                     </Link>
@@ -117,13 +117,13 @@ function TopNavbar() {
             </div>
 
             {/* Right Tools */}
-            <div className="flex items-center gap-6">
-                <div className="relative border-b border-gray-200 py-1 flex items-center gap-3">
+            <div className="flex items-center gap-4 md:gap-6">
+                <div className="hidden sm:flex relative border-b border-gray-200 py-1 items-center gap-3">
                     <Search className="text-gray-400" size={16} />
                     <input
                         type="text"
                         placeholder="Search applications..."
-                        className="bg-transparent text-[13px] border-none focus:outline-none w-48 text-gray-800 placeholder:text-gray-400"
+                        className="bg-transparent text-[13px] border-none focus:outline-none w-32 md:w-48 text-gray-800 placeholder:text-gray-400"
                     />
                 </div>
                 <button className="text-gray-500 hover:text-gray-900 transition-colors relative">
@@ -144,7 +144,7 @@ function TopNavbar() {
                                 },
                             }}
                         />
-                        <div className="flex flex-col">
+                        <div className="hidden md:flex flex-col">
                             <span className="text-[13px] font-bold text-gray-900 leading-tight">Admin</span>
                             <span className="text-[9px] font-bold text-gray-400 tracking-wider">SUPER ADMIN</span>
                         </div>
@@ -186,9 +186,9 @@ function AdminLayout({ children }) {
             {!isLoginPage && isCommandPaletteOpen && (
                 <CommandPalette onClose={() => setIsCommandPaletteOpen(false)} />
             )}
-            <main className={`flex-1 min-w-0 flex flex-col ${!isLoginPage ? "md:ml-[260px]" : ""}`}>
+            <main className={`flex-1 min-w-0 flex flex-col pb-20 md:pb-0 ${!isLoginPage ? "md:ml-[260px]" : ""}`}>
                 {!isLoginPage && <TopNavbar />}
-                <div className={`max-w-[1200px] w-full ${!isLoginPage ? "px-6 sm:px-10 py-10" : "flex-1 flex flex-col"}`}>
+                <div className={`max-w-[1200px] w-full mx-auto ${!isLoginPage ? "px-4 sm:px-10 py-6 sm:py-10" : "flex-1 flex flex-col"}`}>
                     {children}
                 </div>
             </main>

@@ -92,7 +92,7 @@ export function BottomNav() {
       className="md:hidden sticky bottom-0 mt-auto w-full z-50 bg-[var(--color-surface-base)] border-t border-[var(--color-outline-variant)]"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
-      <div className="flex items-stretch justify-around">
+      <div className="flex items-stretch overflow-x-auto hide-scrollbar pb-1">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path
           const showBadge = item.path === "/admin/requests" && pendingCount > 0
@@ -100,19 +100,19 @@ export function BottomNav() {
             <Link
               key={item.path}
               to={item.path}
-              className={`relative flex flex-col items-center justify-center gap-1 flex-1 py-3 transition-all ${
-                isActive ? "text-[var(--color-primary)]" : "text-[var(--color-on-surface)]"
+              className={`relative flex flex-col flex-shrink-0 min-w-[72px] sm:min-w-[80px] items-center justify-center gap-1 flex-1 py-3 transition-all ${
+                isActive ? "text-[var(--color-primary)] bg-[var(--color-primary-fixed)]/20" : "text-[var(--color-on-surface)]"
               }`}
             >
               <item.icon
-                size={20}
+                size={22}
                 strokeWidth={isActive ? 2.5 : 2}
               />
-              <span className={`text-[10px] font-medium ${isActive ? "font-bold text-[var(--color-primary)]" : "text-gray-500"}`}>
+              <span className={`text-[9px] sm:text-[10px] w-full text-center truncate px-1 font-medium ${isActive ? "font-bold text-[var(--color-primary)]" : "text-gray-500"}`}>
                 {item.name}
               </span>
               {showBadge && (
-                <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-red-500" />
+                <span className="absolute top-2 right-4 w-2 h-2 rounded-full bg-red-500" />
               )}
             </Link>
           )

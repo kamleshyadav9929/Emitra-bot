@@ -157,36 +157,62 @@ export default function Dashboard() {
           {recentStudents.length === 0 ? (
              <div className="text-center py-8 text-sm text-gray-500">No students found.</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[500px]">
-                <thead>
-                  <tr>
-                    <th className="text-[10px] font-bold tracking-wider text-gray-400 uppercase pb-4">Name</th>
-                    <th className="text-[10px] font-bold tracking-wider text-gray-400 uppercase pb-4">Phone Number</th>
-                    <th className="text-[10px] font-bold tracking-wider text-gray-400 uppercase pb-4">Exam Prep</th>
-                    <th className="text-[10px] font-bold tracking-wider text-gray-400 uppercase pb-4">Status</th>
-                    <th className="text-[10px] font-bold tracking-wider text-gray-400 uppercase pb-4 text-right">Joined</th>
-                  </tr>
-                </thead>
-                <tbody className="text-[13px] font-medium border-t-0">
-                  {recentStudents.map((s, idx) => {
-                    const dateObj = new Date(s.joined_at)
-                    const dateStr = !isNaN(dateObj) ? dateObj.toLocaleDateString() : 'Unknown'
-                    return (
-                      <tr key={s.phone_number || idx} className="odd:bg-[var(--color-surface-low)]">
-                        <td className="py-4 px-2 font-bold text-[var(--color-on-surface)] border-none">{s.name || "Unknown"}</td>
-                        <td className="py-4 px-2 border-none text-gray-600">{s.phone_number || "Not Shared"}</td>
-                        <td className="py-4 text-gray-600 px-2 border-none">{s.exam_preference || "NONE"}</td>
-                        <td className="py-4 px-2 border-none">
-                          <span className="bg-[#E1F7E8] text-[#1E8A44] px-3 py-1 rounded-md text-[10px] font-bold">Active</span>
-                        </td>
-                        <td className="py-4 px-2 text-gray-400 text-right border-none">{dateStr}</td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <>
+              {/* Mobile View */}
+              <div className="block md:hidden divide-y-0 border-t border-gray-100">
+                {recentStudents.map((s, idx) => {
+                  const dateObj = new Date(s.joined_at)
+                  const dateStr = !isNaN(dateObj) ? dateObj.toLocaleDateString() : 'Unknown'
+                  return (
+                    <div key={s.phone_number || idx} className={`p-4 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                      <div className="flex justify-between items-start mb-2">
+                        <p className="font-bold text-[13px] text-[#0A1A40]">{s.name || "Unknown"}</p>
+                        <span className="bg-[#E1F7E8] text-[#1E8A44] px-2 py-0.5 rounded text-[10px] font-bold">Active</span>
+                      </div>
+                      <div className="flex justify-between items-end">
+                        <div>
+                          <p className="text-[11px] text-gray-500">{s.phone_number || "Not Shared"}</p>
+                          <p className="text-[11px] text-[#164FA8] font-bold mt-1">Exam: {s.exam_preference || "NONE"}</p>
+                        </div>
+                        <p className="text-[10px] text-gray-400">{dateStr}</p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Desktop View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[500px]">
+                  <thead>
+                    <tr>
+                      <th className="text-[10px] font-bold tracking-wider text-gray-400 uppercase pb-4">Name</th>
+                      <th className="text-[10px] font-bold tracking-wider text-gray-400 uppercase pb-4">Phone Number</th>
+                      <th className="text-[10px] font-bold tracking-wider text-gray-400 uppercase pb-4">Exam Prep</th>
+                      <th className="text-[10px] font-bold tracking-wider text-gray-400 uppercase pb-4">Status</th>
+                      <th className="text-[10px] font-bold tracking-wider text-gray-400 uppercase pb-4 text-right">Joined</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-[13px] font-medium border-t-0">
+                    {recentStudents.map((s, idx) => {
+                      const dateObj = new Date(s.joined_at)
+                      const dateStr = !isNaN(dateObj) ? dateObj.toLocaleDateString() : 'Unknown'
+                      return (
+                        <tr key={s.phone_number || idx} className="odd:bg-[var(--color-surface-low)]">
+                          <td className="py-4 px-2 font-bold text-[var(--color-on-surface)] border-none">{s.name || "Unknown"}</td>
+                          <td className="py-4 px-2 border-none text-gray-600">{s.phone_number || "Not Shared"}</td>
+                          <td className="py-4 text-gray-600 px-2 border-none">{s.exam_preference || "NONE"}</td>
+                          <td className="py-4 px-2 border-none">
+                            <span className="bg-[#E1F7E8] text-[#1E8A44] px-3 py-1 rounded-md text-[10px] font-bold">Active</span>
+                          </td>
+                          <td className="py-4 px-2 text-gray-400 text-right border-none">{dateStr}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
 
           {/* Exam Distribution Inject */}

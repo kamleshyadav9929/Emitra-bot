@@ -277,67 +277,112 @@ export default function ServiceRequests() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left min-w-[600px]">
-              <thead>
-                <tr className="bg-[var(--color-surface-base)]">
-                  {["Student", "Service", "Status", "Requested At", "Actions"].map((h, i) => (
-                    <th key={h} className={`py-4 px-6 text-[10px] font-bold text-[var(--color-primary)] tracking-widest uppercase ${i === 4 ? "text-right" : ""}`}>
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {requests.map((req, idx) => (
-                  <tr key={req.id} className={`group hover:bg-[var(--color-surface-bright)] transition-colors ${idx % 2 === 0 ? "bg-[var(--color-surface-lowest)]" : "bg-[var(--color-surface-low)]"}`}>
-                    <td className="py-5 px-6">
+          <>
+            {/* Mobile View */}
+            <div className="block md:hidden divide-y-0">
+              {requests.map((req, idx) => (
+                <div key={req.id} className={`p-4 hover:bg-[var(--color-surface-bright)] transition-colors ${idx % 2 === 0 ? "bg-[var(--color-surface-lowest)]" : "bg-[var(--color-surface-low)]"}`}>
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
                       <p className="text-[14px] font-bold text-[#0A1A40]">{req.student_name}</p>
-                      {req.student_phone && <p className="text-[12px] text-gray-500 font-medium">{req.student_phone}</p>}
-                    </td>
-                    <td className="py-5 px-6">
-                      <p className="text-[13px] font-medium text-gray-800">{CATEGORY_EMOJI[req.category] || "📋"} {req.service_name}</p>
-                    </td>
-                    <td className="py-5 px-6">
-                      <span className={`inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full ${
-                        req.status === "pending"
-                          ? "bg-amber-50 text-amber-700"
-                          : "bg-emerald-50 text-emerald-700"
-                      }`}>
-                        {req.status === "pending" ? <Clock size={12} /> : <CheckCircle size={12} />}
-                        {req.status === "pending" ? "Pending" : "Completed"}
-                      </span>
-                    </td>
-                    <td className="py-5 px-6">
-                      <span className="text-[12px] text-gray-500 font-medium">{formatTime(req.requested_at)}</span>
-                    </td>
-                    <td className="py-5 px-6">
-                      <div className="flex items-center gap-3 justify-end">
+                      {req.student_phone && <p className="text-[11px] text-gray-500 font-medium">{req.student_phone}</p>}
+                    </div>
+                    <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full ${
+                      req.status === "pending" ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"
+                    }`}>
+                      {req.status === "pending" ? <Clock size={10} /> : <CheckCircle size={10} />}
+                      {req.status === "pending" ? "Pending" : "Completed"}
+                    </span>
+                  </div>
+                  <div className="mb-3">
+                    <p className="text-[12px] font-medium text-gray-800">{CATEGORY_EMOJI[req.category] || "📋"} {req.service_name}</p>
+                    <p className="text-[11px] text-gray-400">{formatTime(req.requested_at)}</p>
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <button
+                        title="View Documents"
+                        onClick={() => setSelectedDocsReq(req)}
+                        className="p-2 border border-blue-100 bg-blue-50 text-blue-600 rounded-[10px]"
+                    >
+                        <Paperclip size={14} />
+                    </button>
+                    {req.status === "pending" && (
                         <button
-                          title="View Documents"
-                          onClick={() => setSelectedDocsReq(req)}
-                          className="w-9 h-9 bg-[var(--color-surface-low)] text-gray-500 flex items-center justify-center hover:text-[var(--color-primary)] hover:bg-[var(--color-primary-fixed)] transition-all rounded-[12px] shadow-ambient"
+                          onClick={() => setSelectedReq(req)}
+                          className="flex-1 flex items-center justify-center gap-2 py-2 bg-[var(--color-primary)] text-white text-[12px] font-bold rounded-[10px]"
                         >
-                          <Paperclip size={13} />
+                          <Send size={12} />
+                          Issue Receipt
                         </button>
-                        {req.status === "pending" ? (
-                          <button
-                            onClick={() => setSelectedReq(req)}
-                            className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] text-white text-[12px] font-bold hover:shadow-lg transition-all rounded-[12px]"
-                          >
-                            <Send size={12} />
-                            Receipt
-                          </button>
-                        ) : (
-                          <span className="text-[12px] text-gray-400 italic px-2 font-medium">Done</span>
-                        )}
-                      </div>
-                    </td>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left min-w-[600px]">
+                <thead>
+                  <tr className="bg-[var(--color-surface-base)]">
+                    {["Student", "Service", "Status", "Requested At", "Actions"].map((h, i) => (
+                      <th key={h} className={`py-4 px-6 text-[10px] font-bold text-[var(--color-primary)] tracking-widest uppercase ${i === 4 ? "text-right" : ""}`}>
+                        {h}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {requests.map((req, idx) => (
+                    <tr key={req.id} className={`group hover:bg-[var(--color-surface-bright)] transition-colors ${idx % 2 === 0 ? "bg-[var(--color-surface-lowest)]" : "bg-[var(--color-surface-low)]"}`}>
+                      <td className="py-5 px-6">
+                        <p className="text-[14px] font-bold text-[#0A1A40]">{req.student_name}</p>
+                        {req.student_phone && <p className="text-[12px] text-gray-500 font-medium">{req.student_phone}</p>}
+                      </td>
+                      <td className="py-5 px-6">
+                        <p className="text-[13px] font-medium text-gray-800">{CATEGORY_EMOJI[req.category] || "📋"} {req.service_name}</p>
+                      </td>
+                      <td className="py-5 px-6">
+                        <span className={`inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full ${
+                          req.status === "pending"
+                            ? "bg-amber-50 text-amber-700"
+                            : "bg-emerald-50 text-emerald-700"
+                        }`}>
+                          {req.status === "pending" ? <Clock size={12} /> : <CheckCircle size={12} />}
+                          {req.status === "pending" ? "Pending" : "Completed"}
+                        </span>
+                      </td>
+                      <td className="py-5 px-6">
+                        <span className="text-[12px] text-gray-500 font-medium">{formatTime(req.requested_at)}</span>
+                      </td>
+                      <td className="py-5 px-6">
+                        <div className="flex items-center gap-3 justify-end">
+                          <button
+                            title="View Documents"
+                            onClick={() => setSelectedDocsReq(req)}
+                            className="w-9 h-9 bg-[var(--color-surface-low)] text-gray-500 flex items-center justify-center hover:text-[var(--color-primary)] hover:bg-[var(--color-primary-fixed)] transition-all rounded-[12px] shadow-ambient"
+                          >
+                            <Paperclip size={13} />
+                          </button>
+                          {req.status === "pending" ? (
+                            <button
+                              onClick={() => setSelectedReq(req)}
+                              className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] text-white text-[12px] font-bold hover:shadow-lg transition-all rounded-[12px]"
+                            >
+                              <Send size={12} />
+                              Receipt
+                            </button>
+                          ) : (
+                            <span className="text-[12px] text-gray-400 italic px-2 font-medium">Done</span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>
