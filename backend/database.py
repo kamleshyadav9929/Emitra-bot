@@ -116,6 +116,17 @@ def init_db():
         )
     ''')
 
+    # ── Schema Migrations ─────────────────────────────────────────────────────
+    try:
+        cursor.execute("ALTER TABLE services ADD COLUMN show_in_web INTEGER DEFAULT 1")
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+        
+    try:
+        cursor.execute("ALTER TABLE services ADD COLUMN sort_order INTEGER DEFAULT 0")
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+
     conn.commit()
 
     # Seed default services only if table is empty
