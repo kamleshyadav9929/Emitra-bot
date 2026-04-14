@@ -16,9 +16,12 @@ import config
 import database
 import notifier
 import bot as bot_handlers
-
 import jwt
+from jwt import PyJWKClient
 
+jwks_client = None
+if config.CLERK_JWKS_URL:
+    jwks_client = PyJWKClient(config.CLERK_JWKS_URL)
 # ── In-memory broadcast job tracker ──────────────────────────────────────────
 # Stores status of background broadcast jobs so the frontend can poll.
 _broadcast_jobs = {}  # job_id -> {"status": "running"|"done", "sent": N, "total": N, "exam": ...}
@@ -53,52 +56,23 @@ def token_required(f):
 
         if not token:
             return jsonify({"error": "Token is missing. Please log in again."}), 401
+            
+        if not jwks_client:
+            return jsonify({"error": "Auth is not configured securely. Missing Clerk JWKS URL."}), 500
 
         try:
-            jwt.decode(token, config.JWT_SECRET_KEY, algorithms=["HS256"])
-        except Exception:
-            return jsonify({"error": "Token is invalid or expired."}), 401
+            signing_key = jwks_client.get_signing_key_from_jwt(token)
+            jwt.decode(
+                token,
+                signing_key.key,
+                algorithms=["RS256"]
+            )
+        except Exception as e:
+            return jsonify({"error": f"Token is invalid or expired: {e}"}), 401
 
         return f(*args, **kwargs)
     return decorated
 
-
-# ── FIX #7: Login rate limiting ───────────────────────────────────────────────
-
-_login_attempts = defaultdict(list)
-LOGIN_MAX_ATTEMPTS = 10       # max attempts
-LOGIN_WINDOW_SECONDS = 300    # per 5 minutes
-
-def _check_login_rate_limit(ip):
-    now = _time.time()
-    window_start = now - LOGIN_WINDOW_SECONDS
-    _login_attempts[ip] = [t for t in _login_attempts[ip] if t > window_start]
-    if len(_login_attempts[ip]) >= LOGIN_MAX_ATTEMPTS:
-        return False
-    _login_attempts[ip].append(now)
-    return True
-
-
-@app.route("/api/login", methods=["POST"])
-def login():
-    ip = request.remote_addr or "unknown"
-    if not _check_login_rate_limit(ip):
-        return jsonify({"error": "Too many login attempts. Try again in 5 minutes."}), 429
-
-    data = request.json
-    if not data or not data.get("password"):
-        return jsonify({"error": "Missing password"}), 400
-
-    password = data.get("password")
-
-    if password == config.ADMIN_SECRET_KEY:
-        token = jwt.encode({
-            "admin": True,
-            "exp": datetime.now(timezone.utc) + timedelta(days=7)
-        }, config.JWT_SECRET_KEY, algorithm="HS256")
-        return jsonify({"token": token, "success": True})
-
-    return jsonify({"error": "Invalid administrative password"}), 401
 
 
 def run_async(coro):

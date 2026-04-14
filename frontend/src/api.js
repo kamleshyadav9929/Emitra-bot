@@ -1,131 +1,129 @@
 export const BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "")
 
-const getAuthHeaders = () => {
-  const token = localStorage.getItem("admin_token")
+const getAuthHeaders = async () => {
+  let token = null;
+  if (window.Clerk && window.Clerk.session) {
+    try {
+      token = await window.Clerk.session.getToken();
+    } catch (e) {
+      console.error("Error getting Clerk token", e);
+    }
+  }
   return {
     "Content-Type": "application/json",
     ...(token ? { "Authorization": `Bearer ${token}` } : {})
   }
 }
 
-export const login = (password) =>
-  fetch(`${BASE_URL}/api/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password })
-  }).then(r => r.json())
+export const getStats = async () =>
+  fetch(`${BASE_URL}/api/stats`, { headers: await getAuthHeaders() }).then(r => r.json())
 
-export const loginAdmin = login
+export const getStudents = async (exam = "ALL") =>
+  fetch(`${BASE_URL}/api/students?exam=${exam}`, { headers: await getAuthHeaders() }).then(r => r.json())
 
-export const getStats = () =>
-  fetch(`${BASE_URL}/api/stats`, { headers: getAuthHeaders() }).then(r => r.json())
-
-export const getStudents = (exam = "ALL") =>
-  fetch(`${BASE_URL}/api/students?exam=${exam}`, { headers: getAuthHeaders() }).then(r => r.json())
-
-export const addStudent = (studentData) =>
+export const addStudent = async (studentData) =>
   fetch(`${BASE_URL}/api/students`, {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
     body: JSON.stringify(studentData)
   }).then(r => r.json())
 
-export const sendNotification = (exam, message) =>
+export const sendNotification = async (exam, message) =>
   fetch(`${BASE_URL}/api/send-notification`, {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
     body: JSON.stringify({ exam, message })
   }).then(r => r.json())
 
-export const getLogs = () =>
-  fetch(`${BASE_URL}/api/logs`, { headers: getAuthHeaders() }).then(r => r.json())
+export const getLogs = async () =>
+  fetch(`${BASE_URL}/api/logs`, { headers: await getAuthHeaders() }).then(r => r.json())
 
-export const getServiceRequests = (status = "") =>
-  fetch(`${BASE_URL}/api/service-requests${status ? `?status=${status}` : ""}`, { headers: getAuthHeaders() }).then(r => r.json())
+export const getServiceRequests = async (status = "") =>
+  fetch(`${BASE_URL}/api/service-requests${status ? `?status=${status}` : ""}`, { headers: await getAuthHeaders() }).then(r => r.json())
 
-export const sendReceipt = (telegramId, message, requestId) =>
+export const sendReceipt = async (telegramId, message, requestId) =>
   fetch(`${BASE_URL}/api/send-receipt`, {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
     body: JSON.stringify({ telegram_id: telegramId, message, request_id: requestId })
   }).then(r => r.json())
 
-export const getStudentDocuments = (telegramId) =>
-  fetch(`${BASE_URL}/api/documents/${telegramId}`, { headers: getAuthHeaders() }).then(r => r.json())
+export const getStudentDocuments = async (telegramId) =>
+  fetch(`${BASE_URL}/api/documents/${telegramId}`, { headers: await getAuthHeaders() }).then(r => r.json())
 
-export const getDocumentUrl = (fileId) =>
-  fetch(`${BASE_URL}/api/document-url/${fileId}`, { headers: getAuthHeaders() }).then(r => r.json())
+export const getDocumentUrl = async (fileId) =>
+  fetch(`${BASE_URL}/api/document-url/${fileId}`, { headers: await getAuthHeaders() }).then(r => r.json())
 
 
 // ── Bot Settings API ──────────────────────────────────────────────────────────
-export const getBotSettings = () =>
-  fetch(`${BASE_URL}/api/bot-settings`, { headers: getAuthHeaders() }).then(r => r.json())
+export const getBotSettings = async () =>
+  fetch(`${BASE_URL}/api/bot-settings`, { headers: await getAuthHeaders() }).then(r => r.json())
 
-export const saveBotSettings = (settings) =>
+export const saveBotSettings = async (settings) =>
   fetch(`${BASE_URL}/api/bot-settings`, {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
     body: JSON.stringify(settings)
   }).then(r => r.json())
 
 // ── Student management ────────────────────────────────────────────────────────
-export const blockStudent = (telegramId) =>
+export const blockStudent = async (telegramId) =>
   fetch(`${BASE_URL}/api/students/${telegramId}/block`, {
     method: "POST",
-    headers: getAuthHeaders()
+    headers: await getAuthHeaders()
   }).then(r => r.json())
 
-export const deleteStudent = (telegramId) =>
+export const deleteStudent = async (telegramId) =>
   fetch(`${BASE_URL}/api/students/${telegramId}`, {
     method: "DELETE",
-    headers: getAuthHeaders()
+    headers: await getAuthHeaders()
   }).then(r => r.json())
 
 // ── Services API ──────────────────────────────────────────────────────────────
-export const getServices = () =>
-  fetch(`${BASE_URL}/api/services`, { headers: getAuthHeaders() }).then(r => r.json())
+export const getServices = async () =>
+  fetch(`${BASE_URL}/api/services`, { headers: await getAuthHeaders() }).then(r => r.json())
 
-export const createService = (data) =>
+export const createService = async (data) =>
   fetch(`${BASE_URL}/api/services`, {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
     body: JSON.stringify(data)
   }).then(r => r.json())
 
-export const updateService = (id, data) =>
+export const updateService = async (id, data) =>
   fetch(`${BASE_URL}/api/services/${id}`, {
     method: "PUT",
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
     body: JSON.stringify(data)
   }).then(r => r.json())
 
-export const toggleService = (id) =>
+export const toggleService = async (id) =>
   fetch(`${BASE_URL}/api/services/${id}/toggle`, {
     method: "POST",
-    headers: getAuthHeaders()
+    headers: await getAuthHeaders()
   }).then(r => r.json())
 
-export const deleteServiceApi = (id) =>
+export const deleteServiceApi = async (id) =>
   fetch(`${BASE_URL}/api/services/${id}`, {
     method: "DELETE",
-    headers: getAuthHeaders()
+    headers: await getAuthHeaders()
   }).then(r => r.json())
 
 // ── Exams API ─────────────────────────────────────────────────────────────────
-export const getExams = () =>
-  fetch(`${BASE_URL}/api/exams`, { headers: getAuthHeaders() }).then(r => r.json())
+export const getExams = async () =>
+  fetch(`${BASE_URL}/api/exams`, { headers: await getAuthHeaders() }).then(r => r.json())
 
-export const createExam = (data) =>
+export const createExam = async (data) =>
   fetch(`${BASE_URL}/api/exams`, {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
     body: JSON.stringify(data)
   }).then(r => r.json())
 
-export const deleteExamApi = (id) =>
+export const deleteExamApi = async (id) =>
   fetch(`${BASE_URL}/api/exams/${id}`, {
     method: "DELETE",
-    headers: getAuthHeaders()
+    headers: await getAuthHeaders()
   }).then(r => r.json())
 
 

@@ -67,25 +67,6 @@ function AccessDenied() {
 function PrivateRoute({ children }) {
     const { isSignedIn, isLoaded } = useAuth()
     const { user } = useUser()
-    const [isBackendAuthed, setIsBackendAuthed] = useState(false)
-
-    useEffect(() => {
-        if (isSignedIn && user) {
-            const email = user.primaryEmailAddress?.emailAddress?.toLowerCase() || ""
-            const isAdmin = ADMIN_EMAILS.includes(email)
-            if (isAdmin) {
-                // Automatically get the backend token using the secret key so legacy Python APIs work
-                import("./api").then(api => {
-                    api.loginAdmin(import.meta.env.VITE_SECRET_KEY || "emitra2025").then(res => {
-                        if (res.token) {
-                            localStorage.setItem("admin_token", res.token)
-                            setIsBackendAuthed(true)
-                        }
-                    }).catch(console.error)
-                })
-            }
-        }
-    }, [isSignedIn, user])
 
     if (!isLoaded) return <ClerkLoadingSpinner />
     if (!isSignedIn) return <Navigate to="/login" replace />
@@ -94,11 +75,6 @@ function PrivateRoute({ children }) {
     const email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || ""
     const isAdmin = ADMIN_EMAILS.includes(email)
     if (!isAdmin) return <AccessDenied />
-
-    // Wait until the backend token is fetched so children components don't make unauthorized API calls
-    if (!isBackendAuthed && !localStorage.getItem("admin_token")) {
-        return <ClerkLoadingSpinner />
-    }
 
     return children
 }

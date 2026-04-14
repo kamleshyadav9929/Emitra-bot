@@ -8,31 +8,18 @@ load_dotenv(env_path)
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 
-# ── FIX #1: Enforce secrets — crash loudly if missing in production ────────────
-_admin_key = os.getenv("ADMIN_SECRET_KEY")
-_jwt_key   = os.getenv("JWT_SECRET_KEY")
+# ── Clerk Configuration ───────────────────────────────────────────────────────
+CLERK_PUBLISHABLE_KEY = os.getenv("CLERK_PUBLISHABLE_KEY", "pk_test_cGlja2VkLWJveGVyLTk2LmNsZXJrLmFjY291bnRzLmRldiQ")
+try:
+    import base64
+    _key_part = CLERK_PUBLISHABLE_KEY.split("_")[2]
+    _padded = _key_part + '=' * (-len(_key_part) % 4)
+    CLERK_DOMAIN = base64.b64decode(_padded).decode('utf-8').rstrip('$')
+    CLERK_JWKS_URL = f"https://{CLERK_DOMAIN}/.well-known/jwks.json"
+except Exception as e:
+    print(f"WARNING: Invalid CLERK_PUBLISHABLE_KEY format ({e}). Clerk JWTs cannot be verified.")
+    CLERK_JWKS_URL = ""
 
-# Only enforce non-empty secrets when not in dev (allow local dev with defaults)
-_is_dev = os.getenv("FLASK_ENV", "production") == "development"
-
-if not _admin_key:
-    if _is_dev:
-        print("WARNING: ADMIN_SECRET_KEY not set. Using insecure default for development.")
-        _admin_key = "emitra2025"
-    else:
-        print("FATAL: ADMIN_SECRET_KEY environment variable is not set!", file=sys.stderr)
-        sys.exit(1)
-
-if not _jwt_key:
-    if _is_dev:
-        print("WARNING: JWT_SECRET_KEY not set. Using insecure default for development.")
-        _jwt_key = "super-secret-jwt-key-2025"
-    else:
-        print("FATAL: JWT_SECRET_KEY environment variable is not set!", file=sys.stderr)
-        sys.exit(1)
-
-ADMIN_SECRET_KEY = _admin_key
-JWT_SECRET_KEY   = _jwt_key
 
 # Webhook secret for verifying incoming Telegram updates
 WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET", "")
