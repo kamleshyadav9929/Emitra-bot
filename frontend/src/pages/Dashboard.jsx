@@ -161,6 +161,7 @@ export default function Dashboard() {
               <table className="w-full text-left border-collapse min-w-[500px]">
                 <thead>
                   <tr>
+                    <th className="text-[10px] font-bold tracking-wider text-gray-400 uppercase pb-4">Name</th>
                     <th className="text-[10px] font-bold tracking-wider text-gray-400 uppercase pb-4">Phone Number</th>
                     <th className="text-[10px] font-bold tracking-wider text-gray-400 uppercase pb-4">Exam Prep</th>
                     <th className="text-[10px] font-bold tracking-wider text-gray-400 uppercase pb-4">Status</th>
@@ -172,9 +173,10 @@ export default function Dashboard() {
                     const dateObj = new Date(s.joined_at)
                     const dateStr = !isNaN(dateObj) ? dateObj.toLocaleDateString() : 'Unknown'
                     return (
-                      <tr key={s.phone || idx} className="odd:bg-[var(--color-surface-low)]">
-                        <td className="py-4 px-2 font-bold text-[var(--color-on-surface)] border-none">{s.phone}</td>
-                        <td className="py-4 text-gray-600 px-2 border-none">{s.exam}</td>
+                      <tr key={s.phone_number || idx} className="odd:bg-[var(--color-surface-low)]">
+                        <td className="py-4 px-2 font-bold text-[var(--color-on-surface)] border-none">{s.name || "Unknown"}</td>
+                        <td className="py-4 px-2 border-none text-gray-600">{s.phone_number || "Not Shared"}</td>
+                        <td className="py-4 text-gray-600 px-2 border-none">{s.exam_preference || "NONE"}</td>
                         <td className="py-4 px-2 border-none">
                           <span className="bg-[#E1F7E8] text-[#1E8A44] px-3 py-1 rounded-md text-[10px] font-bold">Active</span>
                         </td>
