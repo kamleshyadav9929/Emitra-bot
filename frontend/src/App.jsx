@@ -72,7 +72,7 @@ function PrivateRoute({ children }) {
     useEffect(() => {
         if (isSignedIn && user) {
             const email = user.primaryEmailAddress?.emailAddress?.toLowerCase() || ""
-            const isAdmin = ADMIN_EMAILS.length === 0 || ADMIN_EMAILS.includes(email)
+            const isAdmin = ADMIN_EMAILS.includes(email)
             if (isAdmin) {
                 // Automatically get the backend token using the secret key so legacy Python APIs work
                 import("./api").then(api => {
@@ -92,7 +92,7 @@ function PrivateRoute({ children }) {
 
     // Check email against allowlist
     const email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || ""
-    const isAdmin = ADMIN_EMAILS.length === 0 || ADMIN_EMAILS.includes(email)
+    const isAdmin = ADMIN_EMAILS.includes(email)
     if (!isAdmin) return <AccessDenied />
 
     // Wait until the backend token is fetched so children components don't make unauthorized API calls
