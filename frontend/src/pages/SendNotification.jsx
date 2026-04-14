@@ -13,11 +13,11 @@ const getAuthHeaders = () => ({ "Content-Type": "application/json", Authorizatio
 function Toast({ visible, message }) {
   return (
     <div
-      className={`fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 px-5 py-3 bg-[#1a1a1a] text-white text-[13px] font-medium shadow-xl transition-all duration-300 ${
+      className={`fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 px-5 py-3 bg-[#071E27] text-white text-[13px] font-bold rounded-[14px] shadow-2xl transition-all duration-300 ${
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
       }`}
     >
-      <CheckCircle2 size={16} className="text-[#4ade80]" />
+      <CheckCircle2 size={16} className="text-emerald-400" />
       {message}
     </div>
   )
@@ -141,11 +141,11 @@ export default function SendNotification() {
     <div className="space-y-6">
       <Toast visible={toastVisible} message={toastMsg} />
       {/* Header */}
-      <div className="flex items-end justify-between border-b border-[#A3A3A3] pb-6">
+      <div className="flex items-end justify-between mb-8">
         <div>
-          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#737373] mb-2">Broadcast</p>
-          <h1 className="text-3xl font-light text-black tracking-tight">Send Notification</h1>
-          <p className="text-[13px] text-[#7A7A78] mt-1">Send instantly to your students.</p>
+          <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-[var(--color-primary)] mb-2">Broadcast</p>
+          <h1 className="text-3xl font-black text-[#0A1A40] tracking-tight leading-tight font-display">Send Notification</h1>
+          <p className="text-[14px] text-gray-500 mt-2 max-w-2xl leading-relaxed font-medium">Send instantly to your students.</p>
         </div>
       </div>
 
@@ -162,18 +162,18 @@ export default function SendNotification() {
               {/* Audience */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <Users size={14} className="text-[#7A7A78]" />
-                  <h2 className="text-[13px] font-semibold text-black tracking-wide uppercase">Target Audience</h2>
+                  <Users size={16} className="text-[#164FA8]" />
+                  <h2 className="text-[13px] font-bold text-gray-900 tracking-wide uppercase">Target Audience</h2>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
                   {/* All Students */}
                   <button
                     onClick={selectAll}
-                    className={`px-4 py-2 text-[13px] font-semibold border transition-colors rounded-xl ${
+                    className={`px-5 py-2 text-[12px] font-bold transition-all rounded-[14px] shadow-ambient ${
                       selectedExams.includes("ALL")
-                        ? "bg-black text-white border-black"
-                        : "bg-white text-[#7A7A78] border-[#A3A3A3] hover:border-black hover:text-black"
+                        ? "bg-[var(--color-primary)] text-white"
+                        : "bg-[var(--color-surface-lowest)] text-gray-500 hover:bg-[var(--color-surface-low)] hover:text-gray-900"
                     }`}
                   >
                     All Students
@@ -185,10 +185,10 @@ export default function SendNotification() {
                       <button
                         key={exam}
                         onClick={() => toggleExam(exam)}
-                        className={`px-4 py-2 text-[13px] font-semibold border transition-colors rounded-xl ${
+                        className={`px-5 py-2 text-[12px] font-bold transition-all rounded-[14px] shadow-ambient ${
                           active
-                            ? "bg-black text-white border-black"
-                            : "bg-white text-[#7A7A78] border-[#A3A3A3] hover:border-black hover:text-black"
+                            ? "bg-[var(--color-primary)] text-white"
+                            : "bg-[var(--color-surface-lowest)] text-gray-500 hover:bg-[var(--color-surface-low)] hover:text-gray-900"
                         }`}
                       >
                         {exam}
@@ -198,10 +198,10 @@ export default function SendNotification() {
                 </div>
 
                 {/* Recipient count */}
-                <div className="flex items-center gap-2 px-4 py-3 bg-[#F7F7F5] border border-[#A3A3A3] rounded-xl">
-                  <div className="w-1.5 h-1.5 bg-black rounded-full" />
-                  <span className="text-[13px] text-[#3D3D3D]">
-                    <span className="font-semibold text-black">{targetCount}</span> students will receive this
+                <div className="flex items-center gap-3 px-5 py-4 bg-[var(--color-primary-fixed)] rounded-[16px] shadow-ambient">
+                  <div className="w-2 h-2 bg-[#164FA8] rounded-full" />
+                  <span className="text-[13px] font-medium text-[#164FA8]">
+                    <span className="font-bold text-gray-900 text-[14px]">{targetCount}</span> students will receive this
                   </span>
                 </div>
               </div>
@@ -212,24 +212,24 @@ export default function SendNotification() {
           <Step>
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <MessageSquare size={14} className="text-[#7A7A78]" />
-                <h2 className="text-[13px] font-semibold text-black tracking-wide uppercase">Message</h2>
+                <MessageSquare size={16} className="text-[#164FA8]" />
+                <h2 className="text-[13px] font-bold text-gray-900 tracking-wide uppercase">Message</h2>
               </div>
               <textarea
                 value={message}
                 onChange={e => { if (e.target.value.length <= CHAR_LIMIT) setMessage(e.target.value) }}
                 placeholder={"Important Update!\n\nAaj ka Mock Test raat 8 baje hoga.\n\n— E-Mitra Team"}
                 rows={8}
-                className={`w-full border px-4 py-3 text-[13px] text-black placeholder:text-[#737373] bg-white focus:outline-none resize-none transition-colors leading-relaxed rounded-2xl ${
-                  message.length > CHAR_LIMIT * 0.9 ? "border-[#C62828]" : "border-[#A3A3A3] focus:border-black"
+                className={`w-full bg-[var(--color-surface-lowest)] border-none px-5 py-4 text-[13px] text-gray-900 placeholder:text-gray-400 focus:outline-none resize-none shadow-ambient transition-all leading-relaxed rounded-[20px] ${
+                  message.length > CHAR_LIMIT * 0.9 ? "ring-2 ring-red-400/40" : "focus:ring-2 focus:ring-[var(--color-primary)]/10"
                 }`}
               />
-              <div className="flex justify-between items-center">
-                <span className={`text-[11px] font-medium ${message.trim() ? "text-[#2E7D32]" : "text-[#737373]"}`}>
+              <div className="flex justify-between items-center px-1">
+                <span className={`text-[11px] font-semibold ${message.trim() ? "text-[#10B981]" : "text-gray-400"}`}>
                   {message.trim() ? "✓ Ready" : "Write a message above"}
                 </span>
-                <span className={`text-[11px] font-mono ${
-                  message.length > CHAR_LIMIT * 0.9 ? "text-[#C62828]" : "text-[#737373]"
+                <span className={`text-[11px] font-semibold ${
+                  message.length > CHAR_LIMIT * 0.9 ? "text-red-500" : "text-gray-400"
                 }`}>
                   {message.length} / {CHAR_LIMIT}
                 </span>
@@ -241,72 +241,72 @@ export default function SendNotification() {
           <Step>
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <Bot size={14} className="text-[#7A7A78]" />
-                <h2 className="text-[13px] font-semibold text-black tracking-wide uppercase">
+                <Bot size={16} className="text-[#164FA8]" />
+                <h2 className="text-[13px] font-bold text-gray-900 tracking-wide uppercase">
                   Preview & Send
                 </h2>
               </div>
 
               {/* Telegram-style preview */}
-              <div className="border border-[#A3A3A3] p-4 bg-[#F7F7F5] rounded-2xl overflow-hidden">
-                <div className="flex items-center gap-2 mb-3 pb-3 border-b border-[#A3A3A3]">
-                  <div className="w-7 h-7 bg-black flex items-center justify-center rounded-lg">
-                    <Bot size={13} className="text-white" />
+              <div className="bg-[var(--color-surface-low)] p-5 rounded-[20px] overflow-hidden shadow-ambient">
+                <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200">
+                  <div className="w-9 h-9 bg-[#EBF1FA] text-[#164FA8] flex items-center justify-center rounded-[12px]">
+                    <Bot size={18} />
                   </div>
                   <div>
-                    <p className="text-[12px] font-semibold text-black">E-Mitra Seva</p>
-                    <p className="text-[10px] text-[#737373]">bot</p>
+                    <p className="text-[13px] font-bold text-gray-900">E-Mitra Bot</p>
+                    <p className="text-[10px] text-[#164FA8] font-semibold tracking-widest uppercase">Automated</p>
                   </div>
                 </div>
-                <div className="bg-white border border-[#A3A3A3] px-4 py-3 max-w-[88%] text-[13px] text-black leading-relaxed rounded-2xl rounded-tl-none">
+                <div className="bg-white border border-gray-100 px-5 py-4 shadow-sm max-w-[88%] text-[13px] text-gray-800 leading-relaxed rounded-[20px] rounded-tl-none">
                   {message.trim() ? (
                     message.split("\n").map((line, i) => <div key={i}>{line || <br />}</div>)
                   ) : (
-                    <span className="text-[#737373] italic text-[12px]">No message yet...</span>
+                    <span className="text-gray-400 italic text-[12px]">Message preview will appear here...</span>
                   )}
-                  <div className="text-[10px] text-[#737373] text-right mt-2 font-mono">
+                  <div className="text-[10px] text-gray-400 text-right mt-3 font-semibold">
                     {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </div>
                 </div>
               </div>
 
               {/* Meta info */}
-              <div className="flex items-center justify-between text-[11px] text-[#7A7A78] px-1">
-                <span>
-                  To: <span className="text-black font-semibold">
+              <div className="flex items-center justify-between text-[12px] px-2">
+                <span className="text-gray-500 font-medium">
+                  To: <span className="text-gray-900 font-bold ml-1">
                     {selectedExams.includes("ALL") ? "All Students" : selectedExams.join(", ") || "None"}
                   </span>
                 </span>
-                <div className="flex items-center gap-3">
-                  <span><span className="text-black font-semibold">{targetCount}</span> recipients</span>
-                </div>
+                <span className="bg-[#EBF1FA] text-[#164FA8] font-bold px-3 py-1 rounded-full text-[11px]">
+                  {targetCount} Recipients
+                </span>
               </div>
 
               {errorMsg && (
-                <div className="text-[#C62828] text-[12px] border border-[#FECACA] bg-[#FEF2F2] p-3">
+                <div className="text-red-600 text-[12px] font-medium border border-red-200 bg-red-50 p-4 rounded-[16px]">
                   {errorMsg}
                 </div>
               )}
 
               {/* Live progress bar during polling */}
               {(status === "polling" || status === "sending") && jobProgress && (
-                <div className="border border-[#A3A3A3] p-4 space-y-2 rounded-xl">
-                  <div className="flex justify-between text-[11px]">
-                    <span className="text-[#7A7A78] flex items-center gap-1.5">
-                      <Loader2 size={11} className="animate-spin" /> Bhej raha hai...
+                <div className="bg-[var(--color-primary-fixed)] p-5 space-y-3 rounded-[20px] shadow-ambient">
+                  <div className="flex justify-between text-[12px] font-semibold text-[#164FA8]">
+                    <span className="flex items-center gap-2">
+                      <Loader2 size={14} className="animate-spin" /> Broadcasting...
                     </span>
-                    <span className="font-mono text-black">
+                    <span>
                       {jobProgress.sent || 0} / {jobProgress.total || targetCount}
                     </span>
                   </div>
-                  <div className="w-full bg-[#F7F7F5] h-1.5 overflow-hidden rounded-full">
+                  <div className="w-full bg-[var(--color-surface-lowest)] h-2 overflow-hidden rounded-full shadow-ambient">
                     <div
-                      className="h-full bg-black transition-all duration-500 rounded-full"
+                      className="h-full bg-[#164FA8] transition-all duration-500 rounded-full"
                       style={{ width: `${jobProgress.total ? Math.round(((jobProgress.sent || 0) / jobProgress.total) * 100) : 5}%` }}
                     />
                   </div>
-                  <p className="text-[10px] text-[#737373] font-mono">
-                    {jobProgress.total ? Math.round(((jobProgress.sent || 0) / jobProgress.total) * 100) : 0}% complete · Yeh page band mat karein
+                  <p className="text-[11px] text-gray-500 font-medium">
+                    {jobProgress.total ? Math.round(((jobProgress.sent || 0) / jobProgress.total) * 100) : 0}% complete · Please keep this page open.
                   </p>
                 </div>
               )}
@@ -315,17 +315,17 @@ export default function SendNotification() {
               <button
                 onClick={handleSend}
                 disabled={!message.trim() || targetCount === 0 || status === "sending" || status === "polling"}
-                className={`w-full py-3 font-semibold text-[13px] flex items-center justify-center gap-2 transition-colors ${
+                className={`w-full py-4 font-bold text-[14px] flex items-center justify-center gap-2 transition-all rounded-[16px] shadow-sm ${
                   !message.trim() || targetCount === 0
-                    ? "bg-[#F7F7F5] text-[#737373] cursor-not-allowed border border-[#A3A3A3]"
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200"
                     : status === "success"
-                      ? "bg-[#2E7D32] text-white border border-[#2E7D32]"
+                      ? "bg-[#10B981] text-white shadow-md"
                       : status === "sending" || status === "polling"
-                        ? "bg-[#3D3D3D] text-white cursor-wait border border-[#3D3D3D]"
-                        : "bg-black text-white hover:bg-[#3D3D3D] border border-black rounded-xl"
+                        ? "bg-[#164FA8] text-white cursor-wait opacity-80"
+                        : "bg-[#4162EE] text-white hover:bg-[#3451D4] hover:shadow-lg hover:-translate-y-0.5"
                 }`}
               >
-                {(status === "sending" || status === "polling") && <><Loader2 size={15} className="animate-spin" /> Bhej raha hai...</>}
+                {(status === "sending" || status === "polling") && <><Loader2 size={18} className="animate-spin" /> Broadcasting...</>}
                 {status === "success" && <><CheckCircle size={15} /> Sent!</>}
                 {(status === "idle" || status === "error") && (
                   <>

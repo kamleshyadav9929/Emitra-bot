@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "motion/react"
-import { X, LogOut, Phone, Clock, CheckCircle, AlertCircle, Loader2 } from "lucide-react"
+import { X, LogOut, Mail, Clock, CheckCircle, AlertCircle, Loader2 } from "lucide-react"
 import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
 
@@ -10,9 +10,9 @@ export default function StudentProfileDrawer({ isOpen, onClose }) {
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        if (isOpen && user?.phone) {
+        if (isOpen && (user?.phone || user?.email)) {
             setLoading(true)
-            api.publicCheckStatus(user.phone)
+            api.publicCheckStatus(user.phone || user.email)
                 .then(data => setHistory(data.history || []))
                 .catch(() => setHistory([]))
                 .finally(() => setLoading(false))
@@ -70,8 +70,8 @@ export default function StudentProfileDrawer({ isOpen, onClose }) {
                                     <div>
                                         <p className="text-base font-black tracking-tight leading-tight">{user?.name}</p>
                                         <div className="flex items-center gap-1.5 mt-0.5">
-                                            <Phone size={10} className="text-ink-3" />
-                                            <p className="text-xs font-bold text-ink-3">+91 {user?.phone}</p>
+                                            <Mail size={10} className="text-gray-400" />
+                                            <p className="text-xs font-bold text-gray-500 truncate max-w-[180px]">{user?.email || user?.phone}</p>
                                         </div>
                                         <span className="mt-1.5 inline-flex items-center px-2 py-0.5 bg-black text-white text-[9px] font-black uppercase tracking-wider rounded-full">
                                             ✓ Verified

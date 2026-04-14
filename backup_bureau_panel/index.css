@@ -1,44 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Mukta:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&family=Mukta:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-surface-base:      #f3faff;
-  --color-surface-low:       #e6f6ff;
-  --color-surface-lowest:    #ffffff;
-  --color-surface-highest:   #cfe6f2;
-  
-  --color-primary:           #003f87;
-  --color-primary-container: #0056b3;
-  --color-primary-fixed:     #d7e2ff;
-  --color-on-surface:        #071e27;
-  
-  --color-secondary-fixed:   #dee0ff;
-  --color-surface-bright:    #f8fbff;
-  
-  --color-outline-variant:   #c2c6d426;
-  
-  --color-tertiary:          #623700;
-  --color-tertiary-fixed:    #ffdcbe;
+  --color-bg:        #FFFFFF;
+  --color-surface:   #F7F7F5;
+  --color-card:      #FFFFFF;
+  --color-border:    #A3A3A3;
+  --color-hover:     #F2F2F0;
+
+  --color-ink:       #0A0A0A;
+  --color-ink-2:     #3D3D3D;
+  --color-ink-3:     #525252;
+  --color-ink-4:     #737373;
+
+  --color-accent:    #0A0A0A;
+  --color-accent-lt: #3D3D3D;
 
   --color-exam-jee:  #D4450C;
   --color-exam-neet: #0A7A6B;
   --color-exam-ssc:  #0A52A3;
   --color-exam-upsc: #5A7A0A;
   --color-exam-cuet: #A37A0A;
-  --color-exam-all:  #071e27;
+  --color-exam-all:  #0A0A0A;
 
   --color-success:   #2E7D32;
   --color-danger:    #C62828;
 
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-display: 'Public Sans', sans-serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
   --font-mono: 'DM Mono', 'Courier New', monospace;
+  --font-display: 'Outfit', sans-serif;
   
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
-  --radius-xl: 0.75rem;
-  --radius-2xl: 1rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
 }
 
 html[lang="hi"] {
@@ -62,9 +58,9 @@ html {
 }
 
 body {
-  background-color: var(--color-surface-base);
-  color: var(--color-on-surface);
-  font-family: var(--font-sans);
+  background-color: #FFFFFF;
+  color: #0A0A0A;
+  font-family: 'DM Sans', system-ui, sans-serif;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
@@ -93,14 +89,10 @@ body {
   transition-timing-function: ease;
 }
 
-/* Focus ring — Institutional Elements */
+/* Focus ring — editorial black */
 :focus-visible {
-  outline: 2px solid var(--color-secondary-fixed);
+  outline: 2px solid #0A0A0A;
   outline-offset: 2px;
-}
-
-@utility shadow-ambient {
-  box-shadow: 0 20px 40px rgba(7, 30, 39, 0.06);
 }
 
 /* Custom Utilities for Bento & Editorial */

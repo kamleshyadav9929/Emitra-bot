@@ -1,33 +1,34 @@
-import { createContext, useContext, useState } from "react"
+// AuthContext.jsx — now a thin re-export shim over Clerk so all existing
+// consumer components (Landing, ServicesPage, StudentProfileDrawer, LandingBottomNav)
+// continue to call `useAuth()` without any changes to their import lines.
+//
+// Shape returned:
+//   { user: { name, email, imageUrl, phone },  isLoggedIn, logout }
 
-const AuthContext = createContext(null)
+import { useUser, useClerk } from "@clerk/react"
 
-export function AuthProvider({ children }) {
-    const [user, setUser] = useState(() => {
-        try {
-            const stored = localStorage.getItem("emitra_student")
-            return stored ? JSON.parse(stored) : null
-        } catch {
-            return null
-        }
-    })
+export function useAuth() {
+    const { user: clerkUser, isSignedIn, isLoaded } = useUser()
+    const { signOut } = useClerk()
 
-    const login = (phone, name) => {
-        const userData = { phone, name, isLoggedIn: true }
-        localStorage.setItem("emitra_student", JSON.stringify(userData))
-        setUser(userData)
+    const user = isSignedIn
+        ? {
+              name:     clerkUser.fullName || clerkUser.firstName || clerkUser.username || "Student",
+              email:    clerkUser.primaryEmailAddress?.emailAddress || "",
+              imageUrl: clerkUser.imageUrl || "",
+              phone:    clerkUser.primaryPhoneNumber?.phoneNumber || "",
+          }
+        : null
+
+    return {
+        user,
+        isLoggedIn: !!isSignedIn && isLoaded,
+        logout: () => signOut(),
     }
-
-    const logout = () => {
-        localStorage.removeItem("emitra_student")
-        setUser(null)
-    }
-
-    return (
-        <AuthContext.Provider value={{ user, login, logout, isLoggedIn: !!user }}>
-            {children}
-        </AuthContext.Provider>
-    )
 }
 
-export const useAuth = () => useContext(AuthContext)
+// AuthProvider is no longer needed (Clerk manages state globally via ClerkProvider
+// in main.jsx), but we keep the export so App.jsx doesn't need editing yet.
+export function AuthProvider({ children }) {
+    return children
+}

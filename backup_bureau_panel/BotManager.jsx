@@ -59,8 +59,8 @@ function TabBtn({ id, label, icon: Icon, active, onClick, accent }) {
       onClick={() => onClick(id)}
       className={`flex items-center gap-2 px-5 py-2.5 text-[13px] font-bold transition-all rounded-[16px] shadow-sm ${
         active
-          ? "bg-[var(--color-surface-low)] text-[var(--color-primary)] border border-[var(--color-surface-low)] shadow-ambient"
-          : "bg-[var(--color-surface-lowest)] text-[var(--color-on-surface)] border border-transparent hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-bright)]"
+          ? "bg-[#164FA8] text-white border border-[#164FA8]"
+          : "bg-white text-gray-500 border border-gray-200 hover:border-[#164FA8] hover:text-[#164FA8]"
       }`}
     >
       <Icon size={14} />
@@ -99,16 +99,16 @@ function MessagesTab({ toast }) {
   return (
     <div className="space-y-6">
       {DEFS.map(({ key, label, sub }) => (
-        <div key={key} className="bg-[var(--color-surface-lowest)] rounded-xl overflow-hidden shadow-ambient border-none">
-          <div className="px-6 py-5 bg-[var(--color-surface-low)] flex items-start justify-between gap-4">
+        <div key={key} className="border border-gray-100 bg-white rounded-[24px] overflow-hidden shadow-sm">
+          <div className="px-6 py-5 border-b border-gray-50 bg-[#F8FAFC] flex items-start justify-between gap-4">
             <div>
               <p className="text-[14px] font-bold text-gray-900">{label}</p>
               <p className="text-[12px] text-gray-500 mt-1 font-medium">{sub}</p>
             </div>
             <button
               onClick={() => save(key)}
-              className={`flex items-center gap-2 px-4 py-2 text-[13px] font-bold transition-all rounded-md flex-shrink-0 shadow-sm ${
-                saved[key] ? "bg-[#10B981] text-white" : "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] text-white hover:shadow-ambient hover:-translate-y-0.5"
+              className={`flex items-center gap-2 px-4 py-2 text-[13px] font-bold transition-all rounded-[12px] flex-shrink-0 shadow-sm ${
+                saved[key] ? "bg-[#10B981] text-white" : "bg-[#4162EE] text-white hover:bg-[#3451D4] hover:shadow-md hover:-translate-y-0.5"
               }`}
             >
               {saved[key] ? <CheckCircle2 size={14} /> : <Save size={14} />}
@@ -120,7 +120,7 @@ function MessagesTab({ toast }) {
               rows={5}
               value={msgs[key]}
               onChange={e => setMsgs(p => ({ ...p, [key]: e.target.value }))}
-              className="w-full border border-[var(--color-outline-variant)] px-5 py-4 text-[13px] text-[var(--color-on-surface)] bg-[var(--color-surface-lowest)] focus:outline-none shadow-sm resize-none transition-all leading-relaxed rounded-xl"
+              className="w-full border border-gray-200 px-5 py-4 text-[13px] text-gray-900 bg-white focus:outline-none focus:border-[#164FA8] focus:ring-1 focus:ring-[#164FA8] shadow-sm resize-none transition-all leading-relaxed rounded-[16px]"
               placeholder="Message yahan likhein..."
             />
             <p className="text-[11px] text-gray-400 font-medium mt-2">{msgs[key].length} chars</p>
@@ -234,13 +234,13 @@ function AnnouncementsTab({ toast }) {
         <p className="text-[12px] text-gray-500 font-medium">{anns.filter(a => !isPast(a.runAt)).length} upcoming · {anns.filter(a => isPast(a.runAt) || a.sent).length} done</p>
         <button
           onClick={() => setModal("add")}
-          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] text-white text-[13px] font-bold transition-all rounded-xl shadow-ambient hover:shadow-lg hover:-translate-y-0.5"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#4162EE] text-white text-[13px] font-bold transition-all rounded-[16px] shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:bg-[#3451D4]"
         >
           <Plus size={14} /> Schedule New
         </button>
       </div>
 
-      <div className="bg-[var(--color-surface-lowest)] rounded-xl overflow-hidden shadow-ambient border-none">
+      <div className="border border-gray-100 bg-white rounded-[24px] overflow-hidden shadow-sm divide-y divide-gray-50">
         {anns.length === 0 && (
           <div className="py-16 text-center">
             <p className="text-[13px] text-gray-500 font-medium">Koi scheduled announcement nahi hai.</p>
@@ -249,7 +249,7 @@ function AnnouncementsTab({ toast }) {
         {[...anns].sort((a, b) => new Date(a.runAt) - new Date(b.runAt)).map(ann => {
           const past = isPast(ann.runAt)
           return (
-            <div key={ann.id} className={`flex flex-col sm:flex-row sm:items-start gap-4 px-6 py-6 transition-colors odd:bg-[var(--color-surface-low)] even:bg-[var(--color-surface-lowest)] hover:bg-[var(--color-surface-bright)] ${past ? "opacity-60 grayscale-[0.3]" : ""}`}>
+            <div key={ann.id} className={`flex flex-col sm:flex-row sm:items-start gap-4 px-6 py-6 hover:bg-[#F8FAFC] transition-colors ${past ? "opacity-60 grayscale-[0.3]" : ""}`}>
               {/* Exam pill */}
               <span
                 className="flex-shrink-0 mt-1 px-3 py-1 text-[11px] font-bold tracking-widest text-white uppercase rounded-[8px]"
@@ -273,14 +273,14 @@ function AnnouncementsTab({ toast }) {
                 {!past && (
                   <button
                     onClick={() => setModal(ann)}
-                    className="w-9 h-9 bg-transparent flex items-center justify-center text-gray-500 hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-bright)] transition-all rounded-md"
+                    className="w-9 h-9 border border-gray-200 bg-white shadow-sm flex items-center justify-center text-gray-500 hover:border-[#164FA8] hover:text-[#164FA8] transition-all rounded-[12px]"
                   >
                     <Pencil size={14} />
                   </button>
                 )}
                 <button
                   onClick={() => remove(ann.id)}
-                  className="w-9 h-9 bg-transparent flex items-center justify-center text-gray-500 hover:text-red-500 hover:bg-[#fef2f2] transition-all rounded-md"
+                  className="w-9 h-9 border border-gray-200 bg-white shadow-sm flex items-center justify-center text-gray-500 hover:border-red-500 hover:text-red-500 hover:bg-red-50 transition-all rounded-[12px]"
                 >
                   <Trash2 size={14} />
                 </button>
@@ -341,7 +341,7 @@ function ExamsTab({ toast }) {
 
   return (
     <div className="space-y-6 max-w-xl">
-      <div className="bg-[var(--color-surface-lowest)] p-6 rounded-xl shadow-ambient border-none">
+      <div className="border border-gray-100 bg-white p-6 rounded-[24px] shadow-sm">
         <label className="text-[10px] text-gray-500 font-bold tracking-widest uppercase block mb-3">Add New Exam</label>
         <div className="flex flex-col sm:flex-row gap-3">
           <input
@@ -350,19 +350,19 @@ function ExamsTab({ toast }) {
             onChange={e => setNewExam(e.target.value.toUpperCase())}
             onKeyDown={e => e.key === "Enter" && handleAdd()}
             placeholder="e.g. GATE"
-            className="flex-1 border border-[var(--color-outline-variant)] px-5 py-3 text-[13px] text-gray-900 bg-white focus:outline-none focus:ring-0 shadow-sm transition-all rounded-xl"
+            className="flex-1 border border-gray-200 px-5 py-3 text-[13px] text-gray-900 bg-white focus:outline-none focus:border-[#164FA8] focus:ring-1 focus:ring-[#164FA8] shadow-sm transition-all rounded-[16px]"
           />
           <button
             onClick={handleAdd}
             disabled={!newExam.trim() || saving}
-            className="px-8 py-3 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] text-white text-[13px] font-bold transition-all rounded-xl shadow-ambient hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-8 py-3 bg-[#4162EE] text-white text-[13px] font-bold transition-all rounded-[16px] shadow-sm hover:shadow-md hover:bg-[#3451D4] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-sm"
           >
             {saving ? "Adding..." : "Add"}
           </button>
         </div>
       </div>
 
-      <div className="bg-[var(--color-surface-lowest)] rounded-xl overflow-hidden shadow-ambient border-none">
+      <div className="border border-gray-100 bg-white rounded-[24px] overflow-hidden shadow-sm divide-y divide-gray-50">
         {loading ? (
           <div className="py-12 flex justify-center">
              <div className="w-6 h-6 border-2 border-[#164FA8] border-t-transparent rounded-full animate-spin" />
@@ -373,7 +373,7 @@ function ExamsTab({ toast }) {
           exams.map(exam => {
             const color = getExamColor(exam.name)
             return (
-              <div key={exam.id} className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-5 transition-colors gap-3 odd:bg-[var(--color-surface-low)] even:bg-[var(--color-surface-lowest)] hover:bg-[var(--color-surface-bright)]">
+              <div key={exam.id} className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-5 hover:bg-[#F8FAFC] transition-colors gap-3">
                 <span
                    className="inline-flex items-center justify-center px-4 py-1.5 text-[11px] font-bold tracking-widest uppercase text-white rounded-[8px]"
                    style={{ backgroundColor: color }}
@@ -382,7 +382,7 @@ function ExamsTab({ toast }) {
                 </span>
                 <button
                   onClick={() => handleDelete(exam.id, exam.name)}
-                  className="w-9 h-9 bg-transparent flex items-center justify-center text-gray-500 hover:text-red-500 hover:bg-[#fef2f2] transition-all rounded-md"
+                  className="w-9 h-9 border border-gray-200 bg-white shadow-sm flex items-center justify-center text-gray-500 hover:border-red-500 hover:text-red-500 hover:bg-red-50 transition-all rounded-[12px]"
                   title="Delete"
                 >
                   <Trash2 size={14} />
@@ -411,19 +411,19 @@ function SettingsTab({ toast }) {
   return (
     <div className="max-w-2xl space-y-6">
       {/* Bot Name */}
-      <div className="bg-[var(--color-surface-lowest)] rounded-xl overflow-hidden shadow-ambient border-none">
-        <div className="px-6 py-4 bg-[var(--color-surface-low)] flex items-center gap-3">
-          <div className="w-8 h-8 bg-transparent text-[var(--color-primary)] flex items-center justify-center">
+      <div className="border border-gray-100 bg-white rounded-[24px] overflow-hidden shadow-sm">
+        <div className="px-6 py-4 border-b border-gray-50 bg-[#F8FAFC] flex items-center gap-3">
+          <div className="w-8 h-8 bg-white border border-gray-200 rounded-[10px] flex items-center justify-center text-gray-500">
             <BotMessageSquare size={14} />
           </div>
-          <p className="text-[14px] font-bold text-[var(--color-on-surface)]">Bot Name</p>
+          <p className="text-[14px] font-bold text-gray-900">Bot Name</p>
         </div>
         <div className="px-6 py-5">
           <input
             type="text"
             value={settings.botName}
             onChange={e => set("botName", e.target.value)}
-            className="w-full border border-[var(--color-outline-variant)] px-5 py-3.5 text-[13px] text-[var(--color-on-surface)] bg-transparent focus:outline-none focus:ring-0 shadow-sm transition-all rounded-xl"
+            className="w-full border border-gray-200 px-5 py-3.5 text-[13px] text-gray-900 bg-white focus:outline-none focus:border-[#164FA8] focus:ring-1 focus:ring-[#164FA8] shadow-sm transition-all rounded-[16px]"
             placeholder="e.g. E-Mitra Seva"
           />
           <p className="text-[12px] text-gray-500 font-medium mt-2">Ye naam broadcasts ke header mein dikhega.</p>
@@ -431,12 +431,12 @@ function SettingsTab({ toast }) {
       </div>
 
       {/* Language */}
-      <div className="bg-[var(--color-surface-lowest)] rounded-xl overflow-hidden shadow-ambient border-none">
-        <div className="px-6 py-4 bg-[var(--color-surface-low)] flex items-center gap-3">
-          <div className="w-8 h-8 bg-transparent text-[var(--color-primary)] flex items-center justify-center">
+      <div className="border border-gray-100 bg-white rounded-[24px] overflow-hidden shadow-sm">
+        <div className="px-6 py-4 border-b border-gray-50 bg-[#F8FAFC] flex items-center gap-3">
+          <div className="w-8 h-8 bg-white border border-gray-200 rounded-[10px] flex items-center justify-center text-gray-500">
             <Languages size={14} />
           </div>
-          <p className="text-[14px] font-bold text-[var(--color-on-surface)]">Default Language</p>
+          <p className="text-[14px] font-bold text-gray-900">Default Language</p>
         </div>
         <div className="px-6 py-5">
           <div className="flex flex-col sm:flex-row gap-3">
@@ -448,14 +448,14 @@ function SettingsTab({ toast }) {
               <button
                 key={val}
                 onClick={() => set("language", val)}
-                className={`flex-1 py-4 px-4 text-left transition-all rounded-xl shadow-ambient border-none ${
+                className={`flex-1 border py-4 px-4 text-left transition-all rounded-[16px] shadow-sm ${
                   settings.language === val
-                    ? "bg-[var(--color-primary-fixed)] text-[var(--color-primary)]"
-                    : "bg-[var(--color-surface-lowest)] text-[var(--color-on-surface)] hover:bg-[var(--color-surface-low)]"
+                    ? "border-[#10B981] bg-[#10B981] text-white"
+                    : "border-gray-200 bg-white text-gray-700 hover:border-[#10B981] hover:text-[#10B981]"
                 }`}
               >
                 <p className="text-[14px] font-bold">{label}</p>
-                <p className={`text-[11px] font-medium mt-1 ${settings.language === val ? "text-[var(--color-on-surface)]" : "text-gray-400"}`}>{sub}</p>
+                <p className={`text-[11px] font-medium mt-1 ${settings.language === val ? "text-emerald-50" : "text-gray-400"}`}>{sub}</p>
               </button>
             ))}
           </div>
@@ -463,23 +463,23 @@ function SettingsTab({ toast }) {
       </div>
 
       {/* Notification Cooldown */}
-      <div className="bg-[var(--color-surface-lowest)] rounded-xl overflow-hidden shadow-ambient border-none">
-        <div className="px-6 py-4 bg-[var(--color-surface-low)] flex items-center gap-3">
-          <div className="w-8 h-8 bg-transparent text-[var(--color-primary)] flex items-center justify-center">
+      <div className="border border-gray-100 bg-white rounded-[24px] overflow-hidden shadow-sm">
+        <div className="px-6 py-4 border-b border-gray-50 bg-[#F8FAFC] flex items-center gap-3">
+          <div className="w-8 h-8 bg-white border border-gray-200 rounded-[10px] flex items-center justify-center text-gray-500">
             <Bell size={14} />
           </div>
-          <p className="text-[14px] font-bold text-[var(--color-on-surface)]">Notification Cooldown</p>
+          <p className="text-[14px] font-bold text-gray-900">Notification Cooldown</p>
         </div>
         <div className="px-6 py-5">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="flex items-center gap-3 flex-wrap flex-1 bg-[var(--color-surface-low)] p-3 pl-4 rounded-xl">
-              <span className="text-[13px] font-bold text-[var(--color-on-surface)]">Max limit</span>
+            <div className="flex items-center gap-3 flex-wrap flex-1 bg-[#F0F4FA] p-3 pl-4 rounded-[16px]">
+              <span className="text-[13px] font-bold text-gray-900">Max limit</span>
               <input
                 type="number"
                 min={1} max={20}
                 value={settings.maxMsgDay}
                 onChange={e => set("maxMsgDay", Number(e.target.value))}
-                className="w-20 border border-[var(--color-outline-variant)] px-3 py-2 text-[14px] font-bold text-[var(--color-on-surface)] bg-transparent text-center focus:outline-none focus:ring-0 shadow-sm transition-all rounded-xl"
+                className="w-20 border border-gray-200 px-3 py-2 text-[14px] font-bold text-gray-900 bg-white text-center focus:outline-none focus:border-[#164FA8] focus:ring-1 focus:ring-[#164FA8] shadow-sm transition-all rounded-[12px]"
               />
               <span className="text-[13px] font-medium text-gray-600">messages per student per day</span>
             </div>
@@ -491,7 +491,7 @@ function SettingsTab({ toast }) {
       {/* Save */}
       <button
         onClick={save}
-        className="flex items-center justify-center gap-2 w-full py-4 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] text-white text-[14px] font-bold transition-all rounded-xl shadow-ambient hover:shadow-lg hover:-translate-y-0.5"
+        className="flex items-center justify-center gap-2 w-full py-4 bg-[#4162EE] text-white text-[14px] font-bold transition-all rounded-[16px] shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:bg-[#3451D4]"
       >
         <Save size={16} />
         Save All Settings

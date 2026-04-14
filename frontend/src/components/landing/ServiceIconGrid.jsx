@@ -1,259 +1,175 @@
-import { useEffect, useId, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import {
-    CreditCard, Zap, GraduationCap, Home, Car,
+    CreditCard, Zap, GraduationCap, Shield, Car,
     FileSignature, FileText, CheckCircle2, Clock,
-    MessageCircle
+    MessageCircle, ArrowRight, X
 } from "lucide-react"
 import { useOutsideClick } from "../../hooks/useOutsideClick"
 
-// ── Per-category icon + banner style ─────────────────────────────────────────
+// ── All categories use the Bureau Blue palette only ───────────────────────────
+// surface-container-low   = #e6f6ff  (tonal row bg)
+// surface-container-lowest= #ffffff  (card bg)
+// primary-fixed           = #d7e2ff  (icon bg, badge bg)
+// primary                 = #003f87  (icon color, accent)
+// primary-container       = #0056b3  (gradient end)
 const CATEGORY_META = {
-    id:        { icon: CreditCard,    bg: "bg-neutral-900",     pattern: "radial-gradient(circle at 30% 50%, rgba(255,255,255,0.07) 0%, transparent 60%)" },
-    bills:     { icon: Zap,           bg: "bg-neutral-800",     pattern: "radial-gradient(circle at 70% 30%, rgba(255,255,255,0.07) 0%, transparent 60%)" },
-    forms:     { icon: GraduationCap, bg: "bg-neutral-900",     pattern: "radial-gradient(circle at 50% 70%, rgba(255,255,255,0.06) 0%, transparent 60%)" },
-    schemes:   { icon: Home,          bg: "bg-neutral-800",     pattern: "radial-gradient(circle at 20% 60%, rgba(255,255,255,0.07) 0%, transparent 60%)" },
-    land_auto: { icon: Car,           bg: "bg-neutral-900",     pattern: "radial-gradient(circle at 80% 40%, rgba(255,255,255,0.07) 0%, transparent 60%)" },
-    cert:      { icon: FileSignature, bg: "bg-neutral-800",     pattern: "radial-gradient(circle at 40% 20%, rgba(255,255,255,0.06) 0%, transparent 60%)" },
-    default:   { icon: FileText,      bg: "bg-neutral-900",     pattern: "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 60%)" },
+    id:        { icon: CreditCard    },
+    bills:     { icon: Zap          },
+    forms:     { icon: GraduationCap},
+    schemes:   { icon: Shield       },
+    land_auto: { icon: Car          },
+    cert:      { icon: FileSignature},
+    default:   { icon: FileText     },
 }
 
-// ── Animated close icon ───────────────────────────────────────────────────────
-function CloseIcon() {
-    return (
-        <motion.svg
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.05 } }}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24" height="24"
-            viewBox="0 0 24 24"
-            fill="none" stroke="currentColor"
-            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-            className="h-4 w-4 text-black"
-        >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M18 6l-12 12" />
-            <path d="M6 6l12 12" />
-        </motion.svg>
-    )
-}
+// ── Detail overlay card ───────────────────────────────────────────────────────
+function ServiceDetailCard({ svc, catKey, categoryLabel, onClose, onApply }) {
+    const ref = useRef(null)
+    const Icon = (CATEGORY_META[catKey] || CATEGORY_META.default).icon
+    useOutsideClick(ref, onClose)
 
-// ── Icon Banner — used as the "image" in both compact + expanded ──────────────
-function IconBanner({ svc, catKey, compact = false }) {
-    const meta = CATEGORY_META[catKey] || CATEGORY_META.default
-    const Icon = meta.icon
+    useEffect(() => {
+        document.body.style.overflow = "hidden"
+        const esc = (e) => { if (e.key === "Escape") onClose() }
+        window.addEventListener("keydown", esc)
+        return () => { document.body.style.overflow = "auto"; window.removeEventListener("keydown", esc) }
+    }, [])
+
     return (
-        <div
-            className={`${meta.bg} flex items-center justify-center relative overflow-hidden ${
-                compact
-                    ? "h-14 w-14 md:h-14 md:w-14 rounded-lg shrink-0"
-                    : "w-full h-72 sm:rounded-tr-xl sm:rounded-tl-xl"
-            }`}
-            style={{ backgroundImage: meta.pattern }}
-        >
-            {/* Subtle grid lines */}
-            <div className="absolute inset-0 opacity-[0.04]"
-                style={{
-                    backgroundImage: "linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)",
-                    backgroundSize: compact ? "8px 8px" : "24px 24px"
-                }}
+        <div className="fixed inset-0 grid place-items-center z-[100]">
+            {/* Backdrop */}
+            <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-[#071E27]/40 backdrop-blur-md"
             />
-            <Icon
-                size={compact ? 22 : 56}
-                className="text-white relative z-10"
-                strokeWidth={1.4}
-            />
-            {!compact && (
-                <p className="absolute bottom-4 left-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
-                    {svc.category || "Government Service"}
-                </p>
-            )}
+
+            {/* Card */}
+            <motion.div
+                ref={ref}
+                initial={{ opacity: 0, scale: 0.95, y: 16 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 16 }}
+                transition={{ type: "spring", damping: 28, stiffness: 300 }}
+                className="relative w-full max-w-[460px] mx-4 bg-[var(--color-surface-lowest)] rounded-[24px] overflow-hidden shadow-ambient z-10"
+            >
+                {/* Blue gradient banner */}
+                <div className="h-28 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] flex items-center justify-between px-7 relative overflow-hidden">
+                    <div>
+                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 mb-1">{categoryLabel}</p>
+                        <h3 className="text-[19px] font-black text-white leading-tight font-display max-w-[270px]">{svc.name}</h3>
+                    </div>
+                    <Icon size={72} strokeWidth={1} className="text-white/10 absolute right-4 bottom-2" />
+                    <button
+                        onClick={onClose}
+                        className="absolute top-4 right-4 w-7 h-7 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors"
+                    >
+                        <X size={13} className="text-white" />
+                    </button>
+                </div>
+
+                {/* Body */}
+                <div className="p-6 space-y-5">
+                    <div className="flex items-center gap-3">
+                        <span className="px-3 py-1 rounded-full text-[11px] font-black bg-[var(--color-primary-fixed)] text-[var(--color-primary)]">
+                            {svc.price ? `₹${svc.price}` : "Free Service"}
+                        </span>
+                        <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1.5">
+                            <Clock size={11} /> Priority Processing
+                        </span>
+                    </div>
+
+                    <div className="bg-[var(--color-surface-low)] rounded-[16px] p-5 space-y-3 shadow-ambient">
+                        <p className="text-[13px] text-gray-600 leading-relaxed font-medium">
+                            {svc.description || "Apply for this government service quickly and easily through e-Mitra. Our team will process your application and keep you updated via WhatsApp & Telegram."}
+                        </p>
+                        <div className="space-y-2 pt-2">
+                            {["100% Digital Processing", "Updates on WhatsApp & Telegram", "Priority processing available"].map((f) => (
+                                <div key={f} className="flex items-center gap-2.5">
+                                    <CheckCircle2 size={13} className="text-[var(--color-primary)]" />
+                                    <p className="text-[12px] font-bold text-gray-600">{f}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <button
+                        onClick={() => { onApply(svc); onClose() }}
+                        className="w-full py-4 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] text-white font-black text-[13px] uppercase tracking-widest rounded-[14px] flex items-center justify-center gap-3 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all"
+                    >
+                        <MessageCircle size={15} />
+                        Apply via WhatsApp
+                    </button>
+                    <p className="text-[9px] text-center font-bold text-gray-400 uppercase tracking-widest">
+                        WhatsApp pe direct chat shuru hogi
+                    </p>
+                </div>
+            </motion.div>
         </div>
     )
 }
 
-// ── Main expandable list ──────────────────────────────────────────────────────
-function ExpandableServiceList({ catKey, categoryLabel, services, onApply }) {
-    const [active, setActive] = useState(null)
-    const ref = useRef(null)
-    const id = useId()
-
-    useOutsideClick(ref, () => setActive(null))
-
-    useEffect(() => {
-        const onKey = (e) => { if (e.key === "Escape") setActive(false) }
-        window.addEventListener("keydown", onKey)
-        return () => window.removeEventListener("keydown", onKey)
-    }, [active])
-
-    useEffect(() => {
-        document.body.style.overflow = active && typeof active === "object" ? "hidden" : "auto"
-        return () => { document.body.style.overflow = "auto" }
-    }, [active])
+// ── Single service row ────────────────────────────────────────────────────────
+function ServiceRow({ svc, catKey, categoryLabel, onApply }) {
+    const [expanded, setExpanded] = useState(false)
+    const Icon = (CATEGORY_META[catKey] || CATEGORY_META.default).icon
 
     return (
         <>
-            {/* ── BACKDROP ── */}
             <AnimatePresence>
-                {active && typeof active === "object" && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/20 h-full w-full z-10"
+                {expanded && (
+                    <ServiceDetailCard
+                        svc={svc}
+                        catKey={catKey}
+                        categoryLabel={categoryLabel}
+                        onClose={() => setExpanded(false)}
+                        onApply={onApply}
                     />
                 )}
             </AnimatePresence>
 
-            {/* ── EXPANDED CARD ── */}
-            <AnimatePresence>
-                {active && typeof active === "object" ? (
-                    <div className="fixed inset-0 grid place-items-center z-[100]">
-
-                        {/* Mobile close */}
-                        <motion.button
-                            key={`close-${active.name}-${id}`}
-                            layout
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0, transition: { duration: 0.05 } }}
-                            className="flex absolute top-2 right-2 lg:hidden items-center justify-center bg-white rounded-full h-6 w-6 shadow-md z-[101]"
-                            onClick={() => setActive(null)}
-                        >
-                            <CloseIcon />
-                        </motion.button>
-
-                        <motion.div
-                            layoutId={`card-${active.name}-${id}`}
-                            ref={ref}
-                            className="w-full max-w-[500px] h-full md:h-fit md:max-h-[90%] flex flex-col bg-white sm:rounded-3xl overflow-hidden shadow-2xl"
-                        >
-                            {/* Banner image (shared layoutId) */}
-                            <motion.div layoutId={`image-${active.name}-${id}`}>
-                                <IconBanner svc={{ ...active, category: categoryLabel }} catKey={catKey} compact={false} />
-                            </motion.div>
-
-                            <div>
-                                {/* Header row */}
-                                <div className="flex justify-between items-start p-4">
-                                    <div>
-                                        <motion.h3
-                                            layoutId={`title-${active.name}-${id}`}
-                                            className="font-bold text-neutral-700"
-                                        >
-                                            {active.name}
-                                        </motion.h3>
-                                        <motion.p
-                                            layoutId={`description-${active.name}-${id}`}
-                                            className="text-neutral-600 text-sm"
-                                        >
-                                            {active.price ? `₹${active.price}` : "Free Service"}
-                                        </motion.p>
-                                    </div>
-
-                                    <motion.button
-                                        layoutId={`button-${active.name}-${id}`}
-                                        onClick={() => { onApply(active); setActive(null) }}
-                                        className="px-4 py-3 text-sm rounded-full font-bold bg-black text-white flex items-center gap-1.5 shrink-0 hover:bg-neutral-800 active:scale-95 transition-all"
-                                    >
-                                        <MessageCircle size={13} />
-                                        Apply
-                                    </motion.button>
-                                </div>
-
-                                {/* Content */}
-                                <div className="pt-2 relative px-4">
-                                    <motion.div
-                                        layout
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        className="text-neutral-600 text-xs md:text-sm h-40 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none]"
-                                    >
-                                        <p>
-                                            {active.description || "Apply for this government service quickly and easily through Krishna E-Mitra. Our team will process your application and keep you updated."}
-                                        </p>
-                                        <div className="space-y-2 w-full">
-                                            <div className="flex items-center gap-2">
-                                                <CheckCircle2 size={14} className="text-neutral-400 shrink-0" />
-                                                <p className="text-xs font-semibold text-neutral-500">100% Digital Processing</p>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <CheckCircle2 size={14} className="text-neutral-400 shrink-0" />
-                                                <p className="text-xs font-semibold text-neutral-500">Updates on WhatsApp & Telegram</p>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Clock size={14} className="text-neutral-400 shrink-0" />
-                                                <p className="text-xs font-semibold text-neutral-500">Priority processing available</p>
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                </div>
-                            </div>
-                        </motion.div>
+            <motion.div
+                onClick={() => setExpanded(true)}
+                whileTap={{ scale: 0.985 }}
+                className="flex items-center justify-between gap-4 px-5 py-4 rounded-[14px] cursor-pointer transition-all bg-[var(--color-surface-low)] hover:bg-[var(--color-primary-fixed)] hover:shadow-ambient group"
+            >
+                {/* Left: icon + text */}
+                <div className="flex items-center gap-4 min-w-0">
+                    <div className="w-10 h-10 bg-[var(--color-primary-fixed)] rounded-[10px] flex items-center justify-center shrink-0 group-hover:bg-white transition-colors">
+                        <Icon size={18} className="text-[var(--color-primary)]" strokeWidth={1.8} />
                     </div>
-                ) : null}
-            </AnimatePresence>
+                    <div className="min-w-0">
+                        <p className="text-[13px] font-black text-[#0A1A40] leading-tight font-display truncate">{svc.name}</p>
+                        <p className="text-[11px] font-bold text-[var(--color-primary)] mt-0.5">
+                            {svc.price ? `₹${svc.price}` : categoryLabel}
+                        </p>
+                    </div>
+                </div>
 
-            {/* ── COMPACT LIST (exact Aceternity structure) ── */}
-            <ul className="w-full gap-4">
-                {services.map((svc) => (
-                    <motion.div
-                        layoutId={`card-${svc.name}-${id}`}
-                        key={`card-${svc.name}-${id}`}
-                        onClick={() => setActive(svc)}
-                        className="p-4 flex flex-col md:flex-row justify-between items-center hover:bg-neutral-50 rounded-xl cursor-pointer"
-                    >
-                        {/* Left: icon banner + text */}
-                        <div className="flex gap-4 flex-col md:flex-row items-center md:items-center">
-                            <motion.div layoutId={`image-${svc.name}-${id}`}>
-                                <IconBanner svc={svc} catKey={catKey} compact={true} />
-                            </motion.div>
-
-                            <div>
-                                <motion.h3
-                                    layoutId={`title-${svc.name}-${id}`}
-                                    className="font-medium text-neutral-800 text-center md:text-left"
-                                >
-                                    {svc.name}
-                                </motion.h3>
-                                <motion.p
-                                    layoutId={`description-${svc.name}-${id}`}
-                                    className="text-neutral-600 text-sm text-center md:text-left"
-                                >
-                                    {svc.price ? `₹${svc.price}` : categoryLabel}
-                                </motion.p>
-                            </div>
-                        </div>
-
-                        {/* Right: CTA button */}
-                        <motion.button
-                            layoutId={`button-${svc.name}-${id}`}
-                            className="px-4 py-2 text-sm rounded-full font-bold bg-gray-100 hover:bg-black hover:text-white text-black mt-4 md:mt-0 transition-colors"
-                        >
-                            Apply
-                        </motion.button>
-                    </motion.div>
-                ))}
-            </ul>
+                {/* Right: apply pill */}
+                <button
+                    onClick={(e) => { e.stopPropagation(); setExpanded(true) }}
+                    className="shrink-0 flex items-center gap-1.5 px-4 py-2 bg-[var(--color-primary-fixed)] text-[var(--color-primary)] text-[11px] font-black rounded-full hover:bg-[var(--color-primary)] hover:text-white transition-all"
+                >
+                    Apply <ArrowRight size={12} />
+                </button>
+            </motion.div>
         </>
     )
 }
 
 // ── Category section header ───────────────────────────────────────────────────
-function CategoryHeader({ label, index, id }) {
+function CategoryHeader({ label, index, id, catKey }) {
+    const Icon = (CATEGORY_META[catKey] || CATEGORY_META.default).icon
     return (
-        <div id={id} className="mb-4 scroll-mt-16">
-            <div className="flex items-center gap-3">
-                <span className="text-[11px] font-black text-black/20 tabular-nums tracking-widest">
-                    {String(index + 1).padStart(2, "0")}
-                </span>
-                <div className="h-px flex-1 bg-black/[0.07]" />
+        <div id={id} className="mb-4 scroll-mt-20 flex items-center gap-3">
+            <div className="w-8 h-8 bg-[var(--color-primary-fixed)] rounded-[10px] flex items-center justify-center shrink-0">
+                <Icon size={15} className="text-[var(--color-primary)]" />
             </div>
-            <h2 className="mt-2 text-sm font-black uppercase tracking-widest text-black/75">
-                {label}
-            </h2>
+            <h2 className="text-[15px] font-black text-[#0A1A40] font-display">{label}</h2>
+            <span className="text-[9px] font-black text-gray-300 tabular-nums tracking-widest ml-auto">
+                {String(index + 1).padStart(2, "0")}
+            </span>
         </div>
     )
 }
@@ -265,20 +181,26 @@ export default function ServiceIconGrid({ services, activeCategory, onServiceCli
         : Object.entries(services).filter(([key]) => key === activeCategory)
 
     return (
-        <div className="space-y-10 md:space-y-14">
+        <div className="space-y-10">
             {filtered.map(([key, cat], catIdx) => (
                 <div key={key}>
-                    <CategoryHeader
-                        label={cat.label}
-                        index={catIdx}
-                        id={`cat-${key}`}
-                    />
-                    <ExpandableServiceList
-                        catKey={key}
-                        categoryLabel={cat.label}
-                        services={cat.services || []}
-                        onApply={(svc) => onServiceClick({ ...svc, category: cat.label, catKey: key })}
-                    />
+                    <CategoryHeader label={cat.label} index={catIdx} id={`cat-${key}`} catKey={key} />
+                    <div className="space-y-2">
+                        {(cat.services || []).map(svc => (
+                            <ServiceRow
+                                key={svc.name}
+                                svc={svc}
+                                catKey={key}
+                                categoryLabel={cat.label}
+                                onApply={(s) => onServiceClick({ ...s, category: cat.label, catKey: key })}
+                            />
+                        ))}
+                        {(cat.services || []).length === 0 && (
+                            <div className="text-center py-10 bg-[var(--color-surface-low)] rounded-[16px]">
+                                <p className="text-[13px] text-gray-400 font-medium">No services in this category yet.</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             ))}
         </div>

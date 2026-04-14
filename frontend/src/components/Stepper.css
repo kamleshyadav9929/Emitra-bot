@@ -8,17 +8,19 @@
 .step-circle-container {
   width: 100%;
   background-color: #FFFFFF;
-  border: 1px solid #E5E5E3;
+  border: 1px solid #F3F4F6;
+  border-radius: 24px;
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .step-indicator-row {
   display: flex;
   width: 100%;
   align-items: center;
-  padding: 1.25rem 2rem;
-  border-bottom: 1px solid #E5E5E3;
-  background-color: #F7F7F5;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #F3F4F6;
+  background-color: #F8FAFC;
 }
 
 .step-content-default {
@@ -31,9 +33,9 @@
 }
 
 .footer-container {
-  padding: 1rem 2rem;
-  border-top: 1px solid #E5E5E3;
-  background-color: #F7F7F5;
+  padding: 1.25rem 2rem;
+  border-top: 1px solid #F3F4F6;
+  background-color: #F8FAFC;
 }
 
 .footer-nav {
@@ -50,20 +52,21 @@
 
 .back-button {
   transition: all 150ms;
-  padding: 0.5rem 1.25rem;
-  color: #7A7A78;
+  padding: 0.6rem 1.5rem;
+  color: #64748b;
   cursor: pointer;
   background: transparent;
-  border: 1px solid #E5E5E3;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
   font-size: 0.8125rem;
-  font-weight: 500;
+  font-weight: 600;
   font-family: inherit;
 }
 
 .back-button:hover {
-  color: #0A0A0A;
-  border-color: #0A0A0A;
-  background: transparent;
+  color: #1e293b;
+  border-color: #cbd5e1;
+  background: white;
 }
 
 .back-button.inactive {
@@ -77,23 +80,27 @@
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  background-color: #0A0A0A;
+  background-color: #4162EE;
   color: #FFFFFF;
   font-weight: 600;
   font-size: 0.8125rem;
-  padding: 0.5rem 1.5rem;
+  padding: 0.6rem 2rem;
   cursor: pointer;
-  border: 1px solid #0A0A0A;
+  border: none;
+  border-radius: 12px;
   font-family: inherit;
+  box-shadow: 0 4px 10px rgba(65, 98, 238, 0.2);
 }
 
 .next-button:hover {
-  background-color: #3D3D3D;
-  border-color: #3D3D3D;
+  background-color: #3451D4;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(65, 98, 238, 0.3);
 }
 
 .next-button:active {
-  background-color: #000000;
+  background-color: #2a41a8;
+  transform: translateY(0px);
 }
 
 .step-indicator {
@@ -104,34 +111,36 @@
 
 .step-indicator-inner {
   display: flex;
-  height: 2rem;
-  width: 2rem;
+  height: 2.2rem;
+  width: 2.2rem;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
   font-weight: 600;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .active-dot {
-  height: 0.55rem;
-  width: 0.55rem;
+  height: 0.6rem;
+  width: 0.6rem;
   border-radius: 9999px;
   background-color: #fff;
 }
 
 .step-number {
-  font-size: 0.8rem;
-  color: #AEAEAC;
+  font-size: 0.85rem;
+  color: #94a3b8;
 }
 
 .step-connector {
   position: relative;
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
-  height: 1px;
+  margin-left: 0.75rem;
+  margin-right: 0.75rem;
+  height: 2px;
   flex: 1;
   overflow: hidden;
-  background-color: #E5E5E3;
+  background-color: #e2e8f0;
+  border-radius: 2px;
 }
 
 .step-connector-inner {
@@ -142,7 +151,7 @@
 }
 
 .check-icon {
-  height: 1rem;
-  width: 1rem;
+  height: 1.1rem;
+  width: 1.1rem;
   color: #fff;
 }

@@ -166,7 +166,7 @@ def webhook():
 
 @app.route("/api/public/services", methods=["GET"])
 def get_public_services():
-    return jsonify({"services": database.get_services_as_dict()})
+    return jsonify({"services": database.get_public_services_as_dict()})
 
 
 @app.route("/api/public/exams", methods=["GET"])
@@ -263,6 +263,27 @@ def get_students():
     else:
         students = database.get_students_by_exam(exam)
     return jsonify({"students": students, "total": len(students)})
+
+
+@app.route("/api/students", methods=["POST"])
+@token_required
+def add_student():
+    data = request.json or {}
+    name = data.get("name", "").strip()
+    phone = data.get("phone", "").strip()
+    exam = data.get("exam_preference", "NONE")
+
+    if not name or not phone:
+        return jsonify({"success": False, "error": "Name and Phone are required"}), 400
+
+    if not re.match(r"^[6-9]\d{9}$", phone):
+        return jsonify({"success": False, "error": "Invalid Indian phone number"}), 400
+
+    success, result = database.add_student_admin(name, phone, exam)
+    if success:
+        return jsonify({"success": True, "message": "Student added successfully", "id": result})
+    else:
+        return jsonify({"success": False, "error": result}), 409
 
 
 @app.route("/api/stats", methods=["GET"])

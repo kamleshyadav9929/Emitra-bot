@@ -87,55 +87,53 @@ export default function Dashboard() {
         {/* Total Students */}
         <div 
           onClick={() => navigate("/admin/students")}
-          className="bg-[var(--color-primary-fixed)] border-none rounded-xl p-6 relative overflow-hidden flex flex-col justify-between h-[180px] cursor-pointer hover:shadow-ambient transition-shadow group"
+          className="bg-[#EBF1FA] border border-[#DEECF5] rounded-[20px] p-6 relative overflow-hidden flex flex-col justify-between h-[180px] cursor-pointer hover:shadow-md transition-shadow group"
         >
-          <div className="z-10 relative">
-            <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-[var(--color-primary)]">TOTAL STUDENTS</p>
+          <div>
+            <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-[#164FA8]">TOTAL STUDENTS</p>
             <p className="text-5xl font-extrabold text-[#0A1A40] mt-3 group-hover:scale-105 transition-transform origin-left">{total}</p>
           </div>
-          <div className="flex items-center gap-2 z-10 relative">
-            <TrendingUp size={16} className="text-[var(--color-primary)]" />
-            <span className="text-[13px] font-medium text-[var(--color-primary)]">Active Registrations</span>
+          <div className="flex items-center gap-2 z-10">
+            <TrendingUp size={16} className="text-[#164FA8]" />
+            <span className="text-[13px] font-medium text-[#164FA8]">Active Registrations</span>
           </div>
-          <Users size={140} strokeWidth={1} className="absolute -bottom-6 -right-6 text-white text-opacity-50 rotate-[-5deg] pointer-events-none z-0" />
+          <Users size={120} strokeWidth={1} className="absolute -bottom-6 -right-8 text-[#D1DDED]/80 rotate-[-5deg]" />
         </div>
 
         {/* Messages Sent */}
         <div 
           onClick={() => navigate("/admin/logs")}
-          className="bg-[var(--color-surface-lowest)] shadow-ambient border-none rounded-xl p-6 flex flex-col justify-between h-[180px] cursor-pointer hover:scale-[1.01] transition-transform relative overflow-hidden"
+          className="bg-white border border-gray-100 rounded-[20px] p-6 shadow-sm flex flex-col justify-between h-[180px] cursor-pointer hover:border-[#164FA8] transition-colors"
         >
-          <div className="z-10 relative">
+          <div>
             <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-gray-400">MESSAGES SENT</p>
             <p className="text-4xl font-extrabold text-gray-900 mt-4 tracking-tight">{totalSent}</p>
           </div>
-          <div className="mt-auto flex justify-between items-end z-10 relative">
+          <div className="mt-auto flex justify-between items-end">
             <div>
                <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide">Total Delivered Broadcasts</p>
             </div>
             <Send size={24} className="text-gray-200" />
           </div>
-          <Send size={140} strokeWidth={1} className="absolute -bottom-8 -right-8 text-[#f3faff] rotate-[-15deg] pointer-events-none z-0" />
         </div>
 
         {/* Pending Requests */}
         <div 
           onClick={() => navigate("/admin/requests")}
-          className="bg-[var(--color-surface-low)] border-none shadow-sm rounded-xl p-6 flex flex-col justify-between h-[180px] relative overflow-hidden cursor-pointer hover:shadow-ambient transition-shadow"
+          className="bg-[#EDF6FA] border border-[#DEECF5] rounded-[20px] p-6 flex flex-col justify-between h-[180px] relative cursor-pointer hover:shadow-md transition-shadow"
         >
           {pendingCount > 0 && (
-             <div className="absolute top-6 right-6 w-3 h-3 bg-red-500 rounded-full animate-pulse z-20"></div>
+             <div className="absolute top-6 right-6 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
           )}
-          <div className="z-10 relative">
+          <div>
             <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-gray-500">PENDING REQUESTS</p>
             <p className="text-4xl font-extrabold text-gray-900 mt-4 tracking-tight">
                {pendingCount} {pendingCount > 0 && <span className="font-semibold text-2xl text-red-500 ml-1">New</span>}
             </p>
           </div>
-          <p className="text-[13px] font-bold text-[var(--color-primary)] underline underline-offset-2 hover:text-black transition-colors mt-auto z-10 relative">
+          <p className="text-[13px] font-bold text-[#164FA8] underline underline-offset-2 hover:text-[#0B3A82] transition-colors mt-auto">
             View All e-Mitra Requests
           </p>
-          <FileText size={140} strokeWidth={1} className="absolute -bottom-6 -right-10 text-white/70 rotate-[10deg] pointer-events-none z-0" />
         </div>
       </div>
 
@@ -143,7 +141,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Left Column - Exam Distribution & Recent Students */}
-        <div className="bg-[var(--color-surface-lowest)] border-none rounded-xl p-7 shadow-ambient lg:col-span-2">
+        <div className="bg-white border border-gray-100 rounded-[24px] p-7 shadow-sm lg:col-span-2">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-[17px] font-bold text-gray-900">Recent Student Registrations</h2>
             <button 
@@ -167,18 +165,19 @@ export default function Dashboard() {
                     <th className="text-[10px] font-bold tracking-wider text-gray-400 uppercase pb-4 text-right">Joined</th>
                   </tr>
                 </thead>
-                <tbody className="text-[13px] font-medium border-t-0">
+                <tbody className="text-[13px] font-medium border-t border-gray-100">
                   {recentStudents.map((s, idx) => {
+                    const isLast = idx === recentStudents.length - 1;
                     const dateObj = new Date(s.joined_at)
                     const dateStr = !isNaN(dateObj) ? dateObj.toLocaleDateString() : 'Unknown'
                     return (
-                      <tr key={s.phone || idx} className="odd:bg-[var(--color-surface-low)]">
-                        <td className="py-4 px-2 font-bold text-[var(--color-on-surface)] border-none">{s.phone}</td>
-                        <td className="py-4 text-gray-600 px-2 border-none">{s.exam}</td>
-                        <td className="py-4 px-2 border-none">
-                          <span className="bg-[#E1F7E8] text-[#1E8A44] px-3 py-1 rounded-md text-[10px] font-bold">Active</span>
+                      <tr key={s.phone || idx}>
+                        <td className={`py-4 font-bold text-gray-800 ${!isLast ? 'border-b border-gray-50' : ''}`}>{s.phone}</td>
+                        <td className={`py-4 text-gray-600 pr-4 ${!isLast ? 'border-b border-gray-50' : ''}`}>{s.exam}</td>
+                        <td className={`py-4 ${!isLast ? 'border-b border-gray-50' : ''}`}>
+                          <span className="bg-[#E1F7E8] text-[#1E8A44] px-3 py-1 rounded-full text-[10px] font-bold">Active</span>
                         </td>
-                        <td className="py-4 px-2 text-gray-400 text-right border-none">{dateStr}</td>
+                        <td className={`py-4 text-gray-400 text-right ${!isLast ? 'border-b border-gray-50' : ''}`}>{dateStr}</td>
                       </tr>
                     )
                   })}
@@ -218,12 +217,26 @@ export default function Dashboard() {
         {/* Right Column - Action Cards */}
         <div className="flex flex-col gap-6 lg:col-span-1">
           
-
+          {/* Post New News -> Send Broadcast */}
+          <div 
+            onClick={() => navigate("/admin/send")}
+            className="bg-[#4162EE] text-white rounded-[24px] p-7 cursor-pointer hover:bg-[#3451D4] hover:shadow-lg transition-all group relative overflow-hidden flex-shrink-0"
+           >
+            <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+            <Megaphone size={24} className="mb-4 text-white" />
+            <h3 className="text-[18px] font-bold mb-2">Send Broadcast</h3>
+            <p className="text-[13px] text-white/80 leading-relaxed max-w-[85%] pr-4 mb-6">
+              Push bulk notifications to your student segments directly via WhatsApp.
+            </p>
+            <div className="flex justify-end mt-auto relative z-10 w-full text-right">
+                <ArrowRight size={22} className="text-white group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
 
           {/* Update Form List -> Service Requests */}
           <div 
             onClick={() => navigate("/admin/requests")}
-            className="bg-[var(--color-surface-low)] border-none rounded-xl p-7 flex flex-col justify-between cursor-pointer hover:shadow-ambient transition-all flex-shrink-0"
+            className="bg-[#E2EDF8] rounded-[24px] p-7 flex flex-col justify-between cursor-pointer hover:bg-[#D5E4F5] transition-colors flex-shrink-0"
           >
             <div>
               <FileText size={22} className="text-[#164FA8] mb-4" />

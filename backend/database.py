@@ -90,6 +90,7 @@ def init_db():
             description    TEXT DEFAULT '',
             price          TEXT DEFAULT '',
             enabled        INTEGER DEFAULT 1,
+            show_in_web    INTEGER DEFAULT 1,
             sort_order     INTEGER DEFAULT 0
         )
     ''')
@@ -188,7 +189,7 @@ def _seed_default_services(conn):
     ]
     for i, row in enumerate(defaults):
         conn.execute(
-            "INSERT INTO services (category_key, category_label, name, description, price, enabled, sort_order) VALUES (?,?,?,?,?,1,?)",
+            "INSERT INTO services (category_key, category_label, name, description, price, enabled, show_in_web, sort_order) VALUES (?,?,?,?,?,1,1,?)",
             (row[0], row[1], row[2], row[3], row[4], i)
         )
     conn.commit()
@@ -237,6 +238,21 @@ def register_student_web(name, phone_number, exam_pref):
         return True, cursor.lastrowid
     except sqlite3.IntegrityError:
         return False, "Phone number already registered"
+
+
+def add_student_admin(name, phone_number, exam_pref="NONE"):
+    """Admin-initiated manual student addition. Bypasses Telegram requirement."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            INSERT INTO students (name, phone_number, exam_preference, is_registered)
+            VALUES (?, ?, ?, 1)
+        ''', (name.strip(), phone_number.strip(), exam_pref or "NONE"))
+        conn.commit()
+        return True, cursor.lastrowid
+    except sqlite3.IntegrityError:
+        return False, "A student with this phone number already exists"
 
 
 def update_phone_number(telegram_id, phone_number):
@@ -606,7 +622,36 @@ def get_services_as_dict():
     return result
 
 
-def add_service(category_key, category_label, name, description="", price="", enabled=True):
+def get_public_services_as_dict():
+    """
+    Returns services grouped by category for the Web Portal.
+    Only returns services where show_in_web = 1.
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM services WHERE show_in_web = 1 ORDER BY sort_order ASC, id ASC"
+    )
+    rows = cursor.fetchall()
+
+    # Build ordered dict preserving category order
+    result = {}
+    for row in rows:
+        key = row["category_key"]
+        if key not in result:
+            result[key] = {
+                "label": row["category_label"],
+                "services": [],
+            }
+        result[key]["services"].append({
+            "name": row["name"],
+            "description": row["description"],
+            "price": row["price"]
+        })
+    return result
+
+
+def add_service(category_key, category_label, name, description="", price="", enabled=True, show_in_web=True):
     conn = get_connection()
     cursor = conn.cursor()
     # Place at end of its category
@@ -614,16 +659,16 @@ def add_service(category_key, category_label, name, description="", price="", en
     row = cursor.fetchone()
     next_order = (row["m"] or 0) + 1
     conn.execute(
-        "INSERT INTO services (category_key, category_label, name, description, price, enabled, sort_order) VALUES (?,?,?,?,?,?,?)",
-        (category_key, category_label, name, description, price, 1 if enabled else 0, next_order)
+        "INSERT INTO services (category_key, category_label, name, description, price, enabled, show_in_web, sort_order) VALUES (?,?,?,?,?,?,?,?)",
+        (category_key, category_label, name, description, price, 1 if enabled else 0, 1 if show_in_web else 0, next_order)
     )
     conn.commit()
     return cursor.lastrowid
 
 
 def update_service(service_id, **fields):
-    """Update any combination of: name, description, price, category_key, category_label, enabled."""
-    allowed = {"name", "description", "price", "category_key", "category_label", "enabled"}
+    """Update any combination of: name, description, price, category_key, category_label, enabled, show_in_web."""
+    allowed = {"name", "description", "price", "category_key", "category_label", "enabled", "show_in_web"}
     updates = {k: v for k, v in fields.items() if k in allowed}
     if not updates:
         return

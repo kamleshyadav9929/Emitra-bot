@@ -23,6 +23,13 @@ export const getStats = () =>
 export const getStudents = (exam = "ALL") =>
   fetch(`${BASE_URL}/api/students?exam=${exam}`, { headers: getAuthHeaders() }).then(r => r.json())
 
+export const addStudent = (studentData) =>
+  fetch(`${BASE_URL}/api/students`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(studentData)
+  }).then(r => r.json())
+
 export const sendNotification = (exam, message) =>
   fetch(`${BASE_URL}/api/send-notification`, {
     method: "POST",
