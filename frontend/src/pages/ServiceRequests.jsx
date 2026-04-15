@@ -192,8 +192,8 @@ export default function ServiceRequests() {
       const data = await getServiceRequests(filter)
       setRequests(data.requests || [])
       setStats({ total: data.total || 0, pending: data.pending || 0 })
-    } catch {
-      setError("Failed to fetch requests."); setRequests([])
+    } catch (err) {
+      setError(err?.message || "Failed to fetch requests."); setRequests([])
     } finally { setLoading(false) }
   }, [filter])
 

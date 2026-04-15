@@ -48,7 +48,7 @@ export default function Students() {
         setAddError(res.error || "Failed to add student")
       }
     } catch (err) {
-      setAddError("An error occurred")
+      setAddError(err?.message || "An error occurred")
     }
   }
 
@@ -65,7 +65,7 @@ export default function Students() {
     setError(null)
     getStudents(activeFilter)
       .then(r => { if (!cancelled) setStudents(r.students || []) })
-      .catch(() => { if (!cancelled) { setStudents([]); setError("Failed to fetch.") } })
+      .catch(err => { if (!cancelled) { setStudents([]); setError(err?.message || "Failed to fetch.") } })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
   }, [activeFilter])

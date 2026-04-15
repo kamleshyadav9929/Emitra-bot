@@ -20,16 +20,18 @@ export default function Dashboard() {
   const [loading, setLoading]       = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [lastUpdated, setLastUpdated] = useState(null)
+  const [error, setError] = useState("")
 
   const fetchAll = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true)
     else setLoading(true)
+    setError("")
     try {
       const [st, stList, logData, reqData] = await Promise.all([
-        getStats().catch(() => ({ total_students: 0, by_exam: {} })),
-        getStudents().catch(() => ({ students: [] })),
-        getLogs().catch(() => ({ logs: [] })),
-        getServiceRequests("pending").catch(() => ({ pending: 0 })),
+        getStats(),
+        getStudents(),
+        getLogs(),
+        getServiceRequests("pending"),
       ])
       setStats(st)
       const sorted = (stList.students || []).sort((a, b) => new Date(b.joined_at) - new Date(a.joined_at))
@@ -37,6 +39,8 @@ export default function Dashboard() {
       setTotalSent((logData.logs || []).reduce((acc, l) => acc + (l.total_recipients || 0), 0))
       setPending(reqData.pending || 0)
       setLastUpdated(new Date())
+    } catch (err) {
+      setError(err?.message || "Failed to load admin data")
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -53,6 +57,15 @@ export default function Dashboard() {
       </div>
     </div>
   )
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-5">
+        <p className="font-bold text-sm">Admin data could not be loaded.</p>
+        <p className="text-sm mt-1">{error}</p>
+      </div>
+    )
+  }
 
   const total = stats?.total_students || 0
   const examEntries = Object.entries(stats?.by_exam || {}).filter(([k, v]) => k !== "ALL" && k !== "NONE" && v > 0)

@@ -1,5 +1,23 @@
 export const BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "")
 
+const requestJson = async (path, options = {}) => {
+  const response = await fetch(`${BASE_URL}${path}`, options)
+  let data = null
+
+  try {
+    data = await response.json()
+  } catch {
+    data = null
+  }
+
+  if (!response.ok) {
+    const message = data?.error || data?.message || `Request failed with status ${response.status}`
+    throw new Error(message)
+  }
+
+  return data
+}
+
 const getAuthHeaders = async () => {
   let token = null;
   if (window.Clerk && window.Clerk.session) {
@@ -16,142 +34,142 @@ const getAuthHeaders = async () => {
 }
 
 export const getStats = async () =>
-  fetch(`${BASE_URL}/api/stats`, { headers: await getAuthHeaders() }).then(r => r.json())
+  requestJson(`/api/stats`, { headers: await getAuthHeaders() })
 
 export const getStudents = async (exam = "ALL") =>
-  fetch(`${BASE_URL}/api/students?exam=${exam}`, { headers: await getAuthHeaders() }).then(r => r.json())
+  requestJson(`/api/students?exam=${exam}`, { headers: await getAuthHeaders() })
 
 export const addStudent = async (studentData) =>
-  fetch(`${BASE_URL}/api/students`, {
+  requestJson(`/api/students`, {
     method: "POST",
     headers: await getAuthHeaders(),
     body: JSON.stringify(studentData)
-  }).then(r => r.json())
+  })
 
 export const sendNotification = async (exam, message) =>
-  fetch(`${BASE_URL}/api/send-notification`, {
+  requestJson(`/api/send-notification`, {
     method: "POST",
     headers: await getAuthHeaders(),
     body: JSON.stringify({ exam, message })
-  }).then(r => r.json())
+  })
 
 export const getLogs = async () =>
-  fetch(`${BASE_URL}/api/logs`, { headers: await getAuthHeaders() }).then(r => r.json())
+  requestJson(`/api/logs`, { headers: await getAuthHeaders() })
 
 export const getServiceRequests = async (status = "") =>
-  fetch(`${BASE_URL}/api/service-requests${status ? `?status=${status}` : ""}`, { headers: await getAuthHeaders() }).then(r => r.json())
+  requestJson(`/api/service-requests${status ? `?status=${status}` : ""}`, { headers: await getAuthHeaders() })
 
 export const sendReceipt = async (telegramId, message, requestId) =>
-  fetch(`${BASE_URL}/api/send-receipt`, {
+  requestJson(`/api/send-receipt`, {
     method: "POST",
     headers: await getAuthHeaders(),
     body: JSON.stringify({ telegram_id: telegramId, message, request_id: requestId })
-  }).then(r => r.json())
+  })
 
 export const getStudentDocuments = async (telegramId) =>
-  fetch(`${BASE_URL}/api/documents/${telegramId}`, { headers: await getAuthHeaders() }).then(r => r.json())
+  requestJson(`/api/documents/${telegramId}`, { headers: await getAuthHeaders() })
 
 export const getDocumentUrl = async (fileId) =>
-  fetch(`${BASE_URL}/api/document-url/${fileId}`, { headers: await getAuthHeaders() }).then(r => r.json())
+  requestJson(`/api/document-url/${fileId}`, { headers: await getAuthHeaders() })
 
 
 // ── Bot Settings API ──────────────────────────────────────────────────────────
 export const getBotSettings = async () =>
-  fetch(`${BASE_URL}/api/bot-settings`, { headers: await getAuthHeaders() }).then(r => r.json())
+  requestJson(`/api/bot-settings`, { headers: await getAuthHeaders() })
 
 export const saveBotSettings = async (settings) =>
-  fetch(`${BASE_URL}/api/bot-settings`, {
+  requestJson(`/api/bot-settings`, {
     method: "POST",
     headers: await getAuthHeaders(),
     body: JSON.stringify(settings)
-  }).then(r => r.json())
+  })
 
 // ── Student management ────────────────────────────────────────────────────────
 export const blockStudent = async (telegramId) =>
-  fetch(`${BASE_URL}/api/students/${telegramId}/block`, {
+  requestJson(`/api/students/${telegramId}/block`, {
     method: "POST",
     headers: await getAuthHeaders()
-  }).then(r => r.json())
+  })
 
 export const deleteStudent = async (telegramId) =>
-  fetch(`${BASE_URL}/api/students/${telegramId}`, {
+  requestJson(`/api/students/${telegramId}`, {
     method: "DELETE",
     headers: await getAuthHeaders()
-  }).then(r => r.json())
+  })
 
 // ── Services API ──────────────────────────────────────────────────────────────
 export const getServices = async () =>
-  fetch(`${BASE_URL}/api/services`, { headers: await getAuthHeaders() }).then(r => r.json())
+  requestJson(`/api/services`, { headers: await getAuthHeaders() })
 
 export const createService = async (data) =>
-  fetch(`${BASE_URL}/api/services`, {
+  requestJson(`/api/services`, {
     method: "POST",
     headers: await getAuthHeaders(),
     body: JSON.stringify(data)
-  }).then(r => r.json())
+  })
 
 export const updateService = async (id, data) =>
-  fetch(`${BASE_URL}/api/services/${id}`, {
+  requestJson(`/api/services/${id}`, {
     method: "PUT",
     headers: await getAuthHeaders(),
     body: JSON.stringify(data)
-  }).then(r => r.json())
+  })
 
 export const toggleService = async (id) =>
-  fetch(`${BASE_URL}/api/services/${id}/toggle`, {
+  requestJson(`/api/services/${id}/toggle`, {
     method: "POST",
     headers: await getAuthHeaders()
-  }).then(r => r.json())
+  })
 
 export const deleteServiceApi = async (id) =>
-  fetch(`${BASE_URL}/api/services/${id}`, {
+  requestJson(`/api/services/${id}`, {
     method: "DELETE",
     headers: await getAuthHeaders()
-  }).then(r => r.json())
+  })
 
 // ── Exams API ─────────────────────────────────────────────────────────────────
 export const getExams = async () =>
-  fetch(`${BASE_URL}/api/exams`, { headers: await getAuthHeaders() }).then(r => r.json())
+  requestJson(`/api/exams`, { headers: await getAuthHeaders() })
 
 export const createExam = async (data) =>
-  fetch(`${BASE_URL}/api/exams`, {
+  requestJson(`/api/exams`, {
     method: "POST",
     headers: await getAuthHeaders(),
     body: JSON.stringify(data)
-  }).then(r => r.json())
+  })
 
 export const deleteExamApi = async (id) =>
-  fetch(`${BASE_URL}/api/exams/${id}`, {
+  requestJson(`/api/exams/${id}`, {
     method: "DELETE",
     headers: await getAuthHeaders()
-  }).then(r => r.json())
+  })
 
 
 // ── Public API (No Auth Required) ─────────────────────────────────────────────
-export const getPublicServices      = () => fetch(`${BASE_URL}/api/public/services`).then(r => r.json())
-export const getPublicExams         = () => fetch(`${BASE_URL}/api/public/exams`).then(r => r.json())
-export const getPublicAnnouncements = () => fetch(`${BASE_URL}/api/public/announcements`).then(r => r.json())
-export const getPublicStats         = () => fetch(`${BASE_URL}/api/public/stats`).then(r => r.json())
-export const getPublicConfig        = () => fetch(`${BASE_URL}/api/public/config`).then(r => r.json())
-export const getPublicNews          = () => fetch(`${BASE_URL}/api/public/news`).then(r => r.json())
+export const getPublicServices      = () => requestJson(`/api/public/services`)
+export const getPublicExams         = () => requestJson(`/api/public/exams`)
+export const getPublicAnnouncements = () => requestJson(`/api/public/announcements`)
+export const getPublicStats         = () => requestJson(`/api/public/stats`)
+export const getPublicConfig        = () => requestJson(`/api/public/config`)
+export const getPublicNews          = () => requestJson(`/api/public/news`)
 
 export const publicRegister = (data) =>
-  fetch(`${BASE_URL}/api/public/register`, {
+  requestJson(`/api/public/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
-  }).then(r => r.json())
+  })
 
 export const publicCheckStatus = (phone) =>
-  fetch(`${BASE_URL}/api/public/check-status`, {
+  requestJson(`/api/public/check-status`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ phone })
-  }).then(r => r.json())
+  })
 
 export const publicLogIntent = (service_name, category) =>
-  fetch(`${BASE_URL}/api/public/log-intent`, {
+  requestJson(`/api/public/log-intent`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ service_name, category })
-  }).then(r => r.json())
+  })
