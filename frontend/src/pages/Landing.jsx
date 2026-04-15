@@ -164,10 +164,10 @@ export default function Landing() {
             <main className="flex-1 flex flex-col h-full overflow-y-auto scroll-smooth bg-[var(--color-surface-base)] relative">
                 
                 {/* Fixed Top Canvas Header */}
-                <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 h-[70px] flex items-center justify-between px-6 md:px-10 shrink-0">
+                <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 h-14 md:h-[70px] flex items-center justify-between px-4 md:px-10 shrink-0">
                     {/* Mobile Logo Toggle */}
-                    <div className="flex items-center lg:hidden gap-3">
-                        <span className="text-[var(--color-primary)] font-black text-[20px] tracking-tight font-display">e-Mitra Digital</span>
+                    <div className="flex items-center lg:hidden gap-2">
+                        <span className="text-[var(--color-primary)] font-black text-[16px] md:text-[20px] tracking-tight font-display">e-Mitra Digital</span>
                     </div>
 
                     {/* Global Search Canvas Input */}
@@ -248,16 +248,16 @@ export default function Landing() {
 
                 {/* Sleek Live Updates Marquee */}
                 {announcements.length > 0 && (
-                    <div className="bg-[var(--color-surface-low)] border-b border-[var(--color-surface-lowest)] text-gray-600 overflow-hidden h-9 flex items-center shrink-0">
+                    <div className="bg-[var(--color-surface-low)] border-b border-[var(--color-surface-lowest)] text-gray-600 overflow-hidden h-7 md:h-9 flex items-center shrink-0">
                         <div className="flex items-center gap-2 px-4 md:px-10 shrink-0 h-full border-r border-gray-200 bg-white">
-                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                            <span className="text-[10px] font-bold tracking-widest uppercase text-gray-900 hidden sm:block">Live Updates</span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                            <span className="text-[9px] md:text-[10px] font-bold tracking-widest uppercase text-gray-900 hidden sm:block">Live Updates</span>
                         </div>
                         <div className="overflow-hidden flex-1 h-full flex items-center">
-                            <div className="marquee-track flex gap-12 sm:gap-16 whitespace-nowrap">
+                            <div className="marquee-track flex gap-8 md:gap-16 whitespace-nowrap">
                                 {[...announcements, ...announcements].map((a, i) => (
-                                    <span key={i} className="text-[12px] font-bold text-gray-700 flex items-center gap-3">
-                                        <span className="text-[var(--color-primary)]">•</span> {a.title} — {a.content}
+                                    <span key={i} className="text-[11px] md:text-[12px] font-bold text-gray-700 flex items-center gap-2 md:gap-3">
+                                        <span className="text-[var(--color-primary)]">•</span> {a.title}
                                     </span>
                                 ))}
                             </div>
@@ -269,17 +269,17 @@ export default function Landing() {
                 <div className="flex flex-1 min-h-0">
 
                 {/* ── MAIN CANVAS ── */}
-                <div className="flex-1 overflow-y-auto pb-32 p-4 md:p-8 lg:p-10">
+                <div className="flex-1 overflow-y-auto pb-24 md:pb-32 p-3 md:p-8 lg:p-10">
                     
                     {/* ── BIG CATEGORY CARDS (Main Canvas view) ── */}
-                    <section id="services" className="scroll-mt-24 mt-2">
-                        <div className="mb-10 flex flex-col items-center text-center lg:items-start lg:text-left">
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--color-surface-low)] border border-[var(--color-outline-variant)] mb-5">
-                                <ShieldCheck size={14} className="text-[var(--color-primary)]" />
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#164FA8]">Digital Governance</span>
+                    <section id="services" className="scroll-mt-20 mt-1">
+                        <div className="mb-6 md:mb-10 flex flex-col items-center text-center lg:items-start lg:text-left">
+                            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[var(--color-surface-low)] border border-[var(--color-outline-variant)] mb-4 md:mb-5">
+                                <ShieldCheck size={12} className="text-[var(--color-primary)]" />
+                                <span className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-[#164FA8]">Digital Governance</span>
                             </div>
-                            <h1 className="text-3xl md:text-4xl font-black text-[#0A1A40] font-display mb-3">Service Directory</h1>
-                            <p className="text-[14px] md:text-[15px] text-gray-500 max-w-lg font-medium">Access unified utility and educational services instantly.</p>
+                            <h1 className="text-2xl md:text-4xl font-black text-[#0A1A40] font-display mb-2 md:mb-3">Service Directory</h1>
+                            <p className="text-[13px] md:text-[15px] text-gray-500 max-w-lg font-medium">Access unified utility and educational services instantly.</p>
                         </div>
                         
                         {loading ? (
@@ -293,16 +293,16 @@ export default function Landing() {
                                         <div
                                             key={key}
                                             onClick={() => navigate(`/services/${key}`)}
-                                            className="cursor-pointer group flex flex-col p-5 rounded-[16px] bg-white transition-all shadow-ambient hover:shadow-lg hover:-translate-y-1 hover:bg-[var(--color-primary-fixed)] relative overflow-hidden h-[160px]"
+                                            className="cursor-pointer group flex flex-col p-4 rounded-[12px] bg-white transition-all shadow-ambient hover:shadow-lg hover:-translate-y-1 hover:bg-[var(--color-primary-fixed)] relative overflow-hidden h-[120px] md:h-[160px]"
                                         >
-                                            <div className="flex items-center gap-3 mb-3 relative z-10">
-                                                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] shadow-ambient">
-                                                    <Icon size={20} className="text-white" strokeWidth={1.8} />
+                                            <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-3 relative z-10">
+                                                <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] shadow-ambient">
+                                                    <Icon size={16} className="text-white" strokeWidth={1.8} />
                                                 </div>
-                                                <h3 className="text-[15px] font-black text-[#0A1A40] group-hover:text-[var(--color-primary)] transition-colors leading-tight font-display line-clamp-2">{cat.label}</h3>
+                                                <h3 className="text-[13px] md:text-[15px] font-black text-[#0A1A40] group-hover:text-[var(--color-primary)] transition-colors leading-tight font-display line-clamp-2">{cat.label}</h3>
                                             </div>
 
-                                            <p className="text-[11px] text-gray-500 font-medium mb-3 flex-1 pr-2 leading-relaxed line-clamp-2 relative z-10">
+                                            <p className="text-[10px] md:text-[11px] text-gray-500 font-medium mb-2 flex-1 pr-2 leading-relaxed line-clamp-1 md:line-clamp-2 relative z-10">
                                                 {cat.services?.map(s => s.name).join(", ") || `${cat.services?.length || 0} digital processes.`}
                                             </p>
 

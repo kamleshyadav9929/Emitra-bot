@@ -18,24 +18,24 @@ const ServiceDetailModal = ({ service, category, onClose, onApply, config }) => 
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
                     className="relative w-full max-w-xl bg-white rounded-3xl overflow-hidden shadow-2xl"
                 >
-                    <button onClick={onClose} className="absolute top-6 right-6 p-2 hover:bg-black/5 rounded-full transition-colors z-10">
-                        <X size={20} />
+                    <button onClick={onClose} className="absolute top-4 md:top-6 right-4 md:right-6 p-2 hover:bg-black/5 rounded-full transition-colors z-10">
+                        <X size={18} md:size={20} />
                     </button>
 
-                    <div className="p-8 md:p-12 space-y-8">
-                        <div className="space-y-4">
+                    <div className="p-5 md:p-12 space-y-4 md:space-y-8">
+                        <div className="space-y-2 md:space-y-4">
                             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#B5B5B3] block">{category}</span>
-                            <h2 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter leading-none">{service.name}</h2>
-                            <div className="flex items-center gap-4 py-2">
-                                <span className="bg-black text-white px-4 py-1 rounded-full text-xs font-bold">{service.price || 'Free Service'}</span>
-                                <span className="text-ink-4 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
-                                    <Clock size={12} /> Priority Process
+                            <h2 className="text-2xl md:text-5xl font-display font-extrabold tracking-tighter leading-tight">{service.name}</h2>
+                            <div className="flex items-center gap-3 md:gap-4 py-1 md:py-2">
+                                <span className="bg-black text-white px-3 md:px-4 py-1 rounded-full text-[10px] md:text-xs font-bold">{service.price || 'Free Service'}</span>
+                                <span className="text-ink-4 text-[9px] md:text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                                    <Clock size={10} /> Priority Process
                                 </span>
                             </div>
                         </div>
                         
-                        <div className="p-6 bg-slate-50 border border-black/5 rounded-2xl space-y-6">
-                            <p className="text-sm text-ink-2 leading-relaxed">{service.description}</p>
+                        <div className="p-4 md:p-6 bg-slate-50 border border-black/5 rounded-2xl space-y-4 md:space-y-6">
+                            <p className="text-[13px] md:text-sm text-ink-2 leading-relaxed">{service.description}</p>
                             
                             <div className="space-y-3">
                                 <div className="flex items-start gap-3">
@@ -49,14 +49,14 @@ const ServiceDetailModal = ({ service, category, onClose, onApply, config }) => 
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-3 md:gap-4">
                             <button 
                                 onClick={() => onApply(service, category)}
-                                className="w-full bg-black text-white py-5 font-black uppercase tracking-widest text-sm hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4 rounded-2xl shadow-xl shadow-black/10"
+                                className="w-full bg-black text-white py-4 md:py-5 font-black uppercase tracking-widest text-xs md:text-sm hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 md:gap-4 rounded-xl md:rounded-2xl shadow-xl shadow-black/10"
                             >
-                                Apply via WhatsApp <ArrowRight size={20} />
+                                Apply via WhatsApp <ArrowRight size={18} />
                             </button>
-                            <p className="text-[10px] text-center font-bold text-ink-4 uppercase">WhatsApp pe direct chat shuru hogi</p>
+                            <p className="text-[9px] md:text-[10px] text-center font-bold text-ink-4 uppercase">WhatsApp pe direct chat shuru hogi</p>
                         </div>
                     </div>
                 </motion.div>

@@ -34,25 +34,25 @@ export default function LandingBottomNav({ onLoginClick, onProfileClick }) {
 
     return (
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md shadow-[0_-8px_32px_rgba(7,30,39,0.08)]">
-            <div className="flex items-stretch justify-around px-1 pt-2 pb-safe" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
+            <div className="flex items-stretch justify-around px-1 pt-1.5 pb-safe" style={{ paddingBottom: "max(6px, env(safe-area-inset-bottom))" }}>
                 {tabs.map(tab => {
                     const Icon = tab.icon
                     return (
                         <button
                             key={tab.id}
                             onClick={tab.action}
-                            className="flex flex-col items-center gap-1 flex-1 py-1 px-2 rounded-2xl hover:bg-black/[0.04] active:scale-95 transition-all"
+                            className="flex flex-col items-center gap-0.5 flex-1 py-1 px-1 rounded-xl hover:bg-black/[0.04] active:scale-95 transition-all"
                         >
                             {tab.isUser ? (
-                                <div className="w-6 h-6 bg-[#0A1A40] rounded-full flex items-center justify-center shrink-0">
-                                    <span className="text-white text-[10px] font-black leading-none">
+                                <div className="w-5 h-5 bg-[#0A1A40] rounded-full flex items-center justify-center shrink-0">
+                                    <span className="text-white text-[9px] font-black leading-none">
                                         {user?.name?.charAt(0)?.toUpperCase() || "?"}
                                     </span>
                                 </div>
                             ) : (
-                                <Icon size={19} className="text-[#0A1A40] shrink-0" strokeWidth={1.8} />
+                                <Icon size={17} className="text-[#0A1A40] shrink-0" strokeWidth={1.8} />
                             )}
-                            <span className={`text-[9px] font-black uppercase tracking-wider leading-none truncate max-w-full ${
+                            <span className={`text-[8px] font-black uppercase tracking-wider leading-none truncate max-w-full ${
                                 tab.isUser ? "text-[#0A1A40]" : "text-gray-500"
                             }`}>
                                 {tab.label}

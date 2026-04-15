@@ -39,6 +39,12 @@
   --radius-lg: 0.75rem;
   --radius-xl: 0.75rem;
   --radius-2xl: 1rem;
+
+  @media (max-width: 640px) {
+    --radius-2xl: 0.75rem;
+    --radius-xl: 0.5rem;
+    --radius-lg: 0.5rem;
+  }
 }
 
 html[lang="hi"] {
@@ -53,6 +59,10 @@ html[lang="hi"] {
 html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
+  
+  @media (max-width: 640px) {
+    font-size: 14px;
+  }
 }
 
 html {
