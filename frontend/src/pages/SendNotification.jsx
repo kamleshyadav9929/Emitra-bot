@@ -141,7 +141,7 @@ export default function SendNotification() {
     <div className="space-y-6">
       <Toast visible={toastVisible} message={toastMsg} />
       {/* Header */}
-      <div className="flex items-end justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-8">
         <div>
           <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-[var(--color-primary)] mb-2">Broadcast</p>
           <h1 className="text-3xl font-black text-[#0A1A40] tracking-tight leading-tight font-display">Send Notification</h1>

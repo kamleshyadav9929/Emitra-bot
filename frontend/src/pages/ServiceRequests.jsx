@@ -209,7 +209,7 @@ export default function ServiceRequests() {
       {selectedDocsReq && <DocumentsModal telegramId={selectedDocsReq.telegram_id} studentName={selectedDocsReq.student_name} onClose={() => setSelectedDocsReq(null)} />}
 
       {/* Header */}
-      <div className="flex items-end justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-8">
         <div>
           <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-[var(--color-primary)] mb-2">e-Mitra</p>
           <h1 className="text-3xl font-black text-[#0A1A40] tracking-tight leading-tight font-display">Service Requests</h1>

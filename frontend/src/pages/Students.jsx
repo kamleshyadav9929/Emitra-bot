@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { getStudents, blockStudent, deleteStudent, addStudent } from "../api"
+import { getStudents, blockStudent, deleteStudent, addStudent, getExams } from "../api"
 import ExamBadge from "../components/ExamBadge"
 import { Phone, MessagesSquare, Search, X, Download, ChevronDown, Trash2, Plus } from "lucide-react"
 
@@ -53,12 +53,10 @@ export default function Students() {
   }
 
   useEffect(() => {
-    import("../api").then(api => {
-      api.getExams().then(d => {
-         const names = d.exams.map(e => e.name)
-         setExamList(["ALL", ...names])
-      }).catch(console.error)
-    })
+    getExams().then(d => {
+       const names = d.exams.map(e => e.name)
+       setExamList(["ALL", ...names])
+    }).catch(console.error)
   }, [])
 
   useEffect(() => {
@@ -103,7 +101,7 @@ export default function Students() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-end justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-8">
         <div>
           <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-[var(--color-primary)] mb-2">Directory</p>
           <h1 className="text-3xl font-black text-[#0A1A40] tracking-tight leading-tight font-display">Registered Students</h1>

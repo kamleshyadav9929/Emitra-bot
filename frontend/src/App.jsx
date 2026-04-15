@@ -94,7 +94,7 @@ function TopNavbar() {
     return (
         <header className="bg-[var(--color-surface-base)]/80 backdrop-blur-md border-b border-[var(--color-outline-variant)] h-[70px] md:h-[80px] flex items-center justify-between px-4 md:px-8 sticky top-0 z-20">
             {/* Nav Links */}
-            <div className="flex items-center gap-10 h-full">
+            <div className="flex items-center gap-4 md:gap-10 h-full">
                 <div className="flex flex-col -mt-1 leading-none tracking-tight">
                     <span className="text-[var(--color-primary)] font-black text-[20px] md:text-[22px] tracking-tight font-display">e-Mitra</span>
                     <span className="text-gray-500 font-bold text-[10px] md:text-[11px] tracking-widest uppercase mt-0.5">Admin Panel</span>

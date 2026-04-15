@@ -206,7 +206,7 @@ export default function AdminServices() {
 
       {modal && <ServiceModal service={modal === "add" ? null : modal} onSave={handleSave} onClose={() => setModal(null)} loading={saving} />}
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
           <p className="text-[12px] text-gray-500 font-medium">
             {services.length} Total Services · <span className="text-[#10B981] font-bold">{services.filter(s => s.enabled || s.show_in_web).length} Active</span>

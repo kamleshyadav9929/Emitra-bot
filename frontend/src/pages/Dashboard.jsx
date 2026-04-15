@@ -64,7 +64,7 @@ export default function Dashboard() {
   return (
     <div className="w-full">
       {/* ── Header ── */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mb-8">
         <div>
            <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-[#164FA8] mb-2">INSTITUTIONAL DASHBOARD</p>
            <h1 className="text-3xl font-bold text-gray-900 tracking-tight leading-tight">Bot Overview</h1>
@@ -144,7 +144,7 @@ export default function Dashboard() {
         
         {/* Left Column - Exam Distribution & Recent Students */}
         <div className="bg-[var(--color-surface-lowest)] border-none rounded-xl p-7 shadow-ambient lg:col-span-2">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <h2 className="text-[17px] font-bold text-gray-900">Recent Student Registrations</h2>
             <button 
               onClick={() => navigate("/admin/students")}

@@ -230,7 +230,7 @@ function AnnouncementsTab({ toast }) {
     <div className="space-y-4">
       {modal && <AnnouncementModal ann={modal === "add" ? null : modal} onSave={handleSave} onClose={() => setModal(null)} examOpts={examOpts} />}
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <p className="text-[12px] text-gray-500 font-medium">{anns.filter(a => !isPast(a.runAt)).length} upcoming · {anns.filter(a => isPast(a.runAt) || a.sent).length} done</p>
         <button
           onClick={() => setModal("add")}
