@@ -7,7 +7,8 @@ import {
     Search, Mic, LogIn, ChevronRight,
     CreditCard, Zap, GraduationCap, Shield, Car,
     FileSignature, FileText, Bell, User, X,
-    LayoutDashboard, ArrowRight, Menu, LogOut, Settings, ShieldCheck, Headset, Globe, Layers
+    LayoutDashboard, ArrowRight, Menu, LogOut, Settings, ShieldCheck, Headset, Globe, Layers,
+    MessageCircle, MessageSquare, Send
 } from "lucide-react"
 
 import "../portal.css"
@@ -325,83 +326,42 @@ export default function Landing() {
                 </div>{/* end main canvas div */}
 
                 {/* ── RIGHT SIDEBAR — Latest News ── */}
-                <aside className="hidden xl:flex flex-col w-[300px] shrink-0 h-full overflow-y-auto bg-white border-l border-[var(--color-surface-low)] p-5 gap-6">
-
-                    {/* Live Announcements */}
-                    <div>
-                        <div className="flex items-center gap-2 mb-4">
-                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shrink-0" />
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-primary)]">Live Updates</p>
-                        </div>
-                        <div className="space-y-3">
-                            {announcements.length === 0 ? (
-                                <div className="bg-[var(--color-surface-low)] rounded-[14px] p-4 text-center">
-                                    <p className="text-[12px] text-gray-400 font-medium">No announcements yet</p>
-                                </div>
-                            ) : announcements.map((a, i) => (
-                                <div key={i} className="bg-[var(--color-surface-low)] rounded-[14px] p-4 shadow-ambient hover:bg-[var(--color-primary-fixed)] transition-colors cursor-default">
-                                    <p className="text-[11px] font-black text-[#0A1A40] leading-tight mb-1 font-display">{a.title}</p>
-                                    <p className="text-[11px] text-gray-500 font-medium leading-relaxed line-clamp-2">{a.content}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Platform Stats */}
-                    <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-primary)] mb-4">Bureau Stats</p>
-                        <div className="space-y-3">
-                            <div className="bg-[var(--color-primary-fixed)] rounded-[14px] p-4 shadow-ambient flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] flex items-center justify-center shrink-0">
-                                    <User size={16} className="text-white" />
-                                </div>
-                                <div>
-                                    <p className="text-2xl font-black text-[#0A1A40] leading-none">{(stats.total_students || 0).toLocaleString()}</p>
-                                    <p className="text-[10px] text-[var(--color-primary)] font-bold uppercase tracking-widest mt-0.5">Registered Students</p>
-                                </div>
-                            </div>
-                            <div className="bg-[var(--color-surface-low)] rounded-[14px] p-4 shadow-ambient flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] flex items-center justify-center shrink-0">
-                                    <Layers size={16} className="text-white" />
-                                </div>
-                                <div>
-                                    <p className="text-2xl font-black text-[#0A1A40] leading-none">{Object.keys(services).length}</p>
-                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Service Categories</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Exam Categories */}
-                    {exams.length > 0 && (
+                <aside className="hidden xl:flex flex-col w-[300px] shrink-0 h-full bg-white border-l border-[var(--color-surface-low)] relative overflow-hidden">
+                    {/* Scrollable Content */}
+                    <div className="flex-1 overflow-y-auto p-5 space-y-6 scrollbar-hide">
                         <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-primary)] mb-4">Active Exam Tracks</p>
+                            <div className="flex items-center gap-2 mb-4">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shrink-0" />
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-primary)]">Live Updates</p>
+                            </div>
                             <div className="flex flex-wrap gap-2">
-                                {exams.map((exam) => (
-                                    <span key={exam.name || exam} className="px-3 py-1.5 bg-[var(--color-primary-fixed)] text-[var(--color-primary)] text-[11px] font-black rounded-full shadow-ambient">
-                                        {exam.name || exam}
-                                    </span>
+                                {announcements.length === 0 ? (
+                                    <div className="w-full bg-[var(--color-surface-low)] rounded-[14px] p-4 text-center">
+                                        <p className="text-[12px] text-gray-400 font-medium">No updates yet</p>
+                                    </div>
+                                ) : announcements.map((a, i) => (
+                                    <div key={i} className="px-3 py-1.5 bg-[var(--color-primary-fixed)] text-[var(--color-primary)] text-[11px] font-black rounded-lg shadow-sm border border-[var(--color-outline-variant)] hover:bg-[var(--color-primary)] hover:text-white transition-colors cursor-default">
+                                        {a.title}
+                                    </div>
                                 ))}
                             </div>
                         </div>
-                    )}
+                    </div>
 
-                    {/* Quick Links */}
-                    <div className="mt-auto">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-primary)] mb-3">Quick Links</p>
-                        <div className="space-y-2">
-                            {[
-                                { icon: ShieldCheck, label: "Check Seva Status", action: () => {} },
-                                { icon: Headset, label: "WhatsApp Support", action: () => window.open(`https://wa.me/${config.whatsapp_number || "916377964293"}`, "_blank") },
-                                { icon: Settings, label: "Manage Profile", action: () => isLoggedIn ? setIsProfileOpen(true) : setIsLoginOpen(true) },
-                            ].map((link) => (
-                                <button key={link.label} onClick={link.action}
-                                    className="w-full flex items-center gap-3 px-3 py-2.5 bg-[var(--color-surface-low)] hover:bg-[var(--color-primary-fixed)] hover:text-[var(--color-primary)] text-gray-600 text-[12px] font-bold rounded-[12px] transition-all text-left shadow-ambient">
-                                    <link.icon size={14} className="text-[var(--color-primary)] shrink-0" />
-                                    {link.label}
-                                </button>
-                            ))}
-                        </div>
+                    {/* Sticky Bottom Links */}
+                    <div className="p-4 bg-white border-t border-gray-100 flex flex-col gap-2 shrink-0">
+                        <button 
+                            onClick={() => window.open(`https://wa.me/${config.whatsapp_number || "916377964293"}`, "_blank")}
+                            className="w-full h-11 flex items-center justify-center gap-2 bg-[#25D366] text-white text-[13px] font-black rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all"
+                        >
+                            <MessageCircle size={18} /> WhatsApp Support
+                        </button>
+                        <button 
+                            onClick={() => window.open(config.telegram_bot_url || "https://t.me/Kamlesh6377_bot", "_blank")}
+                            className="w-full h-11 flex items-center justify-center gap-2 bg-[#0088cc] text-white text-[13px] font-black rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all"
+                        >
+                            <Send size={18} /> Telegram Bot
+                        </button>
                     </div>
                 </aside>
 
