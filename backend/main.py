@@ -20,8 +20,12 @@ import jwt
 from jwt import PyJWKClient
 
 jwks_client = None
-if config.CLERK_JWKS_URL:
-    jwks_client = PyJWKClient(config.CLERK_JWKS_URL)
+if config.CLERK_JWKS_URL and not config.CLERK_JWT_PUBLIC_KEY:
+    try:
+        jwks_client = PyJWKClient(config.CLERK_JWKS_URL)
+    except Exception as e:
+        print(f"JWKS Client initialization failed: {e}")
+
 # ── In-memory broadcast job tracker ──────────────────────────────────────────
 # Stores status of background broadcast jobs so the frontend can poll.
 _broadcast_jobs = {}  # job_id -> {"status": "running"|"done", "sent": N, "total": N, "exam": ...}
@@ -57,8 +61,27 @@ def token_required(f):
         if not token:
             return jsonify({"error": "Token is missing. Please log in again."}), 401
             
+        # Priority 1: High-Performance Offline Verification (No network calls)
+        if config.CLERK_JWT_PUBLIC_KEY:
+            try:
+                # Ensure the key has proper headers if it's just the raw base64/string
+                key = config.CLERK_JWT_PUBLIC_KEY
+                if "-----BEGIN PUBLIC KEY-----" not in key:
+                    key = f"-----BEGIN PUBLIC KEY-----\n{key}\n-----END PUBLIC KEY-----"
+                
+                jwt.decode(
+                    token,
+                    key,
+                    algorithms=["RS256"],
+                    options={"verify_aud": False} # Clerk tokens usually don't need AUD check here
+                )
+                return f(*args, **kwargs)
+            except Exception as e:
+                return jsonify({"error": f"Offline token verification failed: {e}"}), 401
+
+        # Priority 2: Online Verification (Only if offline key is missing)
         if not jwks_client:
-            return jsonify({"error": "Auth is not configured securely. Missing Clerk JWKS URL."}), 500
+            return jsonify({"error": "Auth is not configured securely. Provide CLERK_JWT_PUBLIC_KEY for PythonAnywhere."}), 500
 
         try:
             signing_key = jwks_client.get_signing_key_from_jwt(token)
@@ -68,7 +91,7 @@ def token_required(f):
                 algorithms=["RS256"]
             )
         except Exception as e:
-            return jsonify({"error": f"Token is invalid or expired: {e}"}), 401
+            return jsonify({"error": f"Token verification failed: {e}"}), 401
 
         return f(*args, **kwargs)
     return decorated
@@ -561,14 +584,29 @@ def delete_exam(exam_id):
     return jsonify({"success": True})
 
 
-# ── Health Check ──────────────────────────────────────────────────────────────
+# ── Static File Handling (Fix Manifest/Asset errors) ──────────────────────────
+from flask import send_from_directory
+import os
 
-@app.route("/ping", methods=["GET"])
-def ping():
-    return jsonify({
-        "status": "awake",
-        "message": "E-Mitra bot is running!",
-    })
+@app.route("/manifest.json")
+@app.route("/manifest.webmanifest")
+def serve_manifest():
+    return send_from_directory(os.path.join(app.root_path, "../frontend/dist"), "manifest.webmanifest")
+
+@app.route("/favicon.svg")
+@app.route("/icons.svg")
+def serve_public_assets():
+    filename = request.path.split("/")[-1]
+    return send_from_directory(os.path.join(app.root_path, "../frontend/dist"), filename)
+
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_frontend(path):
+    if path != "" and os.path.exists(os.path.join(app.root_path, "../frontend/dist", path)):
+        return send_from_directory(os.path.join(app.root_path, "../frontend/dist"), path)
+    else:
+        # For SPA routing, return index.html for all non-found paths
+        return send_from_directory(os.path.join(app.root_path, "../frontend/dist"), "index.html")
 
 
 if __name__ == "__main__":

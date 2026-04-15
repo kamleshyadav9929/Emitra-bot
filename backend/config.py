@@ -20,6 +20,9 @@ except Exception as e:
     print(f"WARNING: Invalid CLERK_PUBLISHABLE_KEY format ({e}). Clerk JWTs cannot be verified.")
     CLERK_JWKS_URL = ""
 
+CLERK_JWT_PUBLIC_KEY = os.getenv("CLERK_JWT_PUBLIC_KEY", "")
+
+
 
 # Webhook secret for verifying incoming Telegram updates
 WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET", "")
