@@ -6,8 +6,9 @@ TELEGRAM_API_URL = "https://api.telegram.org/bot{token}/sendMessage"
 # Telegram allows 30 messages/sec globally, and 1 msg/sec per chat.
 # For broadcasts: send sequentially with a small delay to stay safe.
 # For single receipts from admin: no delay needed.
-BROADCAST_DELAY_SECONDS = 0.05   # 50ms between messages → ~20 msg/sec (safe margin)
-MAX_RETRIES = 2                   # retry once on rate-limit (429) errors
+# Optimized for speed: 1/30s = 0.033s. We use 0.035s to stay safe.
+BROADCAST_DELAY_SECONDS = 0.035   # ~28 messages per second
+MAX_RETRIES = 2
 
 
 def send_message_to_user(bot_token, telegram_id, message, parse_mode="Markdown"):
@@ -48,14 +49,10 @@ def send_message_to_user(bot_token, telegram_id, message, parse_mode="Markdown")
     return False
 
 
-def broadcast(bot_token, student_list, message, parse_mode="Markdown"):
+def broadcast(bot_token, student_list, message, parse_mode="Markdown", on_progress=None):
     """
-    Broadcasts a message to a list of students.
-
-    FIX: Changed from ThreadPoolExecutor to sequential sending with delay
-    to respect Telegram's 30 msg/sec rate limit. With 10 threads sending
-    simultaneously there's no per-message delay — this caused silent failures
-    for lists > 30 students.
+    Broadcasts a message sequentially with high speed.
+    - on_progress: Optional callback function(current_count)
     """
     if not student_list:
         return 0
@@ -67,8 +64,12 @@ def broadcast(bot_token, student_list, message, parse_mode="Markdown"):
         ok = send_message_to_user(bot_token, student["telegram_id"], message, parse_mode)
         if ok:
             success_count += 1
+        
+        # Update progress every 10 messages to reduce DB write overhead
+        if on_progress and (i + 1) % 10 == 0:
+            on_progress(success_count)
+
         # Add inter-message delay to stay under rate limit
-        # Skip delay after the last message
         if i < total - 1:
             time.sleep(BROADCAST_DELAY_SECONDS)
 

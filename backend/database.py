@@ -107,12 +107,17 @@ def init_db():
         )
     ''')
 
-    # ── Exams table ──────────────────────────────────────────────────────────
+    # ── NEW: Broadcast Jobs table (for status polling) ────────────────────
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS exams (
-            id      INTEGER PRIMARY KEY AUTOINCREMENT,
-            name    TEXT UNIQUE NOT NULL,
-            enabled INTEGER DEFAULT 1
+        CREATE TABLE IF NOT EXISTS broadcast_jobs (
+            id           TEXT PRIMARY KEY,
+            target_exam  TEXT NOT NULL,
+            status       TEXT DEFAULT 'queued',
+            sent_count   INTEGER DEFAULT 0,
+            total_count  INTEGER DEFAULT 0,
+            error_msg    TEXT,
+            created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at   DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
 
@@ -730,3 +735,46 @@ def delete_exam(exam_id):
     conn.execute("DELETE FROM exams WHERE id = ?", (exam_id,))
     conn.commit()
 
+# ── Broadcast Jobs persistence ─────────────────────────────────────────────
+
+def create_broadcast_job(job_id, target_exam, total_count):
+    conn = get_connection()
+    conn.execute('''
+        INSERT INTO broadcast_jobs (id, target_exam, total_count, status)
+        VALUES (?, ?, ?, 'queued')
+    ''', (str(job_id), target_exam, total_count))
+    conn.commit()
+
+def update_broadcast_status(job_id, status, sent_count=None, error_msg=None):
+    conn = get_connection()
+    updates = ["status = ?", "updated_at = CURRENT_TIMESTAMP"]
+    params = [status]
+    
+    if sent_count is not None:
+        updates.append("sent_count = ?")
+        params.append(sent_count)
+    if error_msg is not None:
+        updates.append("error_msg = ?")
+        params.append(error_msg)
+        
+    params.append(str(job_id))
+    query = f"UPDATE broadcast_jobs SET {', '.join(updates)} WHERE id = ?"
+    conn.execute(query, params)
+    conn.commit()
+
+def get_broadcast_job(job_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM broadcast_jobs WHERE id = ?", (str(job_id),))
+    row = cursor.fetchone()
+    if not row:
+        return None
+    return {
+        "id": row["id"],
+        "status": row["status"],
+        "sent": row["sent_count"],
+        "total": row["total_count"],
+        "exam": row["target_exam"],
+        "error": row["error_msg"],
+        "updated_at": row["updated_at"]
+    }

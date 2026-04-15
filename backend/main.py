@@ -26,9 +26,8 @@ if config.CLERK_JWKS_URL and not config.CLERK_JWT_PUBLIC_KEY:
     except Exception as e:
         print(f"JWKS Client initialization failed: {e}")
 
-# ── In-memory broadcast job tracker ──────────────────────────────────────────
-# Stores status of background broadcast jobs so the frontend can poll.
-_broadcast_jobs = {}  # job_id -> {"status": "running"|"done", "sent": N, "total": N, "exam": ...}
+# ── Persistent broadcast job tracker (database-backed) ───────────────────
+# status code logic moved to database.py
 
 app = Flask(__name__)
 # Explicit CORS handling for development and production Vercel origins
@@ -52,6 +51,9 @@ database.init_db()
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
+        if request.method == "OPTIONS":
+            return f(*args, **kwargs)
+            
         token = None
         if "Authorization" in request.headers:
             auth_header = request.headers["Authorization"]
@@ -311,13 +313,19 @@ def delete_student(telegram_id):
 
 def _run_broadcast_in_background(job_id, exam, message, students, token):
     """Runs in a daemon thread — broadcasts to all students without blocking the HTTP response."""
-    _broadcast_jobs[job_id]["status"] = "running"
+    database.update_broadcast_status(job_id, "running")
     try:
-        success_count = notifier.broadcast(token, students, message)
+        success_count = notifier.broadcast(
+            token, 
+            students, 
+            message,
+            on_progress=lambda count: database.update_broadcast_status(job_id, "running", sent_count=count)
+        )
         database.log_message(exam, message, success_count)
-        _broadcast_jobs[job_id].update({"status": "done", "sent": success_count})
+        database.update_broadcast_status(job_id, "done", sent_count=success_count)
     except Exception as e:
-        _broadcast_jobs[job_id].update({"status": "error", "error": str(e)})
+        print(f"CRITICAL: Broadcast Background Error: {e}")
+        database.update_broadcast_status(job_id, "error", error_msg=str(e))
 
 
 @app.route("/api/send-notification", methods=["POST"])
@@ -344,7 +352,7 @@ def send_notification():
     # Without this, 4000 students × 50ms = 200s → guaranteed timeout on PythonAnywhere.
     import uuid
     job_id = str(uuid.uuid4())[:8]
-    _broadcast_jobs[job_id] = {"status": "queued", "sent": 0, "total": total, "exam": exam}
+    database.create_broadcast_job(job_id, exam, total)
 
     t = threading.Thread(
         target=_run_broadcast_in_background,
@@ -366,8 +374,8 @@ def send_notification():
 @app.route("/api/broadcast-status/<job_id>", methods=["GET"])
 @token_required
 def broadcast_status(job_id):
-    """Frontend polls this to show real-time broadcast progress."""
-    job = _broadcast_jobs.get(job_id)
+    """Frontend polls this to show real-time broadcast progress from DB."""
+    job = database.get_broadcast_job(job_id)
     if not job:
         return jsonify({"error": "Job not found"}), 404
     return jsonify(job)
