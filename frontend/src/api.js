@@ -56,6 +56,9 @@ export const sendNotification = async (exam, message) =>
 export const getLogs = async () =>
   requestJson(`/api/logs`, { headers: await getAuthHeaders() })
 
+export const getBroadcastStatus = async (jobId) =>
+  requestJson(`/api/broadcast-status/${jobId}`, { headers: await getAuthHeaders() })
+
 export const getServiceRequests = async (status = "") =>
   requestJson(`/api/service-requests${status ? `?status=${status}` : ""}`, { headers: await getAuthHeaders() })
 

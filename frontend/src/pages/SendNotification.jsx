@@ -1,12 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useLocation } from "react-router-dom"
 import { Send, CheckCircle, Loader2, Bot, Users, MessageSquare, Clock, Calendar, Trash2, ArrowRight, CheckCircle2 } from "lucide-react"
-import { getStats, sendNotification, getExams } from "../api"
+import { getStats, sendNotification, getExams, getBroadcastStatus } from "../api"
 import Stepper, { Step } from "../components/Stepper"
 
 const CHAR_LIMIT = 4096
-const BASE_URL = import.meta.env.VITE_API_URL || ""
-const getAuthHeaders = () => ({ "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("admin_token")}` })
 
 
 // ── Toast notification ─────────────────────────────────────────────────────────
@@ -69,8 +67,7 @@ export default function SendNotification() {
     setJobProgress({ sent: 0, total, status: "running" })
     pollRef.current = setInterval(async () => {
       try {
-        const res = await fetch(`${BASE_URL}/api/broadcast-status/${jobId}`, { headers: getAuthHeaders() })
-        const data = await res.json()
+        const data = await getBroadcastStatus(jobId)
         setJobProgress(data)
         if (data.status === "done" || data.status === "error") {
           clearInterval(pollRef.current)
@@ -85,7 +82,10 @@ export default function SendNotification() {
             setStatus("error"); setErrorMsg(data.error || "Broadcast failed")
           }
         }
-      } catch { /* network glitch, keep polling */ }
+      } catch (e) { 
+        console.error("Polling error:", e)
+        /* network glitch or token refresh needed, api.js handles token refresh */ 
+      }
     }, 2000)
   }
 
