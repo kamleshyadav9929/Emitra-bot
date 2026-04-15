@@ -320,42 +320,7 @@ export default function Landing() {
                         )}
                     </section>
 
-                    {/* ── DARK PREMIUM CTA BLOCK ── */}
-                    <section className="w-full relative mt-8">
-                        <div className="bg-[#0A1A40] rounded-[32px] p-8 md:p-14 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-2xl relative overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent pointer-events-none"></div>
-                            
-                            <div className="flex-1 w-full lg:max-w-xl relative z-10 text-center lg:text-left">
-                                <h2 className="text-3xl md:text-4xl font-black text-white font-display mb-4">Ready to start your application?</h2>
-                                <p className="text-[14px] md:text-[16px] text-blue-100/70 font-medium mb-8 leading-relaxed max-w-md mx-auto lg:mx-0">
-                                    Join thousands of students managing their digital credentials and applications through our secure bureau portal.
-                                </p>
-                                <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
-                                    <button onClick={() => setIsRegOpen(true)} className="w-full sm:w-auto px-8 h-12 rounded-xl bg-[#164FA8] text-white font-bold text-[14px] hover:shadow-lg transition-all hover:bg-[#0B3A82]">
-                                        Register Account
-                                    </button>
-                                    <button onClick={() => setIsLoginOpen(true)} className="w-full sm:w-auto px-8 h-12 rounded-xl bg-white/10 text-white font-bold text-[14px] hover:bg-white/20 transition-all border border-white/10 backdrop-blur-sm">
-                                        Bureau Login
-                                    </button>
-                                </div>
-                            </div>
 
-                            <div className="w-full lg:w-auto flex flex-col gap-3 relative z-10 shrink-0">
-                                {[
-                                    { i: ShieldCheck, t: "SSL Encrypted Data Storage" },
-                                    { i: Headset, t: "24/7 Dedicated Support Desk" },
-                                    { i: Zap, t: "Instant Transaction Tracking" }
-                                ].map((ft, i) => (
-                                    <div key={i} className="flex items-center gap-4 bg-white/5 border border-white/10 p-4 rounded-xl backdrop-blur-md w-full lg:w-72">
-                                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[#d7e2ff]">
-                                            <ft.i size={14} />
-                                        </div>
-                                        <span className="text-[12px] font-bold text-white/90">{ft.t}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </section>
                     
                 </div>{/* end main canvas div */}
 
