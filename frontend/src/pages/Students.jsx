@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { getStudents, blockStudent, deleteStudent, addStudent, getExams, updateStudentCategory } from "../api"
+import { getStudents, blockStudent, deleteStudent, addStudent, getExams } from "../api"
 import ExamBadge from "../components/ExamBadge"
 import { Phone, MessagesSquare, Search, X, Download, ChevronDown, Trash2, Plus } from "lucide-react"
 
@@ -17,9 +17,7 @@ export default function Students() {
   const [error, setError] = useState(null)
   const [activeFilter, setActiveFilter] = useState("ALL")
   const [search, setSearch] = useState("")
-  const [changingExam, setChangingExam] = useState(null)
   const [examList, setExamList] = useState(DEFAULT_FILTERS)
-  const changeRef = useRef(null)
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [newStudent, setNewStudent] = useState({ name: "", phone: "", exam_preference: "NONE" })
@@ -92,11 +90,6 @@ export default function Students() {
     a.click(); URL.revokeObjectURL(url)
   }
 
-  useEffect(() => {
-    const handler = (e) => { if (changeRef.current && !changeRef.current.contains(e.target)) setChangingExam(null) }
-    document.addEventListener("mousedown", handler)
-    return () => document.removeEventListener("mousedown", handler)
-  }, [])
 
   return (
     <div className="space-y-6">
@@ -193,45 +186,8 @@ export default function Students() {
                         <p className="text-[11px] text-gray-500 font-mono">{student.telegram_id}</p>
                       </div>
                     </div>
-                    <div className="relative inline-block" ref={changingExam === student.telegram_id ? changeRef : null}>
-                      <div className="flex items-center gap-1.5">
-                        <ExamBadge exam={student.exam_preference} />
-                        <button
-                          onClick={() => setChangingExam(changingExam === student.telegram_id ? null : student.telegram_id)}
-                          className="flex items-center gap-0.5 text-[10px] text-gray-400 hover:text-gray-900 transition-colors"
-                        >
-                          <ChevronDown size={11} />
-                        </button>
-                      </div>
-                      {changingExam === student.telegram_id && (
-                        <div className="absolute right-0 top-full mt-1 z-30 bg-[var(--color-surface-lowest)] shadow-ambient py-1 min-w-[140px] rounded-[14px] overflow-hidden">
-                          <p className="px-3 py-1.5 text-[9px] font-bold text-gray-400 tracking-[0.15em] uppercase">Change Exam</p>
-                          {examList.filter(e => e !== "ALL").map(exam => (
-                            <button
-                              key={exam}
-                              className={`w-full text-left px-3 py-2 text-[12px] font-bold hover:bg-[var(--color-surface-low)] transition-colors ${
-                                student.exam_preference === exam ? "text-[var(--color-primary)]" : "text-gray-600"
-                              }`}
-                                onClick={async () => {
-                                  try {
-                                    const res = await updateStudentCategory(student.id, exam)
-                                    if (res.success) {
-                                      setStudents(prev => prev.map(s =>
-                                        s.id === student.id ? { ...s, exam_preference: exam } : s
-                                      ))
-                                    }
-                                  } catch (err) {
-                                    alert(err.message || "Failed to update category")
-                                  } finally {
-                                    setChangingExam(null)
-                                  }
-                                }}
-                            >
-                              {student.exam_preference === exam ? `✓ ${exam}` : exam}
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                    <div className="flex items-center gap-1.5">
+                      <ExamBadge exam={student.exam_preference} />
                     </div>
                   </div>
 
@@ -330,46 +286,8 @@ export default function Students() {
                         </div>
                       </td>
                       <td className="py-5 px-6">
-                        <div className="relative inline-block" ref={changingExam === student.telegram_id ? changeRef : null}>
-                          <div className="flex items-center gap-2">
-                            <ExamBadge exam={student.exam_preference} />
-                            <button
-                              onClick={() => setChangingExam(changingExam === student.telegram_id ? null : student.telegram_id)}
-                              className="flex items-center gap-0.5 text-gray-400 hover:text-[var(--color-primary)] transition-colors p-1"
-                              title="Change Exam"
-                            >
-                              <ChevronDown size={14} />
-                            </button>
-                          </div>
-                          {changingExam === student.telegram_id && (
-                            <div className="absolute left-0 top-full mt-2 z-30 bg-[var(--color-surface-lowest)] shadow-ambient py-2 min-w-[160px] rounded-[16px] overflow-hidden">
-                              <p className="px-4 py-2 text-[10px] font-bold text-gray-400 tracking-widest uppercase mb-1">Update Category</p>
-                              {examList.filter(e => e !== "ALL").map(exam => (
-                                <button
-                                  key={exam}
-                                  className={`w-full text-left px-4 py-2.5 text-[12px] font-bold hover:bg-[var(--color-surface-low)] transition-colors ${
-                                    student.exam_preference === exam ? "text-[var(--color-primary)]" : "text-gray-600"
-                                  }`}
-                                  onClick={async () => {
-                                    try {
-                                      const res = await updateStudentCategory(student.id, exam)
-                                      if (res.success) {
-                                        setStudents(prev => prev.map(s =>
-                                          s.id === student.id ? { ...s, exam_preference: exam } : s
-                                        ))
-                                      }
-                                    } catch (err) {
-                                      alert(err.message || "Failed to update category")
-                                    } finally {
-                                      setChangingExam(null)
-                                    }
-                                  }}
-                                >
-                                  {student.exam_preference === exam ? `✓ ${exam}` : exam}
-                                </button>
-                              ))}
-                            </div>
-                          )}
+                        <div className="flex items-center gap-2">
+                          <ExamBadge exam={student.exam_preference} />
                         </div>
                       </td>
                       <td className="py-5 px-6">
