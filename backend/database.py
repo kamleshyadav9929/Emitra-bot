@@ -293,6 +293,18 @@ def update_exam_preference(telegram_id, exam):
     conn.commit()
 
 
+def update_student_category(student_id, category):
+    """Update exam preference by primary key ID (useful for manually added students)."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE students
+        SET exam_preference = ?, last_active = CURRENT_TIMESTAMP
+        WHERE id = ?
+    ''', (category, student_id))
+    conn.commit()
+
+
 def get_student(telegram_id):
     """Fetch a single student by telegram_id."""
     conn = get_connection()

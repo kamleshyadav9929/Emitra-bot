@@ -311,6 +311,19 @@ def delete_student(telegram_id):
     return jsonify({"success": True, "action": "deleted", "telegram_id": telegram_id})
 
 
+@app.route("/api/students/<int:student_id>/category", methods=["POST"])
+@token_required
+def update_student_category(student_id):
+    """Update exam category for a student by ID."""
+    data = request.json or {}
+    category = data.get("category")
+    if not category:
+        return jsonify({"success": False, "error": "Category is required"}), 400
+        
+    database.update_student_category(student_id, category)
+    return jsonify({"success": True, "id": student_id, "category": category})
+
+
 def _run_broadcast_in_background(job_id, exam, message, students, token):
     """Runs in a daemon thread — broadcasts to all students without blocking the HTTP response."""
     database.update_broadcast_status(job_id, "running")

@@ -100,6 +100,13 @@ export const deleteStudent = async (telegramId) =>
     headers: await getAuthHeaders()
   })
 
+export const updateStudentCategory = async (id, category) =>
+  requestJson(`/api/students/${id}/category`, {
+    method: "POST",
+    headers: await getAuthHeaders(),
+    body: JSON.stringify({ category })
+  })
+
 // ── Services API ──────────────────────────────────────────────────────────────
 export const getServices = async () =>
   requestJson(`/api/services`, { headers: await getAuthHeaders() })

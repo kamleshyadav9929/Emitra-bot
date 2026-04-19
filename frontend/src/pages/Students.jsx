@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { getStudents, blockStudent, deleteStudent, addStudent, getExams } from "../api"
+import { getStudents, blockStudent, deleteStudent, addStudent, getExams, updateStudentCategory } from "../api"
 import ExamBadge from "../components/ExamBadge"
 import { Phone, MessagesSquare, Search, X, Download, ChevronDown, Trash2, Plus } from "lucide-react"
 
@@ -212,12 +212,20 @@ export default function Students() {
                               className={`w-full text-left px-3 py-2 text-[12px] font-bold hover:bg-[var(--color-surface-low)] transition-colors ${
                                 student.exam_preference === exam ? "text-[var(--color-primary)]" : "text-gray-600"
                               }`}
-                              onClick={() => {
-                                setStudents(prev => prev.map(s =>
-                                  s.telegram_id === student.telegram_id ? { ...s, exam_preference: exam } : s
-                                ))
-                                setChangingExam(null)
-                              }}
+                                onClick={async () => {
+                                  try {
+                                    const res = await updateStudentCategory(student.id, exam)
+                                    if (res.success) {
+                                      setStudents(prev => prev.map(s =>
+                                        s.id === student.id ? { ...s, exam_preference: exam } : s
+                                      ))
+                                    }
+                                  } catch (err) {
+                                    alert(err.message || "Failed to update category")
+                                  } finally {
+                                    setChangingExam(null)
+                                  }
+                                }}
                             >
                               {student.exam_preference === exam ? `✓ ${exam}` : exam}
                             </button>
@@ -342,11 +350,19 @@ export default function Students() {
                                   className={`w-full text-left px-4 py-2.5 text-[12px] font-bold hover:bg-[var(--color-surface-low)] transition-colors ${
                                     student.exam_preference === exam ? "text-[var(--color-primary)]" : "text-gray-600"
                                   }`}
-                                  onClick={() => {
-                                    setStudents(prev => prev.map(s =>
-                                      s.telegram_id === student.telegram_id ? { ...s, exam_preference: exam } : s
-                                    ))
-                                    setChangingExam(null)
+                                  onClick={async () => {
+                                    try {
+                                      const res = await updateStudentCategory(student.id, exam)
+                                      if (res.success) {
+                                        setStudents(prev => prev.map(s =>
+                                          s.id === student.id ? { ...s, exam_preference: exam } : s
+                                        ))
+                                      }
+                                    } catch (err) {
+                                      alert(err.message || "Failed to update category")
+                                    } finally {
+                                      setChangingExam(null)
+                                    }
                                   }}
                                 >
                                   {student.exam_preference === exam ? `✓ ${exam}` : exam}
