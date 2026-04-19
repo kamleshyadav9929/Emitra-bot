@@ -13,7 +13,7 @@ import AdminServices from "./pages/AdminServices"
 import Login from "./pages/Login"
 import Landing from "./pages/Landing"
 import ServicesPage from "./pages/ServicesPage"
-import { Layers, Bell, Search } from "lucide-react"
+import { Layers, Bell, Search, Menu } from "lucide-react"
 import { LanguageProvider } from "./context/LanguageContext"
 import { AuthProvider } from "./context/AuthContext"  // student portal auth (separate from Clerk admin auth)
 
@@ -81,7 +81,7 @@ function PrivateRoute({ children }) {
 
 // ── Layout Components ─────────────────────────────────────────────────────────
 
-function TopNavbar() {
+function TopNavbar({ onMenuClick }) {
     const location = useLocation()
 
     const getLinkClass = (path) => {
@@ -95,9 +95,17 @@ function TopNavbar() {
         <header className="bg-[var(--color-surface-base)]/80 backdrop-blur-md border-b border-[var(--color-outline-variant)] h-[70px] md:h-[80px] flex items-center justify-between px-4 md:px-8 sticky top-0 z-20">
             {/* Nav Links */}
             <div className="flex items-center gap-4 md:gap-10 h-full">
+                <button
+                    onClick={onMenuClick}
+                    className="lg:hidden p-2 -ml-2 text-gray-500 hover:text-[var(--color-primary)] transition-colors"
+                    aria-label="Toggle Menu"
+                >
+                    <Menu size={22} />
+                </button>
+
                 <div className="flex flex-col -mt-1 leading-none tracking-tight">
-                    <span className="text-[var(--color-primary)] font-black text-[20px] md:text-[22px] tracking-tight font-display">e-Mitra</span>
-                    <span className="text-gray-500 font-bold text-[10px] md:text-[11px] tracking-widest uppercase mt-0.5">Admin Panel</span>
+                    <span className="text-[var(--color-primary)] font-black text-[18px] md:text-[22px] tracking-tight font-display">e-Mitra</span>
+                    <span className="text-gray-500 font-bold text-[9px] md:text-[11px] tracking-widest uppercase mt-0.5">Admin</span>
                 </div>
 
                 <nav className="hidden lg:flex h-full ml-4">
@@ -160,6 +168,7 @@ function AdminLayout({ children }) {
     const navigate = useNavigate()
     const isLoginPage = location.pathname === "/login"
     const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
     useEffect(() => {
         const handleKeys = (event) => {
@@ -181,18 +190,19 @@ function AdminLayout({ children }) {
     }, [navigate])
 
     return (
-        <div className="flex flex-col md:flex-row bg-[var(--color-surface-base)] text-[var(--color-on-surface)] min-h-screen">
-            {!isLoginPage && <Sidebar />}
+        <div className="flex flex-col lg:flex-row bg-[var(--color-surface-base)] text-[var(--color-on-surface)] min-h-screen">
+            {!isLoginPage && (
+                <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+            )}
             {!isLoginPage && isCommandPaletteOpen && (
                 <CommandPalette onClose={() => setIsCommandPaletteOpen(false)} />
             )}
-            <main className={`flex-1 min-w-0 flex flex-col pb-20 md:pb-0 ${!isLoginPage ? "md:ml-[260px]" : ""}`}>
-                {!isLoginPage && <TopNavbar />}
+            <main className={`flex-1 min-w-0 flex flex-col ${!isLoginPage ? "lg:ml-[280px]" : ""}`}>
+                {!isLoginPage && <TopNavbar onMenuClick={() => setIsSidebarOpen(true)} />}
                 <div className={`max-w-[1200px] w-full mx-auto ${!isLoginPage ? "px-4 sm:px-10 py-6 sm:py-10" : "flex-1 flex flex-col"}`}>
                     {children}
                 </div>
             </main>
-            {!isLoginPage && <BottomNav />}
         </div>
     )
 }
