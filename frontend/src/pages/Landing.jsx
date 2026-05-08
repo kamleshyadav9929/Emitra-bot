@@ -21,6 +21,7 @@ import RegistrationModal from "../components/landing/RegistrationModal"
 import LoginModal from "../components/landing/LoginModal"
 import StudentProfileDrawer from "../components/landing/StudentProfileDrawer"
 import LandingBottomNav from "../components/landing/LandingBottomNav"
+import StudentHero from "../components/landing/StudentHero"
 
 // ── Icon map — Bureau Blues only ───────────────────────────────────────────
 const CATEGORY_META = {
@@ -271,8 +272,13 @@ export default function Landing() {
                 {/* ── MAIN CANVAS ── */}
                 <div className="flex-1 overflow-y-auto pb-24 md:pb-32 p-3 md:p-8 lg:p-10">
                     
+                    {/* ── STUDENT HERO SECTION ── */}
+                    <StudentHero onGetStarted={() => {
+                        document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+                    }} />
+
                     {/* ── BIG CATEGORY CARDS (Main Canvas view) ── */}
-                    <section id="services" className="scroll-mt-20 mt-1">
+                    <section id="services" className="scroll-mt-20 mt-4 md:mt-8">
                         <div className="mb-6 md:mb-10 flex flex-col items-center text-center lg:items-start lg:text-left">
                             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[var(--color-surface-low)] border border-[var(--color-outline-variant)] mb-4 md:mb-5">
                                 <ShieldCheck size={12} className="text-[var(--color-primary)]" />
