@@ -1,13 +1,13 @@
-/* ─────────────────────────────────────────────────────────────────────────
-   Krishna E-Mitra Portal — Design System
+/* ─────────────────────────────────────────────────────────────────────────────
+   Krishna Krishna Emitra Portal ── Design System
    Color palette: Pure black & white editorial
-───────────────────────────────────────────────────────────────────────── */
+───────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  --navy:        #0A0A0A;   /* sidebar — pure black       */
+  --navy:        #0A0A0A;   /* sidebar ── pure black       */
   --navy-dark:   #000000;   /* deeper black               */
   --navy-light:  #1A1A1A;   /* hover on sidebar           */
-  --amber:       #FFFFFF;   /* active accent — white      */
+  --amber:       #FFFFFF;   /* active accent ── white      */
   --amber-light: #F0F0F0;   /* light accent               */
   --surface:     #F7F7F5;   /* page background            */
   --card:        #FFFFFF;
@@ -61,4 +61,53 @@
   background-size: 700px 100%;
   animation: shimmer 1.4s infinite;
   border-radius: 8px;
+}
+
+/* Premium Animations */
+@keyframes premiumFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: premiumFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes premiumSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slideUp {
+  animation: premiumSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Glassmorphism */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Scrollbars */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(203, 213, 225, 0.8);
+  border-radius: 99px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.8);
 }

@@ -31,7 +31,18 @@ if config.CLERK_JWKS_URL and not config.CLERK_JWT_PUBLIC_KEY:
 
 app = Flask(__name__)
 # Explicit CORS handling for development and production Vercel origins
-CORS(app, resources={r"/api/*": {"origins": ["https://emitra-bot.vercel.app", "http://localhost:5173", "http://localhost:3000", "http://localhost:5000"]}})
+CORS(app, resources={r"/api/*": {"origins": [
+    "https://emitra-bot.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://localhost:3000",
+    "http://localhost:5000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    "http://127.0.0.1:5175",
+    "http://127.0.0.1:3000"
+]}})
 
 # ── Rate Limiter Setup ────────────────────────────────────────────────────────
 limiter = Limiter(
@@ -578,7 +589,7 @@ def delete_service(service_id):
     return jsonify({"success": True})
 
 
-# ── Exams API ─────────────────────────────────────────────────────────────────
+# ── Exams API (Compatibility & Simple Admin) ──────────────────────────────────
 
 @app.route("/api/exams", methods=["GET"])
 @token_required
@@ -603,6 +614,193 @@ def create_exam():
 def delete_exam(exam_id):
     database.delete_exam(exam_id)
     return jsonify({"success": True})
+
+
+# ── Exam Form Applications & Detailed Exams API ─────────────────────────────
+import os
+import uuid
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = os.path.join(app.root_path, "uploads")
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# ── Public APIs ─────────────────────────────────────────────────────────────
+
+@app.route("/api/public/submit-application", methods=["POST"])
+@limiter.limit("5 per minute")
+def public_submit_application():
+    try:
+        # 1. Read normal form parameters
+        student_name = request.form.get("name", "").strip()
+        phone_number = request.form.get("phone", "").strip()
+        email = request.form.get("email", "").strip()
+        dob = request.form.get("dob", "").strip()
+        gender = request.form.get("gender", "").strip()
+        category = request.form.get("category", "").strip()
+        exam_name = request.form.get("exam", "").strip()
+        qualification = request.form.get("qualification", "").strip()
+        doc_submission_method = request.form.get("docSubmissionMethod", "upload").strip()
+
+        if not student_name or not phone_number or not exam_name:
+            return jsonify({"success": False, "error": "Name, Phone and Exam are required"}), 400
+
+        # Validate phone
+        if not re.match(r"^[6-9]\d{9}$", phone_number):
+            return jsonify({"success": False, "error": "Invalid Indian phone number"}), 400
+
+        # 2. Insert form application to get ID
+        app_id = database.submit_form_application(
+            student_name, phone_number, email, dob, gender, category, exam_name, qualification, doc_submission_method
+        )
+
+        # 3. Process files
+        for doc_key in ["photo", "signature", "marksheet", "id_proof"]:
+            if doc_key in request.files:
+                file = request.files[doc_key]
+                if file and file.filename != "":
+                    orig_filename = secure_filename(file.filename)
+                    # Generate unique name: appid_uuid_origfilename
+                    unique_name = f"{app_id}_{uuid.uuid4().hex[:8]}_{orig_filename}"
+                    file_path = os.path.join(UPLOAD_FOLDER, unique_name)
+                    file.save(file_path)
+                    
+                    # Log file in database
+                    database.add_application_document(app_id, doc_key, unique_name, file.filename)
+
+        return jsonify({"success": True, "message": "Application submitted successfully", "application_id": app_id})
+    except Exception as e:
+        print(f"Error submitting form application: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/public/applications/<phone>", methods=["GET"])
+@limiter.limit("20 per minute")
+def public_get_applications_status(phone):
+    """Students call this to see status of all their form filings by phone number."""
+    apps = database.get_student_applications_by_phone(phone)
+    return jsonify({"success": True, "applications": apps})
+
+
+# ── Admin APIs (Auth Required) ──────────────────────────────────────────────
+
+@app.route("/api/admin/exams", methods=["GET"])
+@token_required
+def admin_get_all_exams():
+    """Admin endpoint to see all exams (both enabled & disabled) for configuration."""
+    return jsonify({"success": True, "exams": database.get_all_exams_admin()})
+
+
+@app.route("/api/admin/exams", methods=["POST"])
+@token_required
+def admin_create_exam():
+    data = request.json or {}
+    name = data.get("name", "").strip()
+    if not name:
+        return jsonify({"success": False, "error": "Exam name is required"}), 400
+        
+    desc = data.get("description", "")
+    cat = data.get("category", "UG")
+    start = data.get("start_date", "")
+    end = data.get("end_date", "")
+    exam_d = data.get("exam_date", "")
+    fees_gen = data.get("fees_gen_obc", "")
+    fees_sc = data.get("fees_sc_st", "")
+    elig = data.get("eligibility", "")
+    url = data.get("official_url", "")
+    enabled = data.get("enabled", True)
+
+    success, result = database.add_exam_details(
+        name, desc, cat, start, end, exam_d, fees_gen, fees_sc, elig, url, enabled
+    )
+    if success:
+        return jsonify({"success": True, "id": result})
+    else:
+        return jsonify({"success": False, "error": result}), 400
+
+
+@app.route("/api/admin/exams/<int:exam_id>", methods=["PUT"])
+@token_required
+def admin_update_exam(exam_id):
+    data = request.json or {}
+    name = data.get("name", "").strip()
+    if not name:
+        return jsonify({"success": False, "error": "Exam name is required"}), 400
+        
+    desc = data.get("description", "")
+    cat = data.get("category", "UG")
+    start = data.get("start_date", "")
+    end = data.get("end_date", "")
+    exam_d = data.get("exam_date", "")
+    fees_gen = data.get("fees_gen_obc", "")
+    fees_sc = data.get("fees_sc_st", "")
+    elig = data.get("eligibility", "")
+    url = data.get("official_url", "")
+    enabled = data.get("enabled", True)
+
+    success = database.update_exam_details(
+        exam_id, name, desc, cat, start, end, exam_d, fees_gen, fees_sc, elig, url, enabled
+    )
+    if success:
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False, "error": "Failed to update exam"}), 400
+
+
+@app.route("/api/admin/applications", methods=["GET"])
+@token_required
+def admin_get_all_applications():
+    """Fetch all form filing applications."""
+    status = request.args.get("status")
+    apps = database.get_all_applications(status)
+    return jsonify({"success": True, "applications": apps})
+
+
+@app.route("/api/admin/applications/<int:app_id>", methods=["GET"])
+@token_required
+def admin_get_application_details(app_id):
+    """Fetch detailed metadata of a single application with attachments."""
+    details = database.get_application_details(app_id)
+    if not details:
+        return jsonify({"success": False, "error": "Application not found"}), 404
+    return jsonify({"success": True, "application": details})
+
+
+@app.route("/api/admin/applications/<int:app_id>", methods=["PUT"])
+@token_required
+def admin_update_application(app_id):
+    """Admin updates status and remarks of an application."""
+    data = request.json or {}
+    status = data.get("status")
+    remarks = data.get("remarks", "")
+    
+    if not status:
+        return jsonify({"success": False, "error": "Status is required"}), 400
+        
+    database.update_application_status(app_id, status, remarks)
+    return jsonify({"success": True})
+
+
+@app.route("/api/admin/documents/download/<path:filename>", methods=["GET"])
+@token_required
+def admin_download_document(filename):
+    """Securely serve uploaded student application documents only to authenticated admins."""
+    clean_filename = secure_filename(filename)
+    if not os.path.exists(os.path.join(UPLOAD_FOLDER, clean_filename)):
+        return jsonify({"error": "File not found"}), 404
+        
+    return send_from_directory(UPLOAD_FOLDER, clean_filename, as_attachment=True)
+
+
+@app.route("/api/public/documents/download/<path:filename>", methods=["GET"])
+def public_download_document(filename):
+    """Serve uploaded student documents (filenames are cryptographically secure with UUIDs)."""
+    clean_filename = secure_filename(filename)
+    if not os.path.exists(os.path.join(UPLOAD_FOLDER, clean_filename)):
+        return jsonify({"error": "File not found"}), 404
+        
+    return send_from_directory(UPLOAD_FOLDER, clean_filename, as_attachment=True)
+
+
 
 
 # ── Static File Handling (Fix Manifest/Asset errors) ──────────────────────────

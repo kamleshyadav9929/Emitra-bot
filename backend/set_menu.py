@@ -12,7 +12,7 @@ def set_commands():
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/setMyCommands"
     commands = [
         {"command": "start", "description": "Registration aur shuruwat karein"},
-        {"command": "services", "description": "E-Mitra ki sabhi sewaiyen dekhein"},
+        {"command": "services", "description": "Krishna Emitra ki sabhi sewaiyen dekhein"},
         {"command": "status", "description": "Apni registration details dekhein"},
         {"command": "change", "description": "Apna exam preference badlein"}
     ]

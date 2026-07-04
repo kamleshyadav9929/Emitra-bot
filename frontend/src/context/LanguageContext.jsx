@@ -4,7 +4,7 @@ import React, { createContext, useState, useContext } from 'react';
 const translations = {
     EN: {
         "services_title": "Government Services, From Home.",
-        "services_subtitle": "Access 50+ government services in one place — apply, track status, and get real-time exam updates with Krishna E-Mitra.",
+        "services_subtitle": "Access 50+ government services in one place — apply, track status, and get real-time exam updates with Krishna Krishna Emitra.",
         "apply_now": "Apply Now",
         "telegram_bot": "Telegram Bot",
         "total_students": "Students Registered",

@@ -40,7 +40,7 @@ function TopNavbar() {
             {/* Nav Links */}
             <div className="flex items-center gap-10 h-full">
                 <div className="flex flex-col -mt-1 leading-none tracking-tight">
-                    <span className="text-[#164FA8] font-black text-[22px] tracking-tight">e-Mitra</span>
+                    <span className="text-[#164FA8] font-black text-[22px] tracking-tight">Krishna Emitra</span>
                     <span className="text-gray-500 font-bold text-[11px] tracking-widest uppercase mt-0.5">Admin Panel</span>
                 </div>
                 

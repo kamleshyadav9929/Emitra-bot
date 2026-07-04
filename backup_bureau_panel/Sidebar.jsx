@@ -31,7 +31,7 @@ export function Sidebar() {
       {/* Logo Area */}
       <div className="px-8 py-8">
         <h1 className="text-[18px] font-bold tracking-tight text-[#164FA8]">Bureau Panel</h1>
-        <p className="text-[11px] font-medium text-gray-500 mt-1">E-Mitra Bot Administration</p>
+        <p className="text-[11px] font-medium text-gray-500 mt-1">Krishna Emitra Bot Administration</p>
       </div>
 
       {/* Nav */}

@@ -15,8 +15,8 @@ export default defineConfig({
       },
       includeAssets: ['favicon.svg', 'icons.svg'],
       manifest: {
-        name: 'Krishna E-Mitra',
-        short_name: 'E-Mitra',
+        name: 'Krishna Krishna Emitra',
+        short_name: 'Krishna Emitra',
         description: 'Government Services Portal',
         theme_color: '#ffffff',
         background_color: '#ffffff',

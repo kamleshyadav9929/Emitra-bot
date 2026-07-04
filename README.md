@@ -1,6 +1,6 @@
-# E-Mitra Telegram Bot & Dashboard
+# Krishna Emitra Telegram Bot & Dashboard
 
-E-Mitra is a comprehensive student notification system combining a Telegram Bot ecosystem and a dark-themed React Admin Dashboard.
+Krishna Emitra is a comprehensive student notification system combining a Telegram Bot ecosystem and a dark-themed React Admin Dashboard.
 
 ## Setup Instructions
 

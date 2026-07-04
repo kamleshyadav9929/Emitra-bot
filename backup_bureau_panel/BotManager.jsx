@@ -18,9 +18,9 @@ const LS = {
 
 // ── Default values ──────────────────────────────────────────────────────────────
 const DEFAULT_MESSAGES = {
-  welcome:      "🙏 E-Mitra Seva mein aapka swagat hai!\n\nAap yahan se aadhar, PAN, income certificate aur bahut saari sarkaari seva le sakte hain.\n\n/help se sab options dekhein.",
+  welcome:      "🙏 Krishna Emitra Seva mein aapka swagat hai!\n\nAap yahan se aadhar, PAN, income certificate aur bahut saari sarkaari seva le sakte hain.\n\n/help se sab options dekhein.",
   exam_confirm: "✅ Aapka exam {exam} set ho gaya hai!\n\nAb aap exam se related updates seedhe yahan paayenge.",
-  unsubscribe:  "😢 Aapko E-Mitra notifications se unsubscribe kar diya gaya hai.\n\nWapas subscribe karne ke liye /start karein.",
+  unsubscribe:  "😢 Aapko Krishna Emitra notifications se unsubscribe kar diya gaya hai.\n\nWapas subscribe karne ke liye /start karein.",
 }
 
 const DEFAULT_SERVICES = [
@@ -37,7 +37,7 @@ const DEFAULT_ANNOUNCEMENTS = [
 ]
 
 const DEFAULT_SETTINGS = {
-  botName:    "E-Mitra Seva",
+  botName:    "Krishna Emitra Seva",
   language:   "hinglish",
   maxMsgDay:  3,
 }
@@ -424,7 +424,7 @@ function SettingsTab({ toast }) {
             value={settings.botName}
             onChange={e => set("botName", e.target.value)}
             className="w-full border border-gray-200 px-5 py-3.5 text-[13px] text-gray-900 bg-white focus:outline-none focus:border-[#164FA8] focus:ring-1 focus:ring-[#164FA8] shadow-sm transition-all rounded-[16px]"
-            placeholder="e.g. E-Mitra Seva"
+            placeholder="e.g. Krishna Emitra Seva"
           />
           <p className="text-[12px] text-gray-500 font-medium mt-2">Ye naam broadcasts ke header mein dikhega.</p>
         </div>

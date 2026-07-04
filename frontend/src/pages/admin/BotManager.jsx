@@ -7,8 +7,8 @@ import {
 } from "lucide-react"
 import {
   getExams, createExam, deleteExamApi
-} from "../api"
-import { getExamColor } from "../constants/examColors"
+} from "../../api"
+import { getExamColor } from "../../constants/examColors"
 
 // ── Local storage helpers ───────────────────────────────────────────────────────
 const LS = {
@@ -18,9 +18,9 @@ const LS = {
 
 // ── Default values ──────────────────────────────────────────────────────────────
 const DEFAULT_MESSAGES = {
-  welcome:      "🙏 E-Mitra Seva mein aapka swagat hai!\n\nAap yahan se aadhar, PAN, income certificate aur bahut saari sarkaari seva le sakte hain.\n\n/help se sab options dekhein.",
+  welcome:      "🙏 Krishna Emitra Seva mein aapka swagat hai!\n\nAap yahan se aadhar, PAN, income certificate aur bahut saari sarkaari seva le sakte hain.\n\n/help se sab options dekhein.",
   exam_confirm: "✅ Aapka exam {exam} set ho gaya hai!\n\nAb aap exam se related updates seedhe yahan paayenge.",
-  unsubscribe:  "😢 Aapko E-Mitra notifications se unsubscribe kar diya gaya hai.\n\nWapas subscribe karne ke liye /start karein.",
+  unsubscribe:  "😢 Aapko Krishna Emitra notifications se unsubscribe kar diya gaya hai.\n\nWapas subscribe karne ke liye /start karein.",
 }
 
 const DEFAULT_SERVICES = [
@@ -37,7 +37,7 @@ const DEFAULT_ANNOUNCEMENTS = [
 ]
 
 const DEFAULT_SETTINGS = {
-  botName:    "E-Mitra Seva",
+  botName:    "Krishna Emitra Seva",
   language:   "hinglish",
   maxMsgDay:  3,
 }
@@ -424,7 +424,7 @@ function SettingsTab({ toast }) {
             value={settings.botName}
             onChange={e => set("botName", e.target.value)}
             className="w-full border border-[var(--color-outline-variant)] px-5 py-3.5 text-[13px] text-[var(--color-on-surface)] bg-transparent focus:outline-none focus:ring-0 shadow-sm transition-all rounded-xl"
-            placeholder="e.g. E-Mitra Seva"
+            placeholder="e.g. Krishna Emitra Seva"
           />
           <p className="text-[12px] text-gray-500 font-medium mt-2">Ye naam broadcasts ke header mein dikhega.</p>
         </div>

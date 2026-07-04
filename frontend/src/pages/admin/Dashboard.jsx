@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import { ClipboardList, TrendingUp, Megaphone, ArrowRight, ExternalLink, Activity, FileText, CheckCircle, Users, Send } from "lucide-react"
-import { getStats, getStudents, getLogs, getServiceRequests } from "../api"
+import { getStats, getStudents, getLogs, getServiceRequests } from "../../api"
 
 const EXAM_COLORS = {
   JEE:  { bar: "#3B82F6", text: "#1D4ED8", bg: "#EFF6FF" },
@@ -146,7 +146,7 @@ export default function Dashboard() {
             </p>
           </div>
           <p className="text-[13px] font-bold text-[var(--color-primary)] underline underline-offset-2 hover:text-black transition-colors mt-auto z-10 relative">
-            View All e-Mitra Requests
+            View All Krishna Emitra Requests
           </p>
           <FileText size={140} strokeWidth={1} className="absolute -bottom-6 -right-10 text-white/70 rotate-[10deg] pointer-events-none z-0" />
         </div>
@@ -270,7 +270,7 @@ export default function Dashboard() {
               <FileText size={22} className="text-[#164FA8] mb-4" />
               <h3 className="text-[17px] font-bold text-gray-900 mb-2">Service Requests</h3>
               <p className="text-[13px] text-gray-600 leading-relaxed mb-6 pr-4">
-                Process integration requests for e-Mitra digital services and track statuses.
+                Process integration requests for Krishna Emitra Digital services and track statuses.
               </p>
             </div>
             <button className="flex items-center gap-2 text-[11px] font-bold text-[#164FA8] uppercase tracking-wide group-hover:underline underline-offset-2">
@@ -295,7 +295,7 @@ export default function Dashboard() {
       <div className="mt-12 w-full flex justify-between items-start text-[10px] text-gray-400 border-t border-gray-100 pt-6">
         <div className="flex flex-col md:flex-row gap-10 md:gap-20">
           <div>
-            <h4 className="font-bold text-gray-800 text-[12px] tracking-wide mb-2">E-Mitra Bot Panel</h4>
+            <h4 className="font-bold text-gray-800 text-[12px] tracking-wide mb-2">Krishna Emitra Bot Panel</h4>
             <p className="max-w-xs leading-relaxed">Providing high-end digital infrastructure for administrative efficiency and student convenience.</p>
           </div>
           <div className="flex gap-16">
@@ -313,7 +313,7 @@ export default function Dashboard() {
         </div>
       </div>
       <p className="text-center text-[10px] text-gray-400 mt-10 pb-8">
-        © 2024 E-Mitra Bot Administration. All rights reserved.
+        © 2024 Krishna Emitra Bot Administration. All rights reserved.
       </p>
 
     </div>

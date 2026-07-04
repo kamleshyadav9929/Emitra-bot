@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useLocation } from "react-router-dom"
 import { Send, CheckCircle, Loader2, Bot, Users, MessageSquare, Clock, Calendar, Trash2, ArrowRight, CheckCircle2 } from "lucide-react"
-import { getStats, sendNotification, getExams, getBroadcastStatus } from "../api"
-import Stepper, { Step } from "../components/Stepper"
+import { getStats, sendNotification, getExams, getBroadcastStatus } from "../../api"
+import Stepper, { Step } from "../../components/common/Stepper"
 
 const CHAR_LIMIT = 4096
 
@@ -218,7 +218,7 @@ export default function SendNotification() {
               <textarea
                 value={message}
                 onChange={e => { if (e.target.value.length <= CHAR_LIMIT) setMessage(e.target.value) }}
-                placeholder={"Important Update!\n\nAaj ka Mock Test raat 8 baje hoga.\n\n— E-Mitra Team"}
+                placeholder={"Important Update!\n\nAaj ka Mock Test raat 8 baje hoga.\n\n— Krishna Emitra Team"}
                 rows={8}
                 className={`w-full bg-[var(--color-surface-lowest)] border-none px-5 py-4 text-[13px] text-gray-900 placeholder:text-gray-400 focus:outline-none resize-none shadow-ambient transition-all leading-relaxed rounded-[20px] ${
                   message.length > CHAR_LIMIT * 0.9 ? "ring-2 ring-red-400/40" : "focus:ring-2 focus:ring-[var(--color-primary)]/10"
@@ -254,7 +254,7 @@ export default function SendNotification() {
                     <Bot size={18} />
                   </div>
                   <div>
-                    <p className="text-[13px] font-bold text-gray-900">E-Mitra Bot</p>
+                    <p className="text-[13px] font-bold text-gray-900">Krishna Emitra Bot</p>
                     <p className="text-[10px] text-[#164FA8] font-semibold tracking-widest uppercase">Automated</p>
                   </div>
                 </div>

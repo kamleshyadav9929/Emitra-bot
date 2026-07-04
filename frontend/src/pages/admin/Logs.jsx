@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { CheckCircle2, Send, Clock, MessageSquare, ClipboardList, AlertTriangle, Filter } from "lucide-react"
-import { getLogs } from "../api"
-import ExamBadge from "../components/ExamBadge"
+import { getLogs } from "../../api"
+import ExamBadge from "../../components/common/ExamBadge"
 
 const LOG_FILTERS = ["All", "Messages", "Requests", "Errors"]
 

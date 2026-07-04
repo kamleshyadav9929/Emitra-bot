@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, X, CheckCircle2 } from "lucide-react"
-import { getServices, createService, updateService, toggleService, deleteServiceApi } from "../api"
+import { getServices, createService, updateService, toggleService, deleteServiceApi } from "../../api"
 
 // ── Toast ───────────────────────────────────────────────────────────────────────
 function Toast({ visible, message }) {

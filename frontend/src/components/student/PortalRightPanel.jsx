@@ -103,7 +103,7 @@ export default function PortalRightPanel({ stats, config, onRegister, onTrack })
         { label: "WhatsApp Help", icon: MessageCircle, desc: "Chat instantly", action: () => window.open(`https://wa.me/${config?.whatsapp_number || "916377964293"}`, "_blank"), color: "text-green-600" },
         { label: "Telegram Bot", icon: Phone, desc: "Auto-apply bot", action: () => window.open(config?.telegram_bot_url || "https://t.me/Kamlesh6377_bot", "_blank"), color: "text-blue-600" },
         { label: "Track Status", icon: MapPin, desc: "Check progress", action: onTrack, color: "text-amber-600" },
-        { label: "Register Free", icon: UserPlus, desc: "Join E-Mitra", action: onRegister, color: "text-[var(--navy)]" },
+        { label: "Register Free", icon: UserPlus, desc: "Join Krishna Emitra", action: onRegister, color: "text-[var(--navy)]" },
     ]
 
     return (

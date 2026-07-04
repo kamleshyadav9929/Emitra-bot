@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react"
-import { getServiceRequests, sendReceipt, getStudentDocuments, getDocumentUrl } from "../api"
+import { getServiceRequests, sendReceipt, getStudentDocuments, getDocumentUrl } from "../../api"
 import { ClipboardList, Clock, CheckCircle, Send, X, Phone, MessageSquare, RefreshCw, Paperclip, FileText, Image as ImageIcon, Download } from "lucide-react"
 
 const CATEGORY_EMOJI = {
@@ -211,7 +211,7 @@ export default function ServiceRequests() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-8">
         <div>
-          <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-[var(--color-primary)] mb-2">e-Mitra</p>
+          <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-[var(--color-primary)] mb-2">Krishna Emitra</p>
           <h1 className="text-3xl font-black text-[#0A1A40] tracking-tight leading-tight font-display">Service Requests</h1>
           <p className="text-[14px] text-gray-500 mt-2 max-w-2xl leading-relaxed font-medium">Manage pending seva requests and issue receipts.</p>
         </div>

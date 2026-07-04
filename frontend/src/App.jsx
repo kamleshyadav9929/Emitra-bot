@@ -1,21 +1,36 @@
 import { Routes, Route, useNavigate, useLocation, Navigate, Link } from "react-router-dom"
 import { useEffect, useState } from "react"
-import { useAuth, useUser, Show, UserButton } from "@clerk/react"
-import { Sidebar, BottomNav } from "./components/Sidebar"
-import CommandPalette from "./components/CommandPalette"
-import Dashboard from "./pages/Dashboard"
-import SendNotification from "./pages/SendNotification"
-import Students from "./pages/Students"
-import Logs from "./pages/Logs"
-import ServiceRequests from "./pages/ServiceRequests"
-import BotManager from "./pages/BotManager"
-import AdminServices from "./pages/AdminServices"
-import Login from "./pages/Login"
-import Landing from "./pages/Landing"
-import ServicesPage from "./pages/ServicesPage"
+import { useAuth as useClerkAuth, useUser, Show, UserButton } from "@clerk/react"
+import { AdminSidebar } from "./components/admin/AdminSidebar"
+import CommandPalette from "./components/admin/CommandPalette"
+import Dashboard from "./pages/admin/Dashboard"
+import SendNotification from "./pages/admin/SendNotification"
+import Students from "./pages/admin/Students"
+import Logs from "./pages/admin/Logs"
+import ServiceRequests from "./pages/admin/ServiceRequests"
+import BotManager from "./pages/admin/BotManager"
+import AdminServices from "./pages/admin/AdminServices"
+import AdminApplications from "./pages/admin/AdminApplications"
+import AdminExams from "./pages/admin/AdminExams"
+import Login from "./pages/admin/Login"
+import StudentPanel from "./pages/student/StudentPanel"
+import Landing from "./pages/student/Landing"
+
 import { Layers, Bell, Search, Menu } from "lucide-react"
 import { LanguageProvider } from "./context/LanguageContext"
-import { AuthProvider } from "./context/AuthContext"  // student portal auth (separate from Clerk admin auth)
+import { AuthProvider, useAuth as useStudentAuth } from "./context/AuthContext"  // student portal auth (separate from Clerk admin auth)
+
+// Dynamic home page: renders StudentPanel if logged in, Landing page if logged out
+function StudentPortalHome() {
+    const { isLoggedIn } = useStudentAuth()
+    return isLoggedIn ? <StudentPanel /> : <Landing />
+}
+
+// Private route for student dashboard
+function StudentDashboardRoute() {
+    const { isLoggedIn } = useStudentAuth()
+    return isLoggedIn ? <StudentPanel /> : <Navigate to="/" replace />
+}
 
 // ── Loading Spinner ───────────────────────────────────────────────────────────
 function ClerkLoadingSpinner() {
@@ -37,7 +52,7 @@ const ADMIN_EMAILS = (import.meta.env.VITE_ADMIN_EMAILS || "")
 
 // ── Access Denied screen ──────────────────────────────────────────────────────
 function AccessDenied() {
-    const { signOut } = useAuth()
+    const { signOut } = useClerkAuth()
     return (
         <div className="min-h-screen flex items-center justify-center bg-[var(--color-surface-base)] px-6">
             <div className="flex flex-col items-center gap-6 max-w-sm text-center">
@@ -65,7 +80,7 @@ function AccessDenied() {
 
 // ── Private Route (admin-only, Clerk-powered) ──────────────────────────────────
 function PrivateRoute({ children }) {
-    const { isSignedIn, isLoaded } = useAuth()
+    const { isSignedIn, isLoaded } = useClerkAuth()
     const { user } = useUser()
 
     if (!isLoaded) return <ClerkLoadingSpinner />
@@ -104,7 +119,7 @@ function TopNavbar({ onMenuClick }) {
                 </button>
 
                 <div className="flex flex-col -mt-1 leading-none tracking-tight">
-                    <span className="text-[var(--color-primary)] font-black text-[18px] md:text-[22px] tracking-tight font-display">e-Mitra</span>
+                    <span className="text-[var(--color-primary)] font-black text-[18px] md:text-[22px] tracking-tight font-display">Krishna Emitra</span>
                     <span className="text-gray-500 font-bold text-[9px] md:text-[11px] tracking-widest uppercase mt-0.5">Admin</span>
                 </div>
 
@@ -192,7 +207,7 @@ function AdminLayout({ children }) {
     return (
         <div className="flex flex-col lg:flex-row bg-[var(--color-surface-base)] text-[var(--color-on-surface)] min-h-screen">
             {!isLoginPage && (
-                <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+                <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
             )}
             {!isLoginPage && isCommandPaletteOpen && (
                 <CommandPalette onClose={() => setIsCommandPaletteOpen(false)} />
@@ -214,8 +229,10 @@ function App() {
         <AuthProvider>
         <Routes>
             {/* ── Public Student Portal ─────────────────────────────────────── */}
-            <Route path="/" element={<Landing />} />
-            <Route path="/services/:category" element={<ServicesPage />} />
+            <Route path="/" element={<StudentPortalHome />} />
+            <Route path="/dashboard" element={<StudentDashboardRoute />} />
+            <Route path="/services/:category" element={<StudentPanel />} />
+
 
             {/* ── Admin Auth ────────────────────────────────────────────────── */}
             <Route path="/login" element={<AdminLayout><Login /></AdminLayout>} />
@@ -225,6 +242,8 @@ function App() {
             <Route path="/admin/send" element={<PrivateRoute><AdminLayout><SendNotification /></AdminLayout></PrivateRoute>} />
             <Route path="/admin/students" element={<PrivateRoute><AdminLayout><Students /></AdminLayout></PrivateRoute>} />
             <Route path="/admin/requests" element={<PrivateRoute><AdminLayout><ServiceRequests /></AdminLayout></PrivateRoute>} />
+            <Route path="/admin/exam-forms" element={<PrivateRoute><AdminLayout><AdminApplications /></AdminLayout></PrivateRoute>} />
+            <Route path="/admin/exam-manager" element={<PrivateRoute><AdminLayout><AdminExams /></AdminLayout></PrivateRoute>} />
             <Route path="/admin/logs" element={<PrivateRoute><AdminLayout><Logs /></AdminLayout></PrivateRoute>} />
             <Route path="/admin/services" element={<PrivateRoute><AdminLayout><AdminServices /></AdminLayout></PrivateRoute>} />
             <Route path="/admin/bot-manager" element={<PrivateRoute><AdminLayout><BotManager /></AdminLayout></PrivateRoute>} />

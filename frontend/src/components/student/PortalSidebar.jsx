@@ -97,7 +97,7 @@ function SidebarLogo({ open }) {
                 transition={{ duration: 0.15, delay: open ? 0.06 : 0 }}
                 className="leading-none whitespace-nowrap overflow-hidden"
             >
-                <p className="text-[11px] font-black uppercase tracking-tight text-white">Krishna E-Mitra</p>
+                <p className="text-[11px] font-black uppercase tracking-tight text-white">Krishna Krishna Emitra</p>
                 <p className="text-[8px] text-white/30 font-bold uppercase tracking-widest mt-0.5">Digital Seva Portal</p>
             </motion.div>
         </div>

@@ -1,13 +1,15 @@
 import { Link, useLocation } from "react-router-dom"
-import { Home, Send, Users, ClipboardList, Bot, HelpCircle, LogOut, Wrench } from "lucide-react"
+import { Home, Send, Users, ClipboardList, Bot, HelpCircle, LogOut, Wrench, FileText, GraduationCap } from "lucide-react"
 import { useEffect, useState } from "react"
-import { getServiceRequests } from "../api"
+import { getServiceRequests } from "../../api"
 
 const navItems = [
   { name: "Dashboard",           path: "/admin",            icon: Home },
   { name: "Broadcast",           path: "/admin/send",       icon: Send },
   { name: "Students",            path: "/admin/students",   icon: Users },
   { name: "Requests",            path: "/admin/requests",   icon: ClipboardList },
+  { name: "Exam Forms",          path: "/admin/exam-forms",  icon: FileText },
+  { name: "Exams Manager",       path: "/admin/exam-manager",icon: GraduationCap },
   { name: "Services",            path: "/admin/services",   icon: Wrench },
   { name: "Bot Settings",        path: "/admin/bot-manager",icon: Bot },
 ]
@@ -22,7 +24,8 @@ function usePendingCount() {
   return count
 }
 
-export function Sidebar({ isOpen, onClose }) {
+// Main Admin Sidebar Component
+export function AdminSidebar({ isOpen, onClose }) {
   const location = useLocation()
   const pendingCount = usePendingCount()
 
@@ -45,7 +48,7 @@ export function Sidebar({ isOpen, onClose }) {
         <div className="px-8 py-8 flex items-center justify-between">
           <div>
             <h1 className="text-[18px] font-bold tracking-tight text-[var(--color-primary)] font-display">Bureau Panel</h1>
-            <p className="text-[11px] font-medium text-gray-500 mt-1">E-Mitra Bot Administration</p>
+            <p className="text-[11px] font-medium text-gray-500 mt-1">Krishna Emitra Bot Administration</p>
           </div>
           <button onClick={onClose} className="lg:hidden p-2 text-gray-400 hover:text-gray-900 transition-colors">
             <LogOut size={20} className="rotate-180" />
@@ -102,4 +105,4 @@ export function Sidebar({ isOpen, onClose }) {
   )
 }
 
-export default Sidebar
+export default AdminSidebar

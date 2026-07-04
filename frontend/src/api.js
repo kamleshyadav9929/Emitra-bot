@@ -100,13 +100,6 @@ export const deleteStudent = async (telegramId) =>
     headers: await getAuthHeaders()
   })
 
-export const updateStudentCategory = async (id, category) =>
-  requestJson(`/api/students/${id}/category`, {
-    method: "POST",
-    headers: await getAuthHeaders(),
-    body: JSON.stringify({ category })
-  })
-
 // ── Services API ──────────────────────────────────────────────────────────────
 export const getServices = async () =>
   requestJson(`/api/services`, { headers: await getAuthHeaders() })
@@ -177,9 +170,104 @@ export const publicCheckStatus = (phone) =>
     body: JSON.stringify({ phone })
   })
 
-export const publicLogIntent = (service_name, category) =>
+export const publicLogIntent = (service_name, category, phone = "WEB_ANONYMOUS") =>
   requestJson(`/api/public/log-intent`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ service_name, category })
+    body: JSON.stringify({ service_name, category, phone })
   })
+
+
+// ── Exam Portal Extensions ──────────────────────────────────────────────────
+
+export const submitFormApplication = async (formData) => {
+  const response = await fetch(`${BASE_URL}/api/public/submit-application`, {
+    method: "POST",
+    body: formData, // browser automatically sets multipart/form-data with boundaries
+  })
+  const data = await response.json()
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to submit application")
+  }
+  return data
+}
+
+export const getFormApplicationStatus = (phone) =>
+  requestJson(`/api/public/applications/${phone}`)
+
+export const getAdminExams = async () =>
+  requestJson(`/api/admin/exams`, { headers: await getAuthHeaders() })
+
+export const createAdminExam = async (data) =>
+  requestJson(`/api/admin/exams`, {
+    method: "POST",
+    headers: await getAuthHeaders(),
+    body: JSON.stringify(data)
+  })
+
+export const updateAdminExam = async (id, data) =>
+  requestJson(`/api/admin/exams/${id}`, {
+    method: "PUT",
+    headers: await getAuthHeaders(),
+    body: JSON.stringify(data)
+  })
+
+export const deleteAdminExam = async (id) =>
+  requestJson(`/api/exams/${id}`, {
+    method: "DELETE",
+    headers: await getAuthHeaders()
+  })
+
+export const getFormApplications = async (status = "") =>
+  requestJson(`/api/admin/applications${status ? `?status=${status}` : ""}`, { headers: await getAuthHeaders() })
+
+export const getApplicationDetails = async (id) =>
+  requestJson(`/api/admin/applications/${id}`, { headers: await getAuthHeaders() })
+
+export const updateApplicationStatus = async (id, data) =>
+  requestJson(`/api/admin/applications/${id}`, {
+    method: "PUT",
+    headers: await getAuthHeaders(),
+    body: JSON.stringify(data)
+  })
+
+export const downloadApplicationDocument = async (filename) => {
+  const headers = await getAuthHeaders()
+  const response = await fetch(`${BASE_URL}/api/admin/documents/download/${filename}`, {
+    headers
+  })
+  if (!response.ok) {
+    throw new Error("Could not download file")
+  }
+  const blob = await response.blob()
+  const url = window.URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  // Strip the prefix (appid_uuid_) from name for user
+  const cleanName = filename.split("_").slice(2).join("_") || filename
+  a.download = cleanName
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  window.URL.revokeObjectURL(url)
+}
+
+export const downloadPublicApplicationDocument = async (filename) => {
+  const response = await fetch(`${BASE_URL}/api/public/documents/download/${filename}`)
+  if (!response.ok) {
+    throw new Error("Could not download file")
+  }
+  const blob = await response.blob()
+  const url = window.URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  // Strip the prefix (appid_uuid_) from name for user
+  const cleanName = filename.split("_").slice(2).join("_") || filename
+  a.download = cleanName
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  window.URL.revokeObjectURL(url)
+}
+
+

@@ -30,3 +30,7 @@ WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET", "")
 WHATSAPP_NUMBER = os.getenv("WHATSAPP_NUMBER", "916377964293")
 # Render automatically injects the PORT environment variable
 FLASK_PORT = int(os.getenv("PORT", os.getenv("FLASK_PORT", 5000)))
+
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
+

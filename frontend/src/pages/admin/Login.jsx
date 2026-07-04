@@ -13,7 +13,7 @@ export default function Login() {
           <div className="w-8 h-8 border border-white/20 bg-white/5 flex items-center justify-center rounded-lg backdrop-blur-sm">
             <ShieldCheck size={15} className="text-white" />
           </div>
-          <span className="text-[13px] font-bold tracking-widest uppercase text-white/70">e-Mitra Bureau</span>
+          <span className="text-[13px] font-bold tracking-widest uppercase text-white/70">Krishna Emitra Bureau</span>
         </div>
 
         <div className="relative z-10">
@@ -23,13 +23,13 @@ export default function Login() {
           </h1>
           <div className="mt-10 pt-8 border-t border-white/10">
             <p className="text-[13px] text-white/30 leading-relaxed max-w-xs">
-              Secure administrative workspace for the e-Mitra student notification platform.
+              Secure administrative workspace for the Krishna Emitra student notification platform.
             </p>
           </div>
         </div>
 
         <div className="text-[10px] text-white/15 font-mono relative z-10">
-          © {new Date().getFullYear()} e-Mitra Digital Bureau
+          © {new Date().getFullYear()} Krishna Emitra Digital Bureau
         </div>
       </div>
 
@@ -41,7 +41,7 @@ export default function Login() {
             <div className="w-8 h-8 bg-[#071E27] flex items-center justify-center rounded-lg">
               <ShieldCheck size={14} className="text-white" />
             </div>
-            <span className="text-[14px] font-black text-[#071E27] font-display tracking-tight">e-Mitra Admin</span>
+            <span className="text-[14px] font-black text-[#071E27] font-display tracking-tight">Krishna Emitra Admin</span>
           </div>
 
           <div className="w-full">

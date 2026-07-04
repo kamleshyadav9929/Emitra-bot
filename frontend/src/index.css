@@ -38,6 +38,28 @@
   --radius-md: 0.5rem;
   --radius-xl: 0.75rem;
   --radius-2xl: 1rem;
+
+  /* Apple Design Tokens */
+  --color-apple-primary: #0066cc;
+  --color-apple-primary-focus: #0071e3;
+  --color-apple-primary-on-dark: #2997ff;
+  --color-apple-ink: #1d1d1f;
+  --color-apple-canvas: #ffffff;
+  --color-apple-canvas-parchment: #f5f5f7;
+  --color-apple-surface-pearl: #fafafc;
+  --color-apple-hairline: #e0e0e0;
+  --color-apple-divider-soft: #f0f0f0;
+}
+
+@utility apple-active-scale {
+  transition: transform 0.1s ease;
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+@utility shadow-apple-product {
+  box-shadow: rgba(0, 0, 0, 0.22) 3px 5px 30px 0px;
 }
 
 @media (max-width: 640px) {

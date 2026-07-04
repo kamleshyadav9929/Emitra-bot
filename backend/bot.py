@@ -26,7 +26,7 @@ def load_services():
 
 def generate_whatsapp_link(name, phone, service_name):
     message = (
-        f"Namaste E-Mitra! 🙏\n\n"
+        f"Namaste Krishna Emitra! 🙏\n\n"
         f"📋 Seva: {service_name}\n"
         f"👤 Naam: {name}\n"
         f"📞 Phone: {phone}\n\n"
@@ -83,7 +83,7 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     welcome_msg = get_msg(
         "welcome_message",
-        "🙏 Namaste! E-Mitra Seva mein aapka swagat hai.\n\n"
+        "🙏 Namaste! Krishna Emitra Seva mein aapka swagat hai.\n\n"
         "Pehle apna mobile number share karein taaki hum aapko updates bhi bhej sakein:\n"
         "(Neeche button dabayein)"
     )
@@ -144,7 +144,7 @@ async def contact_handler(update: Update, context):
 # ── Services Command Handler ──────────────────────────────────────────────────
 
 async def services_handler(update: Update, context):
-    """Handles /services command — shows E-Mitra service categories."""
+    """Handles /services command — shows Krishna Emitra service categories."""
     chat_id = update.effective_chat.id
     student = database.get_student(chat_id)
 
@@ -162,7 +162,7 @@ async def services_handler(update: Update, context):
         return
 
     await update.message.reply_text(
-        "🏛️ *E-Mitra Seva — Koi seva chunein:*\n\n"
+        "🏛️ *Krishna Emitra Seva — Koi seva chunein:*\n\n"
         "Neeche category select karein. Aapka naam aur number automatically WhatsApp message mein aa jayega.",
         parse_mode="Markdown",
         reply_markup=build_categories_keyboard(),
@@ -185,19 +185,19 @@ async def button_callback_handler(update: Update, context):
         if exam_choice == "ALL":
             msg = (
                 "🎉 Badhai ho! Aap sabhi exams ke updates ke liye enrolled ho gaye hain!\n\n"
-                "📌 E-Mitra ki kisi seva ke liye type karein: /services"
+                "📌 Krishna Emitra ki kisi seva ke liye type karein: /services"
             )
         else:
             msg = (
                 f"🎉 Badhai ho! Aap *{exam_choice}* exam ke updates ke liye enrolled ho gaye hain!\n\n"
-                f"📌 E-Mitra ki kisi seva ke liye type karein: /services"
+                f"📌 Krishna Emitra ki kisi seva ke liye type karein: /services"
             )
         await query.edit_message_text(text=msg, parse_mode="Markdown")
 
     # ── Service category back button ────────────────────────────
     elif data == "cat_back":
         await query.edit_message_text(
-            text="🏛️ *E-Mitra Seva — Koi category chunein:*",
+            text="🏛️ *Krishna Emitra Seva — Koi category chunein:*",
             parse_mode="Markdown",
             reply_markup=build_categories_keyboard(),
         )
@@ -316,7 +316,7 @@ async def message_handler(update: Update, context):
     else:
         await update.message.reply_text(
             "✅ Aap already registered hain.\n\n"
-            "📌 E-Mitra ki kisi seva ke liye type karein: /services\n"
+            "📌 Krishna Emitra ki kisi seva ke liye type karein: /services\n"
             "📢 Jab updates aayenge, hum aapko notify karenge."
         )
 
