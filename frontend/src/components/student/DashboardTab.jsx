@@ -36,72 +36,101 @@ export default function DashboardTab({
 
             {/* Bento Stats Widgets Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-                <div className="bg-apple-canvas border border-apple-hairline rounded-[18px] p-5 shadow-sm hover:shadow-md hover:border-apple-ink/30 transition-all duration-300 group space-y-3.5 text-left">
-                    <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Total Requests</span>
-                        <div className="w-8 h-8 rounded-lg bg-[var(--color-surface-low)] text-[var(--color-primary)] flex items-center justify-center group-hover:scale-105 transition-transform"><ClipboardList size={16} /></div>
+                {/* Total Requests */}
+                <div 
+                    onClick={() => setActiveTab("services")}
+                    className="bg-[var(--color-primary-fixed)] border-none rounded-xl p-6 relative overflow-hidden flex flex-col justify-between h-[180px] cursor-pointer hover:shadow-ambient transition-shadow group text-left"
+                >
+                    <div className="z-10 relative">
+                        <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-[var(--color-primary)]">TOTAL REQUESTS</p>
+                        <p className="text-5xl font-extrabold text-[#0A1A40] mt-3 group-hover:scale-105 transition-transform origin-left">{statsProgress.total}</p>
                     </div>
-                    <div>
-                        <p className="text-2xl font-black text-slate-900">{statsProgress.total}</p>
-                        <p className="text-[10px] text-slate-400 font-extrabold uppercase mt-1">Filing Forms Logged</p>
+                    <div className="flex items-center gap-2 z-10 relative mt-auto">
+                        <ClipboardList size={16} className="text-[var(--color-primary)]" />
+                        <span className="text-[13px] font-medium text-[var(--color-primary)]">Filing Forms Logged</span>
                     </div>
+                    <ClipboardList size={140} strokeWidth={1} className="absolute -bottom-6 -right-6 text-white text-opacity-50 rotate-[-5deg] pointer-events-none z-0" />
                 </div>
-                <div className="bg-apple-canvas border border-apple-hairline rounded-[18px] p-5 shadow-sm hover:shadow-md hover:border-apple-ink/30 transition-all duration-300 group space-y-3.5 text-left">
-                    <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Under Review</span>
-                        <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-605 flex items-center justify-center group-hover:scale-105 transition-transform"><Clock size={16} /></div>
+
+                {/* Under Review */}
+                <div 
+                    onClick={() => setActiveTab("services")}
+                    className="bg-[var(--color-surface-low)] border-none shadow-sm rounded-xl p-6 flex flex-col justify-between h-[180px] relative overflow-hidden cursor-pointer hover:shadow-ambient transition-shadow text-left"
+                >
+                    <div className="z-10 relative">
+                        <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-gray-500">UNDER REVIEW</p>
+                        <p className="text-4xl font-extrabold text-gray-900 mt-4 tracking-tight">{statsProgress.active}</p>
                     </div>
-                    <div>
-                        <p className="text-2xl font-black text-slate-900">{statsProgress.active}</p>
-                        <p className="text-[10px] text-slate-400 font-extrabold uppercase mt-1">Operator Reviewing</p>
+                    <div className="flex items-center gap-2 mt-auto z-10 relative">
+                        <Clock size={16} className="text-gray-400" />
+                        <span className="text-[13px] font-medium text-gray-500">Operator Reviewing</span>
                     </div>
+                    <Clock size={140} strokeWidth={1} className="absolute -bottom-6 -right-10 text-white/70 rotate-[10deg] pointer-events-none z-0" />
                 </div>
-                <div className="bg-apple-canvas border border-apple-hairline rounded-[18px] p-5 shadow-sm hover:shadow-md hover:border-apple-ink/30 transition-all duration-300 group space-y-3.5 text-left">
-                    <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Completed</span>
-                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform"><CheckCircle2 size={16} /></div>
+
+                {/* Completed */}
+                <div 
+                    onClick={() => setActiveTab("services")}
+                    className="bg-[var(--color-surface-lowest)] shadow-ambient border border-[var(--color-outline-variant)] rounded-xl p-6 flex flex-col justify-between h-[180px] cursor-pointer hover:scale-[1.01] transition-transform relative overflow-hidden text-left"
+                >
+                    <div className="z-10 relative">
+                        <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-slate-400">SUCCESSFULLY FILED</p>
+                        <p className="text-4xl font-extrabold text-gray-900 mt-4 tracking-tight">{statsProgress.completed}</p>
                     </div>
-                    <div>
-                        <p className="text-2xl font-black text-slate-900">{statsProgress.completed}</p>
-                        <p className="text-[10px] text-slate-400 font-extrabold uppercase mt-1">Successfully Filed</p>
+                    <div className="mt-auto flex justify-between items-end z-10 relative">
+                        <div>
+                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wide">Completed Applications</p>
+                        </div>
+                        <CheckCircle2 size={24} className="text-emerald-250" />
                     </div>
+                    <CheckCircle2 size={140} strokeWidth={1} className="absolute -bottom-8 -right-8 text-[#f3faff] rotate-[-15deg] pointer-events-none z-0" />
                 </div>
-                <div className="bg-apple-canvas border border-apple-hairline rounded-[18px] p-5 shadow-sm hover:shadow-md hover:border-apple-ink/30 transition-all duration-300 group space-y-3.5 text-left">
-                    <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Action Needed</span>
-                        <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-105 transition-transform"><AlertCircle size={16} /></div>
+
+                {/* Action Needed */}
+                <div 
+                    onClick={() => setActiveTab("services")}
+                    className="bg-rose-50/70 border border-rose-100/60 rounded-xl p-6 flex flex-col justify-between h-[180px] relative overflow-hidden cursor-pointer hover:shadow-ambient transition-shadow text-left"
+                >
+                    {statsProgress.actionRequired > 0 && (
+                        <div className="absolute top-6 right-6 w-3 h-3 bg-red-500 rounded-full animate-pulse z-20"></div>
+                    )}
+                    <div className="z-10 relative">
+                        <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-rose-600">ACTION REQUIRED</p>
+                        <p className="text-4xl font-extrabold text-rose-900 mt-4 tracking-tight">
+                            {statsProgress.actionRequired} {statsProgress.actionRequired > 0 && <span className="font-bold text-sm text-red-500 ml-1">Urgent</span>}
+                        </p>
                     </div>
-                    <div>
-                        <p className="text-2xl font-black text-slate-900">{statsProgress.actionRequired}</p>
-                        <p className="text-[10px] text-slate-400 font-extrabold uppercase mt-1">Needs Attention</p>
-                    </div>
+                    <p className="text-[13px] font-bold text-rose-600 underline underline-offset-2 hover:text-red-700 transition-colors mt-auto z-10 relative">
+                        Fix Rejected Forms
+                    </p>
+                    <AlertCircle size={140} strokeWidth={1} className="absolute -bottom-6 -right-10 text-rose-200/20 rotate-[10deg] pointer-events-none z-0" />
                 </div>
             </div>
 
             {/* Quick Action Tiles */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <button onClick={() => setActiveTab("exams")} className="bg-apple-canvas border border-apple-hairline hover:border-apple-ink/30 p-5 rounded-[18px] text-left shadow-sm hover:shadow-md transition-all duration-300 space-y-3 cursor-pointer group apple-active-scale border-solid">
+                <button onClick={() => setActiveTab("exams")} className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] hover:border-[var(--color-primary)]/30 p-5 rounded-xl text-left shadow-sm hover:shadow-ambient transition-all duration-300 space-y-3 cursor-pointer group border-solid">
                     <div className="w-9 h-9 rounded-xl bg-[var(--color-surface-low)] text-[var(--color-primary)] flex items-center justify-center group-hover:scale-110 transition-transform"><Award size={18} /></div>
                     <div>
                         <p className="text-[13px] font-extrabold text-slate-900">Select Exams</p>
                         <p className="text-[9.5px] text-slate-400 font-extrabold uppercase mt-0.5">Choose Alerts</p>
                     </div>
                 </button>
-                <button onClick={() => setActiveTab("services")} className="bg-apple-canvas border border-apple-hairline hover:border-apple-ink/30 p-5 rounded-[18px] text-left shadow-sm hover:shadow-md transition-all duration-300 space-y-3 cursor-pointer group apple-active-scale border-solid">
+                <button onClick={() => setActiveTab("services")} className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] hover:border-[var(--color-primary)]/30 p-5 rounded-xl text-left shadow-sm hover:shadow-ambient transition-all duration-300 space-y-3 cursor-pointer group border-solid">
                     <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform"><ClipboardList size={18} /></div>
                     <div>
                         <p className="text-[13px] font-extrabold text-slate-900">My Services</p>
                         <p className="text-[9.5px] text-slate-400 font-extrabold uppercase mt-0.5">Filing Catalog</p>
                     </div>
                 </button>
-                <button onClick={() => setActiveTab("neet")} className="bg-apple-canvas border border-apple-hairline hover:border-apple-ink/30 p-5 rounded-[18px] text-left shadow-sm hover:shadow-md transition-all duration-300 space-y-3 cursor-pointer group apple-active-scale border-solid">
+                <button onClick={() => setActiveTab("neet")} className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] hover:border-[var(--color-primary)]/30 p-5 rounded-xl text-left shadow-sm hover:shadow-ambient transition-all duration-300 space-y-3 cursor-pointer group border-solid">
                     <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform"><BookOpen size={18} /></div>
                     <div>
                         <p className="text-[13px] font-extrabold text-slate-900">NEET Counselling</p>
                         <p className="text-[9.5px] text-slate-400 font-extrabold uppercase mt-0.5">Choice Guide</p>
                     </div>
                 </button>
-                <button onClick={() => setActiveTab("profile")} className="bg-apple-canvas border border-apple-hairline hover:border-apple-ink/30 p-5 rounded-[18px] text-left shadow-sm hover:shadow-md transition-all duration-300 space-y-3 cursor-pointer group apple-active-scale border-solid">
+                <button onClick={() => setActiveTab("profile")} className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] hover:border-[var(--color-primary)]/30 p-5 rounded-xl text-left shadow-sm hover:shadow-ambient transition-all duration-300 space-y-3 cursor-pointer group border-solid">
                     <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform"><Settings size={18} /></div>
                     <div>
                         <p className="text-[13px] font-extrabold text-slate-900">Profile Settings</p>
@@ -114,17 +143,17 @@ export default function DashboardTab({
             <div className="space-y-4 text-left">
                 <h3 className="text-[14.5px] font-extrabold text-slate-900 font-display">My Subscribed Exams</h3>
                 {subscribedExams.length === 0 ? (
-                    <div className="bg-apple-canvas border border-apple-hairline rounded-[18px] p-8 text-center text-slate-400 max-w-md mx-auto space-y-3 shadow-sm hover:shadow-md transition-all duration-300 border-solid">
+                    <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-8 text-center text-slate-450 max-w-md mx-auto space-y-3 shadow-sm hover:shadow-ambient transition-all duration-300 border-solid">
                         <Award size={24} className="mx-auto text-[var(--color-primary)] animate-bounce" />
                         <p className="text-[12.5px] font-bold text-slate-650">Select exams to start receiving updates</p>
-                        <button onClick={() => setActiveTab("exams")} className="px-5 py-2.5 bg-apple-primary hover:bg-apple-primary-focus text-white text-[13px] font-semibold rounded-full transition-all apple-active-scale shadow-sm border-none cursor-pointer">Choose Exams</button>
+                        <button onClick={() => setActiveTab("exams")} className="px-5 py-2.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white text-[13px] font-semibold rounded-xl transition-all shadow-sm border-none cursor-pointer">Choose Exams</button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
                         {exams.filter(ex => subscribedExams.includes(ex.name)).map((ex, exIdx) => {
                             const isClosed = ex.end_date ? new Date(ex.end_date) < new Date() : false
                             return (
-                                <div key={exIdx} className="bg-apple-canvas border border-apple-hairline rounded-[18px] p-5 shadow-sm hover:shadow-md hover:border-apple-ink/30 transition-all duration-300 space-y-4 relative flex flex-col justify-between group border-solid">
+                                <div key={exIdx} className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 shadow-sm hover:shadow-ambient hover:border-[var(--color-primary)]/30 transition-all duration-300 space-y-4 relative flex flex-col justify-between group border-solid">
                                     <span className="absolute top-4 right-4 text-[8.5px] font-extrabold text-[var(--color-primary)] bg-[var(--color-surface-low)] px-2 py-0.5 rounded border border-[var(--color-outline-variant)]">
                                         {ex.category || "UG"}
                                     </span>
@@ -132,7 +161,7 @@ export default function DashboardTab({
                                         <h4 className="text-[13.5px] font-extrabold text-slate-900 pr-12 line-clamp-1 group-hover:text-[var(--color-primary)] transition-colors">{ex.name}</h4>
                                         
                                         <div className="space-y-1">
-                                            <span className="text-slate-455 font-extrabold uppercase text-[8.5px] tracking-wider block">Closing Date</span>
+                                            <span className="text-slate-400 font-extrabold uppercase text-[8.5px] tracking-wider block">Closing Date</span>
                                             <span className={`text-[12.5px] font-extrabold ${isClosed ? "text-red-500" : "text-slate-900"}`}>
                                                 {ex.end_date ? new Date(ex.end_date).toLocaleDateString("en-IN") : "TBD"}
                                             </span>
@@ -144,7 +173,7 @@ export default function DashboardTab({
                                             setActiveExamForTimeline(ex)
                                             setActiveTab("exams")
                                         }} 
-                                        className="text-apple-primary font-semibold text-[13px] hover:underline inline-flex items-center gap-1 mt-1 cursor-pointer transition-colors border-none bg-transparent"
+                                        className="text-[var(--color-primary)] font-semibold text-[13px] hover:underline inline-flex items-center gap-1 mt-1 cursor-pointer transition-colors border-none bg-transparent"
                                     >
                                         View Timeline <ChevronRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
                                     </button>
@@ -157,7 +186,7 @@ export default function DashboardTab({
 
             {/* Support and Location Summary Dashboard Footer */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                <div className="bg-apple-canvas border border-apple-hairline rounded-[18px] p-5 flex items-center justify-between shadow-sm hover:shadow-md hover:border-apple-ink/30 transition-all duration-300 border-solid">
+                <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 flex items-center justify-between shadow-sm hover:shadow-ambient hover:border-[var(--color-primary)]/30 transition-all duration-300 border-solid">
                     <div className="space-y-1">
                         <h4 className="text-[14px] font-extrabold text-slate-900 font-display">Direct Support Line</h4>
                         <p className="text-[12.5px] text-slate-400">Reach operator Kamlesh on WhatsApp instantly.</p>
@@ -165,13 +194,13 @@ export default function DashboardTab({
                     <a 
                         href={`https://wa.me/${config.whatsapp_number || "916377964293"}?text=Hello%20Krishna%20Emitra!%20I%20have%20a%20support%20request.`}
                         target="_blank" rel="noreferrer"
-                        className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[13px] font-semibold rounded-full shadow-sm flex items-center gap-1.5 transition-all apple-active-scale cursor-pointer text-center decoration-none"
+                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[13px] font-semibold rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer text-center decoration-none"
                     >
                         WhatsApp <MessageSquare size={13} />
                     </a>
                 </div>
 
-                <div className="bg-apple-canvas border border-apple-hairline rounded-[18px] p-5 flex items-center justify-between shadow-sm hover:shadow-md hover:border-apple-ink/30 transition-all duration-300 border-solid">
+                <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 flex items-center justify-between shadow-sm hover:shadow-ambient hover:border-[var(--color-primary)]/30 transition-all duration-300 border-solid">
                     <div className="space-y-1">
                         <h4 className="text-[14px] font-extrabold text-slate-900 font-display">Digital Seva Center</h4>
                         <p className="text-[12.5px] text-slate-400">Main Market Road, Jodhpur, Rajasthan.</p>
@@ -179,9 +208,9 @@ export default function DashboardTab({
                     <a 
                         href="https://maps.google.com"
                         target="_blank" rel="noreferrer"
-                        className="px-5 py-2.5 bg-apple-canvas hover:bg-apple-canvas-parchment text-apple-ink/75 border border-apple-hairline hover:border-apple-ink/30 text-[13px] font-semibold rounded-full shadow-sm flex items-center gap-1.5 transition-all apple-active-scale cursor-pointer decoration-none border-solid"
+                        className="px-4 py-2 bg-[var(--color-surface-low)] hover:bg-slate-100 text-slate-700 border border-[var(--color-outline-variant)] hover:border-slate-350 text-[13px] font-semibold rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer decoration-none border-solid"
                     >
-                        View Map <MapPin size={13} className="text-apple-primary" />
+                        View Map <MapPin size={13} className="text-[var(--color-primary)]" />
                     </a>
                 </div>
             </div>

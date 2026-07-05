@@ -9,7 +9,7 @@ export default function ProfileTab({
 }) {
     return (
         <div className="space-y-8 animate-fadeIn text-left">
-            <div className="border-b border-apple-divider-soft pb-4">
+            <div className="border-b border-[var(--color-outline-variant)] pb-4">
                 <h2 className="text-xl font-black text-slate-900">
                     {lang === 'EN' ? 'Profile & Subscription Settings' : 'प्रोफ़ाइल एवं सदस्यता सेटिंग्स'}
                 </h2>
@@ -18,7 +18,7 @@ export default function ProfileTab({
                 </p>
             </div>
 
-            <div className="bg-apple-canvas border border-apple-hairline rounded-[18px] shadow-sm p-6 md:p-8 max-w-xl mx-auto space-y-6 border-solid">
+            <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl shadow-sm p-6 md:p-8 max-w-xl mx-auto space-y-6 border-solid">
                 {profileSavedMessage && (
                     <div className="p-3.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl text-[12px] font-semibold">
                         {profileSavedMessage}
@@ -33,7 +33,7 @@ export default function ProfileTab({
                                 type="text" 
                                 value={editableProfile.name}
                                 onChange={e => setEditableProfile({...editableProfile, name: e.target.value})}
-                                className="w-full p-3.5 bg-apple-canvas border border-apple-hairline rounded-xl text-[13px] font-semibold outline-none focus:border-apple-primary-focus focus:ring-2 focus:ring-apple-primary-focus/10 transition-all shadow-sm border-solid text-apple-ink"
+                                className="w-full p-3.5 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl text-[13px] font-semibold outline-none focus:border-[var(--color-primary)] transition-all shadow-sm border-solid text-[var(--color-on-surface)]"
                                 required
                             />
                         </div>
@@ -45,7 +45,7 @@ export default function ProfileTab({
                                     type="text" 
                                     value={editableProfile.phone}
                                     disabled
-                                    className="w-full p-3.5 bg-apple-canvas-parchment border border-apple-hairline text-slate-400 rounded-xl text-[13px] font-semibold cursor-not-allowed outline-none border-solid"
+                                    className="w-full p-3.5 bg-[var(--color-surface-low)] border border-[var(--color-outline-variant)] text-slate-400 rounded-xl text-[13px] font-semibold cursor-not-allowed outline-none border-solid"
                                 />
                             </div>
                             <div>
@@ -54,13 +54,13 @@ export default function ProfileTab({
                                     type="email" 
                                     value={editableProfile.email}
                                     onChange={e => setEditableProfile({...editableProfile, email: e.target.value})}
-                                    className="w-full p-3.5 bg-apple-canvas border border-apple-hairline rounded-xl text-[13px] font-semibold outline-none focus:border-apple-primary-focus focus:ring-2 focus:ring-apple-primary-focus/10 transition-all shadow-sm border-solid text-apple-ink"
+                                    className="w-full p-3.5 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl text-[13px] font-semibold outline-none focus:border-[var(--color-primary)] transition-all shadow-sm border-solid text-[var(--color-on-surface)]"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className="border-t border-apple-divider-soft pt-5 space-y-4">
+                    <div className="border-t border-[var(--color-outline-variant)] pt-5 space-y-4">
                         <h3 className="text-[11.5px] font-extrabold text-slate-900 uppercase tracking-wider">Alert Notifications Configuration</h3>
                         <div className="space-y-4">
                             <label className="flex items-center justify-between cursor-pointer group">
@@ -69,7 +69,7 @@ export default function ProfileTab({
                                     type="checkbox"
                                     checked={notificationPrefs.whatsapp}
                                     onChange={e => setNotificationPrefs({...notificationPrefs, whatsapp: e.target.checked})}
-                                    className="rounded-lg text-apple-primary focus:ring-apple-primary w-5.5 h-5.5 cursor-pointer border-apple-hairline border border-solid"
+                                    className="rounded-lg text-[var(--color-primary)] focus:ring-[var(--color-primary)] w-5.5 h-5.5 cursor-pointer border-[var(--color-outline-variant)] border border-solid"
                                 />
                             </label>
                             <label className="flex items-center justify-between cursor-pointer group">
@@ -78,7 +78,7 @@ export default function ProfileTab({
                                     type="checkbox"
                                     checked={notificationPrefs.telegram}
                                     onChange={e => setNotificationPrefs({...notificationPrefs, telegram: e.target.checked})}
-                                    className="rounded-lg text-apple-primary focus:ring-apple-primary w-5.5 h-5.5 cursor-pointer border-apple-hairline border border-solid"
+                                    className="rounded-lg text-[var(--color-primary)] focus:ring-[var(--color-primary)] w-5.5 h-5.5 cursor-pointer border-[var(--color-outline-variant)] border border-solid"
                                 />
                             </label>
                         </div>
@@ -86,7 +86,7 @@ export default function ProfileTab({
 
                     <button 
                         type="submit"
-                        className="w-full py-3.5 bg-apple-primary hover:bg-apple-primary-focus text-white text-[12.5px] font-bold uppercase rounded-full transition-all shadow-sm cursor-pointer active:scale-98 hover:-translate-y-0.5 duration-200 border-none apple-active-scale"
+                        className="w-full py-3.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white text-[12.5px] font-bold uppercase rounded-xl transition-all shadow-sm cursor-pointer active:scale-98 hover:-translate-y-0.5 duration-200 border-none"
                     >
                         Save Settings
                     </button>
