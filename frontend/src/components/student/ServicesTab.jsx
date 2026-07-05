@@ -15,11 +15,8 @@ export default function ServicesTab({
     history,
     expandedAppId,
     setExpandedAppId,
-    getStatusDetails,
     triggerSignIn,
-    setActiveServiceForForm,
-    setFormSuccessId,
-    setFormDataDesc,
+    handleAutoServiceRequest,
     config
 }) {
     return (
@@ -85,39 +82,62 @@ export default function ServicesTab({
                         </select>
                     </div>
 
-                    {/* Grid */}
+                    {/* Categorized Grid */}
                     {flatServicesList.length === 0 ? (
                         <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-16 text-center text-slate-400 border-solid">
                             No service records matching selections.
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {flatServicesList.map((svc, idx) => (
-                                <div key={idx} className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-6 shadow-sm hover:shadow-ambient hover:border-[var(--color-primary)]/30 transition-all duration-300 flex flex-col justify-between group border-solid">
-                                    <div className="space-y-3 text-left">
-                                        <div className="flex items-center justify-between text-[9px] font-extrabold uppercase text-slate-400 tracking-wider">
-                                            <span>{svc.categoryLabel}</span>
-                                            <span className="text-[var(--color-primary)] bg-[var(--color-surface-low)] px-2.5 py-0.8 rounded-lg border border-[var(--color-outline-variant)] font-extrabold">Fee: {svc.price || "₹50"}</span>
-                                        </div>
-                                        <h4 className="text-[14.5px] font-extrabold text-slate-900 group-hover:text-[var(--color-primary)] transition-colors leading-snug">{svc.name}</h4>
-                                        <p className="text-[12px] text-slate-500 font-normal leading-relaxed">{svc.description || "Secure filing registration services with error validation."}</p>
-                                    </div>
+                        <div className="space-y-10">
+                            {Object.entries(services).map(([catKey, cat]) => {
+                                const matchingServices = (cat.services || []).filter(s => 
+                                    s.name.toLowerCase().includes(serviceSearch.toLowerCase())
+                                )
+                                const isVisible = serviceCatFilter === "ALL" || serviceCatFilter === catKey
 
-                                    <button
-                                        onClick={() => {
-                                            if (!isLoggedIn) triggerSignIn()
-                                            else {
-                                                setActiveServiceForForm(svc)
-                                                setFormSuccessId("")
-                                                setFormDataDesc("")
-                                            }
-                                        }}
-                                        className="mt-6 w-full py-2.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white text-[13px] font-semibold rounded-xl transition-all shadow-sm border-none cursor-pointer"
-                                    >
-                                        {lang === 'EN' ? 'Request This Service' : 'इस सेवा का अनुरोध करें'}
-                                    </button>
-                                </div>
-                            ))}
+                                if (matchingServices.length === 0 || !isVisible) return null
+
+                                return (
+                                    <div key={catKey} className="space-y-4">
+                                        {/* Category Section Header */}
+                                        <div className="flex items-center gap-3 border-b border-[var(--color-outline-variant)]/60 pb-2">
+                                            <span className="w-1.5 h-6 bg-[var(--color-primary)] rounded-full"></span>
+                                            <h3 className="text-[15.5px] font-extrabold text-slate-900 tracking-tight font-display">{cat.label}</h3>
+                                            <span className="text-[10px] text-slate-400 font-bold bg-[var(--color-surface-low)] px-2 py-0.5 rounded-full border border-[var(--color-outline-variant)]">
+                                                {matchingServices.length} {matchingServices.length === 1 ? "Service" : "Services"}
+                                            </span>
+                                        </div>
+
+                                        {/* Category Cards Grid */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                            {matchingServices.map((svc, idx) => (
+                                                <div key={idx} className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-6 shadow-sm hover:shadow-ambient hover:border-[var(--color-primary)]/30 transition-all duration-300 flex flex-col justify-between group border-solid">
+                                                    <div className="space-y-3 text-left">
+                                                        <div className="flex items-center justify-between text-[9px] font-extrabold uppercase text-slate-400 tracking-wider">
+                                                            <span>{cat.label}</span>
+                                                            <span className="text-[var(--color-primary)] bg-[var(--color-surface-low)] px-2.5 py-0.8 rounded-lg border border-[var(--color-outline-variant)] font-extrabold">Fee: {svc.price || "₹50"}</span>
+                                                        </div>
+                                                        <h4 className="text-[14.5px] font-extrabold text-slate-900 group-hover:text-[var(--color-primary)] transition-colors leading-snug">{svc.name}</h4>
+                                                        <p className="text-[12px] text-slate-500 font-normal leading-relaxed">{svc.description || "Secure filing registration services with error validation."}</p>
+                                                    </div>
+
+                                                    <button
+                                                        onClick={() => {
+                                                            if (!isLoggedIn) triggerSignIn()
+                                                            else {
+                                                                handleAutoServiceRequest({ ...svc, categoryKey: catKey, categoryLabel: cat.label })
+                                                            }
+                                                        }}
+                                                        className="mt-6 w-full py-2.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white text-[13px] font-semibold rounded-xl transition-all shadow-sm border-none cursor-pointer"
+                                                    >
+                                                        {lang === 'EN' ? 'Request This Service' : 'इस सेवा का अनुरोध करें'}
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )
+                            })}
                         </div>
                     )}
                 </div>

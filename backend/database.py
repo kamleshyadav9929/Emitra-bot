@@ -363,7 +363,7 @@ def log_service_intent(phone_number, service_name, category):
         "phone_number": phone_number,
         "service_name": service_name,
         "category": category,
-        "status": "pending_whatsapp"
+        "status": "pending"
     }).execute()
     return res.data[0]["id"]
 

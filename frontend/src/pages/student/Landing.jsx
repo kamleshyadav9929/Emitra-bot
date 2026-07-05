@@ -11,6 +11,23 @@ import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
 
+const formatTelegramMessage = (text) => {
+    if (!text) return "";
+    let formatted = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    
+    // Bold *text*
+    formatted = formatted.replace(/\*(.*?)\*/g, "<strong>$1</strong>");
+    // Underscore _italic_
+    formatted = formatted.replace(/_(.*?)_/g, "<em>$1</em>");
+    // Code `code`
+    formatted = formatted.replace(/`(.*?)`/g, "<code class='bg-slate-100 px-1 py-0.5 rounded text-[10.5px] font-mono'>$1</code>");
+    
+    return <span dangerouslySetInnerHTML={{ __html: formatted }} />;
+}
+
 export default function Landing() {
     const navigate = useNavigate()
     const { lang, toggleLanguage } = useLanguage()
@@ -592,13 +609,21 @@ export default function Landing() {
                         ) : (
                             <div className="space-y-4">
                                 {filteredAnnouncements.map((ann, idx) => (
-                                    <div key={idx} className="border border-slate-100 rounded-xl p-5 bg-slate-50/40 hover:bg-slate-50/90 transition-colors space-y-2.5">
-                                        <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold">
+                                    <div key={idx} className="border border-slate-100 rounded-xl p-5 bg-slate-50/40 hover:bg-slate-50/95 transition-colors space-y-3 text-left">
+                                        {/* Date and category header */}
+                                        <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold border-b border-slate-100 pb-1.5 uppercase tracking-wider">
                                             <span className="px-2 py-0.5 bg-blue-50 text-[#164FA8] rounded uppercase">Govt Alert</span>
-                                            <span>{new Date(ann.created_at || Date.now()).toLocaleDateString("en-IN")}</span>
+                                            <span>{new Date(ann.created_at || Date.now()).toLocaleString("en-IN", {
+                                                day: "numeric",
+                                                month: "short",
+                                                hour: "2-digit",
+                                                minute: "2-digit"
+                                            })}</span>
                                         </div>
-                                        <h4 className="text-[14px] font-bold text-[#0A1A40]">{ann.title}</h4>
-                                        <p className="text-[12px] text-gray-500 font-normal leading-relaxed">{ann.content}</p>
+                                        {ann.title && <h4 className="text-[14px] font-bold text-[#0A1A40] leading-snug">{ann.title}</h4>}
+                                        <div className="text-[12px] text-slate-655 font-normal leading-relaxed whitespace-pre-wrap break-words font-sans">
+                                            {formatTelegramMessage(ann.content)}
+                                        </div>
                                         
                                         {ann.links && (
                                             <a 

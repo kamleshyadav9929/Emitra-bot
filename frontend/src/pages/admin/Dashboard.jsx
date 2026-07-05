@@ -99,7 +99,7 @@ export default function Dashboard() {
         {/* Total Students */}
         <div 
           onClick={() => navigate("/admin/students")}
-          className="bg-[var(--color-primary-fixed)] border-none rounded-xl p-6 relative overflow-hidden flex flex-col justify-between h-[180px] cursor-pointer hover:shadow-ambient transition-shadow group"
+          className="bg-[var(--color-primary-fixed)] border border-[var(--color-primary)]/10 shadow-sm rounded-xl p-6 relative overflow-hidden flex flex-col justify-between h-[180px] cursor-pointer hover:shadow-ambient transition-shadow group"
         >
           <div className="z-10 relative">
             <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-[var(--color-primary)]">TOTAL STUDENTS</p>
@@ -115,7 +115,7 @@ export default function Dashboard() {
         {/* Messages Sent */}
         <div 
           onClick={() => navigate("/admin/logs")}
-          className="bg-[var(--color-surface-lowest)] shadow-ambient border-none rounded-xl p-6 flex flex-col justify-between h-[180px] cursor-pointer hover:scale-[1.01] transition-transform relative overflow-hidden"
+          className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] shadow-sm rounded-xl p-6 flex flex-col justify-between h-[180px] cursor-pointer hover:shadow-ambient transition-shadow relative overflow-hidden"
         >
           <div className="z-10 relative">
             <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-gray-400">MESSAGES SENT</p>
@@ -133,7 +133,7 @@ export default function Dashboard() {
         {/* Pending Requests */}
         <div 
           onClick={() => navigate("/admin/requests")}
-          className="bg-[var(--color-surface-low)] border-none shadow-sm rounded-xl p-6 flex flex-col justify-between h-[180px] relative overflow-hidden cursor-pointer hover:shadow-ambient transition-shadow"
+          className="bg-[var(--color-surface-low)] border border-[var(--color-outline-variant)]/40 shadow-sm rounded-xl p-6 flex flex-col justify-between h-[180px] relative overflow-hidden cursor-pointer hover:shadow-ambient transition-shadow"
         >
           {pendingCount > 0 && (
              <div className="absolute top-6 right-6 w-3 h-3 bg-red-500 rounded-full animate-pulse z-20"></div>

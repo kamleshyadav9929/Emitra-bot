@@ -77,6 +77,7 @@ export default function StudentPanel() {
     const [formFileName, setFormFileName] = useState("")
     const [formSubmitting, setFormSubmitting] = useState(false)
     const [formSuccessId, setFormSuccessId] = useState("")
+    const [customPhone, setCustomPhone] = useState("")
 
     // Helpdesk Support States
     const [cbName, setCbName] = useState("")
@@ -269,9 +270,55 @@ export default function StudentPanel() {
     }
 
     // Render notifications panel for 3-column split layout
+    const formatTelegramMessage = (text) => {
+        if (!text) return "";
+        let formatted = text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+        
+        // Bold *text*
+        formatted = formatted.replace(/\*(.*?)\*/g, "<strong>$1</strong>");
+        // Underscore _italic_
+        formatted = formatted.replace(/_(.*?)_/g, "<em>$1</em>");
+        // Code `code`
+        formatted = formatted.replace(/`(.*?)`/g, "<code class='bg-slate-100 px-1 py-0.5 rounded text-[10.5px] font-mono'>$1</code>");
+        
+        return <span dangerouslySetInnerHTML={{ __html: formatted }} />;
+    }
+
     const renderNotificationsPanel = (isSticky = true) => {
+        // Group notifications by date
+        const grouped = [];
+        const groups = {};
+        
+        subNotifications.forEach(ann => {
+            const dateObj = new Date(ann.created_at || ann.sent_at || Date.now());
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            let dateStr = "";
+            if (dateObj.toDateString() === today.toDateString()) {
+                dateStr = lang === 'EN' ? 'Today' : 'आज';
+            } else if (dateObj.toDateString() === yesterday.toDateString()) {
+                dateStr = lang === 'EN' ? 'Yesterday' : 'कल';
+            } else {
+                dateStr = dateObj.toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                });
+            }
+            
+            if (!groups[dateStr]) {
+                groups[dateStr] = [];
+            }
+            groups[dateStr].push(ann);
+        });
+
         return (
-            <div className={`flex flex-col space-y-5 h-full ${isSticky ? "" : "bg-white border border-[var(--color-outline-variant)] rounded-3xl p-6 shadow-ambient"}`}>
+            <div className={`flex flex-col space-y-4 h-full ${isSticky ? "" : "bg-white border border-[var(--color-outline-variant)] rounded-3xl p-6 shadow-ambient"}`}>
                 <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
                     <div>
                         <h3 className="text-[14.5px] font-extrabold text-slate-900 font-display flex items-center gap-1.5">
@@ -331,27 +378,86 @@ export default function StudentPanel() {
                         </div>
                     </div>
                 ) : (
-                    <div className="space-y-3.5 overflow-y-auto pr-1 scrollbar-thin">
-                        {subNotifications.map((ann, idx) => (
-                            <div key={idx} className="flex items-start gap-3 p-3.5 hover:bg-[var(--color-surface-bright)] rounded-2xl transition-all border border-transparent hover:border-[var(--color-outline-variant)] group bg-white border-slate-100">
-                                <div className="w-7 h-7 rounded-lg bg-[var(--color-surface-low)] text-[var(--color-primary)] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <Bell size={13} />
+                    <div className="flex-1 overflow-y-auto pr-1 scrollbar-thin p-3 rounded-2xl bg-slate-50/70 border border-slate-100/80 flex flex-col space-y-4">
+                        {Object.entries(groups).map(([dateStr, items]) => (
+                            <div key={dateStr} className="space-y-4 flex flex-col">
+                                {/* Centered Date Label */}
+                                <div className="flex justify-center my-1.5">
+                                    <span className="bg-slate-200/80 text-slate-600 text-[9.5px] font-extrabold px-3 py-0.5 rounded-full tracking-wide shadow-sm uppercase">
+                                        {dateStr}
+                                    </span>
                                 </div>
-                                <div className="space-y-1.5 flex-1 min-w-0 text-left">
-                                    <div className="flex justify-between items-start gap-2">
-                                        <h4 className="text-[12.5px] font-extrabold text-slate-900 truncate group-hover:text-[var(--color-primary)] transition-colors">{ann.title}</h4>
-                                        <span className="text-[9.5px] text-slate-400 shrink-0 font-semibold">{new Date(ann.created_at || Date.now()).toLocaleDateString("en-IN")}</span>
-                                    </div>
-                                    <p className="text-[11.5px] text-slate-550 font-normal leading-relaxed">{ann.content}</p>
-                                    {ann.links && (
-                                        <a 
-                                            href={ann.links} target="_blank" rel="noopener noreferrer"
-                                            className="text-[var(--color-primary)] text-[10px] font-extrabold hover:text-[var(--color-primary-container)] inline-flex items-center gap-0.5 mt-1"
+                                
+                                {/* Messages */}
+                                {items.map((ann, idx) => {
+                                    const isRead = readNotifications.includes(ann.id);
+                                    const formattedTime = new Date(ann.created_at || ann.sent_at || Date.now()).toLocaleTimeString("en-IN", {
+                                        hour: "numeric",
+                                        minute: "2-digit",
+                                        hour12: true
+                                    });
+
+                                    return (
+                                        <div 
+                                            key={ann.id || idx} 
+                                            onClick={() => handleMarkNotificationRead(ann.id)}
+                                            className={`relative w-full rounded-2xl p-4 shadow-sm transition-all border border-solid group text-left cursor-pointer flex flex-col ${
+                                                isRead
+                                                    ? "bg-white border-slate-200 text-slate-700 hover:border-slate-350 hover:shadow-md"
+                                                    : "bg-[#e3f2fd] border-blue-200 text-slate-900 hover:border-blue-300 hover:shadow-md ring-1 ring-blue-100/50"
+                                            }`}
                                         >
-                                            Download Document <ExternalLink size={9} />
-                                        </a>
-                                    )}
-                                </div>
+                                            {/* Message title */}
+                                            {ann.title && (
+                                                <h4 className="text-[13px] font-bold text-slate-900 leading-snug mb-2 font-display">
+                                                    {ann.title}
+                                                </h4>
+                                            )}
+
+                                            {/* Message body */}
+                                            <div className="text-[12px] text-slate-650 font-normal leading-relaxed whitespace-pre-wrap break-words font-sans">
+                                                {formatTelegramMessage(ann.content)}
+                                            </div>
+
+                                            {/* Document download link */}
+                                            {ann.links && (
+                                                <div className="pt-2">
+                                                    <a 
+                                                        href={ann.links} target="_blank" rel="noopener noreferrer"
+                                                        className="text-[var(--color-primary)] text-[10px] font-bold hover:text-[var(--color-primary-container)] inline-flex items-center gap-1 hover:underline"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        Download Attachment <ExternalLink size={10} />
+                                                    </a>
+                                                </div>
+                                            )}
+
+                                            {/* Message Footer Row with Category and Time */}
+                                            <div className="flex justify-between items-center mt-3.5 pt-2.5 border-t border-slate-100/80">
+                                                <span className={`text-[8.5px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
+                                                    isRead 
+                                                        ? "bg-slate-100 text-slate-500" 
+                                                        : "bg-blue-100 text-blue-700"
+                                                }`}>
+                                                    {ann.category || "General Update"}
+                                                </span>
+
+                                                <div className="flex items-center gap-1.5 select-none">
+                                                    <span className="text-[8.5px] text-slate-400 font-bold uppercase">
+                                                        {formattedTime}
+                                                    </span>
+                                                    {isRead ? (
+                                                        <span className="text-blue-500 flex items-center" title="Read">
+                                                            <Check size={11} strokeWidth={3} />
+                                                        </span>
+                                                    ) : (
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" title="Unread" />
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         ))}
                     </div>
@@ -368,25 +474,43 @@ export default function StudentPanel() {
         setTimeout(() => setProfileSavedMessage(""), 3000)
     }
 
-    // Submit custom service request (Page 8)
-    const handleServiceFormSubmit = async (e) => {
-        e.preventDefault()
-        if (!activeServiceForForm) return
+    // Log service request intent and auto-redirect to WhatsApp
+    const handleAutoServiceRequest = (svc) => {
+        setActiveServiceForForm(svc)
+        setFormSuccessId("")
+        setFormSubmitting(false)
+        setCustomPhone(user?.phone || "")
+    }
 
+    const submitServiceRequestWithPhone = async (phoneVal) => {
         setFormSubmitting(true)
         try {
-            const submissionNotes = `Requested: ${activeServiceForForm.name}. Details: ${formDataDesc}`
+            let finalPhone = phoneVal.trim()
+            if (!finalPhone) {
+                finalPhone = "WEB_ANONYMOUS"
+            }
+
             await api.publicLogIntent(
-                submissionNotes,
+                activeServiceForForm.name,
                 activeServiceForForm.categoryLabel || "Service Request",
-                user?.phone || "WEB_ANONYMOUS"
+                finalPhone
             )
-            // Generate mock request ID for confirmation
+
             const reqId = `REQ-${Math.floor(100000 + Math.random() * 900000)}`
             setFormSuccessId(reqId)
+
+            // Prefilled WhatsApp message
+            const textMsg = `Hello Krishna Emitra! I have requested the service: *${activeServiceForForm.name}* (Category: *${activeServiceForForm.categoryLabel || "Service Request"}*) via the web portal. Prefilled Contact: ${finalPhone !== "WEB_ANONYMOUS" ? finalPhone : "Not Provided"}.`
+            const waUrl = `https://wa.me/${config.whatsapp_number || "916377964293"}?text=${encodeURIComponent(textMsg)}`
+
+            setTimeout(() => {
+                window.open(waUrl, "_blank")
+            }, 1500)
+
             fetchAllData(true)
         } catch (err) {
             alert("Error logging filing request: " + err.message)
+            setActiveServiceForForm(null)
         } finally {
             setFormSubmitting(false)
         }
@@ -743,7 +867,7 @@ export default function StudentPanel() {
 
                 <div className="flex flex-1 w-full overflow-hidden items-start">
                     {/* ── CENTER WORKSPACE ── */}
-                    <div className="flex-1 min-w-0 h-[calc(100vh-80px)] overflow-y-auto flex flex-col justify-between">
+                    <div className="flex-1 min-w-0 h-[calc(100vh-80px)] overflow-y-auto scroll-container-smooth flex flex-col justify-between">
                         {/* ── CANVAS MAIN CONTENT ── */}
                         <main className="max-w-[1140px] w-full mx-auto px-6 md:px-10 py-8 flex-1">
                     
@@ -794,11 +918,8 @@ export default function StudentPanel() {
                                     history={history}
                                     expandedAppId={expandedAppId}
                                     setExpandedAppId={setExpandedAppId}
-                                    getStatusDetails={getStatusDetails}
                                     triggerSignIn={triggerSignIn}
-                                    setActiveServiceForForm={setActiveServiceForForm}
-                                    setFormSuccessId={setFormSuccessId}
-                                    setFormDataDesc={setFormDataDesc}
+                                    handleAutoServiceRequest={handleAutoServiceRequest}
                                     config={config}
                                 />
                             )}
@@ -821,6 +942,7 @@ export default function StudentPanel() {
                                     setIsWizardOpen={setIsWizardOpen}
                                     config={config}
                                     handleSaveExamSubscriptions={handleSaveExamSubscriptions}
+                                    exams={exams}
                                 />
                             )}
 
@@ -903,7 +1025,7 @@ export default function StudentPanel() {
 
                     {/* ── RIGHT PREMIUM NOTIFICATION PANEL ── */}
                     {!loading && (
-                        <aside className="hidden xl:flex w-[340px] border-l border-[var(--color-outline-variant)] h-[calc(100vh-80px)] shrink-0 p-6 flex-col overflow-y-auto bg-[var(--color-surface-base)] relative">
+                        <aside className="hidden xl:flex w-[340px] border-l border-[var(--color-outline-variant)] h-[calc(100vh-80px)] shrink-0 p-6 flex-col overflow-y-auto scroll-container-smooth bg-[var(--color-surface-base)] relative">
                             {renderNotificationsPanel(true)}
                         </aside>
                     )}
@@ -931,7 +1053,7 @@ export default function StudentPanel() {
                     >
                         <div className="flex justify-between items-start border-b border-slate-100 pb-3">
                             <div>
-                                <h3 className="text-[14.5px] font-extrabold text-slate-900 text-left font-display">Filing Request: {activeServiceForForm.name}</h3>
+                                <h3 className="text-[14.5px] font-extrabold text-slate-900 text-left font-display">Filing Request Registered</h3>
                                 <p className="text-[10px] text-[var(--color-primary)] font-extrabold bg-[var(--color-surface-low)] border border-[var(--color-outline-variant)] px-2 py-0.5 rounded inline-block mt-1 tracking-wider text-left">{activeServiceForForm.categoryLabel}</p>
                             </div>
                             <button onClick={() => setActiveServiceForForm(null)} className="p-1.5 text-slate-400 hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-low)] rounded-lg cursor-pointer transition-colors">
@@ -939,78 +1061,70 @@ export default function StudentPanel() {
                             </button>
                         </div>
 
-                        {formSuccessId ? (
-                            <div className="p-6 text-center space-y-5">
-                                <div className="w-16 h-16 bg-emerald-50 text-emerald-505 flex items-center justify-center rounded-full mx-auto border border-emerald-150 shadow-sm shadow-emerald-500/5">
+                        {formSubmitting ? (
+                            <div className="p-6 text-center space-y-3">
+                                <Loader2 size={30} className="mx-auto text-[var(--color-primary)] animate-spin" />
+                                <h4 className="text-[14px] font-extrabold text-slate-800">Logging Your Request...</h4>
+                            </div>
+                        ) : formSuccessId ? (
+                            <div className="p-4 text-center space-y-5">
+                                <div className="w-16 h-16 bg-emerald-50 text-emerald-500 flex items-center justify-center rounded-full mx-auto border border-emerald-100 shadow-sm shadow-emerald-500/5">
                                     <CheckCircle2 size={30} />
                                 </div>
-                                <h4 className="text-[15px] font-extrabold text-emerald-955">Request Submitted Successfully</h4>
-                                <p className="text-[12.5px] text-emerald-805 leading-relaxed font-semibold">
-                                    Your request has been logged with ID <span className="font-bold font-mono text-emerald-955 bg-white px-2 py-0.5 rounded border border-emerald-150 shadow-sm">{formSuccessId}</span>. Track it inside the **Filing History** section.
+                                <h4 className="text-[15px] font-extrabold text-emerald-600">Request Logged Successfully!</h4>
+                                <p className="text-[12.5px] text-slate-500 leading-relaxed font-semibold">
+                                    Your request for <span className="font-extrabold text-slate-900">{activeServiceForForm.name}</span> has been logged. We are redirecting you to WhatsApp to complete your filing.
                                 </p>
-                                <button 
-                                    onClick={() => setActiveServiceForForm(null)}
-                                    className="px-5 py-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white text-[12.5px] font-extrabold rounded-xl w-full cursor-pointer transition-colors shadow-ambient border-none"
-                                >
-                                    Close Window
-                                </button>
+                                
+                                <div className="space-y-2">
+                                    <a 
+                                        href={`https://wa.me/${config.whatsapp_number || "916377964293"}?text=${encodeURIComponent(`Hello Krishna Emitra! I have requested the service: *${activeServiceForForm.name}* (Category: *${activeServiceForForm.categoryLabel || "Service Request"}*) via the web portal. Prefilled Contact: ${customPhone.trim() || "Not Provided"}.`)}`}
+                                        target="_blank" rel="noopener noreferrer"
+                                        className="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-[12.5px] font-extrabold rounded-xl w-full cursor-pointer transition-colors shadow-sm border-none flex items-center justify-center gap-2 decoration-none font-sans"
+                                    >
+                                        <MessageSquare size={16} /> Open WhatsApp Chat
+                                    </a>
+                                    <button 
+                                        onClick={() => setActiveServiceForForm(null)}
+                                        className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[12px] font-bold rounded-xl w-full cursor-pointer transition-all border-none"
+                                    >
+                                        Close Window
+                                    </button>
+                                </div>
                             </div>
                         ) : (
-                            <form onSubmit={handleServiceFormSubmit} className="space-y-4 text-left">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="text-[9.5px] font-extrabold uppercase text-slate-400 block mb-1">Name</label>
-                                        <input type="text" value={user?.name} disabled className="w-full p-2.8 bg-slate-100 border border-[var(--color-outline-variant)] text-slate-400 rounded-lg text-[12px] font-semibold cursor-not-allowed" />
-                                    </div>
-                                    <div>
-                                        <label className="text-[9.5px] font-extrabold uppercase text-slate-400 block mb-1">Mobile</label>
-                                        <input type="text" value={user?.phone} disabled className="w-full p-2.8 bg-slate-100 border border-[var(--color-outline-variant)] text-slate-400 rounded-lg text-[12px] font-semibold cursor-not-allowed" />
-                                    </div>
+                            /* PHONE COLLECTION STEP */
+                            <div className="space-y-4 text-left">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-extrabold uppercase text-slate-450 block tracking-wider">Contact Number (Optional)</label>
+                                    <p className="text-[11.5px] text-slate-500 leading-normal font-semibold">Provide your mobile number if you want the operator to contact you directly regarding this service request.</p>
                                 </div>
 
-                                <div>
-                                    <label className="text-[9.5px] font-extrabold uppercase text-slate-400 block mb-1">Additional details (Marks, Category, etc.)</label>
-                                    <textarea 
-                                        rows={3}
-                                        value={formDataDesc}
-                                        onChange={e => setFormDataDesc(e.target.value)}
-                                        placeholder="Add roll numbers, target dates, or category specifics..."
-                                        className="w-full p-3.5 bg-slate-50 border border-[var(--color-outline-variant)] rounded-xl text-[12px] font-semibold outline-none resize-none focus:bg-white focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
-                                        required
+                                <div className="relative">
+                                    <input 
+                                        type="text" 
+                                        value={customPhone} 
+                                        onChange={e => setCustomPhone(e.target.value)}
+                                        placeholder="Enter mobile number (optional)" 
+                                        className="w-full p-3 bg-slate-50 border border-[var(--color-outline-variant)] rounded-xl text-[12.5px] font-semibold outline-none focus:bg-white focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
                                     />
                                 </div>
 
-                                <div className="space-y-1">
-                                    <label className="text-[9.5px] font-extrabold uppercase text-slate-400 block">Supporting Document Upload</label>
-                                    <div className="border border-dashed border-[var(--color-outline-variant)] hover:border-[var(--color-primary)] rounded-xl p-4 text-center cursor-pointer transition-all relative group bg-slate-50 hover:bg-white">
-                                        <input 
-                                            type="file" 
-                                            onChange={e => {
-                                                if (e.target.files?.[0]) {
-                                                    setFormFile(e.target.files[0])
-                                                    setFormFileName(e.target.files[0].name)
-                                                }
-                                            }}
-                                            className="absolute inset-0 opacity-0 cursor-pointer"
-                                        />
-                                        <FileText size={20} className="mx-auto text-[var(--color-primary)] mb-1.5 group-hover:scale-110 transition-transform" />
-                                        <span className="text-[11px] text-slate-400 font-bold block">
-                                            {formFileName ? `Selected: ${formFileName}` : "Click to select Aadhaar, photo or marksheet PDF"}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div className="pt-2">
+                                <div className="pt-2 flex gap-2">
                                     <button 
-                                        type="submit"
-                                        disabled={formSubmitting}
-                                        className="px-5 py-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white text-[12.5px] font-extrabold rounded-xl w-full transition-all flex items-center justify-center gap-2 cursor-pointer shadow-ambient hover:shadow-lg border-none active:scale-98"
+                                        onClick={() => submitServiceRequestWithPhone(customPhone)}
+                                        className="px-5 py-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white text-[12.5px] font-extrabold rounded-xl flex-1 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-ambient border-none"
                                     >
-                                        {formSubmitting ? <Loader2 size={13} className="animate-spin" /> : null}
-                                        Submit Filing Request
+                                        Proceed to WhatsApp
+                                    </button>
+                                    <button 
+                                        onClick={() => setActiveServiceForForm(null)}
+                                        className="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-650 text-[12px] font-bold rounded-xl cursor-pointer transition-all border-none"
+                                    >
+                                        Cancel
                                     </button>
                                 </div>
-                            </form>
+                            </div>
                         )}
                     </motion.div>
                 </div>

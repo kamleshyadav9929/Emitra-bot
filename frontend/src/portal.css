@@ -111,3 +111,8 @@
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.8);
 }
+
+.scroll-container-smooth {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}

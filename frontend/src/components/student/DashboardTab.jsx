@@ -11,29 +11,6 @@ export default function DashboardTab({
 }) {
     return (
         <div className="space-y-8 text-left animate-fadeIn">
-            {/* Welcome Header */}
-            <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-primary-container)] to-[var(--color-primary)] text-white rounded-2xl p-6 md:p-8 shadow-ambient border-none overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.1),transparent_40%)]" />
-                <div className="space-y-1.5 relative z-10">
-                    <span className="px-2.5 py-0.8 bg-white/20 border border-white/30 text-white text-[10px] font-bold uppercase tracking-wider rounded-md inline-block">
-                        Online Dashboard
-                    </span>
-                    <h1 className="text-xl md:text-2xl font-black tracking-tight text-white mt-1 font-display">
-                        Namaste, {user?.name?.split(" ")[0]} 👋
-                    </h1>
-                    <p className="text-[12.5px] text-slate-200 leading-normal font-normal">Welcome back! Manage your exam notifications and filing submissions securely.</p>
-                </div>
-
-                <div className="flex gap-3 relative z-10 w-full md:w-auto">
-                    <button onClick={() => setActiveTab("exams")} className="flex-1 md:flex-initial px-5 py-2.5 bg-white hover:bg-slate-50 text-[var(--color-primary)] text-[12.5px] font-bold rounded-xl transition-all shadow-md active:scale-98 cursor-pointer text-center border-none">
-                        Select Exams
-                    </button>
-                    <button onClick={() => setActiveTab("services")} className="flex-1 md:flex-initial px-5 py-2.5 bg-white/20 hover:bg-white/30 text-white text-[12.5px] font-bold rounded-xl transition-all cursor-pointer border-none">
-                        Request Services
-                    </button>
-                </div>
-            </div>
-
             {/* Bento Stats Widgets Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
                 {/* Total Requests */}
@@ -107,35 +84,34 @@ export default function DashboardTab({
                 </div>
             </div>
 
-            {/* Quick Action Tiles */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <button onClick={() => setActiveTab("exams")} className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] hover:border-[var(--color-primary)]/30 p-5 rounded-xl text-left shadow-sm hover:shadow-ambient transition-all duration-300 space-y-3 cursor-pointer group border-solid">
-                    <div className="w-9 h-9 rounded-xl bg-[var(--color-surface-low)] text-[var(--color-primary)] flex items-center justify-center group-hover:scale-110 transition-transform"><Award size={18} /></div>
-                    <div>
-                        <p className="text-[13px] font-extrabold text-slate-900">Select Exams</p>
-                        <p className="text-[9.5px] text-slate-400 font-extrabold uppercase mt-0.5">Choose Alerts</p>
+            {/* Quick Action Circular Buttons */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)]/60 rounded-xl p-6 shadow-sm">
+                <button onClick={() => setActiveTab("exams")} className="flex flex-col items-center gap-2 group cursor-pointer border-none bg-transparent">
+                    <div className="w-14 h-14 rounded-full bg-[var(--color-surface-low)] text-[var(--color-primary)] flex items-center justify-center shadow-inner group-hover:scale-105 group-hover:bg-[var(--color-primary-fixed)] transition-all duration-300">
+                        <Award size={22} />
                     </div>
+                    <span className="text-[12.5px] font-extrabold text-slate-700 group-hover:text-[var(--color-primary)] transition-colors">Select Exams</span>
                 </button>
-                <button onClick={() => setActiveTab("services")} className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] hover:border-[var(--color-primary)]/30 p-5 rounded-xl text-left shadow-sm hover:shadow-ambient transition-all duration-300 space-y-3 cursor-pointer group border-solid">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform"><ClipboardList size={18} /></div>
-                    <div>
-                        <p className="text-[13px] font-extrabold text-slate-900">My Services</p>
-                        <p className="text-[9.5px] text-slate-400 font-extrabold uppercase mt-0.5">Filing Catalog</p>
+
+                <button onClick={() => setActiveTab("services")} className="flex flex-col items-center gap-2 group cursor-pointer border-none bg-transparent">
+                    <div className="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-inner group-hover:scale-105 group-hover:bg-emerald-100 transition-all duration-300">
+                        <ClipboardList size={22} />
                     </div>
+                    <span className="text-[12.5px] font-extrabold text-slate-700 group-hover:text-emerald-600 transition-colors">My Services</span>
                 </button>
-                <button onClick={() => setActiveTab("neet")} className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] hover:border-[var(--color-primary)]/30 p-5 rounded-xl text-left shadow-sm hover:shadow-ambient transition-all duration-300 space-y-3 cursor-pointer group border-solid">
-                    <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform"><BookOpen size={18} /></div>
-                    <div>
-                        <p className="text-[13px] font-extrabold text-slate-900">NEET Counselling</p>
-                        <p className="text-[9.5px] text-slate-400 font-extrabold uppercase mt-0.5">Choice Guide</p>
+
+                <button onClick={() => setActiveTab("neet")} className="flex flex-col items-center gap-2 group cursor-pointer border-none bg-transparent">
+                    <div className="w-14 h-14 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center shadow-inner group-hover:scale-105 group-hover:bg-purple-100 transition-all duration-300">
+                        <BookOpen size={22} />
                     </div>
+                    <span className="text-[12.5px] font-extrabold text-slate-700 group-hover:text-purple-600 transition-colors">NEET Counselling</span>
                 </button>
-                <button onClick={() => setActiveTab("profile")} className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] hover:border-[var(--color-primary)]/30 p-5 rounded-xl text-left shadow-sm hover:shadow-ambient transition-all duration-300 space-y-3 cursor-pointer group border-solid">
-                    <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform"><Settings size={18} /></div>
-                    <div>
-                        <p className="text-[13px] font-extrabold text-slate-900">Profile Settings</p>
-                        <p className="text-[9.5px] text-slate-400 font-extrabold uppercase mt-0.5">Edit Account</p>
+
+                <button onClick={() => setActiveTab("profile")} className="flex flex-col items-center gap-2 group cursor-pointer border-none bg-transparent">
+                    <div className="w-14 h-14 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center shadow-inner group-hover:scale-105 group-hover:bg-rose-100 transition-all duration-300">
+                        <Settings size={22} />
                     </div>
+                    <span className="text-[12.5px] font-extrabold text-slate-700 group-hover:text-rose-600 transition-colors">Profile Settings</span>
                 </button>
             </div>
 
