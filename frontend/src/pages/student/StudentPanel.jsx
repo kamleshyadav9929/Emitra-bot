@@ -40,6 +40,7 @@ export default function StudentPanel() {
     const [services, setServices] = useState({})
     const [exams, setExams] = useState([])
     const [announcements, setAnnouncements] = useState([])
+    const [broadcasts, setBroadcasts] = useState([])
     const [history, setHistory] = useState([])
     const [config, setConfig] = useState({})
     const [loading, setLoading] = useState(true)
@@ -96,17 +97,19 @@ export default function StudentPanel() {
         else setRefreshing(true);
 
         try {
-            const [servicesRes, examsRes, announcementsRes, configRes] = await Promise.all([
+            const [servicesRes, examsRes, announcementsRes, configRes, newsRes] = await Promise.all([
                 api.getPublicServices().catch(() => ({ services: {} })),
                 api.getPublicExams().catch(() => ({ exams: [] })),
                 api.getPublicAnnouncements().catch(() => ({ announcements: [] })),
-                api.getPublicConfig().catch(() => ({}))
+                api.getPublicConfig().catch(() => ({})),
+                api.getPublicNews().catch(() => ({ news: [] }))
             ])
 
             setServices(servicesRes.services || {})
             setExams(examsRes.exams || [])
             setAnnouncements(announcementsRes.announcements || [])
             setConfig(configRes || {})
+            setBroadcasts(newsRes.news || [])
 
             const identifier = user?.phone || user?.email
             if (isLoggedIn && identifier) {
@@ -221,24 +224,52 @@ export default function StudentPanel() {
         }
     }
 
+    // Compute filtered subscribed notifications from both general announcements and news broadcasts
+    const subNotifications = useMemo(() => {
+        const combined = [
+            ...announcements.map(ann => ({
+                ...ann,
+                type: "announcement"
+            })),
+            ...broadcasts.map(b => ({
+                id: `BC-${b.id}`,
+                title: `Official Update: ${b.exam}`,
+                content: b.message,
+                created_at: b.sent_at,
+                links: null,
+                exam: b.exam,
+                type: "broadcast"
+            }))
+        ]
+
+        if (subscribedExams.length === 0) return []
+
+        return combined.filter(ann => {
+            if (ann.type === "broadcast") {
+                return ann.exam === "ALL" || subscribedExams.some(e => e.toLowerCase() === ann.exam.toLowerCase())
+            } else {
+                return subscribedExams.some(exam => {
+                    const titleMatch = ann.title?.toLowerCase().includes(exam.toLowerCase())
+                    const contentMatch = ann.content?.toLowerCase().includes(exam.toLowerCase())
+                    return titleMatch || contentMatch
+                })
+            }
+        }).sort((a, b) => new Date(b.created_at || b.sent_at) - new Date(a.created_at || a.sent_at))
+    }, [announcements, broadcasts, subscribedExams])
+
+    const unreadCount = useMemo(() => {
+        return subNotifications.filter(n => !readNotifications.includes(n.id)).length
+    }, [subNotifications, readNotifications])
+
     // Mark all notifications read
     const handleMarkAllNotificationsRead = () => {
-        const allIds = announcements.map(ann => ann.id)
+        const allIds = subNotifications.map(ann => ann.id)
         setReadNotifications(allIds)
         localStorage.setItem(`${storagePrefix}_readNotifications`, JSON.stringify(allIds))
     }
 
     // Render notifications panel for 3-column split layout
     const renderNotificationsPanel = (isSticky = true) => {
-        const subNotifications = announcements.filter(ann => {
-            if (subscribedExams.length === 0) return false;
-            return subscribedExams.some(exam => {
-                const titleMatch = ann.title?.toLowerCase().includes(exam.toLowerCase());
-                const contentMatch = ann.content?.toLowerCase().includes(exam.toLowerCase());
-                return titleMatch || contentMatch;
-            });
-        });
-
         return (
             <div className={`flex flex-col space-y-5 h-full ${isSticky ? "" : "bg-white border border-[var(--color-outline-variant)] rounded-3xl p-6 shadow-ambient"}`}>
                 <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
@@ -620,9 +651,9 @@ export default function StudentPanel() {
                                 title="Inbox Notifications"
                             >
                                 <Bell size={16} />
-                                {announcements.length - readNotifications.length > 0 && (
+                                {unreadCount > 0 && (
                                     <span className="absolute top-1 right-1 w-4.5 h-4.5 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-full text-[8px] font-bold flex items-center justify-center ring-2 ring-white">
-                                        {announcements.length - readNotifications.length}
+                                        {unreadCount}
                                     </span>
                                 )}
                             </button>
