@@ -133,7 +133,7 @@ def _seed_default_exams():
 # ── Student helpers ──────────────────────────────────────────────────────────
 
 def is_new_user(telegram_id):
-    res = supabase.table("students").select("1").eq("telegram_id", str(telegram_id)).execute()
+    res = supabase.table("students").select("telegram_id").eq("telegram_id", str(telegram_id)).execute()
     return len(res.data) == 0
 
 
