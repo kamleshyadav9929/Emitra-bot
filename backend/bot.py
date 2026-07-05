@@ -57,7 +57,7 @@ def build_services_keyboard(category_key):
     for i in range(0, len(category["services"]), 2):
         row = []
         for service in category["services"][i : i + 2]:
-            row.append(InlineKeyboardButton(service, callback_data=f"svc_{service}"))
+            row.append(InlineKeyboardButton(service["name"], callback_data=f"svc_{service['name']}"))
         buttons.append(row)
     buttons.append([InlineKeyboardButton("⬅️ Wapas Jayein", callback_data="cat_back")])
     return InlineKeyboardMarkup(buttons)
@@ -234,7 +234,7 @@ async def button_callback_handler(update: Update, context):
         category_label = "other"
         services = load_services()
         for key, cat in services.items():
-            if service_name in cat["services"]:
+            if any(s["name"] == service_name for s in cat["services"]):
                 category_label = key
                 break
 
