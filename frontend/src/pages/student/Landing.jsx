@@ -211,11 +211,13 @@ export default function Landing() {
 
             {/* ── DEADLINES TICKER ── */}
             {upcomingDeadlines.length > 0 && (
-                <div className="bg-gradient-to-r from-[#164FA8] to-[#0A1A40] text-white/95 text-[11px] font-semibold py-2 px-6 overflow-hidden flex items-center shadow-inner">
-                    <div className="flex items-center gap-1.5 shrink-0 border-r border-white/20 pr-4 mr-4 text-amber-300 font-bold uppercase tracking-wider">
+                <div className="bg-[#164FA8] text-white/95 text-[11px] font-semibold py-2 px-6 overflow-hidden flex items-center shadow-inner relative">
+                    <div className="flex items-center gap-1.5 shrink-0 bg-[#164FA8] z-10 pr-4 mr-4 text-amber-300 font-bold uppercase tracking-wider relative">
                         <Clock size={12} className="animate-pulse" /> {lang === "EN" ? "Upcoming Deadlines" : "आगामी अंतिम तिथियां"}
+                        {/* Soft visual shadow separator */}
+                        <div className="absolute right-0 top-0 bottom-0 w-3 bg-gradient-to-r from-transparent to-black/10 pointer-events-none translate-x-full" />
                     </div>
-                    <div className="flex items-center gap-12 whitespace-nowrap animate-marquee">
+                    <div className="flex items-center gap-12 whitespace-nowrap marquee-track">
                         {upcomingDeadlines.map((ex, idx) => (
                             <span key={idx} className="inline-flex items-center gap-1 text-[11.5px]">
                                 ⚡ <span className="font-extrabold text-white">{ex.name}</span>: {lang === "EN" ? "Closes on" : "अंतिम तिथि"} <span className="text-amber-300 font-bold">{new Date(ex.end_date).toLocaleDateString()}</span>
@@ -229,194 +231,93 @@ export default function Landing() {
             <section className="relative px-6 lg:px-12 py-12 lg:py-24 max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
                 {/* Hero Left */}
                 <div className="lg:col-span-7 space-y-6 text-left">
-                    <div className="inline-flex items-center gap-1.5 bg-blue-50 border border-blue-100/50 px-3 py-1 rounded-full text-[10.5px] font-black text-[#164FA8] uppercase tracking-wider">
-                        <Sparkles size={12} /> {lang === "EN" ? "Verified Rajasthan Krishna Emitra Services" : "सत्यापित राजस्थान ई-मित्र सेवाएं"}
+                    <div className="inline-flex items-center gap-1.5 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full text-[10.5px] font-bold text-[#0066cc] uppercase tracking-wider">
+                        <Sparkles size={12} className="text-[#0066cc]" /> {lang === "EN" ? "Verified Rajasthan e-Mitra services" : "सत्यापित राजस्थान ई-मित्र सेवाएं"}
                     </div>
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.08] tracking-tight text-[#0A1A40] font-display">
-                        {lang === "EN" ? (
-                            <>
-                                Instant <span className="text-[#164FA8] bg-clip-text">Govt Forms</span> &amp; Automated Exam Alerts.
-                            </>
-                        ) : (
-                            <>
-                                सरकारी फॉर्म और <span className="text-[#164FA8]">परीक्षा अलर्ट</span>, अब सीधे आपके पास।
-                            </>
-                        )}
+                    <h1 className="text-4xl md:text-5xl lg:text-[46px] font-semibold leading-[1.1] tracking-tight text-[#1d1d1f] font-display" style={{ letterSpacing: "-0.5px" }}>
+                        Track your exam deadlines and govt forms, all in one place
                     </h1>
-                    <p className="text-[14px] md:text-[16px] text-gray-500 leading-relaxed max-w-2xl font-normal">
-                        {lang === "EN" 
-                            ? "Complete your SSC, Railway, NEET Counselling, and state services filings through our online assistant. Get priority WhatsApp & Telegram notification alerts directly on your device."
-                            : "हमारे ऑनलाइन सहायक के माध्यम से अपने सभी सरकारी फॉर्म और नीट काउंसलिंग फाइलिंग को पूरा करें। सीधे अपने फोन पर व्हाट्सएप और टेलीग्राम नोटिफिकेशन अपडेट प्राप्त करें।"}
+                    <p className="text-[15px] text-[#7a7a7a] leading-relaxed max-w-2xl font-normal">
+                        SSC, Railway, NEET counselling, and state services — all updates delivered directly to your Telegram, for free.
                     </p>
 
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap items-center gap-4 pt-2">
+                        <button 
+                            onClick={handleJoinTelegram}
+                            className="px-6 py-3 bg-[#0066cc] hover:bg-[#0071e3] text-white text-[13px] font-medium rounded-full shadow-sm hover:shadow-md transition-all active:scale-[0.97] cursor-pointer border-none flex items-center gap-2"
+                        >
+                            <Send size={14} /> Join Telegram assistant
+                        </button>
+                        <button 
+                            onClick={() => scrollToSection("what-we-do")}
+                            className="px-6 py-3 bg-white hover:bg-slate-50 text-[#0066cc] border border-[#0066cc] text-[13px] font-medium rounded-full shadow-sm transition-all active:scale-[0.97] cursor-pointer"
+                        >
+                            Browse services
+                        </button>
+                    </div>
+
                     {/* Stats Counters */}
-                    <div className="grid grid-cols-3 gap-6 pt-6 border-t border-[#c2c6d4]/20 max-w-md">
+                    <div className="grid grid-cols-3 gap-6 pt-8 border-t border-slate-100 max-w-md">
                         <div>
-                            <span className="block text-2xl lg:text-3xl font-black text-[#0A1A40]">12,000+</span>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 block">Students Served</span>
+                            <span className="block text-2xl font-semibold text-[#1d1d1f] tracking-tight">12,000+</span>
+                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 block">Students served</span>
                         </div>
                         <div>
-                            <span className="block text-2xl lg:text-3xl font-black text-[#0A1A40]">100%</span>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 block">Secure Locker</span>
+                            <span className="block text-2xl font-semibold text-[#1d1d1f] tracking-tight">10+</span>
+                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 block">Exams tracked</span>
                         </div>
                         <div>
-                            <span className="block text-2xl lg:text-3xl font-black text-[#0A1A40]">Instant</span>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 block">Status Alerts</span>
+                            <span className="block text-2xl font-semibold text-[#1d1d1f] tracking-tight">Free</span>
+                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 block">Status alerts</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Hero Right - Onboarding Card (The 3 Step Wizard) */}
+                {/* Hero Right - Onboarding Card (The 2 Step Wizard) */}
                 <div className="lg:col-span-5 relative">
-                    <div className="absolute inset-0 bg-[#164FA8]/5 rounded-[32px] blur-2xl -z-10 pointer-events-none" />
-                    
-                    <div className="bg-white/80 backdrop-blur-xl border border-white rounded-[24px] shadow-2xl p-6 lg:p-8 space-y-6 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-[#164FA8]/5 rounded-bl-[100px] -z-10" />
-                        
+                    <div className="bg-white border border-slate-200 rounded-3xl p-6 lg:p-8 space-y-6 text-left">
                         <div>
-                            <p className="text-[9.5px] font-black text-[#164FA8] uppercase tracking-widest">Digital Onboarding</p>
-                            <h3 className="text-xl font-black text-[#0A1A40] mt-1 font-display">Get Started in 3 Steps</h3>
-                            <p className="text-[11.5px] text-gray-400 mt-1 font-normal">Connect alerts to open your secure workspace dashboard.</p>
+                            <h3 className="text-lg font-semibold text-[#1d1d1f] font-display" style={{ letterSpacing: "-0.2px" }}>Get started in 2 steps</h3>
+                            <p className="text-[12.5px] text-gray-400 mt-1">Get your student dashboard ready in two minutes.</p>
                         </div>
 
-                        {/* Onboarding Steps Visual Accordion */}
                         <div className="space-y-4">
-                            {/* STEP 1: JOIN WHATSAPP */}
-                            <div className={`border rounded-xl transition-all ${activeStep === 1 ? 'border-[#164FA8] bg-blue-50/20' : 'border-gray-200'}`}>
-                                <div className="p-4 flex items-center justify-between cursor-pointer" onClick={() => setActiveStep(1)}>
-                                    <div className="flex items-center gap-3">
-                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black ${
-                                            step1Done ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'
-                                        }`}>
-                                            {step1Done ? <Check size={12} strokeWidth={3} /> : "1"}
-                                        </div>
-                                        <div>
-                                            <h4 className="text-[12px] font-bold text-[#0A1A40]">Join WhatsApp Alerts</h4>
-                                            <p className="text-[10px] text-gray-400 font-normal">Receive immediate exam dates & forms PDF</p>
-                                        </div>
+                            {/* STEP 1: JOIN TELEGRAM */}
+                            <div className="border border-slate-250 rounded-2xl p-5 bg-white flex flex-col gap-4">
+                                <div className="flex gap-4">
+                                    <div className="w-8 h-8 rounded-full bg-blue-50 text-[#0066cc] border border-blue-100 flex items-center justify-center text-[12px] font-bold shrink-0">
+                                        1
                                     </div>
-                                    <ChevronDown size={14} className={`text-gray-400 transition-transform ${activeStep === 1 ? 'rotate-180' : ''}`} />
-                                </div>
-                                <AnimatePresence>
-                                    {activeStep === 1 && (
-                                        <motion.div 
-                                            initial={{ height: 0, opacity: 0 }}
-                                            animate={{ height: "auto", opacity: 1 }}
-                                            exit={{ height: 0, opacity: 0 }}
-                                            className="px-4 pb-4 overflow-hidden"
-                                        >
-                                            <button 
-                                                onClick={handleJoinWhatsApp}
-                                                className="w-full py-3 bg-[#25D366] hover:bg-[#22c35e] text-white text-[12px] font-bold rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
-                                            >
-                                                <MessageSquare size={14} /> Open WhatsApp Broadcast
-                                            </button>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-
-                            {/* STEP 2: JOIN TELEGRAM */}
-                            <div className={`border rounded-xl transition-all ${activeStep === 2 ? 'border-[#164FA8] bg-blue-50/20' : 'border-gray-200'} ${
-                                !step1Done ? 'opacity-60 pointer-events-none' : ''
-                            }`}>
-                                <div className="p-4 flex items-center justify-between cursor-pointer" onClick={() => step1Done && setActiveStep(2)}>
-                                    <div className="flex items-center gap-3">
-                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black ${
-                                            step2Done ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'
-                                        }`}>
-                                            {step2Done ? <Check size={12} strokeWidth={3} /> : "2"}
-                                        </div>
-                                        <div>
-                                            <h4 className="text-[12px] font-bold text-[#0A1A40]">Join Telegram Assistant</h4>
-                                            <p className="text-[10px] text-gray-400 font-normal">Check application status via Krishna Emitra bot</p>
-                                        </div>
+                                    <div className="space-y-1">
+                                        <h4 className="text-[13px] font-semibold text-[#1d1d1f]">Join Telegram assistant</h4>
+                                        <p className="text-[11.5px] text-gray-400 font-normal leading-normal">Exam dates and form PDFs directly in your chat.</p>
                                     </div>
-                                    <ChevronDown size={14} className={`text-gray-400 transition-transform ${activeStep === 2 ? 'rotate-180' : ''}`} />
                                 </div>
-                                <AnimatePresence>
-                                    {activeStep === 2 && (
-                                        <motion.div 
-                                            initial={{ height: 0, opacity: 0 }}
-                                            animate={{ height: "auto", opacity: 1 }}
-                                            exit={{ height: 0, opacity: 0 }}
-                                            className="px-4 pb-4 overflow-hidden"
-                                        >
-                                            <button 
-                                                onClick={handleJoinTelegram}
-                                                className="w-full py-3 bg-[#0088cc] hover:bg-[#007ee6] text-white text-[12px] font-bold rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
-                                            >
-                                                <Send size={14} /> Launch Telegram Bot
-                                            </button>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-
-                            {/* STEP 3: CONNECT / SIGN IN */}
-                            <div className={`border rounded-xl transition-all ${activeStep === 3 ? 'border-[#164FA8] bg-blue-50/20' : 'border-gray-200'} ${
-                                !step2Done ? 'opacity-60 pointer-events-none' : ''
-                            }`}>
-                                <div className="p-4 flex items-center justify-between cursor-pointer" onClick={() => step2Done && setActiveStep(3)}>
-                                    <div className="flex items-center gap-3">
-                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black ${
-                                            isLoggedIn ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'
-                                        }`}>
-                                            {isLoggedIn ? <Check size={12} strokeWidth={3} /> : "3"}
-                                        </div>
-                                        <div>
-                                            <h4 className="text-[12px] font-bold text-[#0A1A40]">Sign In / Register Locker</h4>
-                                            <p className="text-[10px] text-gray-400 font-normal">Connect account and access Dashboard</p>
-                                        </div>
-                                    </div>
-                                    <ChevronDown size={14} className={`text-gray-400 transition-transform ${activeStep === 3 ? 'rotate-180' : ''}`} />
-                                </div>
-                                <AnimatePresence>
-                                    {activeStep === 3 && (
-                                        <motion.div 
-                                            initial={{ height: 0, opacity: 0 }}
-                                            animate={{ height: "auto", opacity: 1 }}
-                                            exit={{ height: 0, opacity: 0 }}
-                                            className="px-4 pb-4 overflow-hidden"
-                                        >
-                                            {isLoggedIn ? (
-                                                <button 
-                                                    onClick={() => navigate("/dashboard")}
-                                                    className="w-full py-3 bg-gradient-to-r from-[#164FA8] to-[#0A1A40] text-white text-[12px] font-bold rounded-lg shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
-                                                >
-                                                    Locker Connected! Go to Dashboard <ArrowRight size={14} />
-                                                </button>
-                                            ) : (
-                                                <button 
-                                                    onClick={triggerSignIn}
-                                                    className="w-full py-3 bg-[#164FA8] hover:bg-[#0A1A40] text-white text-[12px] font-bold rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5"
-                                                >
-                                                    Secure Account Connection
-                                                </button>
-                                            )}
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        </div>
-
-                        {/* Reset state button just in case */}
-                        {(step1Done || step2Done) && (
-                            <div className="text-center">
                                 <button 
-                                    onClick={() => {
-                                        localStorage.removeItem("emitra_step1_wa")
-                                        localStorage.removeItem("emitra_step2_tg")
-                                        setStep1Done(false)
-                                        setStep2Done(false)
-                                        setActiveStep(1)
-                                    }}
-                                    className="text-[10px] font-bold text-gray-400 hover:text-[#164FA8]"
+                                    onClick={handleJoinTelegram}
+                                    className="w-full py-2.5 bg-[#0066cc] hover:bg-[#0071e3] text-white text-[12.5px] font-medium rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm border-none"
                                 >
-                                    Reset Onboarding Progress
+                                    <Send size={13} /> Open Telegram bot
                                 </button>
                             </div>
-                        )}
+
+                            {/* STEP 2: SIGN IN TO PANEL */}
+                            <div 
+                                onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
+                                className="border border-slate-200 rounded-2xl p-5 bg-white flex gap-4 cursor-pointer hover:border-blue-200 hover:bg-slate-50/40 transition-all"
+                            >
+                                <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-[12px] font-bold shrink-0">
+                                    2
+                                </div>
+                                <div className="space-y-1">
+                                    <h4 className="text-[13px] font-semibold text-[#1d1d1f] flex items-center gap-1.5">
+                                        Sign in to student panel {isLoggedIn && <Check size={12} className="text-emerald-500" />}
+                                    </h4>
+                                    <p className="text-[11.5px] text-gray-400 font-normal leading-normal">Full dashboard, service requests and history.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

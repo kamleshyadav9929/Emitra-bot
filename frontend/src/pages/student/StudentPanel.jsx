@@ -23,6 +23,7 @@ import ProfileTab from "../../components/student/ProfileTab"
 import HelpDeskTab from "../../components/student/HelpDeskTab"
 import AboutUsTab from "../../components/student/AboutUsTab"
 import PublicOverview from "../../components/student/PublicOverview"
+import Logo from "../../components/common/Logo"
 
 export default function StudentPanel() {
     const navigate = useNavigate()
@@ -673,9 +674,7 @@ export default function StudentPanel() {
             <aside className="w-[280px] bg-[var(--color-surface-base)] border-r border-[var(--color-outline-variant)] hidden lg:flex flex-col sticky top-0 h-screen shrink-0 z-20">
                 <div className="h-20 flex items-center justify-between px-6 border-b border-[var(--color-outline-variant)]">
                     <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab("overview")}>
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[var(--color-primary)] to-[var(--color-primary-container)] text-white flex items-center justify-center font-bold text-[18px] shadow-md shadow-[var(--color-primary)]/30">
-                            e
-                        </div>
+                        <Logo className="w-9 h-9 shadow-md shadow-[var(--color-primary)]/20 rounded-xl" />
                         <div className="leading-tight">
                             <span className="text-[var(--color-primary)] font-extrabold text-[15px] tracking-tight block font-display">Krishna Emitra</span>
                             <span className="text-[9.5px] text-gray-500 font-extrabold tracking-widest uppercase block mt-0.5">Student Panel</span>
@@ -762,7 +761,7 @@ export default function StudentPanel() {
                             <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)]" />
                         </div>
                         <div className="lg:hidden flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[var(--color-primary)] to-[var(--color-primary-container)] text-white flex items-center justify-center font-bold text-[14px] shadow-md shadow-[var(--color-primary)]/20">e</div>
+                            <Logo className="w-8 h-8 shadow-sm shadow-[var(--color-primary)]/20 rounded-lg" />
                             <span className="text-slate-900 font-extrabold text-[14.5px] tracking-tight">Krishna Emitra</span>
                         </div>
                     </div>
@@ -813,7 +812,7 @@ export default function StudentPanel() {
                             >
                                 <div className="flex items-center justify-between pb-5 border-b border-[var(--color-outline-variant)] mb-5">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[var(--color-primary)] to-[var(--color-primary-container)] text-white flex items-center justify-center font-bold text-[14px]">e</div>
+                                        <Logo className="w-8 h-8 rounded-lg" />
                                         <span className="font-extrabold text-[15px] text-[var(--color-primary)] font-display">Krishna Emitra</span>
                                     </div>
                                     <button onClick={() => setIsMobileMenuOpen(false)} className="p-1.5 hover:bg-[var(--color-surface-bright)] rounded-lg text-slate-400 hover:text-[var(--color-primary)] cursor-pointer transition-colors">
