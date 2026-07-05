@@ -96,88 +96,6 @@ function PrivateRoute({ children }) {
 
 // ── Layout Components ─────────────────────────────────────────────────────────
 
-function TopNavbar({ onMenuClick }) {
-    const location = useLocation()
-
-    const getLinkClass = (path) => {
-        const isActive = location.pathname === path
-        return `h-full flex items-center px-5 font-bold text-[14px] transition-all border-b-[3px] pt-[3px] ${
-            isActive ? "text-[var(--color-primary)] border-[var(--color-primary)]" : "text-gray-500 hover:text-[var(--color-on-surface)] border-transparent"
-        }`
-    }
-
-    return (
-        <header className="bg-[var(--color-surface-base)]/80 backdrop-blur-md border-b border-[var(--color-outline-variant)] h-[70px] md:h-[80px] flex items-center justify-between px-4 md:px-8 sticky top-0 z-20">
-            {/* Nav Links */}
-            <div className="flex items-center gap-4 md:gap-10 h-full">
-                <button
-                    onClick={onMenuClick}
-                    className="lg:hidden p-2 -ml-2 text-gray-500 hover:text-[var(--color-primary)] transition-colors"
-                    aria-label="Toggle Menu"
-                >
-                    <Menu size={22} />
-                </button>
-
-                <div className="flex flex-col -mt-1 leading-none tracking-tight">
-                    <span className="text-[var(--color-primary)] font-black text-[18px] md:text-[22px] tracking-tight font-display">Krishna Emitra</span>
-                    <span className="text-gray-500 font-bold text-[9px] md:text-[11px] tracking-widest uppercase mt-0.5">Admin</span>
-                </div>
-
-                <nav className="hidden lg:flex h-full ml-4">
-                    <Link to="/admin" className={getLinkClass("/admin")}>
-                        Dashboard
-                    </Link>
-                    <Link to="/admin/services" className={getLinkClass("/admin/services")}>
-                        Services
-                    </Link>
-                    <Link to="#" className="h-full flex items-center px-5 text-gray-400 hover:text-gray-900 font-bold text-[14px] transition-colors border-b-[3px] border-transparent pt-[3px]">
-                        Support
-                    </Link>
-                    <Link to="#" className="h-full flex items-center px-5 text-gray-400 hover:text-gray-900 font-bold text-[14px] transition-colors border-b-[3px] border-transparent pt-[3px]">
-                        Resources
-                    </Link>
-                </nav>
-            </div>
-
-            {/* Right Tools */}
-            <div className="flex items-center gap-4 md:gap-6">
-                <div className="hidden sm:flex relative border-b border-gray-200 py-1 items-center gap-3">
-                    <Search className="text-gray-400" size={16} />
-                    <input
-                        type="text"
-                        placeholder="Search applications..."
-                        className="bg-transparent text-[13px] border-none focus:outline-none w-32 md:w-48 text-gray-800 placeholder:text-gray-400"
-                    />
-                </div>
-                <button className="text-gray-500 hover:text-gray-900 transition-colors relative">
-                    <Bell size={20} />
-                    <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-                </button>
-
-                <div className="h-8 w-px bg-gray-200"></div>
-
-                {/* Clerk UserButton — handles avatar, account & sign out */}
-                <Show when="signed-in">
-                    <div className="flex items-center gap-3">
-                        <UserButton
-                            afterSignOutUrl="/login"
-                            appearance={{
-                                elements: {
-                                    avatarBox: "w-8 h-8 ring-2 ring-[#d2e0f8]",
-                                },
-                            }}
-                        />
-                        <div className="hidden md:flex flex-col">
-                            <span className="text-[13px] font-bold text-gray-900 leading-tight">Admin</span>
-                            <span className="text-[9px] font-bold text-gray-400 tracking-wider">SUPER ADMIN</span>
-                        </div>
-                    </div>
-                </Show>
-            </div>
-        </header>
-    )
-}
-
 function AdminLayout({ children }) {
     const location = useLocation()
     const navigate = useNavigate()
@@ -213,7 +131,15 @@ function AdminLayout({ children }) {
                 <CommandPalette onClose={() => setIsCommandPaletteOpen(false)} />
             )}
             <main className={`flex-1 min-w-0 flex flex-col ${!isLoginPage ? "lg:ml-[280px]" : ""}`}>
-                {!isLoginPage && <TopNavbar onMenuClick={() => setIsSidebarOpen(true)} />}
+                {!isLoginPage && (
+                    <button
+                        onClick={() => setIsSidebarOpen(true)}
+                        className="lg:hidden fixed top-4 left-4 z-40 p-2.5 bg-white text-gray-600 border border-[var(--color-outline-variant)] rounded-xl shadow-sm hover:text-[var(--color-primary)] transition-all cursor-pointer"
+                        aria-label="Open Menu"
+                    >
+                        <Menu size={20} />
+                    </button>
+                )}
                 <div className={`max-w-[1200px] w-full mx-auto ${!isLoginPage ? "px-4 sm:px-10 py-6 sm:py-10" : "flex-1 flex flex-col"}`}>
                     {children}
                 </div>

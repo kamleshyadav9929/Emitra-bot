@@ -66,7 +66,6 @@ export default function Dashboard() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between mb-8">
         <div>
-           <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-[#164FA8] mb-2">INSTITUTIONAL DASHBOARD</p>
            <h1 className="text-3xl font-bold text-gray-900 tracking-tight leading-tight">Bot Overview</h1>
            <p className="text-[14px] text-gray-500 mt-2 max-w-2xl leading-relaxed">
              Monitor student onboarding metrics, broadcast volumes, and integration requests from a unified digital panel.

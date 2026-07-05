@@ -270,4 +270,11 @@ export const downloadPublicApplicationDocument = async (filename) => {
   window.URL.revokeObjectURL(url)
 }
 
+export const updateStudentCategory = async (studentId, category) =>
+  requestJson(`/api/students/${studentId}/category`, {
+    method: "POST",
+    headers: await getAuthHeaders(),
+    body: JSON.stringify({ category })
+  })
+
 

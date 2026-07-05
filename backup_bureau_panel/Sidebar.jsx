@@ -30,8 +30,8 @@ export function Sidebar() {
     <aside className="hidden md:flex w-[260px] h-screen fixed top-0 left-0 flex-col bg-[#F7F9FB] border-r border-gray-200 z-30">
       {/* Logo Area */}
       <div className="px-8 py-8">
-        <h1 className="text-[18px] font-bold tracking-tight text-[#164FA8]">Bureau Panel</h1>
-        <p className="text-[11px] font-medium text-gray-500 mt-1">Krishna Emitra Bot Administration</p>
+        <h1 className="text-[18px] font-bold tracking-tight text-[#164FA8]">Krishna Emitra</h1>
+        <p className="text-[11px] font-medium text-gray-500 mt-1">Bot Administration</p>
       </div>
 
       {/* Nav */}

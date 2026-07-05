@@ -369,19 +369,37 @@ def log_service_intent(phone_number, service_name, category):
 
 
 def get_service_requests(status=None):
-    """Fetch service requests with student info via relation mapping."""
+    """Fetch service requests with student info via manual memory join (bypasses missing FK relation)."""
     query = supabase.table("service_requests").select(
-        "id,telegram_id,phone_number,service_name,category,status,requested_at,completed_at,"
-        "students(name,phone_number,username)"
+        "id,telegram_id,phone_number,service_name,category,status,requested_at,completed_at"
     )
     if status:
         res = query.eq("status", status).order("requested_at", desc=True).execute()
     else:
         res = query.order("requested_at", desc=True).execute()
         
+    requests_data = res.data or []
+    if not requests_data:
+        return []
+
+    # Batch fetch matching student details using unique telegram_ids
+    telegram_ids = list(set(row["telegram_id"] for row in requests_data if row.get("telegram_id")))
+    
+    students_map = {}
+    if telegram_ids:
+        try:
+            student_res = supabase.table("students").select("telegram_id,name,phone_number,username").in_("telegram_id", telegram_ids).execute()
+            for s in (student_res.data or []):
+                if s.get("telegram_id"):
+                    students_map[s["telegram_id"]] = s
+        except Exception as e:
+            print(f"Error fetching students for join: {e}")
+            
     records = []
-    for row in res.data:
-        student = row.get("students") or {}
+    for row in requests_data:
+        tid = row.get("telegram_id")
+        student = students_map.get(tid) if tid else None
+        
         records.append({
             "id": row["id"],
             "telegram_id": row["telegram_id"],
@@ -390,9 +408,9 @@ def get_service_requests(status=None):
             "status": row["status"],
             "requested_at": row["requested_at"],
             "completed_at": row["completed_at"],
-            "student_name": student.get("name", "Unknown"),
-            "student_phone": student.get("phone_number") or row.get("phone_number") or "",
-            "student_username": student.get("username", "")
+            "student_name": student.get("name") if student else "Unknown",
+            "student_phone": (student.get("phone_number") if student else None) or row.get("phone_number") or "",
+            "student_username": student.get("username") if student else ""
         })
     return records
 

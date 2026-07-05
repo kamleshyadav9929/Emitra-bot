@@ -25,72 +25,6 @@ function PrivateRoute({ children }) {
 
 // ── Layout Components ─────────────────────────────────────────────────────────
 
-function TopNavbar() {
-    const location = useLocation()
-    
-    const getLinkClass = (path) => {
-        const isActive = location.pathname === path
-        return `h-full flex items-center px-5 font-bold text-[14px] transition-all border-b-[3px] pt-[3px] ${
-            isActive ? "text-[#164FA8] border-[#164FA8]" : "text-gray-500 hover:text-gray-900 border-transparent"
-        }`
-    }
-
-    return (
-        <header className="bg-white border-b border-gray-200 h-[80px] flex items-center justify-between px-8 sticky top-0 z-20">
-            {/* Nav Links */}
-            <div className="flex items-center gap-10 h-full">
-                <div className="flex flex-col -mt-1 leading-none tracking-tight">
-                    <span className="text-[#164FA8] font-black text-[22px] tracking-tight">Krishna Emitra</span>
-                    <span className="text-gray-500 font-bold text-[11px] tracking-widest uppercase mt-0.5">Admin Panel</span>
-                </div>
-                
-                <nav className="flex h-full ml-4">
-                    <Link to="/admin" className={getLinkClass("/admin")}>
-                        Dashboard
-                    </Link>
-                    <Link to="/admin/services" className={getLinkClass("/admin/services")}>
-                        Services
-                    </Link>
-                    <Link to="#" className="h-full flex items-center px-5 text-gray-400 hover:text-gray-900 font-bold text-[14px] transition-colors border-b-[3px] border-transparent pt-[3px]">
-                        Support
-                    </Link>
-                    <Link to="#" className="h-full flex items-center px-5 text-gray-400 hover:text-gray-900 font-bold text-[14px] transition-colors border-b-[3px] border-transparent pt-[3px]">
-                        Resources
-                    </Link>
-                </nav>
-            </div>
-
-            {/* Right Tools */}
-            <div className="flex items-center gap-6">
-                <div className="relative border-b border-gray-200 py-1 flex items-center gap-3">
-                    <Search className="text-gray-400" size={16} />
-                    <input 
-                        type="text" 
-                        placeholder="Search applications..." 
-                        className="bg-transparent text-[13px] border-none focus:outline-none w-48 text-gray-800 placeholder:text-gray-400"
-                    />
-                </div>
-                <button className="text-gray-500 hover:text-gray-900 transition-colors relative">
-                    <Bell size={20} />
-                    <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-                </button>
-                
-                <div className="h-8 w-px bg-gray-200"></div>
-
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#EBF0FA] text-[#164FA8] border border-[#d2e0f8] flex items-center justify-center">
-                        <User size={18} />
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="text-[13px] font-bold text-gray-900 leading-tight">Admin User</span>
-                        <span className="text-[9px] font-bold text-gray-400 tracking-wider">SUPER ADMIN</span>
-                    </div>
-                </div>
-            </div>
-        </header>
-    )
-}
-
 function AdminLayout({ children }) {
     const location = useLocation()
     const navigate = useNavigate()
@@ -123,7 +57,6 @@ function AdminLayout({ children }) {
                 <CommandPalette onClose={() => setIsCommandPaletteOpen(false)} />
             )}
             <main className={`flex-1 min-w-0 flex flex-col ${!isLoginPage ? "md:ml-[260px]" : ""}`}>
-                {!isLoginPage && <TopNavbar />}
                 {/* Max-w and padding changes */}
                 <div className={`max-w-[1200px] w-full ${!isLoginPage ? "px-6 sm:px-10 py-10" : "flex-1 flex flex-col"}`}>
                     {children}

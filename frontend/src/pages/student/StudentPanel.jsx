@@ -15,6 +15,14 @@ import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
 import ExamFormWizard from "../../components/student/ExamFormWizard"
+import DashboardTab from "../../components/student/DashboardTab"
+import ServicesTab from "../../components/student/ServicesTab"
+import ExamsTab from "../../components/student/ExamsTab"
+import NeetCounsellingTab from "../../components/student/NeetCounsellingTab"
+import ProfileTab from "../../components/student/ProfileTab"
+import HelpDeskTab from "../../components/student/HelpDeskTab"
+import AboutUsTab from "../../components/student/AboutUsTab"
+import PublicOverview from "../../components/student/PublicOverview"
 
 export default function StudentPanel() {
     const navigate = useNavigate()
@@ -142,7 +150,7 @@ export default function StudentPanel() {
         if (catParam) {
             setActiveTab("services")
             setServicesSubTab("catalog")
-            setServiceCatFilter(catParam)
+            setServiceCatFilter(catParam.toUpperCase())
         }
     }, [catParam])
 
@@ -716,1060 +724,126 @@ export default function StudentPanel() {
                     ) : (
                         <div className="space-y-8 animate-fadeIn">
                             
-                            {/* ── SECTION 1: PUBLIC LANDING OR DASHBOARD (Tab 1 Overview) ── */}
+                            {/* ── Tab 1: Overview ── */}
                             {activeTab === "overview" && (
-                                <div className="space-y-8 animate-fadeIn animate-slideUp">
-                                    
-                                    {/* IF LOGGED OUT: PUBLIC LANDING PAGE */}
-                                    {!isLoggedIn ? (
-                                        <div className="space-y-8">
-                                            {/* Rotating Hero Carousel */}
-                                            {announcements.length > 0 && (
-                                                <div className="relative h-72 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] text-white rounded-2xl overflow-hidden shadow-ambient border-none flex items-center p-8 md:p-14">
-                                                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_40%)]" />
-                                                    <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent z-10" />
-                                                    <div className="relative z-20 space-y-4 max-w-xl text-left">
-                                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg border border-white/30">
-                                                            <Sparkles size={11} className="animate-pulse" /> Latest Notification
-                                                        </span>
-                                                        <h2 className="text-xl md:text-3xl font-extrabold tracking-tight leading-tight line-clamp-2 bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-200 font-display">
-                                                            {announcements[carouselIndex]?.title}
-                                                        </h2>
-                                                        <p className="text-[12.5px] text-white/90 line-clamp-3 leading-relaxed font-normal">
-                                                            {announcements[carouselIndex]?.content}
-                                                        </p>
-                                                        {announcements[carouselIndex]?.links && (
-                                                            <a 
-                                                                href={announcements[carouselIndex].links} target="_blank" rel="noopener noreferrer"
-                                                                className="text-white hover:text-slate-200 text-[12px] font-bold inline-flex items-center gap-1.5 underline transition-colors group"
-                                                            >
-                                                                Read Official PDF Document <ExternalLink size={13} className="group-hover:translate-x-0.5 transition-transform" />
-                                                            </a>
-                                                        )}
-                                                    </div>
-                                                    
-                                                    {/* Dots pagination indicator */}
-                                                    <div className="absolute bottom-6 right-8 z-20 flex gap-2">
-                                                        {announcements.slice(0, 4).map((_, dotIdx) => (
-                                                            <button 
-                                                                key={dotIdx} 
-                                                                onClick={() => setCarouselIndex(dotIdx)} 
-                                                                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 cursor-pointer ${carouselIndex === dotIdx ? "bg-white w-6" : "bg-white/30 hover:bg-white/55"}`}
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
+                                !isLoggedIn ? (
+                                    <PublicOverview 
+                                        announcements={announcements}
+                                        carouselIndex={carouselIndex}
+                                        setCarouselIndex={setCarouselIndex}
+                                        upcomingDeadlines={upcomingDeadlines}
+                                        triggerSignIn={triggerSignIn}
+                                    />
+                                ) : (
+                                    <DashboardTab 
+                                        user={user}
+                                        statsProgress={statsProgress}
+                                        setActiveTab={setActiveTab}
+                                        subscribedExams={subscribedExams}
+                                        exams={exams}
+                                        config={config}
+                                        setActiveExamForTimeline={setActiveExamForTimeline}
+                                    />
+                                )
+                            )}
 
-                                            {/* Upcoming Deadlines Horizontal Ticker */}
-                                            {upcomingDeadlines.length > 0 && (
-                                                <div className="bg-white border border-[var(--color-outline-variant)] shadow-ambient rounded-2xl p-4 flex items-center overflow-hidden">
-                                                    <div className="flex items-center gap-2 shrink-0 border-r border-[var(--color-outline-variant)] pr-4 mr-4 text-[var(--color-primary)] text-[11px] font-extrabold uppercase tracking-wider">
-                                                        <Clock size={14} className="animate-pulse" /> Deadlines Ticker
-                                                    </div>
-                                                    <div className="flex items-center gap-10 whitespace-nowrap animate-marquee">
-                                                        {upcomingDeadlines.map((ex, exIdx) => (
-                                                            <span key={exIdx} className="text-[12.5px] font-semibold text-slate-700">
-                                                                🔥 <span className="font-extrabold text-slate-900">{ex.name}</span> closes on <span className="text-[var(--color-primary)] font-bold">{new Date(ex.end_date).toLocaleDateString("en-IN")}</span>
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Public Notifications list & Why Krishna Grid */}
-                                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-left">
-                                                {/* Latest Announcements */}
-                                                <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-6 shadow-ambient lg:col-span-2 space-y-4">
-                                                    <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
-                                                        <div>
-                                                            <h3 className="text-[15px] font-extrabold text-slate-900 font-display">Public Notification Board</h3>
-                                                            <p className="text-[11.5px] text-slate-400 mt-0.5">Scrollable lists of recent exam circulars.</p>
-                                                        </div>
-                                                        <span className="text-[10px] font-extrabold text-[var(--color-primary)] uppercase bg-[var(--color-surface-low)] px-2.5 py-1 rounded-lg border border-[var(--color-outline-variant)]">Public Reads</span>
-                                                    </div>
-
-                                                    <div className="space-y-4 max-h-[350px] overflow-y-auto pr-1 scrollbar-thin">
-                                                        {announcements.slice(0, 6).map((ann, idx) => (
-                                                            <div key={idx} className="border border-slate-100 hover:border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-slate-50 transition-all text-left">
-                                                                <div className="flex items-center justify-between text-[10px] text-slate-400 font-extrabold mb-1">
-                                                                    <span className="text-[var(--color-primary)] uppercase tracking-wider">Government Alert</span>
-                                                                    <span>{new Date(ann.created_at || Date.now()).toLocaleDateString("en-IN")}</span>
-                                                                </div>
-                                                                <h4 className="text-[13.5px] font-extrabold text-slate-900 leading-snug">{ann.title}</h4>
-                                                                <p className="text-[12px] text-slate-500 font-normal leading-relaxed mt-1.5">{ann.content}</p>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                {/* Why Krishna Emitra trust section */}
-                                                <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-6 shadow-ambient space-y-4 text-left">
-                                                    <h3 className="text-[15px] font-extrabold text-slate-900 border-b border-slate-100 pb-3 font-display">Why Krishna Emitra?</h3>
-                                                    <div className="space-y-5 text-[12px] leading-relaxed text-slate-500 font-normal">
-                                                        <div className="flex gap-3">
-                                                            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">✓</div>
-                                                            <p><span className="font-extrabold text-slate-800 block">100% Secure Uploads:</span> All marksheets and passport documents are stored locally in the locker.</p>
-                                                        </div>
-                                                        <div className="flex gap-3">
-                                                            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">✓</div>
-                                                            <p><span className="font-extrabold text-slate-800 block">Automatic Status Alerts:</span> Get real-time updates via Telegram broadcast or SMS.</p>
-                                                        </div>
-                                                        <div className="flex gap-3">
-                                                            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">✓</div>
-                                                            <p><span className="font-extrabold text-slate-800 block">WhatsApp File Intake:</span> Submit correction documents with one click.</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* CTA Block */}
-                                            <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-container)] text-white rounded-2xl p-8 md:p-12 text-center space-y-5 shadow-ambient border-none relative overflow-hidden">
-                                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.1),transparent_35%)]" />
-                                                <h3 className="text-lg md:text-2xl font-extrabold tracking-tight relative z-10 font-display">Select your exams and never miss a deadline!</h3>
-                                                <p className="text-[13px] text-slate-200 max-w-lg mx-auto font-normal leading-relaxed relative z-10">
-                                                    Subscribe to SSC, Railways, State PCS, or NEET counselling updates to receive personalized inboxes and countdown alerts.
-                                                </p>
-                                                <div className="pt-2 relative z-10">
-                                                    <button 
-                                                        onClick={triggerSignIn}
-                                                        className="px-6 py-3 bg-white hover:bg-slate-100 text-[var(--color-primary)] text-[12.5px] font-bold uppercase rounded-xl shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                                                    >
-                                                        Sign In &amp; Get Started
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        // IF LOGGED IN: STUDENT DASHBOARD WORKSPACE
-                                        <div className="space-y-8 text-left">
-                                            {/* Welcome Header */}
-                                            <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-primary-container)] to-[var(--color-primary)] text-white rounded-2xl p-6 md:p-8 shadow-ambient border-none overflow-hidden">
-                                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.1),transparent_40%)]" />
-                                                <div className="space-y-1.5 relative z-10">
-                                                    <span className="px-2.5 py-0.8 bg-white/20 border border-white/30 text-white text-[10px] font-bold uppercase tracking-wider rounded-md inline-block">
-                                                        Online Dashboard
-                                                    </span>
-                                                    <h1 className="text-xl md:text-2xl font-black tracking-tight text-white mt-1 font-display">
-                                                        Namaste, {user?.name?.split(" ")[0]} 👋
-                                                    </h1>
-                                                    <p className="text-[12.5px] text-slate-200 leading-normal font-normal">Welcome back! Manage your exam notifications and filing submissions securely.</p>
-                                                </div>
-
-                                                <div className="flex gap-3 relative z-10 w-full md:w-auto">
-                                                    <button onClick={() => setActiveTab("exams")} className="flex-1 md:flex-initial px-5 py-2.8 bg-white hover:bg-slate-50 text-[var(--color-primary)] text-[12.5px] font-bold rounded-xl transition-all shadow-md active:scale-98 cursor-pointer text-center">
-                                                        Select Exams
-                                                    </button>
-                                                    <button onClick={() => setActiveTab("services")} className="flex-1 md:flex-initial px-5 py-2.8 bg-white/20 hover:bg-white/30 text-white text-[12.5px] font-bold rounded-xl transition-all cursor-pointer">
-                                                        Request Services
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* Bento Stats Widgets Grid */}
-                                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-                                                <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-5 shadow-sm space-y-3.5 text-left hover:border-[var(--color-primary)] hover:shadow-ambient transition-all duration-300 group">
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Total Requests</span>
-                                                        <div className="w-8 h-8 rounded-lg bg-[var(--color-surface-low)] text-[var(--color-primary)] flex items-center justify-center group-hover:scale-105 transition-transform"><ClipboardList size={16} /></div>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-2xl font-black text-slate-900">{statsProgress.total}</p>
-                                                        <p className="text-[10px] text-slate-400 font-extrabold uppercase mt-1">Filing Forms Logged</p>
-                                                    </div>
-                                                </div>
-                                                <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-5 shadow-sm space-y-3.5 text-left hover:border-amber-400 hover:shadow-ambient transition-all duration-300 group">
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Under Review</span>
-                                                        <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-605 flex items-center justify-center group-hover:scale-105 transition-transform"><Clock size={16} /></div>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-2xl font-black text-slate-900">{statsProgress.active}</p>
-                                                        <p className="text-[10px] text-slate-400 font-extrabold uppercase mt-1">Operator Reviewing</p>
-                                                    </div>
-                                                </div>
-                                                <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-5 shadow-sm space-y-3.5 text-left hover:border-emerald-400 hover:shadow-ambient transition-all duration-300 group">
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Completed</span>
-                                                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform"><CheckCircle2 size={16} /></div>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-2xl font-black text-slate-900">{statsProgress.completed}</p>
-                                                        <p className="text-[10px] text-slate-400 font-extrabold uppercase mt-1">Successfully Filed</p>
-                                                    </div>
-                                                </div>
-                                                <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-5 shadow-sm space-y-3.5 text-left hover:border-rose-450 hover:shadow-ambient transition-all duration-300 group">
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Action Needed</span>
-                                                        <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-105 transition-transform"><AlertCircle size={16} /></div>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-2xl font-black text-slate-900">{statsProgress.actionRequired}</p>
-                                                        <p className="text-[10px] text-slate-400 font-extrabold uppercase mt-1">Needs Attention</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                                                                         {/* Quick Action Tiles */}
-                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                                 <button onClick={() => setActiveTab("exams")} className="bg-white border border-[var(--color-outline-variant)] hover:border-[var(--color-primary)] p-5 rounded-2xl text-left shadow-sm hover:shadow-ambient transition-all duration-300 space-y-3 cursor-pointer group hover:-translate-y-1">
-                                                     <div className="w-9 h-9 rounded-xl bg-[var(--color-surface-low)] text-[var(--color-primary)] flex items-center justify-center group-hover:scale-110 transition-transform"><Award size={18} /></div>
-                                                     <div>
-                                                         <p className="text-[13px] font-extrabold text-slate-900">Select Exams</p>
-                                                         <p className="text-[9.5px] text-slate-400 font-extrabold uppercase mt-0.5">Choose Alerts</p>
-                                                     </div>
-                                                 </button>
-                                                 <button onClick={() => setActiveTab("services")} className="bg-white border border-[var(--color-outline-variant)] hover:border-emerald-500 p-5 rounded-2xl text-left shadow-sm hover:shadow-ambient transition-all duration-300 space-y-3 cursor-pointer group hover:-translate-y-1">
-                                                     <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform"><ClipboardList size={18} /></div>
-                                                     <div>
-                                                         <p className="text-[13px] font-extrabold text-slate-900">My Services</p>
-                                                         <p className="text-[9.5px] text-slate-400 font-extrabold uppercase mt-0.5">Filing Catalog</p>
-                                                     </div>
-                                                 </button>
-                                                 <button onClick={() => setActiveTab("neet")} className="bg-white border border-[var(--color-outline-variant)] hover:border-purple-500 p-5 rounded-2xl text-left shadow-sm hover:shadow-ambient transition-all duration-300 space-y-3 cursor-pointer group hover:-translate-y-1">
-                                                     <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform"><BookOpen size={18} /></div>
-                                                     <div>
-                                                         <p className="text-[13px] font-extrabold text-slate-900">NEET Counselling</p>
-                                                         <p className="text-[9.5px] text-slate-400 font-extrabold uppercase mt-0.5">Choice Guide</p>
-                                                     </div>
-                                                 </button>
-                                                 <button onClick={() => setActiveTab("profile")} className="bg-white border border-[var(--color-outline-variant)] hover:border-rose-500 p-5 rounded-2xl text-left shadow-sm hover:shadow-ambient transition-all duration-300 space-y-3 cursor-pointer group hover:-translate-y-1">
-                                                     <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform"><Settings size={18} /></div>
-                                                     <div>
-                                                         <p className="text-[13px] font-extrabold text-slate-900">Profile Settings</p>
-                                                         <p className="text-[9.5px] text-slate-400 font-extrabold uppercase mt-0.5">Edit Account</p>
-                                                     </div>
-                                                 </button>
-                                             </div>
-
-                                             {/* Subscribed Exams list */}
-                                             <div className="space-y-4 text-left">
-                                                 <h3 className="text-[14.5px] font-extrabold text-slate-900 font-display">My Subscribed Exams</h3>
-                                                 {subscribedExams.length === 0 ? (
-                                                     <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-8 text-center text-slate-400 max-w-md mx-auto space-y-3 shadow-ambient">
-                                                         <Award size={24} className="mx-auto text-[var(--color-primary)] animate-bounce" />
-                                                         <p className="text-[12.5px] font-bold text-slate-650">Select exams to start receiving updates</p>
-                                                         <button onClick={() => setActiveTab("exams")} className="px-4.5 py-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white rounded-xl text-[11px] font-bold transition-all shadow-md shadow-[var(--color-primary)]/10 cursor-pointer">Choose Exams</button>
-                                                     </div>
-                                                 ) : (
-                                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-                                                         {exams.filter(ex => subscribedExams.includes(ex.name)).map((ex, exIdx) => {
-                                                             const isClosed = ex.end_date ? new Date(ex.end_date) < new Date() : false
-                                                             return (
-                                                                 <div key={exIdx} className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-5 shadow-sm hover:shadow-ambient hover:border-[var(--color-primary)] transition-all space-y-4 relative flex flex-col justify-between group">
-                                                                     <span className="absolute top-4 right-4 text-[8.5px] font-extrabold text-[var(--color-primary)] bg-[var(--color-surface-low)] px-2 py-0.5 rounded border border-[var(--color-outline-variant)]">
-                                                                         {ex.category || "UG"}
-                                                                     </span>
-                                                                     <div className="space-y-2">
-                                                                         <h4 className="text-[13.5px] font-extrabold text-slate-900 pr-12 line-clamp-1 group-hover:text-[var(--color-primary)] transition-colors">{ex.name}</h4>
-                                                                         
-                                                                         <div className="space-y-1">
-                                                                             <span className="text-slate-450 font-extrabold uppercase text-[8.5px] tracking-wider block">Closing Date</span>
-                                                                             <span className={`text-[12.5px] font-extrabold ${isClosed ? "text-red-500" : "text-slate-900"}`}>
-                                                                                 {ex.end_date ? new Date(ex.end_date).toLocaleDateString("en-IN") : "TBD"}
-                                                                             </span>
-                                                                         </div>
-                                                                     </div>
-
-                                                                     <button 
-                                                                         onClick={() => {
-                                                                             setActiveExamForTimeline(ex)
-                                                                             setActiveTab("exams")
-                                                                         }} 
-                                                                         className="text-[var(--color-primary)] font-bold text-[11.5px] hover:text-[var(--color-primary-container)] inline-flex items-center gap-1 mt-1 cursor-pointer transition-colors"
-                                                                     >
-                                                                         View Timeline <ChevronRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
-                                                                     </button>
-                                                                 </div>
-                                                             )
-                                                         })}
-                                                     </div>
-                                                 )}
-                                             </div>
-
-                                             {/* Support and Location Summary Dashboard Footer */}
-                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                                                 <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-5 flex items-center justify-between shadow-sm hover:border-[var(--color-primary)] transition-colors">
-                                                     <div className="space-y-1">
-                                                         <h4 className="text-[14px] font-extrabold text-slate-900 font-display">Direct Support Line</h4>
-                                                         <p className="text-[12.5px] text-slate-400">Reach operator Kamlesh on WhatsApp instantly.</p>
-                                                     </div>
-                                                     <a 
-                                                         href={`https://wa.me/${config.whatsapp_number || "916377964293"}?text=Hello%20Krishna%20Emitra!%20I%20have%20a%20support%20request.`}
-                                                         target="_blank" rel="noreferrer"
-                                                         className="px-5 py-2.8 bg-emerald-605 hover:bg-emerald-700 text-white text-[11.5px] font-bold rounded-xl shadow-md flex items-center gap-1.5 transition-colors cursor-pointer"
-                                                     >
-                                                         WhatsApp <MessageSquare size={13} />
-                                                     </a>
-                                                 </div>
-
-                                                 <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-5 flex items-center justify-between shadow-sm hover:border-[var(--color-primary)] transition-colors">
-                                                     <div className="space-y-1">
-                                                         <h4 className="text-[14px] font-extrabold text-slate-900 font-display">Digital Seva Center</h4>
-                                                         <p className="text-[12.5px] text-slate-400">Main Market Road, Jodhpur, Rajasthan.</p>
-                                                     </div>
-                                                     <a 
-                                                         href="https://maps.google.com"
-                                                         target="_blank" rel="noreferrer"
-                                                         className="px-5 py-2.8 bg-white hover:bg-[var(--color-surface-bright)] text-[var(--color-on-surface)] border border-[var(--color-outline-variant)] text-[11.5px] font-bold rounded-xl shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer"
-                                                     >
-                                                         View Map <MapPin size={13} className="text-[var(--color-primary)]" />
-                                                     </a>
-                                                 </div>
-                                             </div>
-                                         </div>
-                                     )}
-                                 </div>
-                             )}
-
-                            {/* ── TAB 2: SERVICES SELECTION & CATALOG ── */}
+                            {/* ── Tab 2: Services ── */}
                             {activeTab === "services" && (
-                                <div className="space-y-8 animate-fadeIn text-left">
-                                    <div className="border-b border-[var(--color-outline-variant)] pb-4">
-                                        <h2 className="text-xl font-black text-slate-900 font-display">
-                                            {lang === 'EN' ? 'Official e-Mitra Filing Services' : 'आधिकारिक ई-मित्र सेवाएँ'}
-                                        </h2>
-                                        <p className="text-[12px] text-slate-400 mt-0.5">
-                                            {lang === 'EN' ? 'Browse official government documents and request quick filing desk help.' : 'आधिकारिक सरकारी दस्तावेजों को ब्राउज़ करें और त्वरित सहायता के लिए अनुरोध दर्ज करें।'}
-                                        </p>
-                                    </div>
-
-                                    {isLoggedIn && (
-                                        <div className="flex gap-2 bg-[var(--color-surface-low)]/50 p-1 rounded-xl w-fit mb-6 border border-[var(--color-outline-variant)]">
-                                            <button
-                                                onClick={() => setServicesSubTab("catalog")}
-                                                className={`py-2 px-5 text-[12.5px] font-bold rounded-lg transition-all cursor-pointer ${
-                                                    servicesSubTab === "catalog"
-                                                        ? "bg-white text-[var(--color-primary)] font-bold shadow-sm"
-                                                        : "text-slate-500 hover:text-slate-800"
-                                                }`}
-                                            >
-                                                {lang === 'EN' ? 'Services Catalog' : 'सेवाएं सूची'}
-                                            </button>
-                                            <button
-                                                onClick={() => setServicesSubTab("requests")}
-                                                className={`py-2 px-5 text-[12.5px] font-bold rounded-lg transition-all cursor-pointer ${
-                                                    servicesSubTab === "requests"
-                                                        ? "bg-white text-[var(--color-primary)] font-bold shadow-sm"
-                                                        : "text-slate-500 hover:text-slate-800"
-                                                }`}
-                                            >
-                                                {lang === 'EN' ? 'My Filings' : 'मेरे आवेदन'}
-                                            </button>
-                                        </div>
-                                    )}
-
-                                    {(!isLoggedIn || servicesSubTab === "catalog") ? (
-                                        <div className="space-y-6">
-                                            {/* Catalog Filters */}
-                                            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                                                <div className="relative w-full sm:w-72">
-                                                    <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                    <input 
-                                                        type="text"
-                                                        value={serviceSearch}
-                                                        onChange={e => setServiceSearch(e.target.value)}
-                                                        placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
-                                                        className="w-full pl-10 pr-4 py-2.8 bg-white border border-[var(--color-outline-variant)] focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] rounded-xl text-[12px] outline-none shadow-sm transition-all font-semibold text-slate-800"
-                                                    />
-                                                </div>
-
-                                                <select
-                                                    value={serviceCatFilter}
-                                                    onChange={e => setServiceCatFilter(e.target.value)}
-                                                    className="px-4 py-2.8 bg-white border border-[var(--color-outline-variant)] focus:border-[var(--color-primary)] rounded-xl text-[12px] outline-none font-bold text-slate-650 shadow-sm cursor-pointer"
-                                                >
-                                                    <option value="ALL">{lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां'}</option>
-                                                    {Object.entries(services).map(([k, cat]) => (
-                                                        <option key={k} value={k}>{cat.label}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-
-                                            {/* Grid */}
-                                            {flatServicesList.length === 0 ? (
-                                                <div className="bg-white/70 border border-[var(--color-outline-variant)] rounded-2xl p-16 text-center text-slate-400">
-                                                    No service records matching selections.
-                                                </div>
-                                            ) : (
-                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                                    {flatServicesList.map((svc, idx) => (
-                                                        <div key={idx} className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-6 shadow-sm hover:shadow-ambient hover:border-[var(--color-primary)] transition-all duration-300 flex flex-col justify-between hover:-translate-y-0.5 group">
-                                                            <div className="space-y-3 text-left">
-                                                                <div className="flex items-center justify-between text-[9px] font-extrabold uppercase text-slate-400 tracking-wider">
-                                                                    <span>{svc.categoryLabel}</span>
-                                                                    <span className="text-[var(--color-primary)] bg-[var(--color-surface-low)] px-2.5 py-0.8 rounded-lg border border-[var(--color-outline-variant)] font-extrabold">Fee: {svc.price || "₹50"}</span>
-                                                                </div>
-                                                                <h4 className="text-[14.5px] font-extrabold text-slate-900 group-hover:text-[var(--color-primary)] transition-colors leading-snug">{svc.name}</h4>
-                                                                <p className="text-[12px] text-slate-500 font-normal leading-relaxed">{svc.description || "Secure filing registration services with error validation."}</p>
-                                                            </div>
-
-                                                            <button
-                                                                onClick={() => {
-                                                                    if (!isLoggedIn) triggerSignIn()
-                                                                    else {
-                                                                        setActiveServiceForForm(svc)
-                                                                        setFormSuccessId("")
-                                                                        setFormDataDesc("")
-                                                                    }
-                                                                }}
-                                                                className="mt-6 w-full py-2.8 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white text-[12px] font-bold rounded-xl transition-all text-center cursor-pointer shadow-ambient hover:shadow-lg"
-                                                            >
-                                                                {lang === 'EN' ? 'Request This Service' : 'इस सेवा का अनुरोध करें'}
-                                                            </button>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        /* History table */
-                                        <div className="space-y-6">
-                                            {history.length === 0 ? (
-                                                <div className="bg-white/70 border border-[var(--color-outline-variant)] rounded-2xl p-16 text-center text-slate-400 font-medium">
-                                                    No submitted requests found.
-                                                </div>
-                                            ) : (
-                                                <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl overflow-hidden shadow-ambient">
-                                                    <div className="overflow-x-auto">
-                                                        <table className="w-full text-[12.5px] border-collapse text-left">
-                                                            <thead>
-                                                                <tr className="bg-[var(--color-surface-low)]/40 border-b border-[var(--color-outline-variant)] text-slate-500 font-extrabold tracking-wider text-[9.5px] uppercase">
-                                                                    <th className="py-4 px-5">ID</th>
-                                                                    <th className="py-4 px-4">Service Details</th>
-                                                                    <th className="py-4 px-4">Filing Date</th>
-                                                                    <th className="py-4 px-4">Status</th>
-                                                                    <th className="py-4 px-4 text-right pr-6">Remarks / Action</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {history.map((app) => {
-                                                                    const isExpanded = expandedAppId === app.id
-                                                                    const statDetails = getStatusDetails(app.status, !!app.remarks)
-                                                                    return (
-                                                                        <Fragment key={app.id}>
-                                                                            <tr 
-                                                                                onClick={() => setExpandedAppId(isExpanded ? null : app.id)}
-                                                                                className={`border-b border-slate-100 hover:bg-slate-50/70 transition-colors cursor-pointer ${isExpanded ? "bg-slate-50/30" : ""}`}
-                                                                            >
-                                                                                <td className="py-5 px-5 font-bold text-slate-805 font-mono text-[12px]">{app.id}</td>
-                                                                                <td className="py-5 px-4 text-left">
-                                                                                    <span className="font-extrabold text-slate-900 block text-[13.5px]">{app.service_name}</span>
-                                                                                    <span className="inline-block text-[8px] font-extrabold text-[var(--color-primary)] bg-[var(--color-surface-low)] border border-[var(--color-outline-variant)] px-2 py-0.5 rounded uppercase mt-1 tracking-wider">{app.category}</span>
-                                                                                </td>
-                                                                                <td className="py-5 px-4 font-semibold text-slate-400">{new Date(app.requested_at).toLocaleDateString("en-IN")}</td>
-                                                                                <td className="py-5 px-4">
-                                                                                    <span className={`text-[8.5px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-md border ${statDetails.colorClass}`}>
-                                                                                        {lang === 'EN' ? statDetails.label : statDetails.labelHi}
-                                                                                    </span>
-                                                                                </td>
-                                                                                <td className="py-5 px-4 text-right text-slate-500 font-semibold truncate max-w-xs pr-6">
-                                                                                    {app.remarks ? (
-                                                                                        <span className="inline-flex items-center gap-1 text-amber-600 text-[11px] font-bold bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/50">
-                                                                                            <AlertCircle size={12} className="animate-pulse" /> Action Required
-                                                                                        </span>
-                                                                                    ) : (
-                                                                                        <span className="text-slate-400 text-[11px] font-semibold">{lang === 'EN' ? 'Click to expand' : 'विस्तार करें'}</span>
-                                                                                    )}
-                                                                                </td>
-                                                                            </tr>
-
-                                                                            {isExpanded && (
-                                                                                <tr className="bg-slate-50/50">
-                                                                                    <td colSpan={5} className="p-6 space-y-4">
-                                                                                        <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-5 shadow-sm max-w-xl text-left">
-                                                                                            <p className="text-[9.5px] font-extrabold uppercase tracking-widest text-slate-400 mb-4">Filing Process Timeline</p>
-                                                                                            <div className="relative flex justify-between items-center w-full py-1 px-4">
-                                                                                                <div className="absolute left-0 right-0 h-0.5 bg-slate-100 top-1/2 -translate-y-1/2 z-0" />
-                                                                                                <div className="absolute left-0 h-0.5 bg-[var(--color-primary)] top-1/2 -translate-y-1/2 z-0 transition-all duration-500" style={{ width: `${(statDetails.stepIndex / 3) * 100}%` }} />
-                                                                                                {["Submitted", "Review", "Processing", "Done"].map((step, sIdx) => {
-                                                                                                    const isActive = statDetails.stepIndex >= sIdx
-                                                                                                    return (
-                                                                                                        <div key={sIdx} className="relative z-10 flex flex-col items-center">
-                                                                                                            <div className={`w-4 h-4 rounded-full flex items-center justify-center border-2 ${isActive ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-white" : "bg-white border-slate-200 text-slate-300"}`}>
-                                                                                                                {isActive && <Check size={8} strokeWidth={3} />}
-                                                                                                            </div>
-                                                                                                            <span className={`text-[9.5px] font-bold mt-1.5 ${isActive ? "text-[var(--color-primary)] font-extrabold" : "text-slate-400"}`}>{step}</span>
-                                                                                                        </div>
-                                                                                                    )
-                                                                                                })}
-                                                                                            </div>
-                                                                                        </div>
-
-                                                                                        {app.remarks && (
-                                                                                            <div className="p-4 bg-amber-50/80 rounded-2xl border border-amber-250 flex items-start gap-2.5 max-w-xl shadow-sm text-left">
-                                                                                                <Info size={15} className="text-amber-600 shrink-0 mt-0.5" />
-                                                                                                <div className="space-y-1.5">
-                                                                                                    <p className="text-[9.5px] font-extrabold text-amber-805 uppercase tracking-widest">Operator Action Remark</p>
-                                                                                                    <p className="text-[12.5px] text-amber-900 leading-normal font-semibold mt-0.5">{app.remarks}</p>
-                                                                                                    <div className="pt-2">
-                                                                                                        <a 
-                                                                                                            href={`https://wa.me/${config.whatsapp_number || "916377964293"}?text=Hello%2C%20regarding%20my%20request%20${app.id}%20which%2520requires%20attention.`} 
-                                                                                                            target="_blank" rel="noopener noreferrer"
-                                                                                                            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold rounded-xl inline-flex items-center gap-1.5 shadow-sm transition-all active:scale-95"
-                                                                                                        >
-                                                                                                            Chat Support on WhatsApp <MessageSquare size={12} />
-                                                                                                        </a>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        )}
-                                                                                    </td>
-                                                                                </tr>
-                                                                            )}
-                                                                        </Fragment>
-                                                                    )
-                                                                })}
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
+                                <ServicesTab 
+                                    lang={lang}
+                                    isLoggedIn={isLoggedIn}
+                                    services={services}
+                                    flatServicesList={flatServicesList}
+                                    serviceSearch={serviceSearch}
+                                    setServiceSearch={setServiceSearch}
+                                    serviceCatFilter={serviceCatFilter}
+                                    setServiceCatFilter={setServiceCatFilter}
+                                    servicesSubTab={servicesSubTab}
+                                    setServicesSubTab={setServicesSubTab}
+                                    history={history}
+                                    expandedAppId={expandedAppId}
+                                    setExpandedAppId={setExpandedAppId}
+                                    getStatusDetails={getStatusDetails}
+                                    triggerSignIn={triggerSignIn}
+                                    setActiveServiceForForm={setActiveServiceForForm}
+                                    setFormSuccessId={setFormSuccessId}
+                                    setFormDataDesc={setFormDataDesc}
+                                    config={config}
+                                />
                             )}
 
-                            {/* ── TAB 3: EXAMS SELECTION & DETAILS ── */}
+                            {/* ── Tab 3: Exams ── */}
                             {activeTab === "exams" && (
-                                <div className="space-y-8 animate-fadeIn text-left">
-                                    
-                                    {/* IF ACTIVE TIMELINE SELECTION LOADED */}
-                                    {activeExamForTimeline ? (
-                                        <div className="space-y-8">
-                                            {/* Details Header */}
-                                            <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-6 shadow-ambient flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                                <div className="space-y-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <button 
-                                                            onClick={() => setActiveExamForTimeline(null)} 
-                                                            className="text-slate-400 hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-bright)] px-3 py-1 rounded-lg text-[12px] font-bold cursor-pointer transition-colors"
-                                                        >
-                                                            ← Go Back
-                                                        </button>
-                                                        <span className="text-[9.5px] font-extrabold text-[var(--color-primary)] bg-[var(--color-surface-low)] border border-[var(--color-outline-variant)] px-2 py-0.5 rounded tracking-wide uppercase">
-                                                            {activeExamForTimeline.category || "UG"}
-                                                        </span>
-                                                    </div>
-                                                    <h2 className="text-lg font-extrabold text-slate-900 pr-12 line-clamp-1">{activeExamForTimeline.name}</h2>
-                                                    <p className="text-[12.5px] text-slate-500 font-normal leading-relaxed">{activeExamForTimeline.description || "Official government recruitment listing."}</p>
-                                                </div>
-
-                                                <button
-                                                    onClick={() => handleToggleExamSubscription(activeExamForTimeline.name)}
-                                                    className={`px-5 py-2.8 text-[12px] font-bold rounded-xl transition-all border cursor-pointer ${
-                                                        subscribedExams.includes(activeExamForTimeline.name)
-                                                            ? "bg-[var(--color-surface-low)] hover:bg-[var(--color-surface-bright)] text-[var(--color-primary)] border-[var(--color-outline-variant)]"
-                                                            : "bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white shadow-ambient border-none"
-                                                    }`}
-                                                >
-                                                    {subscribedExams.includes(activeExamForTimeline.name) ? "Unsubscribe Alerts" : "Subscribe Alerts"}
-                                                </button>
-                                            </div>
-
-                                            {/* Visual Timeline */}
-                                            <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-8 shadow-ambient space-y-6">
-                                                <h3 className="text-[14px] font-extrabold text-slate-900 border-b border-slate-100 pb-3 font-display">Visual Examination Timeline</h3>
-                                                
-                                                <div className="relative flex justify-between items-center max-w-3xl mx-auto py-6 px-4">
-                                                    <div className="absolute left-0 right-0 h-0.5 bg-slate-105 top-1/2 -translate-y-1/2 z-0" />
-                                                    
-                                                    {[
-                                                        { label: "Registration Start", date: activeExamForTimeline.start_date },
-                                                        { label: "Registration Deadline", date: activeExamForTimeline.end_date },
-                                                        { label: "Exam Date", date: activeExamForTimeline.exam_date }
-                                                    ].map((item, idx) => {
-                                                        const isUpcoming = item.date ? new Date(item.date) >= new Date() : true
-                                                        return (
-                                                            <div key={idx} className="relative z-10 flex flex-col items-center gap-2">
-                                                                <div className={`w-7 h-7 rounded-full flex items-center justify-center border-2 font-bold text-[11px] transition-colors ${
-                                                                    isUpcoming 
-                                                                        ? "bg-white border-slate-200 text-slate-400" 
-                                                                        : "bg-[var(--color-primary)] border-[var(--color-primary)] text-white shadow-ambient"
-                                                                }`}>
-                                                                    {idx + 1}
-                                                                </div>
-                                                                <span className={`text-[10px] font-extrabold ${isUpcoming ? "text-slate-400" : "text-slate-800"}`}>{item.label}</span>
-                                                                <span className="text-[11px] font-bold text-slate-505 bg-[var(--color-surface-low)]/50 border border-[var(--color-outline-variant)] px-2 py-0.5 rounded">{item.date ? new Date(item.date).toLocaleDateString("en-IN") : "TBD"}</span>
-                                                            </div>
-                                                        )
-                                                    })}
-                                                </div>
-                                            </div>
-
-                                            {/* Action Blocks */}
-                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                                                <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-5 flex items-center justify-between shadow-sm hover:border-[var(--color-primary)] transition-all">
-                                                    <div className="space-y-1 text-left">
-                                                        <h4 className="text-[13.5px] font-extrabold text-slate-900 font-display">Official Website</h4>
-                                                        <p className="text-[11.5px] text-slate-400">View official board notice.</p>
-                                                    </div>
-                                                    <a 
-                                                        href={activeExamForTimeline.official_url} target="_blank" rel="noopener noreferrer"
-                                                        className="px-4 py-2.2 bg-white hover:bg-slate-50 text-[var(--color-on-surface)] border border-[var(--color-outline-variant)] text-[11px] font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5"
-                                                    >
-                                                        Official Link <ExternalLink size={12} />
-                                                    </a>
-                                                </div>
-
-                                                <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-5 flex items-center justify-between shadow-sm hover:border-[var(--color-primary)] transition-all">
-                                                    <div className="space-y-1 text-left">
-                                                        <h4 className="text-[13.5px] font-extrabold text-slate-900 font-display">Filing Assistant</h4>
-                                                        <p className="text-[11.5px] text-slate-400">Apply form via bureau desk.</p>
-                                                    </div>
-                                                    <button
-                                                        onClick={() => {
-                                                            if (!isLoggedIn) triggerSignIn()
-                                                            else {
-                                                                setWizardExamName(activeExamForTimeline.name)
-                                                                setIsWizardOpen(true)
-                                                            }
-                                                        }}
-                                                        className="px-4 py-2.2 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white text-[11px] font-bold rounded-xl shadow-ambient transition-colors flex items-center gap-1.5 cursor-pointer border-none"
-                                                    >
-                                                        Apply Now <Sparkles size={12} className="text-white animate-pulse" />
-                                                    </button>
-                                                </div>
-
-                                                <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-5 flex items-center justify-between shadow-sm hover:border-[var(--color-primary)] transition-all">
-                                                    <div className="space-y-1 text-left">
-                                                        <h4 className="text-[13.5px] font-extrabold text-slate-900 font-display">Ask Operator</h4>
-                                                        <p className="text-[11.5px] text-slate-400">Ask support on WhatsApp.</p>
-                                                    </div>
-                                                    <a 
-                                                        href={`https://wa.me/${config.whatsapp_number || "916377964293"}?text=${encodeURIComponent(`Hi Support! I have a question regarding the ${activeExamForTimeline.name} exam.`)}`}
-                                                        target="_blank" rel="noopener noreferrer"
-                                                        className="px-4 py-2.2 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-xl shadow-md transition-colors flex items-center gap-1.5"
-                                                    >
-                                                        WhatsApp <MessageSquare size={12} />
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        // EXAMS SELECTION LIST
-                                        <div className="space-y-6">
-                                            {/* List Header */}
-                                            <div className="border-b border-[var(--color-outline-variant)] pb-4 space-y-3">
-                                                <div>
-                                                    <h2 className="text-lg font-extrabold text-slate-900 font-display">Select Exam Circular Preferences</h2>
-                                                    <p className="text-[11.5px] text-slate-400 mt-0.5">Subscribe to target notifications and countdown trackers.</p>
-                                                </div>
-
-                                                {/* Search & Category Filter chips */}
-                                                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between pt-2">
-                                                    {/* Search bar */}
-                                                    <div className="relative w-full sm:w-72">
-                                                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                        <input 
-                                                            type="text"
-                                                            value={examSearch}
-                                                            onChange={e => setExamSearch(e.target.value)}
-                                                            placeholder="Search exam name..."
-                                                            className="w-full pl-8 pr-4 py-2.8 bg-white border border-[var(--color-outline-variant)] focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] rounded-xl text-[12px] outline-none shadow-sm transition-all font-semibold"
-                                                        />
-                                                    </div>
-
-                                                    {/* Filter Chips */}
-                                                    <div className="flex flex-wrap gap-1.5">
-                                                        {["ALL", "SSC", "Railway", "Banking", "State PCS", "Defence", "Others"].map((chip) => (
-                                                            <button
-                                                                key={chip}
-                                                                onClick={() => setExamCategoryFilter(chip)}
-                                                                className={`px-4 py-2 rounded-xl text-[11.5px] font-bold border transition-all cursor-pointer ${
-                                                                    examCategoryFilter === chip 
-                                                                        ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)] shadow-ambient" 
-                                                                        : "bg-white text-[var(--color-on-surface)] border-[var(--color-outline-variant)] hover:bg-[var(--color-surface-low)]"
-                                                                }`}
-                                                            >
-                                                                {chip}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Exams Grid */}
-                                            {filteredExamsList.length === 0 ? (
-                                                <div className="bg-white/70 border border-[var(--color-outline-variant)] rounded-2xl p-16 text-center text-slate-450">
-                                                    No exams found matching preferences.
-                                                </div>
-                                            ) : (
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                                                    {filteredExamsList.map((ex) => {
-                                                        const isSubbed = subscribedExams.includes(ex.name)
-                                                        return (
-                                                            <div key={ex.id} className="bg-white border border-[var(--color-outline-variant)] hover:border-[var(--color-primary)] rounded-2xl p-5.5 shadow-sm hover:shadow-ambient transition-all duration-300 relative flex flex-col justify-between group hover:-translate-y-0.5">
-                                                                <div className="space-y-3.5 text-left">
-                                                                  <div className="flex items-center justify-between">
-                                                                    <span className="text-[8.5px] font-extrabold text-[var(--color-primary)] bg-[var(--color-surface-low)] border border-[var(--color-outline-variant)] px-2 py-0.8 rounded uppercase tracking-wider">
-                                                                        {ex.category || "UG"}
-                                                                    </span>
-                                                                    
-                                                                    <label className="flex items-center gap-1.5 cursor-pointer" title={isSubbed ? "Subscribed Alert" : "Click to subscribe alert"}>
-                                                                        <input 
-                                                                            type="checkbox"
-                                                                            checked={isSubbed}
-                                                                            onChange={() => handleToggleExamSubscription(ex.name)}
-                                                                            className="rounded-lg border-slate-350 text-[var(--color-primary)] focus:ring-[var(--color-primary)] w-4.5 h-4.5 cursor-pointer"
-                                                                        />
-                                                                    </label>
-                                                                  </div>
-                                                                  <h3 
-                                                                      onClick={() => setActiveExamForTimeline(ex)}
-                                                                      className="text-[14px] font-extrabold text-slate-900 group-hover:text-[var(--color-primary)] cursor-pointer line-clamp-1 transition-colors"
-                                                                  >
-                                                                      {ex.name}
-                                                                  </h3>
-                                                                  <p className="text-[12px] text-slate-500 font-normal line-clamp-2 leading-relaxed">
-                                                                      {ex.description || "Apply for recruitment programs with verified credentials."}
-                                                                  </p>
-                                                                </div>
-
-                                                                <div className="flex items-center justify-between border-t border-slate-100 pt-3.5 mt-4">
-                                                                    <div>
-                                                                        <span className="text-[9px] text-slate-400 font-extrabold block uppercase tracking-wider">End Date</span>
-                                                                        <span className="text-[11.5px] font-extrabold text-slate-700">{ex.end_date ? new Date(ex.end_date).toLocaleDateString("en-IN") : "TBD"}</span>
-                                                                    </div>
-                                                                    <button 
-                                                                        onClick={() => setActiveExamForTimeline(ex)}
-                                                                        className="text-[var(--color-primary)] text-[11.5px] font-bold hover:underline cursor-pointer group-hover:translate-x-0.5 transition-transform"
-                                                                    >
-                                                                        Details &amp; Timeline →
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        )
-                                                    })}
-                                                </div>
-                                            )}
-                                            {/* Sticky saveSelections bottom banner */}
-                                            {isLoggedIn && (
-                                                <div className="sticky bottom-6 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-container)] text-white rounded-2xl p-5 flex items-center justify-between shadow-ambient border-none z-20 animate-slideUp">
-                                                    <span className="text-[12.5px] font-bold text-white">
-                                                        💼 <span className="text-white font-extrabold">{subscribedExams.length}</span> Exam Preferences Active
-                                                    </span>
-                                                    <button
-                                                        onClick={() => {
-                                                            handleSaveExamSubscriptions(subscribedExams)
-                                                            alert("Subscriptions updated successfully!")
-                                                        }}
-                                                        className="px-5 py-2.8 bg-white hover:bg-slate-50 text-[var(--color-primary)] text-[12px] font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-md shadow-black/10"
-                                                    >
-                                                        Save Selections
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
+                                <ExamsTab 
+                                    activeExamForTimeline={activeExamForTimeline}
+                                    setActiveExamForTimeline={setActiveExamForTimeline}
+                                    subscribedExams={subscribedExams}
+                                    handleToggleExamSubscription={handleToggleExamSubscription}
+                                    examSearch={examSearch}
+                                    setExamSearch={setExamSearch}
+                                    examCategoryFilter={examCategoryFilter}
+                                    setExamCategoryFilter={setExamCategoryFilter}
+                                    filteredExamsList={filteredExamsList}
+                                    isLoggedIn={isLoggedIn}
+                                    triggerSignIn={triggerSignIn}
+                                    setWizardExamName={setWizardExamName}
+                                    setIsWizardOpen={setIsWizardOpen}
+                                    config={config}
+                                    handleSaveExamSubscriptions={handleSaveExamSubscriptions}
+                                />
                             )}
 
-                            {/* ── TAB 4: NEET CHOICE-FILLING COUNSELLING ── */}
+                            {/* ── Tab 4: NEET Counselling ── */}
                             {activeTab === "neet" && (
-                                <div className="space-y-8 animate-fadeIn text-left">
-                                    <div className="border-b border-[var(--color-outline-variant)] pb-4">
-                                        <h2 className="text-xl font-black text-slate-900">
-                                            {lang === 'EN' ? 'NEET UG Counselling Assistance' : 'नीट यूजी काउंसलिंग सहायता'}
-                                        </h2>
-                                        <p className="text-[12px] text-slate-400 mt-0.5">
-                                            {lang === 'EN' ? 'Enter your details to request custom choice-filling templates and professional guidance.' : 'कस्टम चॉइस-फिलिंग टेम्पलेट और पेशेवर मार्गदर्शन के लिए अपने विवरण दर्ज करें।'}
-                                        </p>
-                                    </div>
-
-                                    <div className="bg-white border border-[var(--color-outline-variant)] rounded-3xl shadow-ambient p-6 md:p-8 max-w-xl mx-auto space-y-6">
-                                        {neetFormSubmitted ? (
-                                            <div className="text-center py-6 space-y-5">
-                                                <div className="w-16 h-16 bg-emerald-50 text-emerald-505 flex items-center justify-center rounded-full mx-auto border border-emerald-100 shadow-sm shadow-emerald-500/5">
-                                                    <CheckCircle2 size={36} />
-                                                </div>
-                                                <h3 className="text-lg font-extrabold text-slate-900">Counselling Request Submitted!</h3>
-                                                <p className="text-[13px] text-slate-505 leading-relaxed font-normal">
-                                                    Your NEET Counselling guidance request has been registered. You are being redirected to chat with Krishna Emitra on WhatsApp to receive choice templates.
-                                                </p>
-                                                <button
-                                                    onClick={() => setNeetFormSubmitted(false)}
-                                                    className="px-5 py-2.8 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white text-[12px] font-bold rounded-xl transition-all cursor-pointer shadow-ambient hover:shadow-lg border-none"
-                                                >
-                                                    Submit Another Response
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <form onSubmit={handleNeetCounsellingSubmit} className="space-y-5">
-                                                <div>
-                                                    <label className="text-[9.5px] font-extrabold uppercase text-slate-400 tracking-wider block mb-1">NEET All India Rank (AIR) *</label>
-                                                    <input 
-                                                        type="number"
-                                                        value={neetRank}
-                                                        onChange={e => setNeetRank(e.target.value)}
-                                                        placeholder="e.g. 15430"
-                                                        className="w-full p-3.5 bg-slate-50 border border-[var(--color-outline-variant)] rounded-xl text-[13px] font-semibold outline-none focus:bg-white focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all shadow-sm placeholder:text-slate-350"
-                                                        required
-                                                    />
-                                                </div>
-
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                    <div>
-                                                        <label className="text-[9.5px] font-extrabold uppercase text-slate-400 tracking-wider block mb-1">Counselling Category *</label>
-                                                        <select
-                                                            value={neetCategory}
-                                                            onChange={e => setNeetCategory(e.target.value)}
-                                                            className="w-full p-3.5 bg-slate-50 border border-[var(--color-outline-variant)] rounded-xl text-[13px] font-semibold outline-none focus:bg-white focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all shadow-sm cursor-pointer"
-                                                        >
-                                                            <option value="GEN">General (UR)</option>
-                                                            <option value="OBC">OBC-NCL</option>
-                                                            <option value="EWS">EWS</option>
-                                                            <option value="SC">SC</option>
-                                                            <option value="ST">ST</option>
-                                                        </select>
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-[9.5px] font-extrabold uppercase text-slate-400 tracking-wider block mb-1">WhatsApp Phone Number *</label>
-                                                        <input 
-                                                            type="tel"
-                                                            value={neetPhone}
-                                                            onChange={e => setNeetPhone(e.target.value)}
-                                                            placeholder="10-digit number"
-                                                            className="w-full p-3.5 bg-slate-50 border border-[var(--color-outline-variant)] rounded-xl text-[13px] font-semibold outline-none focus:bg-white focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all shadow-sm placeholder:text-slate-350"
-                                                            required
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <button
-                                                    type="submit"
-                                                    className="w-full py-3.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white text-[12.5px] font-bold uppercase rounded-xl transition-all shadow-ambient hover:shadow-lg cursor-pointer active:scale-98 hover:-translate-y-0.5 duration-200 border-none"
-                                                >
-                                                    Get Counselling Guidance
-                                                </button>
-                                            </form>
-                                        )}
-                                    </div>
-                                </div>
+                                <NeetCounsellingTab 
+                                    lang={lang}
+                                    neetFormSubmitted={neetFormSubmitted}
+                                    setNeetFormSubmitted={setNeetFormSubmitted}
+                                    neetRank={neetRank}
+                                    setNeetRank={setNeetRank}
+                                    neetCategory={neetCategory}
+                                    setNeetCategory={setNeetCategory}
+                                    neetPhone={neetPhone}
+                                    setNeetPhone={setNeetPhone}
+                                    handleNeetCounsellingSubmit={handleNeetCounsellingSubmit}
+                                />
                             )}
 
-                            {/* ── TAB 5: PROFILE & NOTIFICATIONS SETTINGS ── */}
+                            {/* ── Tab 5: Profile ── */}
                             {activeTab === "profile" && isLoggedIn && (
-                                <div className="space-y-8 animate-fadeIn text-left">
-                                    <div className="border-b border-[var(--color-outline-variant)] pb-4">
-                                        <h2 className="text-xl font-black text-slate-900">
-                                            {lang === 'EN' ? 'Profile & Subscription Settings' : 'प्रोफ़ाइल एवं सदस्यता सेटिंग्स'}
-                                        </h2>
-                                        <p className="text-[12px] text-slate-400 mt-0.5">
-                                            {lang === 'EN' ? 'Configure messaging channels and maintain contact parameters.' : 'संदेश भेजने वाले चैनलों को कॉन्फ़िगर करें और संपर्क मापदंडों को बनाए रखें।'}
-                                        </p>
-                                    </div>
-
-                                    <div className="bg-white border border-[var(--color-outline-variant)] rounded-3xl shadow-ambient p-6 md:p-8 max-w-xl mx-auto space-y-6">
-                                        {profileSavedMessage && (
-                                            <div className="p-3.5 bg-emerald-50 text-emerald-755 border border-emerald-100 rounded-xl text-[12px] font-semibold">
-                                                {profileSavedMessage}
-                                            </div>
-                                        )}
-
-                                        <form onSubmit={handleSaveProfile} className="space-y-6">
-                                            <div className="space-y-4">
-                                                <div>
-                                                    <label className="text-[9.5px] font-extrabold uppercase text-slate-400 tracking-wider block mb-1">Display Name</label>
-                                                    <input 
-                                                        type="text" 
-                                                        value={editableProfile.name}
-                                                        onChange={e => setEditableProfile({...editableProfile, name: e.target.value})}
-                                                        className="w-full p-3.5 bg-slate-50 border border-[var(--color-outline-variant)] rounded-xl text-[13px] font-semibold outline-none focus:bg-white focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all shadow-sm"
-                                                        required
-                                                    />
-                                                </div>
-
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                    <div>
-                                                        <label className="text-[9.5px] font-extrabold uppercase text-slate-400 tracking-wider block mb-1">Phone Number</label>
-                                                        <input 
-                                                            type="text" 
-                                                            value={editableProfile.phone}
-                                                            disabled
-                                                            className="w-full p-3.5 bg-slate-105 border border-[var(--color-outline-variant)] text-slate-400 rounded-xl text-[13px] font-semibold cursor-not-allowed outline-none"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-[9.5px] font-extrabold uppercase text-slate-400 tracking-wider block mb-1">Email (Optional)</label>
-                                                        <input 
-                                                            type="email" 
-                                                            value={editableProfile.email}
-                                                            onChange={e => setEditableProfile({...editableProfile, email: e.target.value})}
-                                                            className="w-full p-3.5 bg-slate-50 border border-[var(--color-outline-variant)] rounded-xl text-[13px] font-semibold outline-none focus:bg-white focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all shadow-sm"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="border-t border-slate-100 pt-5 space-y-4">
-                                                <h3 className="text-[11.5px] font-extrabold text-slate-900 uppercase tracking-wider">Alert Notifications Configuration</h3>
-                                                <div className="space-y-4">
-                                                    <label className="flex items-center justify-between cursor-pointer group">
-                                                        <span className="text-[13px] font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">Receive alerts via WhatsApp</span>
-                                                        <input 
-                                                            type="checkbox"
-                                                            checked={notificationPrefs.whatsapp}
-                                                            onChange={e => setNotificationPrefs({...notificationPrefs, whatsapp: e.target.checked})}
-                                                            className="rounded-lg text-[var(--color-primary)] focus:ring-[var(--color-primary)] w-5.5 h-5.5 cursor-pointer border-slate-300"
-                                                        />
-                                                    </label>
-                                                    <label className="flex items-center justify-between cursor-pointer group">
-                                                        <span className="text-[13px] font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">Receive alerts via Telegram Bot</span>
-                                                        <input 
-                                                            type="checkbox"
-                                                            checked={notificationPrefs.telegram}
-                                                            onChange={e => setNotificationPrefs({...notificationPrefs, telegram: e.target.checked})}
-                                                            className="rounded-lg text-[var(--color-primary)] focus:ring-[var(--color-primary)] w-5.5 h-5.5 cursor-pointer border-slate-300"
-                                                        />
-                                                    </label>
-                                                </div>
-                                            </div>
-
-                                            <button 
-                                                type="submit"
-                                                className="px-5 py-3.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white text-[12.5px] font-bold uppercase rounded-xl w-full transition-all hover:shadow-lg cursor-pointer hover:-translate-y-0.5 duration-200 active:scale-98 border-none"
-                                            >
-                                                Save Settings
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
+                                <ProfileTab 
+                                    lang={lang}
+                                    profileSavedMessage={profileSavedMessage}
+                                    editableProfile={editableProfile}
+                                    setEditableProfile={setEditableProfile}
+                                    notificationPrefs={notificationPrefs}
+                                    setNotificationPrefs={setNotificationPrefs}
+                                    handleSaveProfile={handleSaveProfile}
+                                />
                             )}
 
-                            {/* ── TAB 6: HELP DESK / SUPPORT CALLS ── */}
+                            {/* ── Tab 6: Help Desk ── */}
                             {activeTab === "help" && (
-                                <div className="space-y-8 animate-fadeIn text-left">
-                                    <div className="border-b border-[var(--color-outline-variant)] pb-4">
-                                        <h2 className="text-xl font-black text-slate-900">
-                                            {lang === 'EN' ? 'Support Desk & Callback Support' : 'सहायता डेस्क और कॉलबैक सहायता'}
-                                        </h2>
-                                        <p className="text-[12px] text-slate-400 mt-0.5">
-                                            {lang === 'EN' ? 'Submit your support query or direct request for verification.' : 'सत्यापन के लिए अपना समर्थन प्रश्न या सीधा अनुरोध सबमिट करें।'}
-                                        </p>
-                                    </div>
-
-                                    <div className="bg-white border border-[var(--color-outline-variant)] rounded-3xl shadow-ambient p-6 md:p-8 max-w-xl mx-auto space-y-6">
-                                        {cbSubmitted ? (
-                                            <div className="text-center py-6 space-y-5">
-                                                <div className="w-16 h-16 bg-emerald-50 text-emerald-500 flex items-center justify-center rounded-full mx-auto border border-emerald-100 shadow-sm shadow-emerald-500/5">
-                                                    <CheckCircle2 size={36} />
-                                                </div>
-                                                <h3 className="text-lg font-extrabold text-slate-900">Support Query Received!</h3>
-                                                <p className="text-[13px] text-slate-500 leading-relaxed font-normal">
-                                                    Your callback request has been logged successfully. Our operator will call you back shortly.
-                                                </p>
-                                                <button
-                                                    onClick={() => setCbSubmitted(false)}
-                                                    className="px-5 py-2.8 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white text-[12px] font-bold rounded-xl transition-all cursor-pointer shadow-ambient border-none"
-                                                >
-                                                    Submit Another Query
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <form onSubmit={handleCallbackQuerySubmit} className="space-y-5">
-                                                <div>
-                                                    <label className="text-[9.5px] font-extrabold uppercase text-slate-400 tracking-wider block mb-1">Your Full Name *</label>
-                                                    <input 
-                                                        type="text"
-                                                        value={cbName}
-                                                        onChange={e => setCbName(e.target.value)}
-                                                        placeholder="e.g. Rahul Sharma"
-                                                        className="w-full p-3.5 bg-slate-50 border border-[var(--color-outline-variant)] rounded-xl text-[13px] font-semibold outline-none focus:bg-white focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all shadow-sm placeholder:text-slate-355"
-                                                        required
-                                                    />
-                                                </div>
-
-                                                <div>
-                                                    <label className="text-[9.5px] font-extrabold uppercase text-slate-400 tracking-wider block mb-1">Mobile Phone Number *</label>
-                                                    <input 
-                                                        type="tel"
-                                                        value={cbPhone}
-                                                        onChange={e => setCbPhone(e.target.value)}
-                                                        placeholder="10-digit number"
-                                                        className="w-full p-3.5 bg-slate-50 border border-[var(--color-outline-variant)] rounded-xl text-[13px] font-semibold outline-none focus:bg-white focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all shadow-sm placeholder:text-slate-355"
-                                                        required
-                                                    />
-                                                </div>
-
-                                                <div>
-                                                    <label className="text-[9.5px] font-extrabold uppercase text-slate-400 tracking-wider block mb-1">What can we help you with? *</label>
-                                                    <textarea 
-                                                        rows={4}
-                                                        value={cbQuery}
-                                                        onChange={e => setCbQuery(e.target.value)}
-                                                        placeholder="Ask about marksheet uploads, fee payments, document correction, etc."
-                                                        className="w-full p-3.5 bg-slate-50 border border-[var(--color-outline-variant)] rounded-xl text-[13px] font-semibold outline-none resize-none focus:bg-white focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all shadow-sm placeholder:text-slate-355"
-                                                        required
-                                                    />
-                                                </div>
-
-                                                <button
-                                                    type="submit"
-                                                    className="w-full py-3.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white text-[12.5px] font-bold uppercase rounded-xl transition-all shadow-ambient cursor-pointer border-none hover:shadow-lg hover:-translate-y-0.5 duration-200 active:scale-98"
-                                                >
-                                                    Submit Callback Request
-                                                </button>
-                                            </form>
-                                        )}
-                                    </div>
-                                </div>
+                                <HelpDeskTab 
+                                    lang={lang}
+                                    cbSubmitted={cbSubmitted}
+                                    setCbSubmitted={setCbSubmitted}
+                                    cbName={cbName}
+                                    setCbName={setCbName}
+                                    cbPhone={cbPhone}
+                                    setCbPhone={setCbPhone}
+                                    cbQuery={cbQuery}
+                                    setCbQuery={setCbQuery}
+                                    handleCallbackQuerySubmit={handleCallbackQuerySubmit}
+                                />
                             )}
 
-                            {/* ── TAB 7: ABOUT US ── */}
+                            {/* ── Tab 7: About Us ── */}
                             {activeTab === "about" && (
-                                <div className="space-y-8 animate-fadeIn text-left">
-                                    <div className="border-b border-[var(--color-outline-variant)] pb-4">
-                                        <h2 className="text-xl font-black text-slate-900">
-                                            {lang === 'EN' ? 'About Krishna Emitra Digital Seva' : 'कृष्णा ई-मित्र डिजिटल सेवा के बारे में'}
-                                        </h2>
-                                        <p className="text-[12px] text-slate-400 mt-0.5">
-                                            {lang === 'EN' ? 'Rajasthan students unified desk support.' : 'राजस्थान के छात्रों के लिए एकीकृत डिजिटल सहायता डेस्क।'}
-                                        </p>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-6 shadow-sm hover:border-[var(--color-primary)] hover:shadow-ambient transition-all duration-300 space-y-4 text-left">
-                                            <h4 className="text-[13.5px] font-extrabold text-[var(--color-primary)] uppercase tracking-wider font-display">Center Location</h4>
-                                            <p className="text-[12.5px] text-slate-655 font-semibold leading-relaxed">
-                                                Shop No. 12, Main Market Road,<br />Jodhpur, Rajasthan - 342001
-                                            </p>
-                                            <div className="pt-2">
-                                                <a 
-                                                    href="https://maps.google.com" target="_blank" rel="noopener noreferrer"
-                                                    className="px-4 py-2.2 bg-white hover:bg-slate-50 text-[var(--color-on-surface)] text-[11px] font-bold rounded-xl border border-[var(--color-outline-variant)] shadow-sm inline-flex items-center gap-1.5 transition-colors"
-                                                >
-                                                    Get Directions <MapPin size={12} className="text-[var(--color-primary)]" />
-                                                </a>
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-6 shadow-sm hover:border-[var(--color-primary)] hover:shadow-ambient transition-all duration-300 space-y-4 text-left">
-                                            <h4 className="text-[13.5px] font-extrabold text-[var(--color-primary)] uppercase tracking-wider font-display">Working Hours</h4>
-                                            <p className="text-[12.5px] text-slate-655 font-semibold leading-relaxed">
-                                                Monday to Saturday: 9:00 AM - 8:00 PM<br />
-                                                Sunday: Closed for system maintenance
-                                            </p>
-                                            <span className="text-[9.5px] text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100 uppercase font-extrabold inline-block">Open Now</span>
-                                        </div>
-
-                                        <div className="bg-white border border-[var(--color-outline-variant)] rounded-2xl p-6 shadow-sm hover:border-[var(--color-primary)] hover:shadow-ambient transition-all duration-300 space-y-4 text-left">
-                                            <h4 className="text-[13.5px] font-extrabold text-[var(--color-primary)] uppercase tracking-wider font-display">Direct WhatsApp Desk</h4>
-                                            <p className="text-[12.5px] text-slate-655 font-semibold leading-relaxed">
-                                                Need quick manual support? Directly message our desk to verify fees or document uploads.
-                                            </p>
-                                            <div className="pt-2">
-                                                <a 
-                                                    href={`https://wa.me/${config.whatsapp_number || "916377964293"}?text=Hello%20Krishna%20Emitra!%20I%20need%20assistance.`} 
-                                                    target="_blank" rel="noopener noreferrer"
-                                                    className="px-4.5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold rounded-xl inline-flex items-center gap-1.5 shadow-md shadow-emerald-500/10 transition-colors"
-                                                >
-                                                    Chat on WhatsApp <MessageSquare size={13} />
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <AboutUsTab 
+                                    lang={lang}
+                                    config={config}
+                                />
                             )}
 
                         </div>

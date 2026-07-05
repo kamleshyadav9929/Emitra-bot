@@ -47,8 +47,8 @@ export function AdminSidebar({ isOpen, onClose }) {
         {/* Logo Area */}
         <div className="px-8 py-8 flex items-center justify-between">
           <div>
-            <h1 className="text-[18px] font-bold tracking-tight text-[var(--color-primary)] font-display">Bureau Panel</h1>
-            <p className="text-[11px] font-medium text-gray-500 mt-1">Krishna Emitra Bot Administration</p>
+            <h1 className="text-[18px] font-bold tracking-tight text-[var(--color-primary)] font-display">Krishna Emitra</h1>
+            <p className="text-[11px] font-medium text-gray-500 mt-1">Bot Administration</p>
           </div>
           <button onClick={onClose} className="lg:hidden p-2 text-gray-400 hover:text-gray-900 transition-colors">
             <LogOut size={20} className="rotate-180" />
