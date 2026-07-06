@@ -56,24 +56,25 @@ limiter = Limiter(
 database.init_db()
 
 # ── Persistent Bot & Event Loop ──────────────────────────────────────────────
-# Creating a Bot() per webhook request was the #1 bottleneck (~500-800ms each).
-# A persistent bot reuses the same HTTP connection pool across all requests.
-# NOTE: Bot() constructor is lightweight (no network calls) — safe for WSGI import.
+# Creating a Bot() per webhook request was the #1 bottleneck.
+# A persistent bot reuses the same HTTP connection pool across requests.
+# A persistent event loop avoids per-request loop creation/teardown.
+# NO background threads — PythonAnywhere WSGI kills daemon threads.
 
 _bot_loop = asyncio.new_event_loop()
-_bot_thread = threading.Thread(
-    target=_bot_loop.run_forever,
-    daemon=True,
-    name="bot-event-loop",
-)
-_bot_thread.start()
 
-# Simple persistent Bot — no Application.initialize() needed
-# (Application.initialize() makes network calls that hang PythonAnywhere's WSGI startup)
 _persistent_bot = Bot(token=config.TELEGRAM_BOT_TOKEN) if config.TELEGRAM_BOT_TOKEN else None
 if not _persistent_bot:
     print("WARNING: TELEGRAM_BOT_TOKEN not set. Bot will not function.")
 
+
+def run_async(coro):
+    """
+    Runs an async coroutine on the persistent event loop.
+    WSGI is single-threaded per worker, so run_until_complete is safe.
+    Reusing the same loop keeps the Bot's httpx client alive across requests.
+    """
+    return _bot_loop.run_until_complete(coro)
 
 
 # ── Authentication ─────────────────────────────────────────────────────────────
