@@ -129,17 +129,6 @@ def token_required(f):
         return f(*args, **kwargs)
     return decorated
 
-
-
-def run_async(coro):
-    """
-    Runs an async coroutine on the persistent background event loop.
-    Much faster than creating a new loop per call.
-    """
-    future = asyncio.run_coroutine_threadsafe(coro, _bot_loop)
-    return future.result(timeout=30)
-
-
 # ── FIX #5: Telegram Webhook with secret token verification ───────────────────
 
 @app.route("/webhook", methods=["POST"])
@@ -187,6 +176,11 @@ def webhook():
     except Exception as e:
         print("Webhook processing error:", str(e))
         return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/ping", methods=["GET", "HEAD"])
+def ping():
+    return jsonify({"ok": True})
 # ── Public API (Unprotected / Rate-Limited) ───────────────────────────────────
 
 @app.route("/api/public/services", methods=["GET"])

@@ -36,6 +36,11 @@ Whenever you deploy the backend to Render (or any public server), you MUST tell 
 https://api.telegram.org/bot{YOUR_BOT_TOKEN}/setWebhook?url=https://{YOUR_RENDER_URL}/webhook
 ```
 
+If `WEBHOOK_SECRET` is set in `.env`, include the same value when registering the webhook, otherwise the backend will reject Telegram updates with `403 Unauthorized`:
+```text
+https://api.telegram.org/bot{YOUR_BOT_TOKEN}/setWebhook?url=https://{YOUR_RENDER_URL}/webhook&secret_token={YOUR_WEBHOOK_SECRET}
+```
+
 ### 5. Prevent Server Sleep (Render Free Tier)
 The backend exposes a `/ping` route that doesn't trigger database requests.
 Go to `cron-job.org` and set it up to call `https://{YOUR_RENDER_URL}/ping` every 14 minutes.
