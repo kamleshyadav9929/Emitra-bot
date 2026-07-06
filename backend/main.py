@@ -3,37 +3,35 @@ import sys
 import subprocess
 
 def auto_fix_packages():
+    import importlib.metadata
+    
     # 1. Check and install/upgrade httpx to 0.25.2
     need_httpx = False
     try:
-        import httpx
-        if getattr(httpx, "__version__", "") != "0.25.2":
+        version = importlib.metadata.version("httpx")
+        if version != "0.25.2":
             need_httpx = True
-    except ImportError:
+    except importlib.metadata.PackageNotFoundError:
         need_httpx = True
         
     if need_httpx:
-        print("Self-healing: Installing compatible httpx==0.25.2...")
+        print("Self-healing: Forcing install of compatible httpx==0.25.2...")
         try:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "httpx==0.25.2"])
-            import importlib
-            importlib.invalidate_caches()
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "--force-reinstall", "httpx==0.25.2"])
         except Exception as e:
             print(f"Self-healing error installing httpx: {e}")
 
     # 2. Check and install/upgrade supabase
     need_supabase = False
     try:
-        import supabase
-    except ImportError:
+        importlib.metadata.version("supabase")
+    except importlib.metadata.PackageNotFoundError:
         need_supabase = True
         
     if need_supabase:
         print("Self-healing: Installing supabase...")
         try:
             subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "supabase"])
-            import importlib
-            importlib.invalidate_caches()
         except Exception as e:
             print(f"Self-healing error installing supabase: {e}")
 
