@@ -3,8 +3,15 @@ import sys
 from dotenv import load_dotenv
 
 # Try to load .env from the root directory or backend directory
-env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
-load_dotenv(env_path)
+env_path_root = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
+env_path_backend = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+
+if os.path.exists(env_path_root):
+    load_dotenv(env_path_root)
+elif os.path.exists(env_path_backend):
+    load_dotenv(env_path_backend)
+else:
+    load_dotenv()
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 

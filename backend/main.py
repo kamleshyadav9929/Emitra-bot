@@ -184,6 +184,54 @@ def webhook():
 @app.route("/ping", methods=["GET", "HEAD"])
 def ping():
     return jsonify({"ok": True})
+
+
+@app.route("/debug-env", methods=["GET"])
+def debug_env():
+    import os
+    info = {
+        "cwd": os.getcwd(),
+        "files_in_cwd": os.listdir("."),
+        "env_keys": list(os.environ.keys()),
+        "config_url": bool(config.SUPABASE_URL),
+        "config_key": bool(config.SUPABASE_KEY),
+        "config_token": bool(config.TELEGRAM_BOT_TOKEN),
+        "config_webhook_secret": bool(config.WEBHOOK_SECRET),
+    }
+    
+    # Check parent directory
+    parent_dir = os.path.dirname(os.getcwd())
+    if os.path.exists(parent_dir):
+        info["parent_dir"] = parent_dir
+        try:
+            info["files_in_parent"] = os.listdir(parent_dir)
+        except Exception as e:
+            info["files_in_parent_error"] = str(e)
+        
+    # Check if .env exists in backend or parent
+    info["env_in_cwd"] = os.path.exists(".env")
+    info["env_in_parent"] = os.path.exists(os.path.join(parent_dir, ".env"))
+    
+    # Try reading .env in cwd
+    if os.path.exists(".env"):
+        try:
+            with open(".env", "r") as f:
+                lines = f.readlines()
+            info["env_cwd_keys"] = [line.split("=")[0].strip() for line in lines if "=" in line]
+        except Exception as e:
+            info["env_cwd_read_error"] = str(e)
+            
+    # Try reading .env in parent
+    parent_env = os.path.join(parent_dir, ".env")
+    if os.path.exists(parent_env):
+        try:
+            with open(parent_env, "r") as f:
+                lines = f.readlines()
+            info["env_parent_keys"] = [line.split("=")[0].strip() for line in lines if "=" in line]
+        except Exception as e:
+            info["env_parent_read_error"] = str(e)
+            
+    return jsonify(info)
 # ── Public API (Unprotected / Rate-Limited) ───────────────────────────────────
 
 @app.route("/api/public/services", methods=["GET"])
