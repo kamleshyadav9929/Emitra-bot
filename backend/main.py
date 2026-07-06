@@ -189,14 +189,28 @@ def ping():
 @app.route("/debug-env", methods=["GET"])
 def debug_env():
     import os
+    import sys
+    
+    def mask(s):
+        if not s:
+            return "empty/falsy"
+        s = str(s)
+        if len(s) <= 10:
+            return "short:" + s
+        return f"{s[:6]}...{s[-4:]} (len={len(s)})"
+        
     info = {
         "cwd": os.getcwd(),
-        "files_in_cwd": os.listdir("."),
+        "sys_path": sys.path,
+        "database_file": getattr(database, "__file__", "unknown"),
+        "config_file": getattr(config, "__file__", "unknown"),
+        "config_url": mask(config.SUPABASE_URL),
+        "config_key": mask(config.SUPABASE_KEY),
+        "config_token": mask(config.TELEGRAM_BOT_TOKEN),
+        "config_webhook_secret": mask(config.WEBHOOK_SECRET),
+        "database_supabase": str(database.supabase),
+        "database_supabase_type": str(type(database.supabase)),
         "env_keys": list(os.environ.keys()),
-        "config_url": bool(config.SUPABASE_URL),
-        "config_key": bool(config.SUPABASE_KEY),
-        "config_token": bool(config.TELEGRAM_BOT_TOKEN),
-        "config_webhook_secret": bool(config.WEBHOOK_SECRET),
     }
     
     # Check parent directory
@@ -207,11 +221,7 @@ def debug_env():
             info["files_in_parent"] = os.listdir(parent_dir)
         except Exception as e:
             info["files_in_parent_error"] = str(e)
-        
-    # Check if .env exists in backend or parent
-    info["env_in_cwd"] = os.path.exists(".env")
-    info["env_in_parent"] = os.path.exists(os.path.join(parent_dir, ".env"))
-    
+            
     # Try reading .env in cwd
     if os.path.exists(".env"):
         try:
@@ -220,16 +230,6 @@ def debug_env():
             info["env_cwd_keys"] = [line.split("=")[0].strip() for line in lines if "=" in line]
         except Exception as e:
             info["env_cwd_read_error"] = str(e)
-            
-    # Try reading .env in parent
-    parent_env = os.path.join(parent_dir, ".env")
-    if os.path.exists(parent_env):
-        try:
-            with open(parent_env, "r") as f:
-                lines = f.readlines()
-            info["env_parent_keys"] = [line.split("=")[0].strip() for line in lines if "=" in line]
-        except Exception as e:
-            info["env_parent_read_error"] = str(e)
             
     return jsonify(info)
 # ── Public API (Unprotected / Rate-Limited) ───────────────────────────────────
