@@ -2,11 +2,8 @@ import { useState, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { useNavigate } from "react-router-dom"
 import {
-    ArrowRight, MessageSquare, Send, CheckCircle2,
-    Clock, Bell, ShieldCheck, Globe, HelpCircle,
-    Download, ExternalLink, Award, FileText, ChevronRight,
-    Users, ChevronDown, Check, Sparkles, LogOut, Info, BookOpen,
-    User
+    Send, Clock, Bell, Globe, ExternalLink,
+    ChevronDown, Check, LogOut, User, Search
 } from "lucide-react"
 import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
@@ -53,7 +50,21 @@ export default function Landing() {
     // UI state
     const [searchQuery, setSearchQuery] = useState("")
     const [filterCategory, setFilterCategory] = useState("ALL")
+    const [serviceSearch, setServiceSearch] = useState("")
+    const [serviceCatFilter, setServiceCatFilter] = useState("ALL")
     const [expandedFaq, setExpandedFaq] = useState(null)
+
+    // Filtered services presence check
+    const hasMatchingServices = useMemo(() => {
+        return Object.entries(services).some(([catKey, cat]) => {
+            const isVisible = serviceCatFilter === "ALL" || serviceCatFilter === catKey
+            if (!isVisible) return false
+            return (cat.services || []).some(s => 
+                s.name.toLowerCase().includes(serviceSearch.toLowerCase()) ||
+                (s.description && s.description.toLowerCase().includes(serviceSearch.toLowerCase()))
+            )
+        })
+    }, [services, serviceSearch, serviceCatFilter])
 
     // Fetch initial data
     useEffect(() => {
@@ -236,9 +247,6 @@ export default function Landing() {
             <section className="relative px-6 lg:px-12 py-12 lg:py-24 max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
                 {/* Hero Left */}
                 <div className="lg:col-span-7 space-y-6 text-left">
-                    <div className="inline-flex items-center gap-1.5 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full text-[10.5px] font-bold text-[#0066cc] uppercase tracking-wider">
-                        <Sparkles size={12} className="text-[#0066cc]" /> {lang === "EN" ? "Verified Rajasthan e-Mitra services" : "सत्यापित राजस्थान ई-मित्र सेवाएं"}
-                    </div>
                     <h1 className="text-4xl md:text-5xl lg:text-[46px] font-semibold leading-[1.1] tracking-tight text-[#1d1d1f] font-display" style={{ letterSpacing: "-0.5px" }}>
                         Track your exam deadlines and govt forms, all in one place
                     </h1>
@@ -329,57 +337,116 @@ export default function Landing() {
 
             {/* ── WHAT WE DO & HOW WE DO IT ── */}
             <section id="what-we-do" className="bg-[#f8fcff] border-y border-[#c2c6d4]/10 py-20 px-6 lg:px-12">
-                <div className="max-w-[1240px] mx-auto space-y-16">
+                <div className="max-w-[1240px] mx-auto space-y-12">
                     <div className="text-center max-w-2xl mx-auto space-y-4">
-                        <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">Our Services</p>
-                        <h2 className="text-3xl md:text-4xl font-black text-[#0A1A40] font-display">What We Do &amp; How We Do It</h2>
+                        <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "Our Services" : "हमारी सेवाएँ"}</p>
+                        <h2 className="text-3xl md:text-4xl font-black text-[#0A1A40] font-display">
+                            {lang === "EN" ? "Available Services" : "उपलब्ध सेवाएँ"}
+                        </h2>
                         <p className="text-[13.5px] text-gray-500 font-normal leading-relaxed">
-                            We bridge the gap between complex government filing systems and students. Here is how we make digital administration smooth and prompt.
+                            {lang === "EN" 
+                                ? "Browse and request official government documentation, application filings, and counselling services online."
+                                : "आधिकारिक सरकारी दस्तावेज़, आवेदन पत्र और काउंसलिंग सेवाओं को ऑनलाइन ब्राउज़ करें और अनुरोध करें।"}
                         </p>
                     </div>
 
-                    {/* What We Do - Bento Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div className="bg-white border border-[#c2c6d4]/20 p-6 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all space-y-4">
-                            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#164FA8] flex items-center justify-center shadow-sm">
-                                <Award size={18} />
+                    {/* Services Search & Filter Controls */}
+                    {!loading && Object.keys(services).length > 0 && (
+                        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white border border-[#c2c6d4]/20 p-4 rounded-2xl shadow-sm animate-fadeIn">
+                            <div className="relative w-full sm:w-80">
+                                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                                <input 
+                                    type="text"
+                                    value={serviceSearch}
+                                    onChange={e => setServiceSearch(e.target.value)}
+                                    placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
+                                    className="w-full bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] placeholder:text-gray-400 pl-11 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all font-medium"
+                                />
                             </div>
-                            <h3 className="text-base font-bold text-[#0A1A40]">Exam Form Filing</h3>
-                            <p className="text-[12px] text-gray-500 leading-relaxed font-normal">
-                                Get your SSC, Railway, UPSC, and state-level recruitment forms filed with 100% accuracy. Our operators review and submit on time.
-                            </p>
-                        </div>
 
-                        <div className="bg-white border border-[#c2c6d4]/20 p-6 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all space-y-4">
-                            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shadow-sm">
-                                <Users size={18} />
+                            <div className="w-full sm:w-auto">
+                                <select
+                                    value={serviceCatFilter}
+                                    onChange={e => setServiceCatFilter(e.target.value)}
+                                    className="w-full sm:w-auto px-4 py-2.5 bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all cursor-pointer font-semibold"
+                                >
+                                    <option value="ALL">{lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां'}</option>
+                                    {Object.entries(services).map(([k, cat]) => (
+                                        <option key={k} value={k}>{cat.label}</option>
+                                    ))}
+                                </select>
                             </div>
-                            <h3 className="text-base font-bold text-[#0A1A40]">NEET UG Counselling</h3>
-                            <p className="text-[12px] text-gray-500 leading-relaxed font-normal">
-                                Visual rank predictors and choice-filling templates to secure seats in Rajasthan State quota and MCC All India quota.
-                            </p>
                         </div>
+                    )}
 
-                        <div className="bg-white border border-[#c2c6d4]/20 p-6 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all space-y-4">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-sm">
-                                <ShieldCheck size={18} />
-                            </div>
-                            <h3 className="text-base font-bold text-[#0A1A40]">Document Locker</h3>
-                            <p className="text-[12px] text-gray-500 leading-relaxed font-normal">
-                                Save your marksheets, caste certificates, photo, and signature securely in our encrypted locker. Never upload them twice!
-                            </p>
+                    {/* Available Services Grouped by Category */}
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-12 gap-2">
+                            <div className="w-6 h-6 border-2 border-[#164FA8] border-t-transparent rounded-full animate-spin" />
+                            <span className="text-[11px] text-gray-400 font-bold tracking-widest uppercase">Loading Services...</span>
                         </div>
+                    ) : Object.keys(services).length === 0 ? (
+                        <div className="text-center py-12 text-gray-400">
+                            <p className="text-sm font-semibold">No services available at the moment.</p>
+                        </div>
+                    ) : !hasMatchingServices ? (
+                        <div className="text-center py-16 bg-white border border-dashed border-[#c2c6d4]/30 rounded-2xl text-gray-400">
+                            <Search size={28} className="mx-auto text-gray-300 mb-2" />
+                            <p className="text-sm font-bold">{lang === 'EN' ? 'No services match your search query.' : 'आपकी खोज से मेल खाने वाली कोई सेवा नहीं मिली।'}</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-12 text-left">
+                            {Object.entries(services).map(([catKey, cat]) => {
+                                const matchingServices = (cat.services || []).filter(s => 
+                                    s.name.toLowerCase().includes(serviceSearch.toLowerCase()) ||
+                                    (s.description && s.description.toLowerCase().includes(serviceSearch.toLowerCase()))
+                                )
+                                const isVisible = serviceCatFilter === "ALL" || serviceCatFilter === catKey
 
-                        <div className="bg-white border border-[#c2c6d4]/20 p-6 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all space-y-4">
-                            <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shadow-sm">
-                                <Bell size={18} />
-                            </div>
-                            <h3 className="text-base font-bold text-[#0A1A40]">Automatic Bot Broadcasts</h3>
-                            <p className="text-[12px] text-gray-500 leading-relaxed font-normal">
-                                Instant status checks, admit cards alerts, result links, and syllabus updates delivered straight to your WhatsApp and Telegram app.
-                            </p>
+                                if (matchingServices.length === 0 || !isVisible) return null
+
+                                return (
+                                    <div key={catKey} className="space-y-6 animate-fadeIn">
+                                        {/* Category Section Header */}
+                                        <div className="flex items-center gap-3 border-b border-[#c2c6d4]/20 pb-2">
+                                            <span className="w-1.5 h-6 bg-[#164FA8] rounded-full"></span>
+                                            <h3 className="text-base font-bold text-[#0A1A40] tracking-tight font-display">{cat.label}</h3>
+                                            <span className="text-[10px] text-gray-400 font-bold bg-white px-2 py-0.5 rounded-full border border-slate-200">
+                                                {matchingServices.length} {matchingServices.length === 1 ? "Service" : "Services"}
+                                            </span>
+                                        </div>
+
+                                        {/* Category Cards Grid */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                            {matchingServices.map((svc, idx) => (
+                                                <div key={idx} className="bg-white border border-[#c2c6d4]/20 p-6 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center justify-between text-[10px] font-bold uppercase text-slate-400 tracking-wider">
+                                                            <span>{cat.label}</span>
+                                                            {svc.price && (
+                                                                <span className="text-[#164FA8] bg-blue-50/50 px-2.5 py-1 rounded-lg border border-blue-150 font-bold">
+                                                                    Fee: {svc.price}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <h4 className="text-base font-bold text-[#0A1A40] group-hover:text-[#164FA8] transition-colors leading-snug">{svc.name}</h4>
+                                                        <p className="text-[12.5px] text-gray-500 font-normal leading-relaxed">{svc.description || "Official filing and registration services."}</p>
+                                                    </div>
+
+                                                    <button
+                                                        onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
+                                                        className="mt-6 w-full py-2.5 bg-[#164FA8] hover:bg-[#0A1A40] text-white text-[12.5px] font-bold rounded-xl transition-all shadow-sm border-none cursor-pointer text-center"
+                                                    >
+                                                        {lang === 'EN' ? 'Request Service' : 'सेवा का अनुरोध करें'}
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )
+                            })}
                         </div>
-                    </div>
+                    )}
 
                     {/* How It Works - Process Flow */}
                     <div id="how-it-works" className="pt-8 border-t border-[#c2c6d4]/20">
@@ -396,9 +463,13 @@ export default function Landing() {
                                 <div className="w-14 h-14 rounded-full bg-slate-900 border-4 border-white shadow-md text-white flex items-center justify-center font-bold text-sm">
                                     01
                                 </div>
-                                <h4 className="text-[13.5px] font-bold text-[#0A1A40]">Opt-In & Join</h4>
+                                <h4 className="text-[13.5px] font-bold text-[#0A1A40]">
+                                    {lang === 'EN' ? 'Add Telegram Bot' : 'टेलीग्राम बॉट जोड़ें'}
+                                </h4>
                                 <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs">
-                                    Join WhatsApp alerts & Telegram bot. Link your phone/email to set up preferences.
+                                    {lang === 'EN' 
+                                        ? 'Start our interactive bot on Telegram to receive live alerts and pick filing services.' 
+                                        : 'लाइव अलर्ट प्राप्त करने और सेवाएं चुनने के लिए टेलीग्राम पर हमारे इंटरैक्टिव बॉट को शुरू करें।'}
                                 </p>
                             </div>
 
@@ -406,9 +477,13 @@ export default function Landing() {
                                 <div className="w-14 h-14 rounded-full bg-[#164FA8] border-4 border-white shadow-md text-white flex items-center justify-center font-bold text-sm">
                                     02
                                 </div>
-                                <h4 className="text-[13.5px] font-bold text-[#0A1A40]">Upload Documents</h4>
+                                <h4 className="text-[13.5px] font-bold text-[#0A1A40]">
+                                    {lang === 'EN' ? 'Request a Service' : 'सेवा का अनुरोध करें'}
+                                </h4>
                                 <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs">
-                                    Securely upload your photo, certificates, and ID. Saved once for all future filings.
+                                    {lang === 'EN' 
+                                        ? 'Select the specific government form, exam filing, or state service you wish to request.' 
+                                        : 'उस विशिष्ट सरकारी फॉर्म या सेवा का चयन करें जिसके लिए आप आवेदन करना चाहते हैं।'}
                                 </p>
                             </div>
 
@@ -416,9 +491,13 @@ export default function Landing() {
                                 <div className="w-14 h-14 rounded-full bg-[#164FA8] border-4 border-white shadow-md text-white flex items-center justify-center font-bold text-sm">
                                     03
                                 </div>
-                                <h4 className="text-[13.5px] font-bold text-[#0A1A40]">Operator Submissions</h4>
+                                <h4 className="text-[13.5px] font-bold text-[#0A1A40]">
+                                    {lang === 'EN' ? 'Complete via WhatsApp' : 'व्हाट्सएप पर पूरा करें'}
+                                </h4>
                                 <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs">
-                                    Our kiosk operator reviews details, fills, and pays on the official portals.
+                                    {lang === 'EN' 
+                                        ? 'Connect on WhatsApp to securely upload your documents and complete the filing details with our operator.' 
+                                        : 'सुरक्षित रूप से दस्तावेज़ अपलोड करने और हमारे ऑपरेटर के साथ आवेदन विवरण पूरा करने के लिए व्हाट्सएप पर जुड़ें।'}
                                 </p>
                             </div>
 
@@ -426,9 +505,13 @@ export default function Landing() {
                                 <div className="w-14 h-14 rounded-full bg-emerald-500 border-4 border-white shadow-md text-white flex items-center justify-center font-bold text-sm">
                                     04
                                 </div>
-                                <h4 className="text-[13.5px] font-bold text-[#0A1A40]">Instant Receipt</h4>
+                                <h4 className="text-[13.5px] font-bold text-[#0A1A40]">
+                                    {lang === 'EN' ? 'Get Final Receipt' : 'अंतिम रसीद प्राप्त करें'}
+                                </h4>
                                 <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs">
-                                    Receive the PDF printout and official transaction receipt directly on Telegram & WhatsApp.
+                                    {lang === 'EN' 
+                                        ? 'Once verified and submitted, get your official government transaction receipt and filled PDF printout.' 
+                                        : 'सत्यापन और सबमिशन के बाद, सीधे अपने चैट में आधिकारिक सरकारी लेनदेन रसीद और भरा हुआ आवेदन पीडीएफ प्राप्त करें।'}
                                 </p>
                             </div>
                         </div>
