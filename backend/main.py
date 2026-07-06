@@ -1,3 +1,45 @@
+# Self-healing package installer (fixes PythonAnywhere package conflicts automatically)
+import sys
+import subprocess
+
+def auto_fix_packages():
+    # 1. Check and install/upgrade httpx to 0.25.2
+    need_httpx = False
+    try:
+        import httpx
+        if getattr(httpx, "__version__", "") != "0.25.2":
+            need_httpx = True
+    except ImportError:
+        need_httpx = True
+        
+    if need_httpx:
+        print("Self-healing: Installing compatible httpx==0.25.2...")
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "httpx==0.25.2"])
+            import importlib
+            importlib.invalidate_caches()
+        except Exception as e:
+            print(f"Self-healing error installing httpx: {e}")
+
+    # 2. Check and install/upgrade supabase
+    need_supabase = False
+    try:
+        import supabase
+    except ImportError:
+        need_supabase = True
+        
+    if need_supabase:
+        print("Self-healing: Installing supabase...")
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "supabase"])
+            import importlib
+            importlib.invalidate_caches()
+        except Exception as e:
+            print(f"Self-healing error installing supabase: {e}")
+
+# Run the self-healing routine
+auto_fix_packages()
+
 import asyncio
 import re
 import threading
@@ -25,9 +67,6 @@ if config.CLERK_JWKS_URL and not config.CLERK_JWT_PUBLIC_KEY:
         jwks_client = PyJWKClient(config.CLERK_JWKS_URL)
     except Exception as e:
         print(f"JWKS Client initialization failed: {e}")
-
-# ── Persistent broadcast job tracker (database-backed) ───────────────────
-# status code logic moved to database.py
 
 app = Flask(__name__)
 # Explicit CORS handling for development and production Vercel origins
