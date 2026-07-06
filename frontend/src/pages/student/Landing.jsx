@@ -5,7 +5,8 @@ import {
     ArrowRight, MessageSquare, Send, CheckCircle2,
     Clock, Bell, ShieldCheck, Globe, HelpCircle,
     Download, ExternalLink, Award, FileText, ChevronRight,
-    Users, ChevronDown, Check, Sparkles, LogOut, Info, BookOpen
+    Users, ChevronDown, Check, Sparkles, LogOut, Info, BookOpen,
+    User
 } from "lucide-react"
 import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
@@ -160,12 +161,12 @@ export default function Landing() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-[#f3faff] via-white to-[#f6fbff] text-[#071e27] font-sans overflow-x-hidden selection:bg-[#164FA8]/20">
             {/* ── HEADER ── */}
-            <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-[#c2c6d4]/20 px-6 lg:px-12 h-20 flex items-center justify-between">
+            <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-[#c2c6d4]/20 px-4 sm:px-6 lg:px-12 h-20 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#164FA8] to-[#0A1A40] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-[#164FA8]/10">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#164FA8] to-[#0A1A40] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-[#164FA8]/10 shrink-0">
                         e
                     </div>
-                    <div className="leading-none">
+                    <div className="leading-none hidden sm:block">
                         <span className="text-lg font-black tracking-tight text-[#0A1A40] font-display">Krishna Emitra Digital</span>
                         <span className="text-[9px] text-gray-400 font-bold tracking-widest uppercase block mt-0.5">Kiosk & Alerts</span>
                     </div>
@@ -179,31 +180,35 @@ export default function Landing() {
                     <button onClick={() => scrollToSection("faq")} className="hover:text-[#164FA8] transition-colors">FAQs</button>
                 </nav>
 
-                <div className="flex items-center gap-4">
-                    <button onClick={toggleLanguage} className="text-slate-600 hover:text-slate-900 transition-colors text-[11px] font-black flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 uppercase">
+                <div className="flex items-center gap-2 sm:gap-4">
+                    <button onClick={toggleLanguage} className="text-slate-600 hover:text-slate-900 transition-colors text-[11px] font-black flex items-center gap-1.5 bg-slate-50 px-2 py-1.5 sm:px-3 rounded-lg border border-slate-200 uppercase">
                         <Globe size={13} className="text-slate-400" /> {lang === 'EN' ? 'हिंदी' : 'English'}
                     </button>
 
                     <div className="h-6 w-px bg-slate-200" />
 
                     {isLoggedIn ? (
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                             <button
                                 onClick={() => navigate("/dashboard")}
-                                className="px-5 py-2.5 rounded-xl bg-[#164FA8] hover:bg-[#0A1A40] text-white text-[12px] font-bold shadow-lg shadow-[#164FA8]/15 flex items-center gap-2 transform active:scale-95 transition-all"
+                                className="p-2.5 sm:px-5 sm:py-2.5 rounded-xl bg-[#164FA8] hover:bg-[#0A1A40] text-white text-[12px] font-bold shadow-lg shadow-[#164FA8]/15 flex items-center justify-center gap-2 transform active:scale-95 transition-all"
+                                title="Dashboard"
                             >
-                                Dashboard <ArrowRight size={13} />
+                                <User size={16} />
+                                <span className="hidden sm:inline">Dashboard</span>
                             </button>
-                            <button onClick={logout} className="p-2.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Log Out">
+                            <button onClick={logout} className="p-2.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors shrink-0" title="Log Out">
                                 <LogOut size={16} />
                             </button>
                         </div>
                     ) : (
                         <button
                             onClick={triggerSignIn}
-                            className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-[12px] font-bold shadow-sm flex items-center gap-1.5 transform active:scale-95 transition-all"
+                            className="p-2.5 sm:px-5 sm:py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-[12px] font-bold shadow-sm flex items-center justify-center gap-1.5 transform active:scale-95 transition-all"
+                            title="Sign In Portal"
                         >
-                            Sign In Portal
+                            <User size={16} />
+                            <span className="hidden sm:inline">Sign In Portal</span>
                         </button>
                     )}
                 </div>
