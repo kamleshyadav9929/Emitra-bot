@@ -55,13 +55,13 @@ limiter = Limiter(
 # Initialize database on startup
 database.init_db()
 
+
+
 # ── Persistent Bot & Event Loop ──────────────────────────────────────────────
 # Creating a Bot() per webhook request was the #1 bottleneck.
 # A persistent bot reuses the same HTTP connection pool across requests.
 # A persistent event loop avoids per-request loop creation/teardown.
 # NO background threads — PythonAnywhere WSGI kills daemon threads.
-
-_bot_loop = asyncio.new_event_loop()
 
 _persistent_bot = Bot(token=config.TELEGRAM_BOT_TOKEN) if config.TELEGRAM_BOT_TOKEN else None
 if not _persistent_bot:
@@ -70,11 +70,11 @@ if not _persistent_bot:
 
 def run_async(coro):
     """
-    Runs an async coroutine on the persistent event loop.
-    WSGI is single-threaded per worker, so run_until_complete is safe.
-    Reusing the same loop keeps the Bot's httpx client alive across requests.
+    Runs an async coroutine. Using asyncio.run() ensures that each request
+    gets its own thread-safe event loop, avoiding event loop conflicts and crashes
+    in multi-threaded WSGI environments like PythonAnywhere.
     """
-    return _bot_loop.run_until_complete(coro)
+    return asyncio.run(coro)
 
 
 # ── Authentication ─────────────────────────────────────────────────────────────
@@ -174,8 +174,11 @@ def webhook():
         return jsonify({"ok": True})
 
     except Exception as e:
-        print("Webhook processing error:", str(e))
-        return jsonify({"ok": False, "error": str(e)}), 500
+        import traceback
+        print("Webhook processing error:")
+        traceback.print_exc()
+        # Return 200 OK to Telegram so it doesn't retry failed updates indefinitely.
+        return jsonify({"ok": False, "error": str(e)}), 200
 
 
 @app.route("/ping", methods=["GET", "HEAD"])

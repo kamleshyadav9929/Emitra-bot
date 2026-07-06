@@ -209,10 +209,49 @@ def add_student_admin(name, phone_number, exam_pref="NONE"):
 
 def update_phone_number(telegram_id, phone_number):
     now_str = datetime.utcnow().isoformat()
-    supabase.table("students").update({
-        "phone_number": phone_number,
-        "last_active": now_str
-    }).eq("telegram_id", str(telegram_id)).execute()
+    # Clean phone number to exactly the last 10 digits to match website registration format
+    clean_phone = phone_number.strip().replace(" ", "").replace("-", "")
+    if clean_phone.startswith("+"):
+        clean_phone = clean_phone[1:]
+    if len(clean_phone) > 10 and (clean_phone.startswith("91") or clean_phone.startswith("091")):
+        clean_phone = clean_phone[-10:]
+    elif len(clean_phone) > 10:
+        clean_phone = clean_phone[-10:]
+        
+    # 1. Check if there is an existing student record with this phone number (e.g., from web registration)
+    try:
+        res = supabase.table("students").select("*").eq("phone_number", clean_phone).execute()
+        existing = res.data[0] if res.data else None
+    except Exception as e:
+        print(f"Error checking existing student by phone: {e}")
+        existing = None
+
+    if existing:
+        # If an existing student record is found with the same phone number
+        existing_tg_id = existing.get("telegram_id")
+        if not existing_tg_id or existing_tg_id != str(telegram_id):
+            try:
+                # 1. Delete the temporary student record first to release the telegram_id unique constraint
+                supabase.table("students").delete().eq("telegram_id", str(telegram_id)).neq("id", existing["id"]).execute()
+                
+                # 2. Merge the records: Associate the existing row with this telegram_id
+                supabase.table("students").update({
+                    "telegram_id": str(telegram_id),
+                    "last_active": now_str,
+                    "is_registered": 1
+                }).eq("id", existing["id"]).execute()
+            except Exception as e:
+                print(f"Error merging student rows: {e}")
+        return
+
+    # 2. If no duplicate exists, update the current student row with the phone number
+    try:
+        supabase.table("students").update({
+            "phone_number": clean_phone,
+            "last_active": now_str
+        }).eq("telegram_id", str(telegram_id)).execute()
+    except Exception as e:
+        print(f"Error updating phone number: {e}")
 
 
 def update_exam_preference(telegram_id, exam):
