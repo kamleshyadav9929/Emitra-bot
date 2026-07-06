@@ -1,6 +1,33 @@
+import time as _time
 from datetime import datetime
 from supabase import create_client, Client
 import config
+
+# ── In-memory TTL cache ──────────────────────────────────────────────────────
+# Eliminates redundant Supabase round-trips on hot bot paths.
+# Services/exams/settings rarely change but are fetched on EVERY interaction.
+
+_cache = {}          # key -> (value, expiry_timestamp)
+_CACHE_TTL = 300     # 5 minutes
+
+
+def _cache_get(key):
+    """Return cached value if present and not expired, else None."""
+    entry = _cache.get(key)
+    if entry and entry[1] > _time.monotonic():
+        return entry[0]
+    return None
+
+
+def _cache_set(key, value):
+    """Store a value in cache with TTL."""
+    _cache[key] = (value, _time.monotonic() + _CACHE_TTL)
+
+
+def _cache_invalidate(*keys):
+    """Remove specific cache entries (call after admin writes)."""
+    for key in keys:
+        _cache.pop(key, None)
 
 # Initialize Supabase client
 supabase: Client = None
@@ -138,15 +165,18 @@ def is_new_user(telegram_id):
 
 
 def register_user(telegram_id, name, username):
-    """Bot registration: needs telegram_id."""
-    if is_new_user(telegram_id):
-        supabase.table("students").insert({
+    """Bot registration: uses upsert to avoid a separate is_new_user check.
+    If the user already exists, this is a no-op (does not overwrite existing data)."""
+    try:
+        supabase.table("students").upsert({
             "telegram_id": str(telegram_id),
             "name": name,
             "username": username,
             "phone_number": f"BOT_TEMP_{telegram_id}",
             "is_registered": 1
-        }).execute()
+        }, on_conflict="telegram_id", ignore_duplicates=True).execute()
+    except Exception:
+        pass  # User already exists — safe to ignore
 
 
 def register_student_web(name, phone_number, exam_pref):
@@ -450,8 +480,15 @@ def get_user_documents(telegram_id):
 # ── Bot Settings CRUD ────────────────────────────────────────────────────────
 
 def get_bot_setting(key, default=None):
+    cache_key = f"bot_setting:{key}"
+    cached = _cache_get(cache_key)
+    if cached is not None:
+        return cached
     res = supabase.table("bot_settings").select("value").eq("key", key).execute()
-    return res.data[0]["value"] if res.data else default
+    val = res.data[0]["value"] if res.data else default
+    if val is not None:
+        _cache_set(cache_key, val)
+    return val
 
 
 def get_all_bot_settings():
@@ -461,6 +498,7 @@ def get_all_bot_settings():
 
 def set_bot_setting(key, value):
     supabase.table("bot_settings").upsert({"key": str(key), "value": str(value)}).execute()
+    _cache_invalidate(f"bot_setting:{key}")
 
 
 def set_bot_settings_bulk(settings_dict):
@@ -468,6 +506,8 @@ def set_bot_settings_bulk(settings_dict):
     rows = [{"key": str(k), "value": str(v)} for k, v in settings_dict.items()]
     if rows:
         supabase.table("bot_settings").upsert(rows).execute()
+        for k in settings_dict:
+            _cache_invalidate(f"bot_setting:{k}")
 
 
 # ── Services CRUD ─────────────────────────────────────────────────────────────
@@ -482,6 +522,10 @@ def get_all_services():
 
 
 def get_services_as_dict():
+    cached = _cache_get("services_dict")
+    if cached is not None:
+        return cached
+
     res = supabase.table("services").select("*")\
         .eq("enabled", 1)\
         .order("sort_order", desc=False)\
@@ -501,10 +545,15 @@ def get_services_as_dict():
             "description": row["description"],
             "price": row["price"]
         })
+    _cache_set("services_dict", result)
     return result
 
 
 def get_public_services_as_dict():
+    cached = _cache_get("public_services_dict")
+    if cached is not None:
+        return cached
+
     res = supabase.table("services").select("*")\
         .eq("show_in_web", 1)\
         .order("sort_order", desc=False)\
@@ -524,6 +573,7 @@ def get_public_services_as_dict():
             "description": row["description"],
             "price": row["price"]
         })
+    _cache_set("public_services_dict", result)
     return result
 
 
@@ -542,6 +592,7 @@ def add_service(category_key, category_label, name, description="", price="", en
         "show_in_web": 1 if show_in_web else 0,
         "sort_order": next_order
     }).execute()
+    _cache_invalidate("services_dict", "public_services_dict")
     return res.data[0]["id"]
 
 
@@ -555,6 +606,7 @@ def update_service(service_id, **fields):
         
     if updates:
         supabase.table("services").update(updates).eq("id", service_id).execute()
+        _cache_invalidate("services_dict", "public_services_dict")
 
 
 def toggle_service(service_id):
@@ -563,23 +615,30 @@ def toggle_service(service_id):
         curr = res.data[0]["enabled"]
         new_val = 0 if curr == 1 else 1
         supabase.table("services").update({"enabled": new_val}).eq("id", service_id).execute()
+        _cache_invalidate("services_dict", "public_services_dict")
 
 
 def delete_service(service_id):
     supabase.table("services").delete().eq("id", service_id).execute()
+    _cache_invalidate("services_dict", "public_services_dict")
 
 
 # ── Exams Management ─────────────────────────────────────────────────────────
 
 def get_all_exams():
     """Returns list of enabled exams."""
+    cached = _cache_get("all_exams")
+    if cached is not None:
+        return cached
     res = supabase.table("exams").select("*").eq("enabled", 1).order("id", desc=False).execute()
+    _cache_set("all_exams", res.data)
     return res.data
 
 
 def add_exam(name):
     try:
         res = supabase.table("exams").insert({"name": name.strip()}).execute()
+        _cache_invalidate("all_exams")
         return True, res.data[0]["id"]
     except Exception as e:
         return False, f"Exam already exists or error: {str(e)}"
@@ -587,6 +646,7 @@ def add_exam(name):
 
 def delete_exam(exam_id):
     supabase.table("exams").delete().eq("id", exam_id).execute()
+    _cache_invalidate("all_exams")
 
 
 # ── Broadcast Jobs persistence ─────────────────────────────────────────────
@@ -650,6 +710,7 @@ def add_exam_details(name, description='', category='UG', start_date='', end_dat
             "official_url": official_url,
             "enabled": 1 if enabled else 0
         }).execute()
+        _cache_invalidate("all_exams")
         return True, res.data[0]["id"]
     except Exception as e:
         return False, f"Exam already exists or error: {str(e)}"
@@ -670,6 +731,7 @@ def update_exam_details(exam_id, name, description, category, start_date, end_da
             "official_url": official_url,
             "enabled": 1 if enabled else 0
         }).eq("id", exam_id).execute()
+        _cache_invalidate("all_exams")
         return True
     except Exception as e:
         return False, f"Another exam with this name already exists or error: {str(e)}"

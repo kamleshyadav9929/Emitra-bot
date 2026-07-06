@@ -47,9 +47,11 @@ def build_categories_keyboard():
     return InlineKeyboardMarkup(buttons)
 
 
-def build_services_keyboard(category_key):
-    """Returns inline keyboard with services for the selected category (live from DB)."""
-    services = load_services()
+def build_services_keyboard(category_key, services=None):
+    """Returns inline keyboard with services for the selected category.
+    Accepts an optional pre-loaded services dict to avoid redundant DB calls."""
+    if services is None:
+        services = load_services()
     category = services.get(category_key)
     if not category:
         return None
@@ -76,7 +78,8 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat_id = update.effective_chat.id
 
-    if user and database.is_new_user(chat_id):
+    if user:
+        # Single call: register_user handles the is_new check internally via upsert-like logic
         username = f"@{user.username}" if user.username else ""
         name = user.first_name + (f" {user.last_name}" if user.last_name else "")
         database.register_user(chat_id, name, username)
@@ -209,7 +212,7 @@ async def button_callback_handler(update: Update, context):
         category = services.get(category_key)
         if not category:
             return
-        keyboard = build_services_keyboard(category_key)
+        keyboard = build_services_keyboard(category_key, services=services)
         await query.edit_message_text(
             text=f"{category['label']}\n\nKoi seva chunein:",
             reply_markup=keyboard,

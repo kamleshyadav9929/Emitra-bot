@@ -11,6 +11,7 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from telegram import Update, Bot
+from telegram.ext import Application
 
 import config
 import database
@@ -54,6 +55,33 @@ limiter = Limiter(
 
 # Initialize database on startup
 database.init_db()
+
+# ── Persistent Bot & Event Loop ──────────────────────────────────────────────
+# Creating a Bot() per webhook request was the #1 bottleneck (~500-800ms each).
+# A persistent bot reuses the same HTTP session and connection pool.
+
+_bot_loop = asyncio.new_event_loop()
+_bot_thread = threading.Thread(
+    target=_bot_loop.run_forever,
+    daemon=True,
+    name="bot-event-loop",
+)
+_bot_thread.start()
+
+# Build a persistent Application (which owns a persistent Bot)
+_tg_app = None
+if config.TELEGRAM_BOT_TOKEN:
+    _tg_app = (
+        Application.builder()
+        .token(config.TELEGRAM_BOT_TOKEN)
+        .build()
+    )
+    # Initialize the application (creates HTTP session pool)
+    asyncio.run_coroutine_threadsafe(_tg_app.initialize(), _bot_loop).result(timeout=15)
+    _persistent_bot = _tg_app.bot
+else:
+    _persistent_bot = None
+    print("WARNING: TELEGRAM_BOT_TOKEN not set. Bot will not function.")
 
 
 
@@ -113,16 +141,11 @@ def token_required(f):
 
 def run_async(coro):
     """
-    Safely runs an async coroutine from a synchronous Flask route.
-    Creates a new event loop per call to avoid conflicts with Flask's WSGI context.
+    Runs an async coroutine on the persistent background event loop.
+    Much faster than creating a new loop per call.
     """
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    try:
-        return loop.run_until_complete(coro)
-    finally:
-        loop.close()
-        asyncio.set_event_loop(None)
+    future = asyncio.run_coroutine_threadsafe(coro, _bot_loop)
+    return future.result(timeout=30)
 
 
 # ── FIX #5: Telegram Webhook with secret token verification ───────────────────
@@ -141,8 +164,8 @@ def webhook():
             return jsonify({"ok": False, "error": "Empty payload"}), 400
 
         async def process():
-            bot = Bot(token=config.TELEGRAM_BOT_TOKEN)
-            update = Update.de_json(update_data, bot)
+            # Reuse the persistent bot — no per-request instantiation
+            update = Update.de_json(update_data, _persistent_bot)
 
             if update.message and update.message.contact:
                 await bot_handlers.contact_handler(update, None)
@@ -467,17 +490,15 @@ def get_student_documents(telegram_id):
     return jsonify({"documents": docs})
 
 
-# FIX #2: Document URL endpoint — loop was referenced before assignment
+# FIX #2: Document URL endpoint — uses persistent bot (no per-request instantiation)
 @app.route("/api/document-url/<file_id>", methods=["GET"])
 @token_required
 def get_document_url(file_id):
     try:
         async def _get_file_path():
-            bot = Bot(token=config.TELEGRAM_BOT_TOKEN)
-            telegram_file = await bot.get_file(file_id)
+            telegram_file = await _persistent_bot.get_file(file_id)
             return telegram_file.file_path
 
-        # run_async creates and manages its own event loop — no NameError
         file_path = run_async(_get_file_path())
         return jsonify({"url": file_path})
     except Exception as e:
