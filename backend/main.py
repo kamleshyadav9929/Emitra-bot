@@ -11,7 +11,6 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from telegram import Update, Bot
-from telegram.ext import Application
 
 import config
 import database
@@ -58,7 +57,8 @@ database.init_db()
 
 # ── Persistent Bot & Event Loop ──────────────────────────────────────────────
 # Creating a Bot() per webhook request was the #1 bottleneck (~500-800ms each).
-# A persistent bot reuses the same HTTP session and connection pool.
+# A persistent bot reuses the same HTTP connection pool across all requests.
+# NOTE: Bot() constructor is lightweight (no network calls) — safe for WSGI import.
 
 _bot_loop = asyncio.new_event_loop()
 _bot_thread = threading.Thread(
@@ -68,19 +68,10 @@ _bot_thread = threading.Thread(
 )
 _bot_thread.start()
 
-# Build a persistent Application (which owns a persistent Bot)
-_tg_app = None
-if config.TELEGRAM_BOT_TOKEN:
-    _tg_app = (
-        Application.builder()
-        .token(config.TELEGRAM_BOT_TOKEN)
-        .build()
-    )
-    # Initialize the application (creates HTTP session pool)
-    asyncio.run_coroutine_threadsafe(_tg_app.initialize(), _bot_loop).result(timeout=15)
-    _persistent_bot = _tg_app.bot
-else:
-    _persistent_bot = None
+# Simple persistent Bot — no Application.initialize() needed
+# (Application.initialize() makes network calls that hang PythonAnywhere's WSGI startup)
+_persistent_bot = Bot(token=config.TELEGRAM_BOT_TOKEN) if config.TELEGRAM_BOT_TOKEN else None
+if not _persistent_bot:
     print("WARNING: TELEGRAM_BOT_TOKEN not set. Bot will not function.")
 
 
