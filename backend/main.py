@@ -5,19 +5,19 @@ import subprocess
 def auto_fix_packages():
     import importlib.metadata
     
-    # 1. Check and install/upgrade httpx to 0.25.2
+    # 1. Check and install/upgrade httpx to 0.27.2
     need_httpx = False
     try:
         version = importlib.metadata.version("httpx")
-        if version != "0.25.2":
+        if version != "0.27.2":
             need_httpx = True
     except importlib.metadata.PackageNotFoundError:
         need_httpx = True
         
     if need_httpx:
-        print("Self-healing: Forcing install of compatible httpx==0.25.2...")
+        print("Self-healing: Forcing install of compatible httpx==0.27.2...")
         try:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "--force-reinstall", "httpx==0.25.2"])
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "--force-reinstall", "httpx==0.27.2"])
         except Exception as e:
             print(f"Self-healing error installing httpx: {e}")
 
