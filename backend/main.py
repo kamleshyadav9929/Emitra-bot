@@ -159,16 +159,31 @@ def token_required(f):
         # Priority 1: High-Performance Offline Verification (No network calls)
         if config.CLERK_JWT_PUBLIC_KEY:
             try:
-                # Ensure the key has proper headers if it's just the raw base64/string
-                key = config.CLERK_JWT_PUBLIC_KEY
+                key = config.CLERK_JWT_PUBLIC_KEY.strip()
+
+                # Fix 1: Replace literal \n escape sequences (common when pasting into .env)
+                key = key.replace("\\n", "\n")
+
+                # Fix 2: If the key has no newlines at all, it's raw base64 — wrap it
                 if "-----BEGIN PUBLIC KEY-----" not in key:
                     key = f"-----BEGIN PUBLIC KEY-----\n{key}\n-----END PUBLIC KEY-----"
-                
+                else:
+                    # Fix 3: Rebuild the PEM properly in case newlines inside body are missing
+                    # Extract just the base64 body between the headers
+                    inner = key.replace("-----BEGIN PUBLIC KEY-----", "") \
+                               .replace("-----END PUBLIC KEY-----", "") \
+                               .replace("\n", "") \
+                               .replace(" ", "") \
+                               .strip()
+                    # Re-wrap with proper 64-char line breaks (standard PEM format)
+                    wrapped = "\n".join(inner[i:i+64] for i in range(0, len(inner), 64))
+                    key = f"-----BEGIN PUBLIC KEY-----\n{wrapped}\n-----END PUBLIC KEY-----"
+
                 jwt.decode(
                     token,
                     key,
                     algorithms=["RS256"],
-                    options={"verify_aud": False} # Clerk tokens usually don't need AUD check here
+                    options={"verify_aud": False}
                 )
                 return f(*args, **kwargs)
             except Exception as e:
