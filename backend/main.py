@@ -1,10 +1,29 @@
-# Ensure critical packages are installed on PythonAnywhere
+# Ensure critical packages are installed on PythonAnywhere.
+# python-telegram-bot 20.x passes `proxies` to httpx.AsyncClient,
+# which was removed in httpx>=0.28.0 → must stay on 0.27.2.
 import sys
 import subprocess
 
 def auto_fix_packages():
     import importlib.metadata
-    # Ensure supabase is installed (not always pre-installed on PythonAnywhere)
+
+    # Lock httpx to 0.27.2 — python-telegram-bot 20.x crashes on 0.28+
+    try:
+        current_httpx = importlib.metadata.version("httpx")
+    except Exception:
+        current_httpx = "unknown"
+
+    if current_httpx != "0.27.2":
+        print(f"[auto_fix] httpx is {current_httpx} — forcing 0.27.2 ...")
+        try:
+            subprocess.check_call([
+                sys.executable, "-m", "pip", "install",
+                "--user", "--force-reinstall", "--quiet", "httpx==0.27.2"
+            ])
+        except Exception as e:
+            print(f"[auto_fix] ERROR: {e}")
+
+    # Ensure supabase is installed
     try:
         importlib.metadata.version("supabase")
     except importlib.metadata.PackageNotFoundError:
