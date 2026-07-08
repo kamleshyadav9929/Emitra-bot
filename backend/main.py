@@ -68,11 +68,11 @@ if config.CLERK_JWKS_URL and not config.CLERK_JWT_PUBLIC_KEY:
 app = Flask(__name__)
 
 # ── Manual CORS – bulletproof for PythonAnywhere ─────────────────────────────
-# flask-cors sometimes fails to attach headers to plain-string responses.
 # Using @after_request ensures every response (200, 401, 500, OPTIONS …)
 # always carries the correct CORS headers.
 ALLOWED_ORIGINS = [
     "https://emitra-bot.vercel.app",
+    "https://krishnaemitra.vercel.app",
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:5175",
@@ -84,10 +84,19 @@ ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
 ]
 
+def _is_origin_allowed(origin):
+    """Allow exact matches OR any *.vercel.app preview URL."""
+    if origin in ALLOWED_ORIGINS:
+        return True
+    # Allow all Vercel preview deployments (emitra-bot-*.vercel.app etc.)
+    if origin.startswith("https://") and origin.endswith(".vercel.app"):
+        return True
+    return False
+
 @app.after_request
 def add_cors_headers(response):
     origin = request.headers.get("Origin", "")
-    if origin in ALLOWED_ORIGINS:
+    if _is_origin_allowed(origin):
         response.headers["Access-Control-Allow-Origin"]  = origin
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept"
