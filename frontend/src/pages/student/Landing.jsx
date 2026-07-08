@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from "motion/react"
 import { useNavigate } from "react-router-dom"
 import {
     Send, Clock, Bell, Globe, ExternalLink,
-    ChevronDown, Check, LogOut, User, Search
+    ChevronDown, Check, LogOut, User, Search,
+    X, Loader2, ArrowRight
 } from "lucide-react"
 import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
@@ -53,6 +54,15 @@ export default function Landing() {
     const [serviceSearch, setServiceSearch] = useState("")
     const [serviceCatFilter, setServiceCatFilter] = useState("ALL")
     const [expandedFaq, setExpandedFaq] = useState(null)
+
+    // Service request modal state
+    const [showRequestModal, setShowRequestModal] = useState(false)
+    const [requestModalSvc, setRequestModalSvc] = useState(null)
+    const [requestModalCatKey, setRequestModalCatKey] = useState("")
+    const [requestModalCatLabel, setRequestModalCatLabel] = useState("")
+    const [customerName, setCustomerName] = useState("")
+    const [customerPhone, setCustomerPhone] = useState("")
+    const [isSubmittingRequest, setIsSubmittingRequest] = useState(false)
 
     // Filtered services presence check
     const hasMatchingServices = useMemo(() => {
@@ -106,6 +116,43 @@ export default function Landing() {
         window.open(`https://wa.me/${config.whatsapp_number || "916377964293"}?text=${waMsg}`, "_blank")
     }
 
+    const handleWhatsAppFiling = () => {
+        const waMsg = encodeURIComponent("Hello! I want to submit my documents and complete my service filing request.")
+        window.open(`https://wa.me/${config.whatsapp_number || "916377964293"}?text=${waMsg}`, "_blank")
+    }
+
+    const handleRequestServiceWhatsApp = (svc, catKey, catLabel) => {
+        setRequestModalSvc(svc)
+        setRequestModalCatKey(catKey)
+        setRequestModalCatLabel(catLabel)
+        setShowRequestModal(true)
+    }
+
+    const handleModalSubmit = async (e) => {
+        e.preventDefault()
+        if (!customerName.trim() || !customerPhone.trim()) return
+        setIsSubmittingRequest(true)
+        try {
+            await api.publicLogIntent(
+                requestModalSvc.name,
+                requestModalCatKey,
+                `${customerName.trim()} | ${customerPhone.trim()}`
+            )
+            const text = lang === 'EN'
+                ? `Hello! I am ${customerName.trim()} (${customerPhone.trim()}). I would like to request the service: "${requestModalSvc.name}" under the category "${requestModalCatLabel}". Please let me know the requirements and fee payment process.`
+                : `नमस्ते! मैं ${customerName.trim()} (${customerPhone.trim()}) हूँ। मैं श्रेणी "${requestModalCatLabel}" के अंतर्गत "${requestModalSvc.name}" सेवा के लिए आवेदन करना चाहता हूँ। कृपया आवश्यक दस्तावेज और शुल्क भुगतान प्रक्रिया बताएं।`
+            const waMsg = encodeURIComponent(text)
+            window.open(`https://wa.me/${config.whatsapp_number || "916377964293"}?text=${waMsg}`, "_blank")
+            setShowRequestModal(false)
+            setCustomerName("")
+            setCustomerPhone("")
+        } catch (err) {
+            console.error("Failed to log request intent", err)
+        } finally {
+            setIsSubmittingRequest(false)
+        }
+    }
+
     const handleJoinTelegram = () => {
         setStep2Done(true)
         localStorage.setItem("emitra_step2_tg", "true")
@@ -125,11 +172,11 @@ export default function Landing() {
     // Filter Announcements/Notifications
     const filteredAnnouncements = useMemo(() => {
         return announcements.filter(ann => {
-            const matchesSearch = ann.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                 ann.content.toLowerCase().includes(searchQuery.toLowerCase())
+            const matchesSearch = (ann.title && ann.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                                 (ann.content && ann.content.toLowerCase().includes(searchQuery.toLowerCase()))
             if (filterCategory === "ALL") return matchesSearch
-            if (filterCategory === "exams") return matchesSearch && ann.title.toLowerCase().match(/(exam|result|admit|date|ssc|rrb|neet|upsc)/)
-            if (filterCategory === "general") return matchesSearch && !ann.title.toLowerCase().match(/(exam|result|admit|date|ssc|rrb|neet|upsc)/)
+            if (filterCategory === "exams") return matchesSearch && (ann.exam_target && ann.exam_target !== "ALL")
+            if (filterCategory === "general") return matchesSearch && (ann.exam_target === "ALL" || !ann.exam_target)
             return matchesSearch
         })
     }, [announcements, searchQuery, filterCategory])
@@ -337,184 +384,226 @@ export default function Landing() {
 
             {/* ── WHAT WE DO & HOW WE DO IT ── */}
             <section id="what-we-do" className="bg-[#f8fcff] border-y border-[#c2c6d4]/10 py-20 px-6 lg:px-12">
-                <div className="max-w-[1240px] mx-auto space-y-12">
-                    <div className="text-center max-w-2xl mx-auto space-y-4">
-                        <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "Our Services" : "हमारी सेवाएँ"}</p>
-                        <h2 className="text-3xl md:text-4xl font-black text-[#0A1A40] font-display">
-                            {lang === "EN" ? "Available Services" : "उपलब्ध सेवाएँ"}
-                        </h2>
-                        <p className="text-[13.5px] text-gray-500 font-normal leading-relaxed">
-                            {lang === "EN" 
-                                ? "Browse and request official government documentation, application filings, and counselling services online."
-                                : "आधिकारिक सरकारी दस्तावेज़, आवेदन पत्र और काउंसलिंग सेवाओं को ऑनलाइन ब्राउज़ करें और अनुरोध करें।"}
-                        </p>
-                    </div>
-
-                    {/* Services Search & Filter Controls */}
-                    {!loading && Object.keys(services).length > 0 && (
-                        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white border border-[#c2c6d4]/20 p-4 rounded-2xl shadow-sm animate-fadeIn">
-                            <div className="relative w-full sm:w-80">
-                                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input 
-                                    type="text"
-                                    value={serviceSearch}
-                                    onChange={e => setServiceSearch(e.target.value)}
-                                    placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
-                                    className="w-full bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] placeholder:text-gray-400 pl-11 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all font-medium"
-                                />
-                            </div>
-
-                            <div className="w-full sm:w-auto">
-                                <select
-                                    value={serviceCatFilter}
-                                    onChange={e => setServiceCatFilter(e.target.value)}
-                                    className="w-full sm:w-auto px-4 py-2.5 bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all cursor-pointer font-semibold"
-                                >
-                                    <option value="ALL">{lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां'}</option>
-                                    {Object.entries(services).map(([k, cat]) => (
-                                        <option key={k} value={k}>{cat.label}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Available Services Grouped by Category */}
-                    {loading ? (
-                        <div className="flex flex-col items-center justify-center py-12 gap-2">
-                            <div className="w-6 h-6 border-2 border-[#164FA8] border-t-transparent rounded-full animate-spin" />
-                            <span className="text-[11px] text-gray-400 font-bold tracking-widest uppercase">Loading Services...</span>
-                        </div>
-                    ) : Object.keys(services).length === 0 ? (
-                        <div className="text-center py-12 text-gray-400">
-                            <p className="text-sm font-semibold">No services available at the moment.</p>
-                        </div>
-                    ) : !hasMatchingServices ? (
-                        <div className="text-center py-16 bg-white border border-dashed border-[#c2c6d4]/30 rounded-2xl text-gray-400">
-                            <Search size={28} className="mx-auto text-gray-300 mb-2" />
-                            <p className="text-sm font-bold">{lang === 'EN' ? 'No services match your search query.' : 'आपकी खोज से मेल खाने वाली कोई सेवा नहीं मिली।'}</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-12 text-left">
-                            {Object.entries(services).map(([catKey, cat]) => {
-                                const matchingServices = (cat.services || []).filter(s => 
-                                    s.name.toLowerCase().includes(serviceSearch.toLowerCase()) ||
-                                    (s.description && s.description.toLowerCase().includes(serviceSearch.toLowerCase()))
-                                )
-                                const isVisible = serviceCatFilter === "ALL" || serviceCatFilter === catKey
-
-                                if (matchingServices.length === 0 || !isVisible) return null
-
-                                return (
-                                    <div key={catKey} className="space-y-6 animate-fadeIn">
-                                        {/* Category Section Header */}
-                                        <div className="flex items-center gap-3 border-b border-[#c2c6d4]/20 pb-2">
-                                            <span className="w-1.5 h-6 bg-[#164FA8] rounded-full"></span>
-                                            <h3 className="text-base font-bold text-[#0A1A40] tracking-tight font-display">{cat.label}</h3>
-                                            <span className="text-[10px] text-gray-400 font-bold bg-white px-2 py-0.5 rounded-full border border-slate-200">
-                                                {matchingServices.length} {matchingServices.length === 1 ? "Service" : "Services"}
-                                            </span>
-                                        </div>
-
-                                        {/* Category Cards Grid */}
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                            {matchingServices.map((svc, idx) => (
-                                                <div key={idx} className="bg-white border border-[#c2c6d4]/20 p-6 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
-                                                    <div className="space-y-3">
-                                                        <div className="flex items-center justify-between text-[10px] font-bold uppercase text-slate-400 tracking-wider">
-                                                            <span>{cat.label}</span>
-                                                            {svc.price && (
-                                                                <span className="text-[#164FA8] bg-blue-50/50 px-2.5 py-1 rounded-lg border border-blue-150 font-bold">
-                                                                    Fee: {svc.price}
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                        <h4 className="text-base font-bold text-[#0A1A40] group-hover:text-[#164FA8] transition-colors leading-snug">{svc.name}</h4>
-                                                        <p className="text-[12.5px] text-gray-500 font-normal leading-relaxed">{svc.description || "Official filing and registration services."}</p>
-                                                    </div>
-
-                                                    <button
-                                                        onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
-                                                        className="mt-6 w-full py-2.5 bg-[#164FA8] hover:bg-[#0A1A40] text-white text-[12.5px] font-bold rounded-xl transition-all shadow-sm border-none cursor-pointer text-center"
-                                                    >
-                                                        {lang === 'EN' ? 'Request Service' : 'सेवा का अनुरोध करें'}
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    )}
-
+                <div className="max-w-[1240px] mx-auto space-y-20">
+                    
                     {/* How It Works - Process Flow */}
-                    <div id="how-it-works" className="pt-8 border-t border-[#c2c6d4]/20">
-                        <div className="text-center max-w-md mx-auto mb-12">
-                            <h3 className="text-xl font-black text-[#0A1A40] font-display">Our Seamless 4-Step Process</h3>
-                            <p className="text-[11.5px] text-gray-400 mt-1 font-semibold">How we process your applications behind the scenes.</p>
+                    <div id="how-it-works" className="space-y-12">
+                        <div className="text-center max-w-xl mx-auto space-y-3">
+                            <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "How It Works" : "यह कैसे काम करता है"}</p>
+                            <h3 className="text-3xl font-black text-[#0A1A40] font-display">
+                                {lang === "EN" ? "Our Seamless 4-Step Process" : "हमारी सरल 4-चरणीय प्रक्रिया"}
+                            </h3>
+                            <p className="text-[13px] text-gray-500 font-normal leading-relaxed">
+                                {lang === "EN" 
+                                    ? "How we process your application form filing request from start to finish." 
+                                    : "शुरू से अंत तक आपकी आवेदन प्रक्रिया को हम कैसे पूरा करते हैं।"}
+                            </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative text-center">
                             {/* Connecting Line (Desktop) */}
                             <div className="hidden lg:block absolute top-[28px] left-[15%] right-[15%] h-[1.5px] bg-[#c2c6d4]/20 -z-10" />
 
-                            <div className="flex flex-col items-center text-center space-y-3">
+                            {/* STEP 1 */}
+                            <div className="flex flex-col items-center space-y-3 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
                                 <div className="w-14 h-14 rounded-full bg-slate-900 border-4 border-white shadow-md text-white flex items-center justify-center font-bold text-sm">
                                     01
                                 </div>
                                 <h4 className="text-[13.5px] font-bold text-[#0A1A40]">
                                     {lang === 'EN' ? 'Add Telegram Bot' : 'टेलीग्राम बॉट जोड़ें'}
                                 </h4>
-                                <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs">
+                                <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs min-h-[50px]">
                                     {lang === 'EN' 
                                         ? 'Start our interactive bot on Telegram to receive live alerts and pick filing services.' 
                                         : 'लाइव अलर्ट प्राप्त करने और सेवाएं चुनने के लिए टेलीग्राम पर हमारे इंटरैक्टिव बॉट को शुरू करें।'}
                                 </p>
+                                <button 
+                                    onClick={handleJoinTelegram}
+                                    className="mt-2 text-[#164FA8] hover:text-[#0A1A40] text-[12px] font-bold flex items-center gap-1 bg-transparent border-none cursor-pointer hover:underline"
+                                >
+                                    {lang === 'EN' ? 'Open Telegram Bot' : 'टेलीग्राम बॉट खोलें'} <ExternalLink size={12} />
+                                </button>
                             </div>
 
-                            <div className="flex flex-col items-center text-center space-y-3">
+                            {/* STEP 2 */}
+                            <div className="flex flex-col items-center space-y-3 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
                                 <div className="w-14 h-14 rounded-full bg-[#164FA8] border-4 border-white shadow-md text-white flex items-center justify-center font-bold text-sm">
                                     02
                                 </div>
                                 <h4 className="text-[13.5px] font-bold text-[#0A1A40]">
                                     {lang === 'EN' ? 'Request a Service' : 'सेवा का अनुरोध करें'}
                                 </h4>
-                                <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs">
+                                <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs min-h-[50px]">
                                     {lang === 'EN' 
                                         ? 'Select the specific government form, exam filing, or state service you wish to request.' 
                                         : 'उस विशिष्ट सरकारी फॉर्म या सेवा का चयन करें जिसके लिए आप आवेदन करना चाहते हैं।'}
                                 </p>
+                                <button 
+                                    onClick={() => scrollToSection("services-catalog")}
+                                    className="mt-2 text-[#164FA8] hover:text-[#0A1A40] text-[12px] font-bold flex items-center gap-1 bg-transparent border-none cursor-pointer hover:underline"
+                                >
+                                    {lang === 'EN' ? 'Browse Catalog' : 'कैटलॉग ब्राउज़ करें'} <ChevronDown size={12} />
+                                </button>
                             </div>
 
-                            <div className="flex flex-col items-center text-center space-y-3">
+                            {/* STEP 3 */}
+                            <div className="flex flex-col items-center space-y-3 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
                                 <div className="w-14 h-14 rounded-full bg-[#164FA8] border-4 border-white shadow-md text-white flex items-center justify-center font-bold text-sm">
                                     03
                                 </div>
                                 <h4 className="text-[13.5px] font-bold text-[#0A1A40]">
                                     {lang === 'EN' ? 'Complete via WhatsApp' : 'व्हाट्सएप पर पूरा करें'}
                                 </h4>
-                                <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs">
+                                <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs min-h-[50px]">
                                     {lang === 'EN' 
                                         ? 'Connect on WhatsApp to securely upload your documents and complete the filing details with our operator.' 
                                         : 'सुरक्षित रूप से दस्तावेज़ अपलोड करने और हमारे ऑपरेटर के साथ आवेदन विवरण पूरा करने के लिए व्हाट्सएप पर जुड़ें।'}
                                 </p>
+                                <button 
+                                    onClick={handleWhatsAppFiling}
+                                    className="mt-2 text-[#164FA8] hover:text-[#0A1A40] text-[12px] font-bold flex items-center gap-1 bg-transparent border-none cursor-pointer hover:underline"
+                                >
+                                    {lang === 'EN' ? 'Chat on WhatsApp' : 'व्हाट्सएप चैट करें'} <ExternalLink size={12} />
+                                </button>
                             </div>
 
-                            <div className="flex flex-col items-center text-center space-y-3">
+                            {/* STEP 4 */}
+                            <div className="flex flex-col items-center space-y-3 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
                                 <div className="w-14 h-14 rounded-full bg-emerald-500 border-4 border-white shadow-md text-white flex items-center justify-center font-bold text-sm">
                                     04
                                 </div>
                                 <h4 className="text-[13.5px] font-bold text-[#0A1A40]">
                                     {lang === 'EN' ? 'Get Final Receipt' : 'अंतिम रसीद प्राप्त करें'}
                                 </h4>
-                                <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs">
+                                <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs min-h-[50px]">
                                     {lang === 'EN' 
                                         ? 'Once verified and submitted, get your official government transaction receipt and filled PDF printout.' 
                                         : 'सत्यापन और सबमिशन के बाद, सीधे अपने चैट में आधिकारिक सरकारी लेनदेन रसीद और भरा हुआ आवेदन पीडीएफ प्राप्त करें।'}
                                 </p>
+                                <button 
+                                    onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
+                                    className="mt-2 text-[#164FA8] hover:text-[#0A1A40] text-[12px] font-bold flex items-center gap-1 bg-transparent border-none cursor-pointer hover:underline"
+                                >
+                                    {lang === 'EN' ? 'Student Portal' : 'छात्र पोर्टल'} <ExternalLink size={12} />
+                                </button>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Divider Line */}
+                    <div className="border-t border-[#c2c6d4]/20 pt-8" id="services-catalog" />
+
+                    {/* Available Services Grouped by Category */}
+                    <div className="space-y-12">
+                        <div className="text-center max-w-2xl mx-auto space-y-4">
+                            <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "Our Services" : "हमारी सेवाएँ"}</p>
+                            <h2 className="text-3xl md:text-4xl font-black text-[#0A1A40] font-display">
+                                {lang === "EN" ? "Available Services" : "उपलब्ध सेवाएँ"}
+                            </h2>
+                            <p className="text-[13.5px] text-gray-500 font-normal leading-relaxed">
+                                {lang === "EN" 
+                                    ? "Browse and request official government documentation, application filings, and counselling services online."
+                                    : "आधिकारिक सरकारी दस्तावेज़, आवेदन पत्र और काउंसलिंग सेवाओं को ऑनलाइन ब्राउज़ करें और अनुरोध करें।"}
+                            </p>
+                        </div>
+
+                        {/* Services Search & Filter Controls */}
+                        {!loading && Object.keys(services).length > 0 && (
+                            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white border border-[#c2c6d4]/20 p-4 rounded-2xl shadow-sm animate-fadeIn">
+                                <div className="relative w-full sm:w-80">
+                                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                                    <input 
+                                        type="text"
+                                        value={serviceSearch}
+                                        onChange={e => setServiceSearch(e.target.value)}
+                                        placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
+                                        className="w-full bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] placeholder:text-gray-400 pl-11 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all font-medium"
+                                    />
+                                </div>
+
+                                <div className="w-full sm:w-auto">
+                                    <select
+                                        value={serviceCatFilter}
+                                        onChange={e => setServiceCatFilter(e.target.value)}
+                                        className="w-full sm:w-auto px-4 py-2.5 bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all cursor-pointer font-semibold"
+                                    >
+                                        <option value="ALL">{lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां'}</option>
+                                        {Object.entries(services).map(([k, cat]) => (
+                                            <option key={k} value={k}>{cat.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Available Services Grouped by Category Grid */}
+                        {loading ? (
+                            <div className="flex flex-col items-center justify-center py-12 gap-2">
+                                <div className="w-6 h-6 border-2 border-[#164FA8] border-t-transparent rounded-full animate-spin" />
+                                <span className="text-[11px] text-gray-400 font-bold tracking-widest uppercase">Loading Services...</span>
+                            </div>
+                        ) : Object.keys(services).length === 0 ? (
+                            <div className="text-center py-12 text-gray-400">
+                                <p className="text-sm font-semibold">No services available at the moment.</p>
+                            </div>
+                        ) : !hasMatchingServices ? (
+                            <div className="text-center py-16 bg-white border border-dashed border-[#c2c6d4]/30 rounded-2xl text-gray-400">
+                                <Search size={28} className="mx-auto text-gray-300 mb-2" />
+                                <p className="text-sm font-bold">{lang === 'EN' ? 'No services match your search query.' : 'आपकी खोज से मेल खाने वाली कोई सेवा नहीं मिली।'}</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-12 text-left">
+                                {Object.entries(services).map(([catKey, cat]) => {
+                                    const matchingServices = (cat.services || []).filter(s => 
+                                        s.name.toLowerCase().includes(serviceSearch.toLowerCase()) ||
+                                        (s.description && s.description.toLowerCase().includes(serviceSearch.toLowerCase()))
+                                    )
+                                    const isVisible = serviceCatFilter === "ALL" || serviceCatFilter === catKey
+
+                                    if (matchingServices.length === 0 || !isVisible) return null
+
+                                    return (
+                                        <div key={catKey} className="space-y-6 animate-fadeIn">
+                                            {/* Category Section Header */}
+                                            <div className="flex items-center gap-3 border-b border-[#c2c6d4]/20 pb-2">
+                                                <span className="w-1.5 h-6 bg-[#164FA8] rounded-full"></span>
+                                                <h3 className="text-base font-bold text-[#0A1A40] tracking-tight font-display">{cat.label}</h3>
+                                                <span className="text-[10px] text-gray-400 font-bold bg-white px-2 py-0.5 rounded-full border border-slate-200">
+                                                    {matchingServices.length} {matchingServices.length === 1 ? "Service" : "Services"}
+                                                </span>
+                                            </div>
+
+                                            {/* Category Cards Grid */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                {matchingServices.map((svc, idx) => (
+                                                    <div key={idx} className="bg-white border border-[#c2c6d4]/20 p-6 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                                                        <div className="space-y-3">
+                                                            <div className="flex items-center justify-between text-[10px] font-bold uppercase text-slate-400 tracking-wider">
+                                                                <span>{cat.label}</span>
+                                                                {svc.price && (
+                                                                    <span className="text-[#164FA8] bg-blue-50/50 px-2.5 py-1 rounded-lg border border-blue-150 font-bold">
+                                                                        Fee: {svc.price}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <h4 className="text-base font-bold text-[#0A1A40] group-hover:text-[#164FA8] transition-colors leading-snug">{svc.name}</h4>
+                                                            <p className="text-[12.5px] text-gray-500 font-normal leading-relaxed">{svc.description || "Official filing and registration services."}</p>
+                                                        </div>
+
+                                                        <button
+                                                            onClick={() => handleRequestServiceWhatsApp(svc, catKey, cat.label)}
+                                                            className="mt-6 w-full py-2.5 bg-[#164FA8] hover:bg-[#0A1A40] text-white text-[12.5px] font-bold rounded-xl transition-all shadow-sm border-none cursor-pointer text-center"
+                                                        >
+                                                            {lang === 'EN' ? 'Request via WhatsApp' : 'व्हाट्सएप से अनुरोध करें'}
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
@@ -819,6 +908,96 @@ export default function Landing() {
                     </div>
                 </div>
             </footer>
+
+            {/* ── SERVICE REQUEST MODAL ── */}
+            {showRequestModal && requestModalSvc && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    {/* Backdrop */}
+                    <div 
+                        className="absolute inset-0 bg-[#0A1A40]/40 backdrop-blur-sm transition-opacity"
+                        onClick={() => setShowRequestModal(false)}
+                    />
+                    
+                    {/* Modal Content */}
+                    <div className="relative bg-white border border-[#c2c6d4]/30 rounded-3xl shadow-2xl p-6 md:p-8 max-w-md w-full z-10">
+                        {/* Close button */}
+                        <button 
+                            onClick={() => setShowRequestModal(false)}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-[#0A1A40] transition-colors p-1 bg-transparent border-none cursor-pointer"
+                        >
+                            <X size={18} />
+                        </button>
+                        
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <span className="text-[10px] font-bold text-[#164FA8] bg-blue-50 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+                                    {requestModalCatLabel}
+                                </span>
+                                <h3 className="text-xl font-black text-[#0A1A40] font-display">
+                                    {lang === 'EN' ? 'Confirm Request' : 'अनुरोध की पुष्टि करें'}
+                                </h3>
+                                <p className="text-[12px] text-gray-500 font-medium">
+                                    {lang === 'EN' 
+                                        ? `You are requesting: "${requestModalSvc.name}". Enter your name and phone number to automatically send this request to our admin desk.` 
+                                        : `आप "${requestModalSvc.name}" का अनुरोध कर रहे हैं। इस अनुरोध को हमारे एडमिन डेस्क पर भेजने के लिए अपना नाम और फोन नंबर दर्ज करें।`}
+                                </p>
+                            </div>
+
+                            <form onSubmit={handleModalSubmit} className="space-y-4">
+                                <div className="space-y-1 text-left">
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                                        {lang === 'EN' ? 'Full Name' : 'पूरा नाम'}
+                                    </label>
+                                    <input 
+                                        type="text"
+                                        required
+                                        value={customerName}
+                                        onChange={e => setCustomerName(e.target.value)}
+                                        placeholder={lang === 'EN' ? 'Enter your name' : 'अपना नाम दर्ज करें'}
+                                        className="w-full bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] placeholder:text-gray-400 px-4 py-2.5 rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all font-medium"
+                                    />
+                                </div>
+
+                                <div className="space-y-1 text-left">
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                                        {lang === 'EN' ? 'Phone Number (WhatsApp)' : 'फ़ोन नंबर (व्हाट्सएप)'}
+                                    </label>
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[13px] text-gray-400 font-bold">+91</span>
+                                        <input 
+                                            type="tel"
+                                            required
+                                            pattern="[6-9][0-9]{9}"
+                                            value={customerPhone}
+                                            onChange={e => setCustomerPhone(e.target.value)}
+                                            placeholder={lang === 'EN' ? '10-digit number' : '10-अंकीय नंबर'}
+                                            className="w-full bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] placeholder:text-gray-400 pl-14 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all font-mono font-medium"
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={isSubmittingRequest}
+                                    className="w-full mt-2 py-3 bg-[#164FA8] hover:bg-[#0A1A40] text-white text-[13px] font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-none disabled:opacity-50"
+                                >
+                                    {isSubmittingRequest ? (
+                                        <>
+                                            <Loader2 className="animate-spin" size={16} />
+                                            <span>{lang === 'EN' ? 'Processing...' : 'प्रक्रिया जारी है...'}</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>{lang === 'EN' ? 'Continue to WhatsApp' : 'व्हाट्सएप पर आगे बढ़ें'}</span>
+                                            <ArrowRight size={16} />
+                                        </>
+                                    )}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

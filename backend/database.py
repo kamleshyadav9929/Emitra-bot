@@ -469,6 +469,14 @@ def get_service_requests(status=None):
         tid = row.get("telegram_id")
         student = students_map.get(tid) if tid else None
         
+        # Parse name & phone if saved in format "Name | Phone" for anonymous web requests
+        phone_raw = row.get("phone_number") or ""
+        parsed_name = None
+        if " | " in phone_raw:
+            parts = phone_raw.split(" | ", 1)
+            parsed_name = parts[0].strip()
+            phone_raw = parts[1].strip()
+
         records.append({
             "id": row["id"],
             "telegram_id": row["telegram_id"],
@@ -477,8 +485,8 @@ def get_service_requests(status=None):
             "status": row["status"],
             "requested_at": row["requested_at"],
             "completed_at": row["completed_at"],
-            "student_name": student.get("name") if student else "Unknown",
-            "student_phone": (student.get("phone_number") if student else None) or row.get("phone_number") or "",
+            "student_name": student.get("name") if student else (parsed_name or "Unknown"),
+            "student_phone": (student.get("phone_number") if student else None) or phone_raw,
             "student_username": student.get("username") if student else ""
         })
     return records

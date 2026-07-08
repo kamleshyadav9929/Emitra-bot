@@ -283,7 +283,30 @@ def get_public_exams():
 
 @app.route("/api/public/announcements", methods=["GET"])
 def get_public_announcements():
-    return jsonify({"announcements": database.get_announcements()})
+    try:
+        logs = database.get_logs()
+    except Exception as e:
+        print(f"Error fetching message logs for public announcements: {e}")
+        logs = []
+    
+    announcements = []
+    for log in logs:
+        exam = log.get("target_exam", "ALL")
+        if exam == "ALL":
+            title = "General Alert to All Students"
+        else:
+            title = f"Official Update for {exam} Exam"
+            
+        announcements.append({
+            "id": log.get("id"),
+            "title": title,
+            "content": log.get("message_text", ""),
+            "created_at": log.get("sent_at"),
+            "links": None,
+            "exam_target": exam
+        })
+        
+    return jsonify({"announcements": announcements})
 
 
 @app.route("/api/public/config", methods=["GET"])
@@ -544,6 +567,17 @@ def send_receipt():
         database.complete_service_request(request_id)
 
     return jsonify({"success": success})
+
+
+@app.route("/api/service-requests/<int:request_id>/complete", methods=["POST"])
+@token_required
+def complete_service_request_endpoint(request_id):
+    """Allows admin to mark a request as completed directly without sending a receipt."""
+    try:
+        database.complete_service_request(request_id)
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 # ── Logs API ──────────────────────────────────────────────────────────────────

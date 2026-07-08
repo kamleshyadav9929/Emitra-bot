@@ -62,6 +62,12 @@ export const getBroadcastStatus = async (jobId) =>
 export const getServiceRequests = async (status = "") =>
   requestJson(`/api/service-requests${status ? `?status=${status}` : ""}`, { headers: await getAuthHeaders() })
 
+export const completeServiceRequest = async (requestId) =>
+  requestJson(`/api/service-requests/${requestId}/complete`, {
+    method: "POST",
+    headers: await getAuthHeaders()
+  })
+
 export const sendReceipt = async (telegramId, message, requestId) =>
   requestJson(`/api/send-receipt`, {
     method: "POST",

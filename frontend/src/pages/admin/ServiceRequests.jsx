@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
-import { getServiceRequests, sendReceipt, getStudentDocuments, getDocumentUrl } from "../../api"
-import { ClipboardList, Clock, CheckCircle, Send, X, Phone, MessageSquare, RefreshCw, Paperclip, FileText, Image as ImageIcon, Download } from "lucide-react"
+import { getServiceRequests, sendReceipt, getStudentDocuments, getDocumentUrl, completeServiceRequest } from "../../api"
+import { ClipboardList, Clock, CheckCircle, Check, Send, X, Phone, MessageSquare, RefreshCw, Paperclip, FileText, Image as ImageIcon, Download } from "lucide-react"
 
 const CATEGORY_EMOJI = {
   documents: "📄", utility: "💡", schemes: "🏛️", license: "🚗", land: "🌾",
@@ -185,6 +185,7 @@ export default function ServiceRequests() {
   const [selectedReq, setSelectedReq] = useState(null)
   const [selectedDocsReq, setSelectedDocsReq] = useState(null)
   const [stats, setStats] = useState({ total: 0, pending: 0 })
+  const [completingId, setCompletingId] = useState(null)
 
   const fetchRequests = useCallback(async () => {
     setLoading(true); setError(null)
@@ -199,12 +200,88 @@ export default function ServiceRequests() {
 
   useEffect(() => { fetchRequests() }, [fetchRequests])
 
-  const handleSent = (id) => setRequests(prev => prev.map(r => r.id === id ? { ...r, status: "completed" } : r))
+  const handleSent = (id) => {
+    setCompletingId(id)
+    setTimeout(() => {
+      if (filter === "pending") {
+        setRequests(prev => prev.filter(r => r.id !== id))
+      } else {
+        setRequests(prev => prev.map(r => r.id === id ? { ...r, status: "completed" } : r))
+      }
+      setStats(prev => ({
+        ...prev,
+        pending: Math.max(0, prev.pending - 1)
+      }))
+      setCompletingId(null)
+    }, 450)
+  }
   const formatTime = (dt) => new Date(dt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
   const completed = stats.total - stats.pending
 
+  const handleCompleteDirect = async (reqId) => {
+    setCompletingId(reqId)
+    setTimeout(async () => {
+      try {
+        const res = await completeServiceRequest(reqId)
+        if (res.success) {
+          if (filter === "pending") {
+            setRequests(prev => prev.filter(r => r.id !== reqId))
+          } else {
+            setRequests(prev => prev.map(r => r.id === reqId ? { ...r, status: "completed", completed_at: new Date().toISOString() } : r))
+          }
+          setStats(prev => ({
+            ...prev,
+            pending: Math.max(0, prev.pending - 1)
+          }))
+        } else {
+          alert("Failed to complete request. Please try again.")
+        }
+      } catch (err) {
+        console.error(err)
+        alert("Network error.")
+      } finally {
+        setCompletingId(null)
+      }
+    }, 450)
+  }
+
+  const handleContactWhatsApp = (req) => {
+    if (!req.student_phone || req.student_phone === "N/A" || req.student_phone.trim() === "") {
+      alert("No phone number available for this user.")
+      return
+    }
+    const cleanPhone = req.student_phone.replace(/\D/g, "")
+    const targetPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone
+    const text = `Hello ${req.student_name}, this is Krishna Emitra regarding your request for "${req.service_name}".`
+    const waUrl = `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`
+    window.open(waUrl, "_blank")
+  }
+
   return (
     <div className="space-y-6">
+      <style>{`
+        @keyframes slideOut {
+          0% {
+            opacity: 1;
+            transform: translateX(0);
+            max-height: 120px;
+          }
+          100% {
+            opacity: 0;
+            transform: translateX(100%);
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+            overflow: hidden;
+          }
+        }
+        .animate-complete-slide {
+          animation: slideOut 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+          pointer-events: none;
+        }
+      `}</style>
       {selectedReq && <ReceiptModal req={selectedReq} onClose={() => setSelectedReq(null)} onSent={handleSent} />}
       {selectedDocsReq && <DocumentsModal telegramId={selectedDocsReq.telegram_id} studentName={selectedDocsReq.student_name} onClose={() => setSelectedDocsReq(null)} />}
 
@@ -281,7 +358,12 @@ export default function ServiceRequests() {
             {/* Mobile View */}
             <div className="block md:hidden divide-y-0">
               {requests.map((req, idx) => (
-                <div key={req.id} className={`p-4 hover:bg-[var(--color-surface-bright)] transition-colors ${idx % 2 === 0 ? "bg-[var(--color-surface-lowest)]" : "bg-[var(--color-surface-low)]"}`}>
+                <div 
+                  key={req.id} 
+                  className={`p-4 hover:bg-[var(--color-surface-bright)] transition-all duration-300 ${
+                    req.id === completingId ? "animate-complete-slide" : ""
+                  } ${idx % 2 === 0 ? "bg-[var(--color-surface-lowest)]" : "bg-[var(--color-surface-low)]"}`}
+                >
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <p className="text-[14px] font-bold text-[#0A1A40]">{req.student_name}</p>
@@ -300,20 +382,31 @@ export default function ServiceRequests() {
                   </div>
                   <div className="flex gap-2 justify-end">
                     <button
-                        title="View Documents"
-                        onClick={() => setSelectedDocsReq(req)}
-                        className="p-2 border border-blue-100 bg-blue-50 text-blue-600 rounded-[10px]"
+                        title="Contact on WhatsApp"
+                        onClick={() => handleContactWhatsApp(req)}
+                        className="p-2 border border-emerald-100 bg-emerald-50 text-emerald-600 rounded-[10px]"
                     >
-                        <Paperclip size={14} />
+                        <Phone size={14} />
                     </button>
                     {req.status === "pending" && (
+                      <>
+                        {req.telegram_id && (
+                          <button
+                            title="Send Telegram Receipt"
+                            onClick={() => setSelectedReq(req)}
+                            className="p-2 border border-blue-100 bg-blue-50 text-blue-600 rounded-[10px]"
+                          >
+                            <Send size={14} />
+                          </button>
+                        )}
                         <button
-                          onClick={() => setSelectedReq(req)}
-                          className="flex-1 flex items-center justify-center gap-2 py-2 bg-[var(--color-primary)] text-white text-[12px] font-bold rounded-[10px]"
+                          title="Mark Completed"
+                          onClick={() => handleCompleteDirect(req.id)}
+                          className="p-2 border border-teal-100 bg-teal-50 text-teal-600 rounded-[10px]"
                         >
-                          <Send size={12} />
-                          Issue Receipt
+                          <Check size={14} />
                         </button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -334,7 +427,12 @@ export default function ServiceRequests() {
                 </thead>
                 <tbody>
                   {requests.map((req, idx) => (
-                    <tr key={req.id} className={`group hover:bg-[var(--color-surface-bright)] transition-colors ${idx % 2 === 0 ? "bg-[var(--color-surface-lowest)]" : "bg-[var(--color-surface-low)]"}`}>
+                    <tr 
+                      key={req.id} 
+                      className={`group hover:bg-[var(--color-surface-bright)] transition-all duration-300 ${
+                        req.id === completingId ? "animate-complete-slide" : ""
+                      } ${idx % 2 === 0 ? "bg-[var(--color-surface-lowest)]" : "bg-[var(--color-surface-low)]"}`}
+                    >
                       <td className="py-5 px-6">
                         <p className="text-[14px] font-bold text-[#0A1A40]">{req.student_name}</p>
                         {req.student_phone && <p className="text-[12px] text-gray-500 font-medium">{req.student_phone}</p>}
@@ -358,20 +456,31 @@ export default function ServiceRequests() {
                       <td className="py-5 px-6">
                         <div className="flex items-center gap-3 justify-end">
                           <button
-                            title="View Documents"
-                            onClick={() => setSelectedDocsReq(req)}
-                            className="w-9 h-9 bg-[var(--color-surface-low)] text-gray-500 flex items-center justify-center hover:text-[var(--color-primary)] hover:bg-[var(--color-primary-fixed)] transition-all rounded-[12px] shadow-ambient"
+                            title="Contact on WhatsApp"
+                            onClick={() => handleContactWhatsApp(req)}
+                            className="w-9 h-9 bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 transition-all rounded-[12px] shadow-ambient"
                           >
-                            <Paperclip size={13} />
+                            <Phone size={13} />
                           </button>
                           {req.status === "pending" ? (
-                            <button
-                              onClick={() => setSelectedReq(req)}
-                              className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] text-white text-[12px] font-bold hover:shadow-lg transition-all rounded-[12px]"
-                            >
-                              <Send size={12} />
-                              Receipt
-                            </button>
+                            <>
+                              {req.telegram_id && (
+                                <button
+                                  title="Send Telegram Receipt"
+                                  onClick={() => setSelectedReq(req)}
+                                  className="w-9 h-9 bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition-all rounded-[12px] shadow-ambient"
+                                >
+                                  <Send size={13} />
+                                </button>
+                              )}
+                              <button
+                                title="Mark Completed"
+                                onClick={() => handleCompleteDirect(req.id)}
+                                className="w-9 h-9 bg-teal-50 text-teal-600 flex items-center justify-center hover:bg-teal-100 transition-all rounded-[12px] shadow-ambient"
+                              >
+                                <Check size={14} />
+                              </button>
+                            </>
                           ) : (
                             <span className="text-[12px] text-gray-400 italic px-2 font-medium">Done</span>
                           )}
