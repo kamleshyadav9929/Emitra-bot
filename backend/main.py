@@ -242,6 +242,37 @@ def ping():
     return jsonify({"ok": True})
 
 
+# ── Auto-Deploy Webhook ────────────────────────────────────────────────────────
+# GitHub calls this URL on every push → pulls latest code → reloads the app.
+# Set DEPLOY_SECRET in PythonAnywhere env vars to secure this endpoint.
+@app.route("/deploy", methods=["POST"])
+def deploy():
+    import hmac, hashlib, subprocess, os
+
+    secret = os.environ.get("DEPLOY_SECRET", "")
+    if secret:
+        sig = request.headers.get("X-Hub-Signature-256", "")
+        body = request.get_data()
+        expected = "sha256=" + hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(sig, expected):
+            return jsonify({"error": "Unauthorized"}), 403
+
+    try:
+        result = subprocess.check_output(
+            ["git", "-C", os.path.dirname(os.path.abspath(__file__)), "pull"],
+            stderr=subprocess.STDOUT,
+        ).decode()
+        # Touch the WSGI file to trigger PythonAnywhere auto-reload
+        wsgi_path = os.path.expanduser(
+            "~/.pythonanywhere.com/var/www/kamlesh6377_pythonanywhere_com_wsgi.py"
+        )
+        if os.path.exists(wsgi_path):
+            os.utime(wsgi_path, None)
+        return jsonify({"ok": True, "output": result})
+    except subprocess.CalledProcessError as e:
+        return jsonify({"ok": False, "error": e.output.decode()}), 500
+
+
 @app.route("/debug-env", methods=["GET"])
 def debug_env():
     import os
