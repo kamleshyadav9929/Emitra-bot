@@ -263,9 +263,7 @@ def deploy():
             stderr=subprocess.STDOUT,
         ).decode()
         # Touch the WSGI file to trigger PythonAnywhere auto-reload
-        wsgi_path = os.path.expanduser(
-            "~/.pythonanywhere.com/var/www/kamlesh6377_pythonanywhere_com_wsgi.py"
-        )
+        wsgi_path = "/var/www/kamlesh6377_pythonanywhere_com_wsgi.py"
         if os.path.exists(wsgi_path):
             os.utime(wsgi_path, None)
         return jsonify({"ok": True, "output": result})
