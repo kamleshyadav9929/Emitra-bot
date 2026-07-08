@@ -68,18 +68,22 @@ if config.CLERK_JWKS_URL and not config.CLERK_JWT_PUBLIC_KEY:
 
 app = Flask(__name__)
 # Explicit CORS handling for development and production Vercel origins
-CORS(app, resources={r"/api/*": {"origins": [
-    "https://emitra-bot.vercel.app",
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://localhost:5175",
-    "http://localhost:3000",
-    "http://localhost:5000",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:5174",
-    "http://127.0.0.1:5175",
-    "http://127.0.0.1:3000"
-]}})
+CORS(app, resources={r"/api/*": {
+    "origins": [
+        "https://emitra-bot.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
+        "http://localhost:3000",
+        "http://localhost:5000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+        "http://127.0.0.1:5175",
+        "http://127.0.0.1:3000"
+    ],
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "allow_headers": ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
+}})
 
 # ── Rate Limiter Setup ────────────────────────────────────────────────────────
 limiter = Limiter(
@@ -120,7 +124,7 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if request.method == "OPTIONS":
-            return f(*args, **kwargs)
+            return "", 200
             
         token = None
         if "Authorization" in request.headers:

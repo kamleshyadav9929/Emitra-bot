@@ -16,14 +16,14 @@ const formatTelegramMessage = (text) => {
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
-    
+
     // Bold *text*
     formatted = formatted.replace(/\*(.*?)\*/g, "<strong>$1</strong>");
     // Underscore _italic_
     formatted = formatted.replace(/_(.*?)_/g, "<em>$1</em>");
     // Code `code`
     formatted = formatted.replace(/`(.*?)`/g, "<code class='bg-slate-100 px-1 py-0.5 rounded text-[10.5px] font-mono'>$1</code>");
-    
+
     return <span dangerouslySetInnerHTML={{ __html: formatted }} />;
 }
 
@@ -69,7 +69,7 @@ export default function Landing() {
         return Object.entries(services).some(([catKey, cat]) => {
             const isVisible = serviceCatFilter === "ALL" || serviceCatFilter === catKey
             if (!isVisible) return false
-            return (cat.services || []).some(s => 
+            return (cat.services || []).some(s =>
                 s.name.toLowerCase().includes(serviceSearch.toLowerCase()) ||
                 (s.description && s.description.toLowerCase().includes(serviceSearch.toLowerCase()))
             )
@@ -173,7 +173,7 @@ export default function Landing() {
     const filteredAnnouncements = useMemo(() => {
         return announcements.filter(ann => {
             const matchesSearch = (ann.title && ann.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                                 (ann.content && ann.content.toLowerCase().includes(searchQuery.toLowerCase()))
+                (ann.content && ann.content.toLowerCase().includes(searchQuery.toLowerCase()))
             if (filterCategory === "ALL") return matchesSearch
             if (filterCategory === "exams") return matchesSearch && (ann.exam_target && ann.exam_target !== "ALL")
             if (filterCategory === "general") return matchesSearch && (ann.exam_target === "ALL" || !ann.exam_target)
@@ -192,7 +192,7 @@ export default function Landing() {
     const faqs = [
         {
             q: lang === "EN" ? "How does Krishna Emitra help me file forms?" : "कमलेश ई-मित्र फॉर्म भरने में मेरी मदद कैसे करता है?",
-            a: lang === "EN" 
+            a: lang === "EN"
                 ? "Instead of standing in long kiosk lines, you can submit your details and documents online through our secure portal or Telegram bot. Our verified Krishna Emitra kiosk operator will check and file the form officially on your behalf, and send you the receipt."
                 : "कियोस्क की लंबी लाइनों में खड़े होने के बजाय, आप हमारे सुरक्षित पोर्टल या टेलीग्राम बॉट के माध्यम से अपने विवरण और दस्तावेज जमा कर सकते हैं। हमारा सत्यापित ई-मित्र संचालक आपकी ओर से आधिकारिक फॉर्म भरेगा और आपको रसीद भेज देगा।"
         },
@@ -303,13 +303,13 @@ export default function Landing() {
 
                     {/* Action Buttons */}
                     <div className="flex flex-wrap items-center gap-4 pt-2">
-                        <button 
+                        <button
                             onClick={handleJoinTelegram}
                             className="px-6 py-3 bg-[#0066cc] hover:bg-[#0071e3] text-white text-[13px] font-medium rounded-full shadow-sm hover:shadow-md transition-all active:scale-[0.97] cursor-pointer border-none flex items-center gap-2"
                         >
                             <Send size={14} /> Join Telegram assistant
                         </button>
-                        <button 
+                        <button
                             onClick={() => scrollToSection("what-we-do")}
                             className="px-6 py-3 bg-white hover:bg-slate-50 text-[#0066cc] border border-[#0066cc] text-[13px] font-medium rounded-full shadow-sm transition-all active:scale-[0.97] cursor-pointer"
                         >
@@ -354,7 +354,7 @@ export default function Landing() {
                                         <p className="text-[11.5px] text-gray-400 font-normal leading-normal">Exam dates and form PDFs directly in your chat.</p>
                                     </div>
                                 </div>
-                                <button 
+                                <button
                                     onClick={handleJoinTelegram}
                                     className="w-full py-2.5 bg-[#0066cc] hover:bg-[#0071e3] text-white text-[12.5px] font-medium rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm border-none"
                                 >
@@ -363,7 +363,7 @@ export default function Landing() {
                             </div>
 
                             {/* STEP 2: SIGN IN TO PANEL */}
-                            <div 
+                            <div
                                 onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
                                 className="border border-slate-200 rounded-2xl p-5 bg-white flex gap-4 cursor-pointer hover:border-blue-200 hover:bg-slate-50/40 transition-all"
                             >
@@ -385,7 +385,7 @@ export default function Landing() {
             {/* ── WHAT WE DO & HOW WE DO IT ── */}
             <section id="what-we-do" className="bg-[#f8fcff] border-y border-[#c2c6d4]/10 py-20 px-6 lg:px-12">
                 <div className="max-w-[1240px] mx-auto space-y-20">
-                    
+
                     {/* How It Works - Process Flow */}
                     <div id="how-it-works" className="space-y-12">
                         <div className="text-center max-w-xl mx-auto space-y-3">
@@ -394,8 +394,8 @@ export default function Landing() {
                                 {lang === "EN" ? "Our Seamless 4-Step Process" : "हमारी सरल 4-चरणीय प्रक्रिया"}
                             </h3>
                             <p className="text-[13px] text-gray-500 font-normal leading-relaxed">
-                                {lang === "EN" 
-                                    ? "How we process your application form filing request from start to finish." 
+                                {lang === "EN"
+                                    ? "How we process your application form filing request from start to finish."
                                     : "शुरू से अंत तक आपकी आवेदन प्रक्रिया को हम कैसे पूरा करते हैं।"}
                             </p>
                         </div>
@@ -413,11 +413,11 @@ export default function Landing() {
                                     {lang === 'EN' ? 'Add Telegram Bot' : 'टेलीग्राम बॉट जोड़ें'}
                                 </h4>
                                 <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs min-h-[50px]">
-                                    {lang === 'EN' 
-                                        ? 'Start our interactive bot on Telegram to receive live alerts and pick filing services.' 
+                                    {lang === 'EN'
+                                        ? 'Start our interactive bot on Telegram to receive live alerts and pick filing services.'
                                         : 'लाइव अलर्ट प्राप्त करने और सेवाएं चुनने के लिए टेलीग्राम पर हमारे इंटरैक्टिव बॉट को शुरू करें।'}
                                 </p>
-                                <button 
+                                <button
                                     onClick={handleJoinTelegram}
                                     className="mt-2 text-[#164FA8] hover:text-[#0A1A40] text-[12px] font-bold flex items-center gap-1 bg-transparent border-none cursor-pointer hover:underline"
                                 >
@@ -434,11 +434,11 @@ export default function Landing() {
                                     {lang === 'EN' ? 'Request a Service' : 'सेवा का अनुरोध करें'}
                                 </h4>
                                 <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs min-h-[50px]">
-                                    {lang === 'EN' 
-                                        ? 'Select the specific government form, exam filing, or state service you wish to request.' 
+                                    {lang === 'EN'
+                                        ? 'Select the specific government form, exam filing, or state service you wish to request.'
                                         : 'उस विशिष्ट सरकारी फॉर्म या सेवा का चयन करें जिसके लिए आप आवेदन करना चाहते हैं।'}
                                 </p>
-                                <button 
+                                <button
                                     onClick={() => scrollToSection("services-catalog")}
                                     className="mt-2 text-[#164FA8] hover:text-[#0A1A40] text-[12px] font-bold flex items-center gap-1 bg-transparent border-none cursor-pointer hover:underline"
                                 >
@@ -455,11 +455,11 @@ export default function Landing() {
                                     {lang === 'EN' ? 'Complete via WhatsApp' : 'व्हाट्सएप पर पूरा करें'}
                                 </h4>
                                 <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs min-h-[50px]">
-                                    {lang === 'EN' 
-                                        ? 'Connect on WhatsApp to securely upload your documents and complete the filing details with our operator.' 
+                                    {lang === 'EN'
+                                        ? 'Connect on WhatsApp to securely upload your documents and complete the filing details with our operator.'
                                         : 'सुरक्षित रूप से दस्तावेज़ अपलोड करने और हमारे ऑपरेटर के साथ आवेदन विवरण पूरा करने के लिए व्हाट्सएप पर जुड़ें।'}
                                 </p>
-                                <button 
+                                <button
                                     onClick={handleWhatsAppFiling}
                                     className="mt-2 text-[#164FA8] hover:text-[#0A1A40] text-[12px] font-bold flex items-center gap-1 bg-transparent border-none cursor-pointer hover:underline"
                                 >
@@ -476,11 +476,11 @@ export default function Landing() {
                                     {lang === 'EN' ? 'Get Final Receipt' : 'अंतिम रसीद प्राप्त करें'}
                                 </h4>
                                 <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs min-h-[50px]">
-                                    {lang === 'EN' 
-                                        ? 'Once verified and submitted, get your official government transaction receipt and filled PDF printout.' 
+                                    {lang === 'EN'
+                                        ? 'Once verified and submitted, get your official government transaction receipt and filled PDF printout.'
                                         : 'सत्यापन और सबमिशन के बाद, सीधे अपने चैट में आधिकारिक सरकारी लेनदेन रसीद और भरा हुआ आवेदन पीडीएफ प्राप्त करें।'}
                                 </p>
-                                <button 
+                                <button
                                     onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
                                     className="mt-2 text-[#164FA8] hover:text-[#0A1A40] text-[12px] font-bold flex items-center gap-1 bg-transparent border-none cursor-pointer hover:underline"
                                 >
@@ -501,7 +501,7 @@ export default function Landing() {
                                 {lang === "EN" ? "Available Services" : "उपलब्ध सेवाएँ"}
                             </h2>
                             <p className="text-[13.5px] text-gray-500 font-normal leading-relaxed">
-                                {lang === "EN" 
+                                {lang === "EN"
                                     ? "Browse and request official government documentation, application filings, and counselling services online."
                                     : "आधिकारिक सरकारी दस्तावेज़, आवेदन पत्र और काउंसलिंग सेवाओं को ऑनलाइन ब्राउज़ करें और अनुरोध करें।"}
                             </p>
@@ -512,7 +512,7 @@ export default function Landing() {
                             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white border border-[#c2c6d4]/20 p-4 rounded-2xl shadow-sm animate-fadeIn">
                                 <div className="relative w-full sm:w-80">
                                     <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                                    <input 
+                                    <input
                                         type="text"
                                         value={serviceSearch}
                                         onChange={e => setServiceSearch(e.target.value)}
@@ -554,7 +554,7 @@ export default function Landing() {
                         ) : (
                             <div className="space-y-12 text-left">
                                 {Object.entries(services).map(([catKey, cat]) => {
-                                    const matchingServices = (cat.services || []).filter(s => 
+                                    const matchingServices = (cat.services || []).filter(s =>
                                         s.name.toLowerCase().includes(serviceSearch.toLowerCase()) ||
                                         (s.description && s.description.toLowerCase().includes(serviceSearch.toLowerCase()))
                                     )
@@ -607,7 +607,7 @@ export default function Landing() {
                     </div>
                 </div>
             </section>
-
+            z
             {/* ── LIVE NOTIFICATIONS BOARD ── */}
             <section id="notifications" className="py-20 px-6 lg:px-12 max-w-[1240px] mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -636,31 +636,28 @@ export default function Landing() {
                         <div className="flex flex-wrap gap-2">
                             <button
                                 onClick={() => setFilterCategory("ALL")}
-                                className={`px-4 py-2 text-[11px] font-bold rounded-lg border transition-all ${
-                                    filterCategory === "ALL" 
-                                        ? "bg-slate-900 text-white border-slate-900" 
-                                        : "bg-white text-gray-500 border-gray-200 hover:bg-slate-50"
-                                }`}
+                                className={`px-4 py-2 text-[11px] font-bold rounded-lg border transition-all ${filterCategory === "ALL"
+                                    ? "bg-slate-900 text-white border-slate-900"
+                                    : "bg-white text-gray-500 border-gray-200 hover:bg-slate-50"
+                                    }`}
                             >
                                 All Notices ({announcements.length})
                             </button>
                             <button
                                 onClick={() => setFilterCategory("exams")}
-                                className={`px-4 py-2 text-[11px] font-bold rounded-lg border transition-all ${
-                                    filterCategory === "exams" 
-                                        ? "bg-slate-900 text-white border-slate-900" 
-                                        : "bg-white text-gray-500 border-gray-200 hover:bg-slate-50"
-                                }`}
+                                className={`px-4 py-2 text-[11px] font-bold rounded-lg border transition-all ${filterCategory === "exams"
+                                    ? "bg-slate-900 text-white border-slate-900"
+                                    : "bg-white text-gray-500 border-gray-200 hover:bg-slate-50"
+                                    }`}
                             >
                                 Exam Bulletins
                             </button>
                             <button
                                 onClick={() => setFilterCategory("general")}
-                                className={`px-4 py-2 text-[11px] font-bold rounded-lg border transition-all ${
-                                    filterCategory === "general" 
-                                        ? "bg-slate-900 text-white border-slate-900" 
-                                        : "bg-white text-gray-500 border-gray-200 hover:bg-slate-50"
-                                }`}
+                                className={`px-4 py-2 text-[11px] font-bold rounded-lg border transition-all ${filterCategory === "general"
+                                    ? "bg-slate-900 text-white border-slate-900"
+                                    : "bg-white text-gray-500 border-gray-200 hover:bg-slate-50"
+                                    }`}
                             >
                                 General Info
                             </button>
@@ -702,11 +699,11 @@ export default function Landing() {
                                         <div className="text-[12px] text-slate-655 font-normal leading-relaxed whitespace-pre-wrap break-words font-sans">
                                             {formatTelegramMessage(ann.content)}
                                         </div>
-                                        
+
                                         {ann.links && (
-                                            <a 
-                                                href={ann.links} 
-                                                target="_blank" 
+                                            <a
+                                                href={ann.links}
+                                                target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-[#164FA8] hover:underline text-[12px] font-bold inline-flex items-center gap-1 mt-1"
                                             >
@@ -733,9 +730,9 @@ export default function Landing() {
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
-                        <a 
-                            href="https://sso.rajasthan.gov.in/" 
-                            target="_blank" 
+                        <a
+                            href="https://sso.rajasthan.gov.in/"
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="bg-white border border-[#c2c6d4]/20 p-5 rounded-2xl hover:border-[#164FA8] transition-all flex flex-col justify-between h-[130px] group shadow-sm"
                         >
@@ -744,9 +741,9 @@ export default function Landing() {
                             <span className="text-[10px] text-slate-400 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
                         </a>
 
-                        <a 
-                            href="https://ssc.gov.in/" 
-                            target="_blank" 
+                        <a
+                            href="https://ssc.gov.in/"
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="bg-white border border-[#c2c6d4]/20 p-5 rounded-2xl hover:border-[#164FA8] transition-all flex flex-col justify-between h-[130px] group shadow-sm"
                         >
@@ -755,9 +752,9 @@ export default function Landing() {
                             <span className="text-[10px] text-slate-400 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
                         </a>
 
-                        <a 
-                            href="https://neet.nta.nic.in/" 
-                            target="_blank" 
+                        <a
+                            href="https://neet.nta.nic.in/"
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="bg-white border border-[#c2c6d4]/20 p-5 rounded-2xl hover:border-[#164FA8] transition-all flex flex-col justify-between h-[130px] group shadow-sm"
                         >
@@ -766,9 +763,9 @@ export default function Landing() {
                             <span className="text-[10px] text-slate-400 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
                         </a>
 
-                        <a 
-                            href="https://www.rrcb.gov.in/" 
-                            target="_blank" 
+                        <a
+                            href="https://www.rrcb.gov.in/"
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="bg-white border border-[#c2c6d4]/20 p-5 rounded-2xl hover:border-[#164FA8] transition-all flex flex-col justify-between h-[130px] group shadow-sm"
                         >
@@ -777,9 +774,9 @@ export default function Landing() {
                             <span className="text-[10px] text-slate-400 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
                         </a>
 
-                        <a 
-                            href="https://www.ibps.in/" 
-                            target="_blank" 
+                        <a
+                            href="https://www.ibps.in/"
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="bg-white border border-[#c2c6d4]/20 p-5 rounded-2xl hover:border-[#164FA8] transition-all flex flex-col justify-between h-[130px] group shadow-sm"
                         >
@@ -811,7 +808,7 @@ export default function Landing() {
                                 <span>{faq.q}</span>
                                 <ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${expandedFaq === idx ? "rotate-180" : ""}`} />
                             </button>
-                            
+
                             <AnimatePresence>
                                 {expandedFaq === idx && (
                                     <motion.div
@@ -835,12 +832,12 @@ export default function Landing() {
             <section className="px-6 lg:px-12 pb-20 max-w-[1240px] mx-auto">
                 <div className="bg-gradient-to-r from-[#164FA8] to-[#0A1A40] rounded-[24px] text-white p-8 lg:p-12 text-center space-y-6 shadow-xl relative overflow-hidden">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.08),transparent)] pointer-events-none" />
-                    
+
                     <h3 className="text-2xl lg:text-3xl font-black font-display tracking-tight">Ready to file forms from home?</h3>
                     <p className="text-[13px] text-white/70 max-w-md mx-auto font-normal leading-relaxed">
                         Complete your digital setup by connecting your mobile and joining our WhatsApp group. File your exams seamlessly.
                     </p>
-                    
+
                     <div className="flex justify-center gap-4">
                         {isLoggedIn ? (
                             <button
@@ -913,21 +910,21 @@ export default function Landing() {
             {showRequestModal && requestModalSvc && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     {/* Backdrop */}
-                    <div 
+                    <div
                         className="absolute inset-0 bg-[#0A1A40]/40 backdrop-blur-sm transition-opacity"
                         onClick={() => setShowRequestModal(false)}
                     />
-                    
+
                     {/* Modal Content */}
                     <div className="relative bg-white border border-[#c2c6d4]/30 rounded-3xl shadow-2xl p-6 md:p-8 max-w-md w-full z-10">
                         {/* Close button */}
-                        <button 
+                        <button
                             onClick={() => setShowRequestModal(false)}
                             className="absolute top-4 right-4 text-gray-400 hover:text-[#0A1A40] transition-colors p-1 bg-transparent border-none cursor-pointer"
                         >
                             <X size={18} />
                         </button>
-                        
+
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <span className="text-[10px] font-bold text-[#164FA8] bg-blue-50 px-2.5 py-1 rounded-lg uppercase tracking-wider">
@@ -937,8 +934,8 @@ export default function Landing() {
                                     {lang === 'EN' ? 'Confirm Request' : 'अनुरोध की पुष्टि करें'}
                                 </h3>
                                 <p className="text-[12px] text-gray-500 font-medium">
-                                    {lang === 'EN' 
-                                        ? `You are requesting: "${requestModalSvc.name}". Enter your name and phone number to automatically send this request to our admin desk.` 
+                                    {lang === 'EN'
+                                        ? `You are requesting: "${requestModalSvc.name}". Enter your name and phone number to automatically send this request to our admin desk.`
                                         : `आप "${requestModalSvc.name}" का अनुरोध कर रहे हैं। इस अनुरोध को हमारे एडमिन डेस्क पर भेजने के लिए अपना नाम और फोन नंबर दर्ज करें।`}
                                 </p>
                             </div>
@@ -948,7 +945,7 @@ export default function Landing() {
                                     <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
                                         {lang === 'EN' ? 'Full Name' : 'पूरा नाम'}
                                     </label>
-                                    <input 
+                                    <input
                                         type="text"
                                         required
                                         value={customerName}
@@ -964,7 +961,7 @@ export default function Landing() {
                                     </label>
                                     <div className="relative">
                                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[13px] text-gray-400 font-bold">+91</span>
-                                        <input 
+                                        <input
                                             type="tel"
                                             required
                                             pattern="[6-9][0-9]{9}"
