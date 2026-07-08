@@ -607,7 +607,7 @@ export default function Landing() {
                     </div>
                 </div>
             </section>
-            z
+
             {/* ── LIVE NOTIFICATIONS BOARD ── */}
             <section id="notifications" className="py-20 px-6 lg:px-12 max-w-[1240px] mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
