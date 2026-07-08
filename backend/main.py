@@ -1,31 +1,10 @@
-# Self-healing package installer (fixes PythonAnywhere httpx conflict)
-# httpx >= 0.28.0 removed the `proxies` arg that python-telegram-bot uses.
-# This runs BEFORE any other import to guarantee the correct version is loaded.
+# Ensure critical packages are installed on PythonAnywhere
 import sys
 import subprocess
 
 def auto_fix_packages():
     import importlib.metadata
-
-    # Force httpx==0.27.2 — must run before telegram/httpx is imported
-    try:
-        current = importlib.metadata.version("httpx")
-    except Exception:
-        current = "unknown"
-
-    if current != "0.27.2":
-        print(f"[auto_fix] httpx is {current}, downgrading to 0.27.2 ...")
-        try:
-            subprocess.check_call([
-                sys.executable, "-m", "pip", "install",
-                "--user", "--force-reinstall", "--quiet",
-                "httpx==0.27.2"
-            ])
-            print("[auto_fix] httpx downgrade done. Restart required to take effect.")
-        except Exception as e:
-            print(f"[auto_fix] ERROR installing httpx: {e}")
-
-    # Ensure supabase is installed
+    # Ensure supabase is installed (not always pre-installed on PythonAnywhere)
     try:
         importlib.metadata.version("supabase")
     except importlib.metadata.PackageNotFoundError:
