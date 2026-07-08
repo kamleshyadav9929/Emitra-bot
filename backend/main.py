@@ -1,41 +1,40 @@
-# Self-healing package installer (fixes PythonAnywhere package conflicts automatically)
+# Self-healing package installer (fixes PythonAnywhere httpx conflict)
+# httpx >= 0.28.0 removed the `proxies` arg that python-telegram-bot uses.
+# This runs BEFORE any other import to guarantee the correct version is loaded.
 import sys
 import subprocess
 
 def auto_fix_packages():
     import importlib.metadata
-    
-    # 1. Check and install/upgrade httpx to 0.27.2
-    need_httpx = False
-    try:
-        version = importlib.metadata.version("httpx")
-        if version != "0.27.2":
-            need_httpx = True
-    except importlib.metadata.PackageNotFoundError:
-        need_httpx = True
-        
-    if need_httpx:
-        print("Self-healing: Forcing install of compatible httpx==0.27.2...")
-        try:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "--force-reinstall", "httpx==0.27.2"])
-        except Exception as e:
-            print(f"Self-healing error installing httpx: {e}")
 
-    # 2. Check and install/upgrade supabase
-    need_supabase = False
+    # Force httpx==0.27.2 — must run before telegram/httpx is imported
+    try:
+        current = importlib.metadata.version("httpx")
+    except Exception:
+        current = "unknown"
+
+    if current != "0.27.2":
+        print(f"[auto_fix] httpx is {current}, downgrading to 0.27.2 ...")
+        try:
+            subprocess.check_call([
+                sys.executable, "-m", "pip", "install",
+                "--user", "--force-reinstall", "--quiet",
+                "httpx==0.27.2"
+            ])
+            print("[auto_fix] httpx downgrade done. Restart required to take effect.")
+        except Exception as e:
+            print(f"[auto_fix] ERROR installing httpx: {e}")
+
+    # Ensure supabase is installed
     try:
         importlib.metadata.version("supabase")
     except importlib.metadata.PackageNotFoundError:
-        need_supabase = True
-        
-    if need_supabase:
-        print("Self-healing: Installing supabase...")
+        print("[auto_fix] Installing supabase ...")
         try:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "supabase"])
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "--quiet", "supabase"])
         except Exception as e:
-            print(f"Self-healing error installing supabase: {e}")
+            print(f"[auto_fix] ERROR installing supabase: {e}")
 
-# Run the self-healing routine
 auto_fix_packages()
 
 import asyncio
