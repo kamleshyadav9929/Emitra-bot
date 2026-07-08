@@ -47,7 +47,6 @@ from collections import defaultdict
 import time as _time
 
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from telegram import Update, Bot
@@ -67,23 +66,39 @@ if config.CLERK_JWKS_URL and not config.CLERK_JWT_PUBLIC_KEY:
         print(f"JWKS Client initialization failed: {e}")
 
 app = Flask(__name__)
-# Explicit CORS handling for development and production Vercel origins
-CORS(app, resources={r"/api/*": {
-    "origins": [
-        "https://emitra-bot.vercel.app",
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:5175",
-        "http://localhost:3000",
-        "http://localhost:5000",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174",
-        "http://127.0.0.1:5175",
-        "http://127.0.0.1:3000"
-    ],
-    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    "allow_headers": ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
-}})
+
+# ── Manual CORS – bulletproof for PythonAnywhere ─────────────────────────────
+# flask-cors sometimes fails to attach headers to plain-string responses.
+# Using @after_request ensures every response (200, 401, 500, OPTIONS …)
+# always carries the correct CORS headers.
+ALLOWED_ORIGINS = [
+    "https://emitra-bot.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://localhost:3000",
+    "http://localhost:5000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    "http://127.0.0.1:5175",
+    "http://127.0.0.1:3000",
+]
+
+@app.after_request
+def add_cors_headers(response):
+    origin = request.headers.get("Origin", "")
+    if origin in ALLOWED_ORIGINS:
+        response.headers["Access-Control-Allow-Origin"]  = origin
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept"
+        response.headers["Access-Control-Max-Age"]       = "86400"
+    return response
+
+# Catch-all OPTIONS handler – returns 200 immediately so preflights never
+# reach the real route (and never hit token_required).
+@app.route("/api/<path:path>", methods=["OPTIONS"])
+def handle_preflight(path):
+    return jsonify({"ok": True}), 200
 
 # ── Rate Limiter Setup ────────────────────────────────────────────────────────
 limiter = Limiter(
@@ -124,7 +139,7 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if request.method == "OPTIONS":
-            return "", 200
+            return jsonify({"ok": True}), 200
             
         token = None
         if "Authorization" in request.headers:
