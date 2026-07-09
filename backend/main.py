@@ -93,14 +93,15 @@ database.init_db()
 if not config.TELEGRAM_BOT_TOKEN:
     print("WARNING: TELEGRAM_BOT_TOKEN not set. Bot will not function.")
 
+# Initialize a global event loop and bot instance for the single WSGI worker
+global_loop = asyncio.new_event_loop()
+asyncio.set_event_loop(global_loop)
 
-def run_async(coro):
-    """
-    Runs an async coroutine. Using asyncio.run() ensures that each request
-    gets its own thread-safe event loop, avoiding event loop conflicts and crashes
-    in multi-threaded WSGI environments like PythonAnywhere.
-    """
-    return asyncio.run(coro)
+global_bot = None
+if config.TELEGRAM_BOT_TOKEN:
+    global_bot = Bot(token=config.TELEGRAM_BOT_TOKEN)
+    # Initialize the bot (and its httpx client) once synchronously when the worker starts
+    global_loop.run_until_complete(global_bot.initialize())
 
 
 # ── Authentication ─────────────────────────────────────────────────────────────
@@ -167,33 +168,31 @@ def webhook():
             return jsonify({"ok": False, "error": "Empty payload"}), 400
 
         async def process():
-            # Use bot async context manager to avoid event loop issues across requests
-            async with Bot(token=config.TELEGRAM_BOT_TOKEN) as bot:
-                update = Update.de_json(update_data, bot)
+            update = Update.de_json(update_data, global_bot)
 
-                if update.message and update.message.contact:
-                    await bot_handlers.contact_handler(update, None)
+            if update.message and update.message.contact:
+                await bot_handlers.contact_handler(update, None)
 
-                elif update.message and (update.message.photo or update.message.document):
-                    await bot_handlers.document_handler(update, None)
+            elif update.message and (update.message.photo or update.message.document):
+                await bot_handlers.document_handler(update, None)
 
-                elif update.message and update.message.text:
-                    text = update.message.text
-                    if text.startswith("/start"):
-                        await bot_handlers.start_handler(update, None)
-                    elif text.startswith("/services"):
-                        await bot_handlers.services_handler(update, None)
-                    elif text.startswith("/status"):
-                        await bot_handlers.status_handler(update, None)
-                    elif text.startswith("/change"):
-                        await bot_handlers.change_handler(update, None)
-                    else:
-                        await bot_handlers.message_handler(update, None)
+            elif update.message and update.message.text:
+                text = update.message.text
+                if text.startswith("/start"):
+                    await bot_handlers.start_handler(update, None)
+                elif text.startswith("/services"):
+                    await bot_handlers.services_handler(update, None)
+                elif text.startswith("/status"):
+                    await bot_handlers.status_handler(update, None)
+                elif text.startswith("/change"):
+                    await bot_handlers.change_handler(update, None)
+                else:
+                    await bot_handlers.message_handler(update, None)
 
-                elif update.callback_query:
-                    await bot_handlers.button_callback_handler(update, None)
+            elif update.callback_query:
+                await bot_handlers.button_callback_handler(update, None)
 
-        run_async(process())
+        global_loop.run_until_complete(process())
         return jsonify({"ok": True})
 
     except Exception as e:
@@ -727,17 +726,16 @@ def get_student_documents(telegram_id):
     return jsonify({"documents": docs})
 
 
-# FIX #2: Document URL endpoint — uses bot async context manager to avoid event loop issues
+# FIX #2: Document URL endpoint — uses global loop and bot
 @app.route("/api/document-url/<file_id>", methods=["GET"])
 @token_required
 def get_document_url(file_id):
     try:
         async def _get_file_path():
-            async with Bot(token=config.TELEGRAM_BOT_TOKEN) as bot:
-                telegram_file = await bot.get_file(file_id)
-                return telegram_file.file_path
+            telegram_file = await global_bot.get_file(file_id)
+            return telegram_file.file_path
 
-        file_path = run_async(_get_file_path())
+        file_path = global_loop.run_until_complete(_get_file_path())
         return jsonify({"url": file_path})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
