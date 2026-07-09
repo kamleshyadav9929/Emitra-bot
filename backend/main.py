@@ -1,6 +1,4 @@
-# NOTE: httpx is pinned to <0.28.0 in requirements.txt to stay compatible
-# with python-telegram-bot 20.x (which passes `proxies` to httpx.AsyncClient,
-# a parameter removed in httpx 0.28+).
+# python-telegram-bot 21.x — natively supports latest httpx, no version pinning needed.
 
 import asyncio
 import re
