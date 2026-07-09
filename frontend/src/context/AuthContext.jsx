@@ -23,6 +23,7 @@ export function useAuth() {
     return {
         user,
         isLoggedIn: !!isSignedIn && isLoaded,
+        isLoaded,
         logout: () => signOut(),
     }
 }

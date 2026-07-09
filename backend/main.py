@@ -913,18 +913,17 @@ def public_submit_application():
         )
 
         # 3. Process files
-        for doc_key in ["photo", "signature", "marksheet", "id_proof"]:
-            if doc_key in request.files:
-                file = request.files[doc_key]
-                if file and file.filename != "":
-                    orig_filename = secure_filename(file.filename)
-                    # Generate unique name: appid_uuid_origfilename
-                    unique_name = f"{app_id}_{uuid.uuid4().hex[:8]}_{orig_filename}"
-                    file_path = os.path.join(UPLOAD_FOLDER, unique_name)
-                    file.save(file_path)
-                    
-                    # Log file in database
-                    database.add_application_document(app_id, doc_key, unique_name, file.filename)
+        for doc_key in request.files:
+            file = request.files[doc_key]
+            if file and file.filename != "":
+                orig_filename = secure_filename(file.filename)
+                # Generate unique name: appid_uuid_origfilename
+                unique_name = f"{app_id}_{uuid.uuid4().hex[:8]}_{orig_filename}"
+                file_path = os.path.join(UPLOAD_FOLDER, unique_name)
+                file.save(file_path)
+                
+                # Log file in database using doc_key (which is the document label like '10th Marksheet') as file_type
+                database.add_application_document(app_id, doc_key, unique_name, file.filename)
 
         return jsonify({"success": True, "message": "Application submitted successfully", "application_id": app_id})
     except Exception as e:
@@ -967,9 +966,10 @@ def admin_create_exam():
     elig = data.get("eligibility", "")
     url = data.get("official_url", "")
     enabled = data.get("enabled", True)
+    req_docs = data.get("required_documents", "")
 
     success, result = database.add_exam_details(
-        name, desc, cat, start, end, exam_d, fees_gen, fees_sc, elig, url, enabled
+        name, desc, cat, start, end, exam_d, fees_gen, fees_sc, elig, url, enabled, req_docs
     )
     if success:
         return jsonify({"success": True, "id": result})
@@ -995,9 +995,10 @@ def admin_update_exam(exam_id):
     elig = data.get("eligibility", "")
     url = data.get("official_url", "")
     enabled = data.get("enabled", True)
+    req_docs = data.get("required_documents", "")
 
     success = database.update_exam_details(
-        exam_id, name, desc, cat, start, end, exam_d, fees_gen, fees_sc, elig, url, enabled
+        exam_id, name, desc, cat, start, end, exam_d, fees_gen, fees_sc, elig, url, enabled, req_docs
     )
     if success:
         return jsonify({"success": True})

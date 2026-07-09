@@ -163,7 +163,7 @@ function ApplicationDetailsModal({ appId, onClose, onStatusUpdated, toastMsgSett
                   <div key={doc.id} className="bg-[var(--color-surface-low)] border border-gray-200/55 p-3 rounded-2xl flex items-center justify-between hover:bg-gray-100/50 transition-colors">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-8 h-8 bg-blue-50 text-[#0071e3] flex items-center justify-center rounded-[10px]">
-                        {doc.file_type === "photo" ? <ImageIcon size={14} /> : <FileText size={14} />}
+                        {(doc.file_type?.toLowerCase().includes("photo") || doc.file_type?.toLowerCase().includes("signature") || doc.file_type?.toLowerCase().includes("image") || doc.file_type?.toLowerCase().includes("pic")) ? <ImageIcon size={14} /> : <FileText size={14} />}
                       </div>
                       <div className="min-w-0">
                         <p className="text-[12.5px] font-bold text-gray-900 truncate max-w-[120px]">{doc.file_name}</p>

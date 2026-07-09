@@ -22,13 +22,15 @@ import { AuthProvider, useAuth as useStudentAuth } from "./context/AuthContext" 
 
 // Dynamic home page: renders StudentPanel if logged in, Landing page if logged out
 function StudentPortalHome() {
-    const { isLoggedIn } = useStudentAuth()
+    const { isLoggedIn, isLoaded } = useStudentAuth()
+    if (!isLoaded) return <ClerkLoadingSpinner />
     return isLoggedIn ? <StudentPanel /> : <Landing />
 }
 
 // Private route for student dashboard
 function StudentDashboardRoute() {
-    const { isLoggedIn } = useStudentAuth()
+    const { isLoggedIn, isLoaded } = useStudentAuth()
+    if (!isLoaded) return <ClerkLoadingSpinner />
     return isLoggedIn ? <StudentPanel /> : <Navigate to="/" replace />
 }
 

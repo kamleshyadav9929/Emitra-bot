@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { useNavigate } from "react-router-dom"
+import { useClerk } from "@clerk/react"
 import {
     Send, Clock, Bell, Globe, ExternalLink,
     ChevronDown, Check, LogOut, User, Search,
@@ -29,6 +30,7 @@ const formatTelegramMessage = (text) => {
 
 export default function Landing() {
     const navigate = useNavigate()
+    const { openSignIn } = useClerk()
     const { lang, toggleLanguage } = useLanguage()
     const { user, isLoggedIn, logout } = useAuth()
 
@@ -161,12 +163,10 @@ export default function Landing() {
     }
 
     const triggerSignIn = () => {
-        if (window.Clerk) {
-            window.Clerk.openSignIn({
-                afterSignInUrl: window.location.origin + "/dashboard",
-                afterSignUpUrl: window.location.origin + "/dashboard",
-            })
-        }
+        openSignIn({
+            afterSignInUrl: window.location.origin + "/dashboard",
+            afterSignUpUrl: window.location.origin + "/dashboard",
+        })
     }
 
     // Filter Announcements/Notifications

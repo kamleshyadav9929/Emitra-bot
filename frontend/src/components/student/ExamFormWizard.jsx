@@ -1,33 +1,23 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { 
-  X, User, Phone, Mail, Calendar, GraduationCap, 
-  UploadCloud, FileText, CheckCircle, ArrowRight, ArrowLeft, 
-  Trash2, AlertCircle, RefreshCw, FileCheck, MessageSquare, Info
+  X, UploadCloud, FileText, CheckCircle, ArrowRight, ArrowLeft, 
+  Trash2, AlertCircle, RefreshCw, FileCheck, Info
 } from "lucide-react"
 import * as api from "../../api"
+import { useAuth } from "../../context/AuthContext"
 
-// Helper to determine required documents based on the exam name
-const getRequiredDocsForExam = (examName) => {
-  const name = (examName || "").toLowerCase()
-  if (name.includes("jee") || name.includes("neet")) {
-    return [
-      "Passport Size Photograph (Recent)",
-      "Candidate Signature (on white paper)",
-      "10th Marksheet & Certificate",
-      "12th Marksheet (or admit card if appearing)",
-      "Category Certificate (OBC/SC/ST/EWS if applicable)"
-    ]
+// Helper to determine required documents based on the exam definition from the database
+const getRequiredDocsForExam = (examName, examsList) => {
+  const exam = (examsList || []).find(e => e.name === examName)
+  if (exam && exam.required_documents) {
+    return exam.required_documents
+      .split(",")
+      .map(d => d.trim())
+      .filter(Boolean)
   }
-  if (name.includes("ssc") || name.includes("upsc")) {
-    return [
-      "Passport Size Photograph",
-      "Candidate Signature",
-      "Graduation Marksheet/Degree",
-      "Matriculation (10th) Certificate for DOB proof",
-      "Caste/Category Certificate (if applicable)"
-    ]
-  }
+  
+  // Default fallback list
   return [
     "Passport Size Photograph",
     "Candidate Signature",
@@ -36,28 +26,38 @@ const getRequiredDocsForExam = (examName) => {
   ]
 }
 
+// Helper to determine if a document is required based on category and name
+const isDocRequired = (docLabel, category) => {
+  const label = docLabel.toLowerCase()
+  if (label.includes("optional")) return false
+  if (label.includes("category certificate") || label.includes("caste") || label.includes("ews certificate")) {
+    // Only required if category is not General
+    return category && category !== "General" && category !== "GEN"
+  }
+  return true
+}
+
 const STEPS = [
-  { id: 1, title: "Personal Details" },
-  { id: 2, title: "Academic Info" },
-  { id: 3, title: "Upload Files" },
-  { id: 4, title: "Review & Submit" }
+  { id: 1, title: "Upload Files" },
+  { id: 2, title: "Review & Submit" }
 ]
 
-export default function ExamFormWizard({ isOpen, onClose, examName, config = {} }) {
+export default function ExamFormWizard({ isOpen, onClose, examName, config = {}, exams = [] }) {
+  const { user } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
   const [appId, setAppId] = useState(null)
 
-  // Form states
+  // Form states pre-filled from Clerk profile
   const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    email: "",
+    name: user?.name || "Student",
+    phone: user?.phone ? user.phone.replace("+91", "").replace(" ", "").trim() : "",
+    email: user?.email || "",
     dob: "",
     gender: "",
-    category: "",
+    category: "General",
     qualification: "",
     board: "",
     passingYear: "",
@@ -65,52 +65,47 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
     docSubmissionMethod: "upload" // 'upload' or 'whatsapp'
   })
 
-  // File states
-  const [files, setFiles] = useState({
-    photo: null,
-    signature: null,
-    marksheet: null,
-    id_proof: null
-  })
+  // Dynamic files state
+  const [files, setFiles] = useState({})
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+  // React to user context changes (in case Clerk session load finishes after mount)
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: prev.name && prev.name !== "Student" ? prev.name : (user.name || "Student"),
+        phone: prev.phone ? prev.phone : (user.phone ? user.phone.replace("+91", "").replace(" ", "").trim() : ""),
+        email: prev.email ? prev.email : (user.email || "")
+      }))
+    }
+  }, [user])
 
-  const handleFileChange = (e, type) => {
+  const requiredDocs = getRequiredDocsForExam(examName, exams)
+
+  const handleFileChange = (e, docLabel) => {
     const file = e.target.files[0]
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
         alert("File size should be less than 5MB")
         return
       }
-      setFiles(prev => ({ ...prev, [type]: file }))
+      setFiles(prev => ({ ...prev, [docLabel]: file }))
     }
   }
 
-  const removeFile = (type) => {
-    setFiles(prev => ({ ...prev, [type]: null }))
+  const removeFile = (docLabel) => {
+    setFiles(prev => ({ ...prev, [docLabel]: null }))
   }
 
   const validateStep = (step) => {
     setError("")
     if (step === 1) {
-      if (!formData.name.trim()) return "Please enter your full name"
-      if (!formData.phone.trim() || !/^[6-9]\d{9}$/.test(formData.phone)) return "Please enter a valid 10-digit phone number"
-      if (!formData.dob) return "Please enter your date of birth"
-      if (!formData.gender) return "Please select your gender"
-      if (!formData.category) return "Please select your social category"
-    } else if (step === 2) {
-      if (!formData.qualification) return "Please select your highest qualification"
-      if (!formData.board.trim()) return "Please enter Board/University name"
-      if (!formData.passingYear || formData.passingYear < 1980 || formData.passingYear > 2026) return "Please enter a valid passing year"
-      if (!formData.marks.trim()) return "Please enter your marks/CGPA"
-    } else if (step === 3) {
       if (formData.docSubmissionMethod === "upload") {
-        if (!files.photo) return "Please upload your passport-size photo"
-        if (!files.signature) return "Please upload your signature"
-        if (!files.marksheet) return "Please upload your qualification marksheet"
+        for (const docLabel of requiredDocs) {
+          if (isDocRequired(docLabel, formData.category) && !files[docLabel]) {
+            return `Please upload your ${docLabel}`
+          }
+        }
       }
     }
     return null
@@ -135,6 +130,7 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
     setError("")
     try {
       const data = new FormData()
+      
       // Append text fields
       Object.entries(formData).forEach(([key, val]) => {
         data.append(key, val)
@@ -143,9 +139,9 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
 
       // Append files only if they chose upload method
       if (formData.docSubmissionMethod === "upload") {
-        Object.entries(files).forEach(([key, file]) => {
+        Object.entries(files).forEach(([docLabel, file]) => {
           if (file) {
-            data.append(key, file)
+            data.append(docLabel, file)
           }
         })
       }
@@ -167,11 +163,10 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
   // Prepares the WhatsApp direct share text
   const getWhatsAppMessage = () => {
     const refId = `#EM-${appId}`
-    const text = `Namaste Krishna Emitra! Maine website par *${examName}* ke liye form details fill kar di hain.\n\n*Reference ID:* ${refId}\n*Student Name:* ${formData.name}\n*Phone:* ${formData.phone}\n\nMain abhi is message ke saath required documents (Photo, Signature aur Marksheets) share kar raha hoon. Please form fill karke receipt bhej dein.`
+    const text = `Namaste Krishna Emitra! Maine website par *${examName}* ke liye form details fill kar di hain.\n\n*Reference ID:* ${refId}\n*Student Name:* ${formData.name}\n*Phone:* ${formData.phone}\n\nMain abhi is message ke saath required documents share kar raha hoon. Please form fill karke receipt bhej dein.`
     return `https://wa.me/${config.whatsapp_number || "916377964293"}?text=${encodeURIComponent(text)}`
   }
 
-  const requiredDocs = getRequiredDocsForExam(examName)
   const inputClass = "w-full border border-gray-200 focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 rounded-xl px-4 py-3 text-[13px] bg-white transition-all outline-none text-[#1d1d1f]"
   const labelClass = "text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5 block"
 
@@ -200,12 +195,12 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
             <div className="px-6 py-5 border-b border-[#e5e5e7] flex items-center justify-between bg-[#f5f5f7]/55">
               <div>
                 <p className="text-[10px] font-bold tracking-widest text-[#0071e3] uppercase">Online Form Assistant</p>
-                <h3 className="text-[16px] font-bold text-[#1d1d1f] mt-0.5">{examName} Application Form</h3>
+                <h3 className="text-[16px] font-bold text-[#1d1d1f] mt-0.5">{examName} Application</h3>
               </div>
               {!loading && (
                 <button 
                   onClick={onClose} 
-                  className="p-1.5 hover:bg-gray-100 rounded-full text-gray-400 hover:text-[#1d1d1f] transition-all"
+                  className="p-1.5 hover:bg-gray-100 rounded-full text-gray-400 hover:text-[#1d1d1f] transition-all cursor-pointer border-none bg-transparent"
                   aria-label="Close modal"
                 >
                   <X size={18} />
@@ -235,7 +230,7 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                       }`}>
                         {step.title}
                       </span>
-                      {step.id < 4 && <div className="w-6 h-[1px] bg-gray-200 hidden sm:block mx-1" />}
+                      {step.id < 2 && <div className="w-6 h-[1px] bg-gray-200 hidden sm:block mx-1" />}
                     </div>
                   )
                 })}
@@ -253,71 +248,19 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
 
               {!success ? (
                 <div className="space-y-6">
-                  {/* STEP 1: Personal Details */}
+                  {/* STEP 1: Upload Files or Select WhatsApp */}
                   {currentStep === 1 && (
-                    <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <div className="sm:col-span-2">
-                        <label className={labelClass}>Full Name (As per Matriculation Certificate) *</label>
-                        <div className="relative">
-                          <User size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                          <input 
-                            type="text" name="name" value={formData.name} onChange={handleChange} 
-                            placeholder="Enter full name" className={`${inputClass} pl-10`}
-                          />
-                        </div>
-                      </div>
-
+                    <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 text-left">
+                      
+                      {/* Social Category Picker (needed to determine if category certificate is required) */}
                       <div>
-                        <label className={labelClass}>Mobile Number (WhatsApp Preferred) *</label>
-                        <div className="relative">
-                          <Phone size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                          <input 
-                            type="tel" name="phone" value={formData.phone} onChange={handleChange} 
-                            placeholder="10-digit number" className={`${inputClass} pl-10`}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className={labelClass}>Email Address</label>
-                        <div className="relative">
-                          <Mail size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                          <input 
-                            type="email" name="email" value={formData.email} onChange={handleChange} 
-                            placeholder="name@example.com" className={`${inputClass} pl-10`}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className={labelClass}>Date of Birth *</label>
-                        <div className="relative">
-                          <Calendar size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                          <input 
-                            type="date" name="dob" value={formData.dob} onChange={handleChange} 
-                            className={`${inputClass} pl-10`}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className={labelClass}>Gender *</label>
-                        <select name="gender" value={formData.gender} onChange={handleChange} className={inputClass}>
-                          <option value="">Select Gender</option>
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                          <option value="Other">Other</option>
-                        </select>
-                      </div>
-
-                      <div className="sm:col-span-2">
                         <label className={labelClass}>Social Category *</label>
                         <div className="grid grid-cols-5 gap-2">
                           {["General", "OBC", "SC", "ST", "EWS"].map((cat) => (
                             <button
                               key={cat} type="button"
                               onClick={() => setFormData(p => ({ ...p, category: cat }))}
-                              className={`py-2.5 px-1 text-[12px] font-bold rounded-xl border transition-all text-center ${
+                              className={`py-2.5 px-1 text-[12px] font-bold rounded-xl border transition-all text-center cursor-pointer ${
                                 formData.category === cat 
                                   ? "bg-[#0071e3] text-white border-[#0071e3] shadow-sm font-semibold"
                                   : "bg-[#f5f5f7] text-[#1d1d1f] border-transparent hover:bg-gray-200"
@@ -328,55 +271,7 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                           ))}
                         </div>
                       </div>
-                    </motion.div>
-                  )}
 
-                  {/* STEP 2: Academic Info */}
-                  {currentStep === 2 && (
-                    <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <div>
-                        <label className={labelClass}>Highest Qualification *</label>
-                        <select name="qualification" value={formData.qualification} onChange={handleChange} className={inputClass}>
-                          <option value="">Select Qualification</option>
-                          <option value="10th Pass">10th Pass</option>
-                          <option value="12th Pass">12th Pass</option>
-                          <option value="Graduate">Graduate (Degree)</option>
-                          <option value="Post Graduate">Post Graduate (PG)</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className={labelClass}>Board / University *</label>
-                        <div className="relative">
-                          <GraduationCap size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                          <input 
-                            type="text" name="board" value={formData.board} onChange={handleChange} 
-                            placeholder="e.g. CBSE, BSER, RU" className={`${inputClass} pl-10`}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className={labelClass}>Passing Year *</label>
-                        <input 
-                          type="number" name="passingYear" value={formData.passingYear} onChange={handleChange} 
-                          placeholder="e.g. 2024" className={inputClass} min="1980" max="2026"
-                        />
-                      </div>
-
-                      <div>
-                        <label className={labelClass}>Marks obtained (Percentage/CGPA) *</label>
-                        <input 
-                          type="text" name="marks" value={formData.marks} onChange={handleChange} 
-                          placeholder="e.g. 84.5% or 8.8 CGPA" className={inputClass}
-                        />
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* STEP 3: Upload Files or Select WhatsApp */}
-                  {currentStep === 3 && (
-                    <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
                       {/* Document Submission Toggle */}
                       <div className="space-y-2">
                         <label className={labelClass}>How would you like to submit your documents?</label>
@@ -384,7 +279,7 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                           <button
                             type="button"
                             onClick={() => setFormData(p => ({ ...p, docSubmissionMethod: "upload" }))}
-                            className={`py-4 px-5 text-[13px] font-bold rounded-2xl border text-left flex items-start gap-3 transition-all ${
+                            className={`py-4 px-5 text-[13px] font-bold rounded-2xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
                               formData.docSubmissionMethod === "upload"
                                 ? "bg-[#0071e3]/5 text-[#0071e3] border-[#0071e3] ring-2 ring-[#0071e3]/10"
                                 : "bg-white text-[#1d1d1f] border-[#e5e5e7] hover:bg-[#f5f5f7]"
@@ -399,7 +294,7 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                           <button
                             type="button"
                             onClick={() => setFormData(p => ({ ...p, docSubmissionMethod: "whatsapp" }))}
-                            className={`py-4 px-5 text-[13px] font-bold rounded-2xl border text-left flex items-start gap-3 transition-all ${
+                            className={`py-4 px-5 text-[13px] font-bold rounded-2xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
                               formData.docSubmissionMethod === "whatsapp"
                                 ? "bg-[#25D366]/5 text-[#25D366] border-[#25D366] ring-2 ring-[#25D366]/10"
                                 : "bg-white text-[#1d1d1f] border-[#e5e5e7] hover:bg-[#f5f5f7]"
@@ -422,7 +317,7 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                             <div>
                               <h4 className="text-[13.5px] font-bold text-[#1d1d1f]">No Uploads Required!</h4>
                               <p className="text-[11.5px] text-gray-500 mt-1 leading-normal">
-                                Secure document handling. Aap click karke details bhar dein, aur direct WhatsApp/Telegram par operator ke saath safe format mein share karein.
+                                Secure document handling. Aap click karke register kar dein, aur direct WhatsApp/Telegram par operator ke saath safe format mein share karein.
                               </p>
                             </div>
                           </div>
@@ -430,9 +325,14 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                           <div className="border-t border-gray-100 pt-3">
                             <p className="text-[10px] font-bold text-[#25D366] uppercase tracking-wider mb-2">Required Documents for {examName}:</p>
                             <ul className="space-y-1.5 pl-4 list-disc text-[12px] text-gray-600 font-medium">
-                              {requiredDocs.map((doc, idx) => (
-                                <li key={idx}>{doc}</li>
-                              ))}
+                              {requiredDocs.map((doc, idx) => {
+                                const isRequired = isDocRequired(doc, formData.category)
+                                return (
+                                  <li key={idx}>
+                                    {doc} {isRequired ? "*" : "(Optional)"}
+                                  </li>
+                                )
+                              })}
                             </ul>
                           </div>
                         </div>
@@ -446,17 +346,15 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                           </div>
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {[
-                              { key: "photo", label: "Passport Photo *" },
-                              { key: "signature", label: "Signature *" },
-                              { key: "marksheet", label: "Qualification Certificate / Marksheet *" },
-                              { key: "id_proof", label: "Aadhar Card (Optional)" }
-                            ].map((item) => {
-                              const file = files[item.key]
+                            {requiredDocs.map((docLabel) => {
+                              const file = files[docLabel]
+                              const isRequired = isDocRequired(docLabel, formData.category)
                               return (
-                                <div key={item.key} className="border border-[#e5e5e7] rounded-2xl p-4 flex flex-col justify-between bg-white min-h-[140px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.01)] transition-all">
+                                <div key={docLabel} className="border border-[#e5e5e7] rounded-2xl p-4 flex flex-col justify-between bg-white min-h-[140px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.01)] transition-all">
                                   <div>
-                                    <span className="text-[11.5px] font-bold text-[#1d1d1f] block mb-2">{item.label}</span>
+                                    <span className="text-[11.5px] font-bold text-[#1d1d1f] block mb-2">
+                                      {docLabel} {isRequired ? "*" : "(Optional)"}
+                                    </span>
                                     {file ? (
                                       <div className="flex items-center justify-between p-2.5 bg-[#f0fdf4] border border-emerald-100 rounded-xl">
                                         <div className="flex items-center gap-2 min-w-0">
@@ -464,8 +362,8 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                                           <span className="text-[12px] font-semibold text-emerald-800 truncate pr-2">{file.name}</span>
                                         </div>
                                         <button 
-                                          type="button" onClick={() => removeFile(item.key)} 
-                                          className="p-1 hover:bg-[#dcfce7] rounded-full text-emerald-600 hover:text-red-500 transition-colors"
+                                          type="button" onClick={() => removeFile(docLabel)} 
+                                          className="p-1 hover:bg-[#dcfce7] rounded-full text-emerald-600 hover:text-red-500 transition-colors cursor-pointer border-none bg-transparent"
                                         >
                                           <Trash2 size={13} />
                                         </button>
@@ -476,7 +374,7 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                                         <span className="text-[11.5px] font-semibold text-gray-500 group-hover:text-[#0071e3] transition-colors mt-2">Select File</span>
                                         <input 
                                           type="file" accept="image/*,application/pdf" 
-                                          onChange={(e) => handleFileChange(e, item.key)} 
+                                          onChange={(e) => handleFileChange(e, docLabel)} 
                                           className="hidden"
                                         />
                                       </label>
@@ -491,9 +389,9 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                     </motion.div>
                   )}
 
-                  {/* STEP 4: Review & Submit */}
-                  {currentStep === 4 && (
-                    <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                  {/* STEP 2: Review & Submit */}
+                  {currentStep === 2 && (
+                    <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 text-left">
                       <div className="p-4 bg-amber-50 border border-amber-100 text-amber-800 text-[12px] font-medium rounded-2xl">
                         Please review your application details. Once submitted, form filling will be processed by Krishna Emitra Desk.
                       </div>
@@ -516,36 +414,8 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                           <p className="text-[13px] font-semibold text-[#1d1d1f] mt-0.5">{formData.email || "-"}</p>
                         </div>
                         <div>
-                          <span className="text-[10px] uppercase font-bold text-gray-400">Date of Birth</span>
-                          <p className="text-[13px] font-semibold text-[#1d1d1f] mt-0.5">{formData.dob}</p>
-                        </div>
-                        <div>
-                          <span className="text-[10px] uppercase font-bold text-gray-400">Gender</span>
-                          <p className="text-[13px] font-semibold text-[#1d1d1f] mt-0.5">{formData.gender}</p>
-                        </div>
-                        <div>
                           <span className="text-[10px] uppercase font-bold text-gray-400">Category</span>
                           <p className="text-[13px] font-semibold text-[#1d1d1f] mt-0.5">{formData.category}</p>
-                        </div>
-
-                        <div className="col-span-2 border-b border-gray-200 pb-2 mt-2 mb-1">
-                          <h4 className="text-[12.5px] font-bold text-[#1d1d1f] uppercase tracking-wider">Academic Record</h4>
-                        </div>
-                        <div>
-                          <span className="text-[10px] uppercase font-bold text-gray-400">Highest Qualification</span>
-                          <p className="text-[13px] font-semibold text-[#1d1d1f] mt-0.5">{formData.qualification}</p>
-                        </div>
-                        <div>
-                          <span className="text-[10px] uppercase font-bold text-gray-400">Board/University</span>
-                          <p className="text-[13px] font-semibold text-[#1d1d1f] mt-0.5">{formData.board}</p>
-                        </div>
-                        <div>
-                          <span className="text-[10px] uppercase font-bold text-gray-400">Passing Year</span>
-                          <p className="text-[13px] font-semibold text-[#1d1d1f] mt-0.5">{formData.passingYear}</p>
-                        </div>
-                        <div>
-                          <span className="text-[10px] uppercase font-bold text-gray-400">Marks / CGPA</span>
-                          <p className="text-[13px] font-semibold text-[#1d1d1f] mt-0.5">{formData.marks}</p>
                         </div>
 
                         <div className="col-span-2 border-b border-gray-200 pb-2 mt-2 mb-1">
@@ -553,13 +423,18 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                         </div>
                         <div className="col-span-2 text-[13px] font-semibold">
                           {formData.docSubmissionMethod === "whatsapp" ? (
-                            <span className="text-amber-600 flex items-center gap-1.5">💬 Will send required documents via WhatsApp later</span>
+                            <span className="text-amber-600 flex items-center gap-1.5 font-bold">💬 Will send required documents via WhatsApp later</span>
                           ) : (
-                            <div className="grid grid-cols-2 gap-2 text-emerald-800">
-                              <div className="flex items-center gap-1.5"><FileCheck size={14} className="text-[#10B981]" /> Photo</div>
-                              <div className="flex items-center gap-1.5"><FileCheck size={14} className="text-[#10B981]" /> Signature</div>
-                              <div className="flex items-center gap-1.5"><FileCheck size={14} className="text-[#10B981]" /> Marksheet</div>
-                              {files.id_proof && <div className="flex items-center gap-1.5"><FileCheck size={14} className="text-[#10B981]" /> ID Proof</div>}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-emerald-800">
+                              {Object.entries(files).map(([docLabel, file]) => {
+                                if (!file) return null
+                                return (
+                                  <div key={docLabel} className="flex items-center gap-1.5 min-w-0">
+                                    <FileCheck size={14} className="text-[#10B981] shrink-0" />
+                                    <span className="truncate" title={docLabel}>{docLabel}</span>
+                                  </div>
+                                )
+                              })}
                             </div>
                           )}
                         </div>
@@ -596,14 +471,14 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                         href={getWhatsAppMessage()}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full py-3.5 bg-[#25D366] hover:bg-[#22c35e] text-white text-[13px] font-bold rounded-2xl shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                        className="w-full py-3.5 bg-[#25D366] hover:bg-[#22c35e] text-white text-[13px] font-bold rounded-2xl shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 decoration-none"
                       >
                         <MessageSquare size={16} /> Send Documents on WhatsApp
                       </a>
                     ) : (
                       <button 
                         onClick={onClose} 
-                        className="w-full py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white text-[12.5px] font-semibold rounded-xl transition-all active:scale-[0.98]"
+                        className="w-full py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white text-[12.5px] font-semibold rounded-xl transition-all active:scale-[0.98] cursor-pointer border-none"
                       >
                         Done &amp; Go Back
                       </button>
@@ -624,7 +499,7 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                     type="button"
                     onClick={handleBack} 
                     disabled={loading}
-                    className="flex items-center gap-1.5 px-4.5 py-2.5 border border-[#d2d2d7] bg-white text-[#1d1d1f] text-[12.5px] font-semibold rounded-xl hover:bg-gray-50 transition-all disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-4.5 py-2.5 border border-[#d2d2d7] bg-white text-[#1d1d1f] text-[12.5px] font-semibold rounded-xl hover:bg-gray-50 transition-all disabled:opacity-50 cursor-pointer"
                   >
                     <ArrowLeft size={14} /> Back
                   </button>
@@ -632,11 +507,11 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                   <div />
                 )}
 
-                {currentStep < 4 ? (
+                {currentStep < 2 ? (
                   <button 
                     type="button"
                     onClick={handleNext}
-                    className="flex items-center gap-1.5 px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-[12.5px] font-semibold rounded-xl shadow-sm transition-all"
+                    className="flex items-center gap-1.5 px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-[12.5px] font-semibold rounded-xl shadow-sm transition-all cursor-pointer border-none"
                   >
                     Next Step <ArrowRight size={14} />
                   </button>
@@ -645,7 +520,7 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {} 
                     type="button"
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-[#1d1d1f] hover:bg-[#2d2d2f] text-white text-[12.5px] font-bold rounded-xl shadow-md transition-all disabled:opacity-60"
+                    className="flex items-center gap-2 px-6 py-2.5 bg-[#1d1d1f] hover:bg-[#2d2d2f] text-white text-[12.5px] font-bold rounded-xl shadow-md transition-all disabled:opacity-60 cursor-pointer border-none"
                   >
                     {loading ? (
                       <>

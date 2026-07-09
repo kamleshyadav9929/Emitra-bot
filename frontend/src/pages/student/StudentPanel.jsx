@@ -11,6 +11,7 @@ import {
 } from "lucide-react"
 
 import "../../portal.css"
+import { useClerk } from "@clerk/react"
 import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
@@ -27,6 +28,7 @@ import Logo from "../../components/common/Logo"
 
 export default function StudentPanel() {
     const navigate = useNavigate()
+    const { openSignIn } = useClerk()
     const { category: catParam } = useParams()
     const { lang, toggleLanguage, t } = useLanguage()
     const { user, isLoggedIn, logout } = useAuth()
@@ -555,12 +557,10 @@ export default function StudentPanel() {
     }
 
     const triggerSignIn = () => {
-        if (window.Clerk) {
-            window.Clerk.openSignIn({
-                afterSignInUrl: window.location.href,
-                afterSignUpUrl: window.location.href,
-            })
-        }
+        openSignIn({
+            afterSignInUrl: window.location.href,
+            afterSignUpUrl: window.location.href,
+        })
     }
 
     // computed stats and list filters
@@ -1112,6 +1112,7 @@ export default function StudentPanel() {
                 }} 
                 examName={wizardExamName} 
                 config={config} 
+                exams={exams}
             />
 
             {/* ── SERVICE REQUEST SUBMISSION MODAL ── */}

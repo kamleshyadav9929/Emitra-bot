@@ -23,7 +23,8 @@ function ExamModal({ exam, onSave, onClose, loading }) {
     fees_sc_st: "",
     eligibility: "",
     official_url: "",
-    enabled: true
+    enabled: true,
+    required_documents: "Passport Photo, Signature, 10th Marksheet, 12th Marksheet"
   }
 
   const [form, setForm] = useState(exam ? {
@@ -37,7 +38,8 @@ function ExamModal({ exam, onSave, onClose, loading }) {
     fees_sc_st: exam.fees_sc_st || "",
     eligibility: exam.eligibility || "",
     official_url: exam.official_url || "",
-    enabled: exam.enabled === 1 || exam.enabled === true
+    enabled: exam.enabled === 1 || exam.enabled === true,
+    required_documents: exam.required_documents || ""
   } : defaultForm)
 
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
@@ -79,6 +81,16 @@ function ExamModal({ exam, onSave, onClose, loading }) {
                 value={form.description} onChange={e => set("description", e.target.value)}
                 className="w-full border border-gray-200 px-4 py-2.5 text-[13px] text-gray-900 rounded-xl focus:border-[#164FA8] focus:ring-1 focus:ring-[#164FA8] outline-none h-16 resize-none"
                 placeholder="Brief information about this exam..."
+              />
+            </div>
+
+            <div className="col-span-2">
+              <label className="text-[10px] text-gray-500 font-bold tracking-widest uppercase block mb-1.5">Required Documents (Comma-separated) *</label>
+              <textarea
+                value={form.required_documents} onChange={e => set("required_documents", e.target.value)}
+                className="w-full border border-gray-200 px-4 py-2.5 text-[13px] text-gray-900 rounded-xl focus:border-[#164FA8] focus:ring-1 focus:ring-[#164FA8] outline-none h-16 resize-none"
+                placeholder="e.g. Passport Photo, Signature, 10th Marksheet, 12th Marksheet"
+                required
               />
             </div>
 
@@ -224,7 +236,8 @@ export default function AdminExams() {
         fees_sc_st: exam.fees_sc_st || "",
         eligibility: exam.eligibility || "",
         official_url: exam.official_url || "",
-        enabled: updatedEnabled
+        enabled: updatedEnabled,
+        required_documents: exam.required_documents || ""
       })
       setExams(prev => prev.map(e => e.id === exam.id ? { ...e, enabled: updatedEnabled ? 1 : 0 } : e))
       showToast(`${exam.name} status updated!`)

@@ -779,7 +779,7 @@ def get_all_exams_admin():
     return res.data
 
 
-def add_exam_details(name, description='', category='UG', start_date='', end_date='', exam_date='', fees_gen_obc='', fees_sc_st='', eligibility='', official_url='', enabled=True):
+def add_exam_details(name, description='', category='UG', start_date='', end_date='', exam_date='', fees_gen_obc='', fees_sc_st='', eligibility='', official_url='', enabled=True, required_documents=''):
     try:
         res = supabase.table("exams").insert({
             "name": name.strip(),
@@ -792,7 +792,8 @@ def add_exam_details(name, description='', category='UG', start_date='', end_dat
             "fees_sc_st": fees_sc_st,
             "eligibility": eligibility,
             "official_url": official_url,
-            "enabled": 1 if enabled else 0
+            "enabled": 1 if enabled else 0,
+            "required_documents": required_documents
         }).execute()
         _cache_invalidate("all_exams")
         return True, res.data[0]["id"]
@@ -800,7 +801,7 @@ def add_exam_details(name, description='', category='UG', start_date='', end_dat
         return False, f"Exam already exists or error: {str(e)}"
 
 
-def update_exam_details(exam_id, name, description, category, start_date, end_date, exam_date, fees_gen_obc, fees_sc_st, eligibility, official_url, enabled):
+def update_exam_details(exam_id, name, description, category, start_date, end_date, exam_date, fees_gen_obc, fees_sc_st, eligibility, official_url, enabled, required_documents):
     try:
         supabase.table("exams").update({
             "name": name.strip(),
@@ -813,7 +814,8 @@ def update_exam_details(exam_id, name, description, category, start_date, end_da
             "fees_sc_st": fees_sc_st,
             "eligibility": eligibility,
             "official_url": official_url,
-            "enabled": 1 if enabled else 0
+            "enabled": 1 if enabled else 0,
+            "required_documents": required_documents
         }).eq("id", exam_id).execute()
         _cache_invalidate("all_exams")
         return True
