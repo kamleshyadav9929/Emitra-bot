@@ -249,11 +249,11 @@ async def button_callback_handler(update: Update, context):
 
         await query.edit_message_text(
             text=(
-                f"✅ *{service_name}* seva ke liye request bhejein!\n\n"
-                f"Neeche link dabayein — WhatsApp khulega aur message already filled hoga. "
-                f"Bas *Send* dabayein. 👇\n\n"
+                f"✅ *{service_name}* seva ki request successfully submit ho gayi hai! 🏛️\n\n"
+                f"Aapki request humare Admin Panel par receive ho chuki hai. Hum jald hi isko process karenge aur receipt isi chat mein bhej denge!\n\n"
+                f"📞 *(Optional)* Agar aap direct updates ke liye WhatsApp par message bhejna chahte hain, toh neeche button dabaayein:\n\n"
                 f"[📲 WhatsApp pe Bhejein]({wa_link})\n\n"
-                f"_Hum aapka form jald process karenge aur receipt bhej denge!_"
+                f"_Hum form process karke details aapko yahan bhej denge._"
             ),
             parse_mode="Markdown",
             disable_web_page_preview=True,
