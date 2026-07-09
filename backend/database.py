@@ -360,13 +360,26 @@ def get_stats():
     total_res = supabase.table("students").select("id", count="exact").execute()
     total = total_res.count if total_res.count is not None else 0
     
+    # Fetch all exam names dynamically to initialize the counts
+    try:
+        exams_res = supabase.table("exams").select("name").execute()
+        by_exam = {exam["name"]: 0 for exam in (exams_res.data or [])}
+    except Exception as e:
+        print(f"Error fetching exams for stats: {e}")
+        by_exam = {}
+        
+    by_exam["ALL"] = 0
+    by_exam["NONE"] = 0
+    by_exam["BLOCKED"] = 0
+    
     # Fetch all students to count by exam preference in Python
     students = supabase.table("students").select("exam_preference").execute().data
-    by_exam = {"JEE": 0, "NEET": 0, "SSC": 0, "UPSC": 0, "CUET": 0, "ALL": 0, "NONE": 0}
     for s in students:
-        pref = s.get("exam_preference")
+        pref = s.get("exam_preference") or "NONE"
         if pref in by_exam:
             by_exam[pref] += 1
+        else:
+            by_exam[pref] = 1
             
     return {"total_students": total, "by_exam": by_exam}
 
