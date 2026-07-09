@@ -2,6 +2,8 @@ import { Link, useLocation } from "react-router-dom"
 import { Home, Send, Users, ClipboardList, Bot, HelpCircle, LogOut, Wrench, FileText, GraduationCap } from "lucide-react"
 import { useEffect, useState } from "react"
 import { getServiceRequests } from "../../api"
+import Logo from "../common/Logo"
+
 
 const navItems = [
   { name: "Dashboard",           path: "/admin",            icon: Home },
@@ -46,9 +48,12 @@ export function AdminSidebar({ isOpen, onClose }) {
       >
         {/* Logo Area */}
         <div className="px-8 py-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-[18px] font-bold tracking-tight text-[var(--color-primary)] font-display">Krishna Emitra</h1>
-            <p className="text-[11px] font-medium text-gray-500 mt-1">Bot Administration</p>
+          <div className="flex items-center gap-3">
+            <Logo className="w-8 h-8 rounded-lg shrink-0" />
+            <div>
+              <h1 className="text-[18px] font-bold tracking-tight text-[var(--color-primary)] font-display">Krishna Emitra</h1>
+              <p className="text-[11px] font-medium text-gray-500 mt-0.5">Bot Administration</p>
+            </div>
           </div>
           <button onClick={onClose} className="lg:hidden p-2 text-gray-400 hover:text-gray-900 transition-colors">
             <LogOut size={20} className="rotate-180" />

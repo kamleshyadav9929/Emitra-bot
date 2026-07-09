@@ -6,6 +6,8 @@ import {
     Layers, User, LogIn, ChevronRight
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import Logo from "../common/Logo"
+
 
 const CATEGORY_ICONS = {
     id:        CreditCard,
@@ -87,9 +89,7 @@ function SidebarLogo({ open }) {
     return (
         <div className="flex items-center gap-2.5 px-3 py-2 overflow-hidden">
             {/* Always-visible icon block */}
-            <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center shrink-0">
-                <Layers size={14} className="text-black" />
-            </div>
+            <Logo className="w-7 h-7 rounded-lg shrink-0" />
 
             {/* Text fades in */}
             <motion.div

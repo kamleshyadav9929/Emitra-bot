@@ -1,5 +1,7 @@
 import { SignIn } from "@clerk/react"
 import { ShieldCheck } from "lucide-react"
+import Logo from "../../components/common/Logo"
+
 
 export default function Login() {
   return (
@@ -10,9 +12,7 @@ export default function Login() {
         <div className="absolute inset-0 bg-gradient-to-br from-[#164FA8]/20 to-transparent pointer-events-none" />
 
         <div className="flex items-center gap-3 relative z-10">
-          <div className="w-8 h-8 border border-white/20 bg-white/5 flex items-center justify-center rounded-lg backdrop-blur-sm">
-            <ShieldCheck size={15} className="text-white" />
-          </div>
+          <Logo className="w-8 h-8 rounded-lg shrink-0" />
           <span className="text-[13px] font-bold tracking-widest uppercase text-white/70">Krishna Emitra Bureau</span>
         </div>
 
@@ -38,9 +38,7 @@ export default function Login() {
         <div className="w-full max-w-sm flex flex-col items-center">
           {/* Mobile logo */}
           <div className="flex md:hidden items-center gap-3 mb-10 self-start">
-            <div className="w-8 h-8 bg-[#071E27] flex items-center justify-center rounded-lg">
-              <ShieldCheck size={14} className="text-white" />
-            </div>
+            <Logo className="w-8 h-8 rounded-lg shrink-0" />
             <span className="text-[14px] font-black text-[#071E27] font-display tracking-tight">Krishna Emitra Admin</span>
           </div>
 

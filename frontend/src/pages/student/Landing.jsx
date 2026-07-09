@@ -10,6 +10,8 @@ import {
 import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
+import Logo from "../../components/common/Logo"
+
 
 const formatTelegramMessage = (text) => {
     if (!text) return "";
@@ -221,9 +223,7 @@ export default function Landing() {
             {/* ── HEADER ── */}
             <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-[#c2c6d4]/20 px-4 sm:px-6 lg:px-12 h-20 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#164FA8] to-[#0A1A40] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-[#164FA8]/10 shrink-0">
-                        e
-                    </div>
+                    <Logo className="w-10 h-10 rounded-xl" />
                     <div className="leading-none hidden sm:block">
                         <span className="text-lg font-black tracking-tight text-[#0A1A40] font-display">Krishna Emitra Digital</span>
                         <span className="text-[9px] text-gray-400 font-bold tracking-widest uppercase block mt-0.5">Kiosk & Alerts</span>
