@@ -71,6 +71,15 @@ def add_cors_headers(response):
 def handle_preflight(path):
     return jsonify({"ok": True}), 200
 
+@app.errorhandler(Exception)
+def handle_exception(e):
+    import traceback
+    trace = traceback.format_exc()
+    print("Unhandled Exception:", trace)
+    response = jsonify({"error": str(e), "trace": trace})
+    response.status_code = 500
+    return response
+
 # ── Rate Limiter Setup ────────────────────────────────────────────────────────
 limiter = Limiter(
     get_remote_address,
@@ -93,15 +102,20 @@ database.init_db()
 if not config.TELEGRAM_BOT_TOKEN:
     print("WARNING: TELEGRAM_BOT_TOKEN not set. Bot will not function.")
 
-# Initialize a global event loop and bot instance for the single WSGI worker
-global_loop = asyncio.new_event_loop()
-asyncio.set_event_loop(global_loop)
+# Lazy initialization variables
+_global_loop = None
+_global_bot = None
 
-global_bot = None
-if config.TELEGRAM_BOT_TOKEN:
-    global_bot = Bot(token=config.TELEGRAM_BOT_TOKEN)
-    # Initialize the bot (and its httpx client) once synchronously when the worker starts
-    global_loop.run_until_complete(global_bot.initialize())
+def get_bot_and_loop():
+    """Lazily initializes the event loop and bot after the WSGI worker has forked."""
+    global _global_loop, _global_bot
+    if _global_loop is None:
+        _global_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(_global_loop)
+        if config.TELEGRAM_BOT_TOKEN:
+            _global_bot = Bot(token=config.TELEGRAM_BOT_TOKEN)
+            _global_loop.run_until_complete(_global_bot.initialize())
+    return _global_bot, _global_loop
 
 
 # ── Authentication ─────────────────────────────────────────────────────────────
@@ -167,8 +181,10 @@ def webhook():
         if not update_data:
             return jsonify({"ok": False, "error": "Empty payload"}), 400
 
+        bot, loop = get_bot_and_loop()
+
         async def process():
-            update = Update.de_json(update_data, global_bot)
+            update = Update.de_json(update_data, bot)
 
             if update.message and update.message.contact:
                 await bot_handlers.contact_handler(update, None)
@@ -192,7 +208,7 @@ def webhook():
             elif update.callback_query:
                 await bot_handlers.button_callback_handler(update, None)
 
-        global_loop.run_until_complete(process())
+        loop.run_until_complete(process())
         return jsonify({"ok": True})
 
     except Exception as e:
@@ -731,11 +747,12 @@ def get_student_documents(telegram_id):
 @token_required
 def get_document_url(file_id):
     try:
+        bot, loop = get_bot_and_loop()
         async def _get_file_path():
-            telegram_file = await global_bot.get_file(file_id)
+            telegram_file = await bot.get_file(file_id)
             return telegram_file.file_path
 
-        file_path = global_loop.run_until_complete(_get_file_path())
+        file_path = loop.run_until_complete(_get_file_path())
         return jsonify({"url": file_path})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
