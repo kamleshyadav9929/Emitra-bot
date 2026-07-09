@@ -1,39 +1,6 @@
-# Ensure critical packages are installed on PythonAnywhere.
-# python-telegram-bot 20.x passes `proxies` to httpx.AsyncClient,
-# which was removed in httpx>=0.28.0 → must stay on 0.27.2.
-import sys
-import subprocess
-
-def auto_fix_packages():
-    import importlib.metadata
-
-    # Lock httpx to 0.27.2 — python-telegram-bot 20.x crashes on 0.28+
-    try:
-        current_httpx = importlib.metadata.version("httpx")
-    except Exception:
-        current_httpx = "unknown"
-
-    if current_httpx != "0.27.2":
-        print(f"[auto_fix] httpx is {current_httpx} — forcing 0.27.2 ...")
-        try:
-            subprocess.check_call([
-                sys.executable, "-m", "pip", "install",
-                "--user", "--force-reinstall", "--quiet", "httpx==0.27.2"
-            ])
-        except Exception as e:
-            print(f"[auto_fix] ERROR: {e}")
-
-    # Ensure supabase is installed
-    try:
-        importlib.metadata.version("supabase")
-    except importlib.metadata.PackageNotFoundError:
-        print("[auto_fix] Installing supabase ...")
-        try:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "--quiet", "supabase"])
-        except Exception as e:
-            print(f"[auto_fix] ERROR installing supabase: {e}")
-
-auto_fix_packages()
+# NOTE: httpx is pinned to <0.28.0 in requirements.txt to stay compatible
+# with python-telegram-bot 20.x (which passes `proxies` to httpx.AsyncClient,
+# a parameter removed in httpx 0.28+).
 
 import asyncio
 import re
@@ -157,31 +124,12 @@ def token_required(f):
             return jsonify({"error": "Token is missing. Please log in again."}), 401
             
         # Priority 1: High-Performance Offline Verification (No network calls)
+        # The key is pre-normalized by config._normalize_pem_key() at startup.
         if config.CLERK_JWT_PUBLIC_KEY:
             try:
-                key = config.CLERK_JWT_PUBLIC_KEY.strip()
-
-                # Fix 1: Replace literal \n escape sequences (common when pasting into .env)
-                key = key.replace("\\n", "\n")
-
-                # Fix 2: If the key has no newlines at all, it's raw base64 — wrap it
-                if "-----BEGIN PUBLIC KEY-----" not in key:
-                    key = f"-----BEGIN PUBLIC KEY-----\n{key}\n-----END PUBLIC KEY-----"
-                else:
-                    # Fix 3: Rebuild the PEM properly in case newlines inside body are missing
-                    # Extract just the base64 body between the headers
-                    inner = key.replace("-----BEGIN PUBLIC KEY-----", "") \
-                               .replace("-----END PUBLIC KEY-----", "") \
-                               .replace("\n", "") \
-                               .replace(" ", "") \
-                               .strip()
-                    # Re-wrap with proper 64-char line breaks (standard PEM format)
-                    wrapped = "\n".join(inner[i:i+64] for i in range(0, len(inner), 64))
-                    key = f"-----BEGIN PUBLIC KEY-----\n{wrapped}\n-----END PUBLIC KEY-----"
-
                 jwt.decode(
                     token,
-                    key,
+                    config.CLERK_JWT_PUBLIC_KEY,
                     algorithms=["RS256"],
                     options={"verify_aud": False}
                 )
