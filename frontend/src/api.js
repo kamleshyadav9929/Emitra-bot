@@ -46,12 +46,32 @@ export const addStudent = async (studentData) =>
     body: JSON.stringify(studentData)
   })
 
-export const sendNotification = async (exam, message) =>
-  requestJson(`/api/send-notification`, {
-    method: "POST",
-    headers: await getAuthHeaders(),
-    body: JSON.stringify({ exam, message })
-  })
+export const sendNotification = async (exam, message, imageFile = null) => {
+  if (imageFile) {
+    const formData = new FormData()
+    formData.append("exam", exam)
+    if (message) formData.append("message", message)
+    formData.append("image", imageFile)
+
+    const headers = await getAuthHeaders()
+    delete headers["Content-Type"]
+
+    const response = await fetch(`${BASE_URL}/api/send-notification`, {
+      method: "POST",
+      headers,
+      body: formData
+    })
+    const data = await response.json()
+    if (!response.ok) throw new Error(data?.error || data?.message || "Failed to send broadcast")
+    return data
+  } else {
+    return requestJson(`/api/send-notification`, {
+      method: "POST",
+      headers: await getAuthHeaders(),
+      body: JSON.stringify({ exam, message })
+    })
+  }
+}
 
 export const getLogs = async () =>
   requestJson(`/api/logs`, { headers: await getAuthHeaders() })

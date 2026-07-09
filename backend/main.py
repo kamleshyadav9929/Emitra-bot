@@ -506,7 +506,7 @@ def update_student_category(student_id):
     return jsonify({"success": True, "id": student_id, "category": category})
 
 
-def _run_broadcast_in_background(job_id, exam, message, students, token):
+def _run_broadcast_in_background(job_id, exam, message, students, token, image_url=None):
     """Runs in a daemon thread — broadcasts to all students without blocking the HTTP response."""
     database.update_broadcast_status(job_id, "running")
     try:
@@ -514,9 +514,13 @@ def _run_broadcast_in_background(job_id, exam, message, students, token):
             token, 
             students, 
             message,
+            image_url=image_url,
             on_progress=lambda count: database.update_broadcast_status(job_id, "running", sent_count=count)
         )
-        database.log_message(exam, message, success_count)
+        log_text = message or ""
+        if image_url:
+            log_text = f"[Image] " + log_text
+        database.log_message(exam, log_text, success_count)
         database.update_broadcast_status(job_id, "done", sent_count=success_count)
     except Exception as e:
         print(f"CRITICAL: Broadcast Background Error: {e}")
@@ -526,15 +530,38 @@ def _run_broadcast_in_background(job_id, exam, message, students, token):
 @app.route("/api/send-notification", methods=["POST"])
 @token_required
 def send_notification():
-    data = request.json
-    if not data:
-        return jsonify({"success": False, "error": "Invalid JSON"}), 400
+    exam = None
+    message = None
+    image_url = None
 
-    exam    = data.get("exam")
-    message = data.get("message")
+    if request.content_type and "multipart/form-data" in request.content_type:
+        exam = request.form.get("exam")
+        message = request.form.get("message")
+        
+        # Check for uploaded image file
+        if "image" in request.files:
+            file = request.files["image"]
+            if file and file.filename != "":
+                orig_filename = secure_filename(file.filename)
+                unique_name = f"broadcast_{uuid.uuid4().hex[:8]}_{orig_filename}"
+                file_path = os.path.join(UPLOAD_FOLDER, unique_name)
+                file.save(file_path)
+                
+                # Construct public URL
+                base_url = request.host_url.rstrip('/')
+                image_url = f"{base_url}/api/public/documents/download/{unique_name}"
+    else:
+        # Fallback to JSON
+        data = request.json or {}
+        exam = data.get("exam")
+        message = data.get("message")
+        image_url = data.get("image_url")
 
-    if not exam or not message:
-        return jsonify({"success": False, "error": "Missing exam or message"}), 400
+    if not exam:
+        return jsonify({"success": False, "error": "Missing exam"}), 400
+
+    if not message and not image_url:
+        return jsonify({"success": False, "error": "Must provide either message text or an image"}), 400
 
     students = database.get_students_by_exam(exam)
     if not students:
@@ -552,6 +579,7 @@ def send_notification():
     t = threading.Thread(
         target=_run_broadcast_in_background,
         args=(job_id, exam, message, students, config.TELEGRAM_BOT_TOKEN),
+        kwargs={"image_url": image_url},
         daemon=True,
     )
     t.start()

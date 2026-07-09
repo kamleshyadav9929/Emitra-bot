@@ -11,17 +11,28 @@ BROADCAST_DELAY_SECONDS = 0.035   # ~28 messages per second
 MAX_RETRIES = 2
 
 
-def send_message_to_user(bot_token, telegram_id, message, parse_mode="Markdown"):
+def send_message_to_user(bot_token, telegram_id, message, parse_mode="Markdown", image_url=None):
     """
-    Send a single message to one user via Telegram HTTP API (no asyncio).
+    Send a message (text, photo, or photo with caption) to one user via Telegram HTTP API (no asyncio).
     Supports Markdown formatting by default (for admin receipts).
     """
-    url = TELEGRAM_API_URL.format(token=bot_token)
-    payload = {
-        "chat_id": str(telegram_id),
-        "text": message,
-        "parse_mode": parse_mode,
-    }
+    if image_url:
+        url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
+        payload = {
+            "chat_id": str(telegram_id),
+            "photo": image_url,
+            "parse_mode": parse_mode,
+        }
+        if message and message.strip():
+            payload["caption"] = message
+    else:
+        url = TELEGRAM_API_URL.format(token=bot_token)
+        payload = {
+            "chat_id": str(telegram_id),
+            "text": message,
+            "parse_mode": parse_mode,
+        }
+
     for attempt in range(MAX_RETRIES + 1):
         try:
             response = requests.post(url, json=payload, timeout=15)
@@ -49,9 +60,9 @@ def send_message_to_user(bot_token, telegram_id, message, parse_mode="Markdown")
     return False
 
 
-def broadcast(bot_token, student_list, message, parse_mode="Markdown", on_progress=None):
+def broadcast(bot_token, student_list, message, parse_mode="Markdown", image_url=None, on_progress=None):
     """
-    Broadcasts a message sequentially with high speed.
+    Broadcasts a message (text, photo, or both) sequentially with high speed.
     - on_progress: Optional callback function(current_count)
     """
     if not student_list:
@@ -61,7 +72,7 @@ def broadcast(bot_token, student_list, message, parse_mode="Markdown", on_progre
     total = len(student_list)
 
     for i, student in enumerate(student_list):
-        ok = send_message_to_user(bot_token, student["telegram_id"], message, parse_mode)
+        ok = send_message_to_user(bot_token, student["telegram_id"], message, parse_mode, image_url)
         if ok:
             success_count += 1
         
