@@ -284,6 +284,42 @@ def debug_env():
             info["env_cwd_read_error"] = str(e)
             
     return jsonify(info)
+
+
+@app.route("/debug-key", methods=["GET"])
+def debug_key():
+    """Temporary endpoint to diagnose PEM key parsing on PythonAnywhere."""
+    import os
+    raw = os.getenv("CLERK_JWT_PUBLIC_KEY", "")
+    normalized = config.CLERK_JWT_PUBLIC_KEY
+
+    # Try to actually parse the normalized key
+    parse_result = "NOT_TESTED"
+    try:
+        jwt.decode("dummy", normalized, algorithms=["RS256"], options={"verify_aud": False})
+    except jwt.exceptions.DecodeError as e:
+        if "Not enough segments" in str(e):
+            parse_result = "KEY_LOADS_OK (token was dummy so decode failed, but key parsed fine)"
+        else:
+            parse_result = f"KEY_PARSE_FAIL: {e}"
+    except jwt.exceptions.InvalidKeyError as e:
+        parse_result = f"INVALID_KEY: {e}"
+    except Exception as e:
+        parse_result = f"OTHER: {type(e).__name__}: {e}"
+
+    return jsonify({
+        "raw_env_length": len(raw),
+        "raw_env_first_40": repr(raw[:40]),
+        "raw_env_has_begin": "-----BEGIN" in raw,
+        "raw_env_has_backslash_n": "\\n" in raw,
+        "normalized_length": len(normalized),
+        "normalized_has_begin": "-----BEGIN" in normalized,
+        "normalized_has_real_newlines": "\n" in normalized,
+        "normalized_first_60": repr(normalized[:60]),
+        "parse_result": parse_result,
+        "env_file_loaded_from": config.env_path_root if os.path.exists(config.env_path_root) else (config.env_path_backend if os.path.exists(config.env_path_backend) else "none_found"),
+    })
+
 # ── Public API (Unprotected / Rate-Limited) ───────────────────────────────────
 
 @app.route("/api/public/services", methods=["GET"])
