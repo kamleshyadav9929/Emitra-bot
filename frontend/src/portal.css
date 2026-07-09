@@ -1,116 +1,129 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   Krishna Krishna Emitra Portal ── Design System
-   Color palette: Pure black & white editorial
+   Rajasthan Government SSO Design System Styles
 ───────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  --navy:        #0A0A0A;   /* sidebar ── pure black       */
-  --navy-dark:   #000000;   /* deeper black               */
-  --navy-light:  #1A1A1A;   /* hover on sidebar           */
-  --amber:       #FFFFFF;   /* active accent ── white      */
-  --amber-light: #F0F0F0;   /* light accent               */
-  --surface:     #F7F7F5;   /* page background            */
-  --card:        #FFFFFF;
-  --border:      #E5E5E3;
-  --text:        #0A0A0A;
-  --muted:       #737373;
-  --green:       #2E7D32;
-  --red:         #C62828;
-  --sidebar-w:   240px;
-  --right-w:     260px;
-  --header-h:    58px;
+  --sso-blue:          #0a4a83;   /* Official SSO Primary Blue */
+  --sso-blue-dark:     #07355e;   /* Darker Navy variant */
+  --sso-blue-light:    #e5effa;   /* Highlight/active background */
+  --sso-orange:        #f26522;   /* Tricolor Saffron */
+  --sso-orange-light:  #fff4ee;   /* Soft saffron background */
+  --sso-green:         #138808;   /* Tricolor Green */
+  --sso-green-light:   #e7f6e7;   /* Soft green background */
+  
+  --surface:           #f0f4f8;   /* Government portal backdrop */
+  --card:              #ffffff;   /* Pure white container cards */
+  --border:            #cbd5e1;   /* Slate outline */
+  --text:              #1e293b;   /* Slate text */
+  --muted:             #64748b;   /* Muted label text */
+  
+  --sidebar-w:         280px;
+  --header-h:          80px;
+}
+
+/* Tricolor Banner Line */
+.sso-tricolor-line {
+  height: 4px;
+  background: linear-gradient(to right, #f26522 33%, #ffffff 33%, #ffffff 66%, #138808 66%);
+  width: 100%;
+}
+
+/* Government notice card style */
+.sso-notice-card {
+  border-left: 4px solid var(--sso-orange);
+  background-color: var(--sso-orange-light);
+}
+
+/* Verified citizen pill */
+.sso-badge-verified {
+  background-color: var(--sso-green-light);
+  color: var(--sso-green);
+  border: 1px solid rgba(19, 136, 8, 0.2);
+}
+
+/* Official widget styling */
+.sso-widget {
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+}
+
+.sso-widget-hover:hover {
+  border-color: var(--sso-blue);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* SSO-style Square Grid Application Buttons */
+.sso-app-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  height: 140px;
+}
+
+.sso-app-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--sso-blue);
+  box-shadow: 0 10px 15px -3px rgba(10, 74, 131, 0.1), 0 4px 6px -4px rgba(10, 74, 131, 0.1);
+}
+
+.sso-app-icon-wrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  transition: all 0.2s ease-in-out;
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #a0aec0; }
-
-/* Portal service icon hover pulse ring */
-@keyframes ring-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.20); }
-  70%  { box-shadow: 0 0 0 8px rgba(0, 0, 0, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
-}
-
-.icon-pulse:hover { animation: ring-pulse 0.5s ease-out; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 /* Ticker animation */
 @keyframes marquee {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
-.marquee-track { animation: marquee 28s linear infinite; }
+.marquee-track { animation: marquee 30s linear infinite; }
 .marquee-track:hover { animation-play-state: paused; }
 
-/* Live dot */
+/* Pulse animation */
 @keyframes live-ping {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.4; transform: scale(1.6); }
+  50%       { opacity: 0.4; transform: scale(1.4); }
 }
 .live-dot { animation: live-ping 1.5s ease-in-out infinite; }
 
-/* Shimmer skeleton */
-@keyframes shimmer {
-  0%   { background-position: -700px 0; }
-  100% { background-position: 700px 0; }
-}
-.skeleton {
-  background: linear-gradient(90deg, #f0f4f8 25%, #e2e8f0 50%, #f0f4f8 75%);
-  background-size: 700px 100%;
-  animation: shimmer 1.4s infinite;
-  border-radius: 8px;
-}
-
-/* Premium Animations */
+/* Fade transitions */
 @keyframes premiumFadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fadeIn {
-  animation: premiumFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: premiumFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes premiumSlideUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.animate-slideUp {
-  animation: premiumSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Glassmorphism */
-.glass-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-/* Scrollbars */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
-}
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(203, 213, 225, 0.8);
-  border-radius: 99px;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.8);
-}
+.scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 99px; }
+.scrollbar-thin::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.6); }
 
 .scroll-container-smooth {
   scroll-behavior: smooth;

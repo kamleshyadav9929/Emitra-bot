@@ -16,102 +16,95 @@ export default function DashboardTab({
                 {/* Total Requests */}
                 <div 
                     onClick={() => setActiveTab("services")}
-                    className="bg-[var(--color-primary-fixed)] border-none rounded-xl p-6 relative overflow-hidden flex flex-col justify-between h-[180px] cursor-pointer hover:shadow-ambient transition-shadow group text-left"
+                    className="bg-[#e5effa] border border-[#0a4a83]/30 rounded-xl p-5 relative overflow-hidden flex flex-col justify-between h-[160px] cursor-pointer hover:border-[#0a4a83] transition-all group text-left shadow-sm"
                 >
                     <div className="z-10 relative">
-                        <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-[var(--color-primary)]">TOTAL REQUESTS</p>
-                        <p className="text-5xl font-extrabold text-[#0A1A40] mt-3 group-hover:scale-105 transition-transform origin-left">{statsProgress.total}</p>
+                        <p className="text-[10px] font-black tracking-wider uppercase text-[#0a4a83]">TOTAL APPLICATIONS / कुल आवेदन</p>
+                        <p className="text-4xl font-extrabold text-[#07355e] mt-3 group-hover:scale-105 transition-transform origin-left">{statsProgress.total}</p>
                     </div>
-                    <div className="flex items-center gap-2 z-10 relative mt-auto">
-                        <ClipboardList size={16} className="text-[var(--color-primary)]" />
-                        <span className="text-[13px] font-medium text-[var(--color-primary)]">Filing Forms Logged</span>
+                    <div className="flex items-center gap-1.5 z-10 relative mt-auto text-[12px] font-bold text-[#0a4a83]">
+                        <ClipboardList size={14} />
+                        <span>View Status Circulars</span>
                     </div>
-                    <ClipboardList size={140} strokeWidth={1} className="absolute -bottom-6 -right-6 text-white text-opacity-50 rotate-[-5deg] pointer-events-none z-0" />
                 </div>
 
                 {/* Under Review */}
                 <div 
                     onClick={() => setActiveTab("services")}
-                    className="bg-[var(--color-surface-low)] border-none shadow-sm rounded-xl p-6 flex flex-col justify-between h-[180px] relative overflow-hidden cursor-pointer hover:shadow-ambient transition-shadow text-left"
+                    className="bg-[#fff4ee] border border-[#f26522]/30 rounded-xl p-5 flex flex-col justify-between h-[160px] relative overflow-hidden cursor-pointer hover:border-[#f26522] transition-all group text-left shadow-sm"
                 >
                     <div className="z-10 relative">
-                        <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-gray-500">UNDER REVIEW</p>
-                        <p className="text-4xl font-extrabold text-gray-900 mt-4 tracking-tight">{statsProgress.active}</p>
+                        <p className="text-[10px] font-black tracking-wider uppercase text-[#f26522]">UNDER REVIEW / लंबित आवेदन</p>
+                        <p className="text-4xl font-extrabold text-[#b83b00] mt-3 group-hover:scale-105 transition-transform origin-left">{statsProgress.active}</p>
                     </div>
-                    <div className="flex items-center gap-2 mt-auto z-10 relative">
-                        <Clock size={16} className="text-gray-400" />
-                        <span className="text-[13px] font-medium text-gray-500">Operator Reviewing</span>
+                    <div className="flex items-center gap-1.5 mt-auto z-10 relative text-[12px] font-bold text-[#f26522]">
+                        <Clock size={14} className="animate-pulse" />
+                        <span>Operator Reviewing</span>
                     </div>
-                    <Clock size={140} strokeWidth={1} className="absolute -bottom-6 -right-10 text-white/70 rotate-[10deg] pointer-events-none z-0" />
                 </div>
 
                 {/* Completed */}
                 <div 
                     onClick={() => setActiveTab("services")}
-                    className="bg-[var(--color-surface-lowest)] shadow-ambient border border-[var(--color-outline-variant)] rounded-xl p-6 flex flex-col justify-between h-[180px] cursor-pointer hover:scale-[1.01] transition-transform relative overflow-hidden text-left"
+                    className="bg-[#e7f6e7] border border-[#138808]/30 rounded-xl p-5 flex flex-col justify-between h-[160px] cursor-pointer hover:border-[#138808] transition-all group relative overflow-hidden text-left shadow-sm"
                 >
                     <div className="z-10 relative">
-                        <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-slate-400">SUCCESSFULLY FILED</p>
-                        <p className="text-4xl font-extrabold text-gray-900 mt-4 tracking-tight">{statsProgress.completed}</p>
+                        <p className="text-[10px] font-black tracking-wider uppercase text-[#138808]">SUCCESSFULLY FILED / पूर्ण आवेदन</p>
+                        <p className="text-4xl font-extrabold text-[#0d5f05] mt-3 group-hover:scale-105 transition-transform origin-left">{statsProgress.completed}</p>
                     </div>
-                    <div className="mt-auto flex justify-between items-end z-10 relative">
-                        <div>
-                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wide">Completed Applications</p>
-                        </div>
-                        <CheckCircle2 size={24} className="text-emerald-250" />
+                    <div className="mt-auto flex items-center justify-between z-10 relative text-[12px] font-bold text-[#138808]">
+                        <span className="flex items-center gap-1"><CheckCircle2 size={14} /> Receipts Issued</span>
                     </div>
-                    <CheckCircle2 size={140} strokeWidth={1} className="absolute -bottom-8 -right-8 text-[#f3faff] rotate-[-15deg] pointer-events-none z-0" />
                 </div>
 
                 {/* Action Needed */}
                 <div 
                     onClick={() => setActiveTab("services")}
-                    className="bg-rose-50/70 border border-rose-100/60 rounded-xl p-6 flex flex-col justify-between h-[180px] relative overflow-hidden cursor-pointer hover:shadow-ambient transition-shadow text-left"
+                    className="bg-red-50 border border-red-200 rounded-xl p-5 flex flex-col justify-between h-[160px] relative overflow-hidden cursor-pointer hover:border-red-500 transition-all group text-left shadow-sm"
                 >
                     {statsProgress.actionRequired > 0 && (
-                        <div className="absolute top-6 right-6 w-3 h-3 bg-red-500 rounded-full animate-pulse z-20"></div>
+                        <div className="absolute top-4 right-4 w-2 h-2 bg-red-650 rounded-full animate-ping z-20"></div>
                     )}
                     <div className="z-10 relative">
-                        <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-rose-600">ACTION REQUIRED</p>
-                        <p className="text-4xl font-extrabold text-rose-900 mt-4 tracking-tight">
-                            {statsProgress.actionRequired} {statsProgress.actionRequired > 0 && <span className="font-bold text-sm text-red-500 ml-1">Urgent</span>}
+                        <p className="text-[10px] font-black tracking-wider uppercase text-red-655">ACTION REQUIRED / त्रुटि सुधार</p>
+                        <p className="text-4xl font-extrabold text-red-900 mt-3 group-hover:scale-105 transition-transform origin-left">
+                            {statsProgress.actionRequired}
                         </p>
                     </div>
-                    <p className="text-[13px] font-bold text-rose-600 underline underline-offset-2 hover:text-red-700 transition-colors mt-auto z-10 relative">
+                    <span className="text-[11.5px] font-black text-red-655 uppercase tracking-wide underline underline-offset-2 hover:text-red-700 transition-colors mt-auto z-10 relative block">
                         Fix Rejected Forms
-                    </p>
-                    <AlertCircle size={140} strokeWidth={1} className="absolute -bottom-6 -right-10 text-rose-200/20 rotate-[10deg] pointer-events-none z-0" />
+                    </span>
                 </div>
             </div>
 
-            {/* Quick Action Circular Buttons */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)]/60 rounded-xl p-6 shadow-sm">
+            {/* Quick Action Desk */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 bg-[#f8fafc] border border-slate-200 rounded-xl p-5 shadow-inner">
                 <button onClick={() => setActiveTab("exams")} className="flex flex-col items-center gap-2 group cursor-pointer border-none bg-transparent">
-                    <div className="w-14 h-14 rounded-full bg-[var(--color-surface-low)] text-[var(--color-primary)] flex items-center justify-center shadow-inner group-hover:scale-105 group-hover:bg-[var(--color-primary-fixed)] transition-all duration-300">
-                        <Award size={22} />
+                    <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 text-[#0a4a83] flex items-center justify-center shadow-sm group-hover:border-[#0a4a83] group-hover:bg-[#e5effa] transition-all duration-200">
+                        <Award size={18} />
                     </div>
-                    <span className="text-[12.5px] font-extrabold text-slate-700 group-hover:text-[var(--color-primary)] transition-colors">Select Exams</span>
+                    <span className="text-[12px] font-bold text-slate-700 group-hover:text-[#0a4a83] transition-colors">Select Exams / परीक्षा चयन</span>
                 </button>
 
                 <button onClick={() => setActiveTab("services")} className="flex flex-col items-center gap-2 group cursor-pointer border-none bg-transparent">
-                    <div className="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-inner group-hover:scale-105 group-hover:bg-emerald-100 transition-all duration-300">
-                        <ClipboardList size={22} />
+                    <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 text-emerald-600 flex items-center justify-center shadow-sm group-hover:border-emerald-600 group-hover:bg-emerald-50 transition-all duration-200">
+                        <ClipboardList size={18} />
                     </div>
-                    <span className="text-[12.5px] font-extrabold text-slate-700 group-hover:text-emerald-600 transition-colors">My Services</span>
+                    <span className="text-[12px] font-bold text-slate-700 group-hover:text-emerald-600 transition-colors">My Services / मेरी सेवाएं</span>
                 </button>
 
                 <button onClick={() => setActiveTab("neet")} className="flex flex-col items-center gap-2 group cursor-pointer border-none bg-transparent">
-                    <div className="w-14 h-14 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center shadow-inner group-hover:scale-105 group-hover:bg-purple-100 transition-all duration-300">
-                        <BookOpen size={22} />
+                    <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 text-purple-600 flex items-center justify-center shadow-sm group-hover:border-purple-600 group-hover:bg-purple-50 transition-all duration-200">
+                        <BookOpen size={18} />
                     </div>
-                    <span className="text-[12.5px] font-extrabold text-slate-700 group-hover:text-purple-600 transition-colors">NEET Counselling</span>
+                    <span className="text-[12px] font-bold text-slate-700 group-hover:text-purple-600 transition-colors">NEET Desk / नीट हेल्प</span>
                 </button>
 
                 <button onClick={() => setActiveTab("profile")} className="flex flex-col items-center gap-2 group cursor-pointer border-none bg-transparent">
-                    <div className="w-14 h-14 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center shadow-inner group-hover:scale-105 group-hover:bg-rose-100 transition-all duration-300">
-                        <Settings size={22} />
+                    <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 text-[#f26522] flex items-center justify-center shadow-sm group-hover:border-[#f26522] group-hover:bg-[#fff4ee] transition-all duration-200">
+                        <Settings size={18} />
                     </div>
-                    <span className="text-[12.5px] font-extrabold text-slate-700 group-hover:text-rose-600 transition-colors">Profile Settings</span>
+                    <span className="text-[12px] font-bold text-slate-700 group-hover:text-[#f26522] transition-colors">SSO Profile / प्रोफ़ाइल</span>
                 </button>
             </div>
 

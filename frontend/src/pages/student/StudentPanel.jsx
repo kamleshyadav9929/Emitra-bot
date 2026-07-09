@@ -671,23 +671,54 @@ export default function StudentPanel() {
         <div className="min-h-screen flex text-slate-800 font-sans antialiased relative bg-[var(--color-surface-base)] w-full">
             
             {/* ── DESKTOP SIDEBAR ── */}
-            <aside className="w-[280px] bg-[var(--color-surface-base)] border-r border-[var(--color-outline-variant)] hidden lg:flex flex-col sticky top-0 h-screen shrink-0 z-20">
-                <div className="h-20 flex items-center justify-between px-6 border-b border-[var(--color-outline-variant)]">
+            <aside className="w-[280px] bg-white border-r border-slate-200 hidden lg:flex flex-col sticky top-0 h-screen shrink-0 z-20">
+                {/* Tricolor Saffron/Green Top Line */}
+                <div className="h-1 bg-gradient-to-r from-[#f26522] via-white to-[#138808]" />
+
+                {/* SSO / e-Mitra Kiosk Header */}
+                <div className="h-16 flex items-center px-5 border-b border-slate-200 bg-[#f8fafc]">
                     <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab("overview")}>
-                        <Logo className="w-9 h-9 shadow-md shadow-[var(--color-primary)]/20 rounded-xl" />
+                        <div className="w-8 h-8 rounded-lg bg-[#0a4a83] text-white flex items-center justify-center font-bold text-sm shadow-md">
+                            SSO
+                        </div>
                         <div className="leading-tight">
-                            <span className="text-[var(--color-primary)] font-extrabold text-[15px] tracking-tight block font-display">Krishna Emitra</span>
-                            <span className="text-[9.5px] text-gray-500 font-extrabold tracking-widest uppercase block mt-0.5">Student Panel</span>
+                            <span className="text-slate-800 font-extrabold text-[13.5px] tracking-tight block">Citizen SSO Portal</span>
+                            <span className="text-[9px] text-[#f26522] font-black tracking-widest uppercase block">कृष्णा ई-मित्र</span>
                         </div>
                     </div>
                 </div>
 
+                {/* REDESIGNED CITIZEN SSOID CARD */}
+                {isLoggedIn && (
+                    <div className="px-4 py-4 border-b border-slate-100 bg-[#f8fafc]/50">
+                        <div className="bg-white border border-slate-200 rounded-xl p-4 text-center relative overflow-hidden shadow-sm">
+                            <div className="absolute top-0 right-0 bg-[#138808] text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-bl">
+                                Verified
+                            </div>
+                            <div className="w-12 h-12 mx-auto mb-2 rounded-full border-2 border-[#0a4a83]/20 bg-slate-50 flex items-center justify-center text-[#0a4a83] text-base font-black shadow-inner overflow-hidden">
+                                {user?.imageUrl ? (
+                                    <img src={user.imageUrl} alt={user.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <span>{user?.name?.charAt(0).toUpperCase()}</span>
+                                )}
+                            </div>
+                            <h4 className="text-[12.5px] font-bold text-slate-800 tracking-tight leading-tight mb-0.5">{user?.name}</h4>
+                            <p className="text-[9.5px] font-mono text-slate-400 select-all">
+                                SSOID: <span className="font-extrabold text-[#0a4a83]">RAJ_{String(user?.phone || user?.telegram_id || 'CITIZEN').slice(-8).toUpperCase()}</span>
+                            </p>
+                            <div className="mt-2.5 py-1 bg-[#e7f6e7] border border-[rgba(19,136,8,0.15)] text-[#138808] text-[9px] font-black uppercase tracking-wider rounded-lg flex items-center justify-center gap-1">
+                                <ShieldCheck size={11} /> verified citizen
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Sidebar Navigation */}
-                <nav className="flex-1 py-6 px-4 space-y-1.5 overflow-y-auto scrollbar-hide">
+                <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto scrollbar-hide">
                     {navigationItems.map((item) => {
                         const Icon = item.icon
                         const isActive = activeTab === item.id
-                        // Do not show notifications or profile tabs if user is logged out
+                        // Do not show profile tab if user is logged out
                         if (!isLoggedIn && ["profile"].includes(item.id)) return null;
 
                         return (
@@ -697,49 +728,39 @@ export default function StudentPanel() {
                                     setActiveTab(item.id)
                                     setActiveExamForTimeline(null)
                                 }}
-                                className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-[13px] font-semibold transition-all duration-200 cursor-pointer group ${
+                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12.5px] font-semibold transition-all duration-155 cursor-pointer group ${
                                     isActive
-                                        ? "bg-[var(--color-surface-low)] text-[var(--color-primary)] font-semibold shadow-ambient"
-                                        : "text-[var(--color-on-surface)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-bright)]"
+                                        ? "bg-[#e5effa] text-[#0a4a83] font-bold"
+                                        : "text-slate-655 hover:text-[#0a4a83] hover:bg-slate-50"
                                 }`}
                             >
-                                <Icon size={16} strokeWidth={isActive ? 2.5 : 2.0} className={`${isActive ? "text-[var(--color-primary)]" : "text-gray-400 group-hover:text-[var(--color-primary)] transition-colors"}`} />
+                                <Icon size={15} strokeWidth={isActive ? 2.5 : 2.0} className={`${isActive ? "text-[#0a4a83]" : "text-slate-400 group-hover:text-[#0a4a83] transition-colors"}`} />
                                 <span className="flex-1 text-left">
                                     {lang === "EN" ? item.label : item.labelHi}
                                 </span>
                                 {!isActive && (
-                                    <ChevronRight size={12} className="text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                                    <ChevronRight size={12} className="text-slate-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                                 )}
                             </button>
                         )
                     })}
                 </nav>
 
-                {/* Desktop Account block */}
-                <div className="p-4 border-t border-[var(--color-outline-variant)] bg-[var(--color-surface-base)]">
+                {/* Desktop Account block at bottom */}
+                <div className="p-4 border-t border-slate-100 bg-[#f8fafc]">
                     {isLoggedIn ? (
-                        <div className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-[var(--color-outline-variant)] shadow-sm">
-                            {user?.imageUrl ? (
-                                <img src={user.imageUrl} alt={user.name} className="w-10 h-10 rounded-xl object-cover ring-2 ring-[var(--color-primary)]/10" />
-                            ) : (
-                                <div className="w-10 h-10 bg-gradient-to-tr from-[var(--color-primary)] to-[var(--color-primary-container)] text-white flex items-center justify-center font-bold text-[14px] rounded-xl shadow-md">
-                                    {user?.name?.charAt(0).toUpperCase()}
-                                </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                                <p className="text-[12.5px] font-bold text-gray-900 truncate leading-tight">{user?.name}</p>
-                                <p className="text-[9.5px] font-semibold text-gray-400 truncate mt-1">Student Account</p>
-                            </div>
-                            <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-lg cursor-pointer" title="Log Out">
-                                <LogOut size={14} />
-                            </button>
-                        </div>
+                        <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center justify-center gap-1.5 py-2.5 border border-red-200 hover:bg-red-50 text-red-655 hover:text-red-700 text-[11px] font-bold uppercase rounded-lg transition-all cursor-pointer"
+                        >
+                            <LogOut size={13} /> Close SSO Session
+                        </button>
                     ) : (
                         <button
                             onClick={triggerSignIn}
-                            className="w-full py-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white text-[12.5px] font-bold uppercase rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-[var(--color-primary)]/10 cursor-pointer hover:-translate-y-0.5 duration-200"
+                            className="w-full py-2.5 bg-[#0a4a83] hover:bg-[#07355e] text-white text-[11.5px] font-bold uppercase rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-md shadow-[#0a4a83]/10 cursor-pointer hover:-translate-y-0.5 duration-200"
                         >
-                            <User size={14} /> Sign In Portal
+                            <User size={13} /> SSO Portal Login
                         </button>
                     )}
                 </div>
@@ -748,49 +769,83 @@ export default function StudentPanel() {
             {/* ── MAIN PORTAL CANVAS ── */}
             <div className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden relative">
                 
-                {/* ── TOP NAV HEADER ── */}
-                <header className="h-20 bg-[var(--color-surface-base)]/80 backdrop-blur-md border-b border-[var(--color-outline-variant)] flex items-center justify-between px-6 md:px-10 sticky top-0 z-30 shrink-0">
-                    <div className="flex items-center gap-3">
-                        <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 -ml-2 text-slate-505 hover:text-slate-800 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors">
-                            <Menu size={20} />
-                        </button>
-                        <div className="hidden lg:flex items-center gap-2">
-                            <h2 className="text-[16px] font-extrabold text-slate-900 tracking-tight font-display">
-                                {lang === "EN" ? navigationItems.find(i => i.id === activeTab)?.label : navigationItems.find(i => i.id === activeTab)?.labelHi}
-                            </h2>
-                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)]" />
+                {/* ── DOUBLE-DECKER GOVT HEADER ── */}
+                <div className="flex flex-col sticky top-0 z-30 shrink-0 shadow-sm">
+                    {/* Top Deck: Gov Info & Support Banner */}
+                    <div className="h-10 bg-[#072146] text-white flex items-center justify-between px-6 md:px-10 text-[11px] font-medium border-b border-[#0f3460]">
+                        <div className="flex items-center gap-2">
+                            <span className="text-[12px]">🏛️</span>
+                            <span className="tracking-wide text-white/90">
+                                {lang === "EN" ? "Government of Rajasthan" : "राजस्थान सरकार"}
+                            </span>
+                            <span className="text-slate-500 font-bold">|</span>
+                            <span className="text-slate-300">
+                                {lang === "EN" ? "Single Sign-On (SSO)" : "सिंगल साइन-ऑन पोर्टल"}
+                            </span>
                         </div>
-                        <div className="lg:hidden flex items-center gap-2">
-                            <Logo className="w-8 h-8 shadow-sm shadow-[var(--color-primary)]/20 rounded-lg" />
-                            <span className="text-slate-900 font-extrabold text-[14.5px] tracking-tight">Krishna Emitra</span>
+                        <div className="flex items-center gap-4 text-white/80">
+                            <span className="hidden sm:inline">📞 Helpline: <span className="font-bold text-amber-400">1800-180-6127</span></span>
+                            {isLoggedIn && (
+                                <span className="text-slate-400 hidden md:inline">
+                                    IP: <span className="font-mono">10.140.23.{String(user?.telegram_id || '99').slice(-2)}</span>
+                                </span>
+                            )}
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        {isLoggedIn && (
-                            <button 
-                                onClick={() => setActiveTab("overview")} 
-                                className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-all relative cursor-pointer"
-                                title="Inbox Notifications"
-                            >
-                                <Bell size={16} />
-                                {unreadCount > 0 && (
-                                    <span className="absolute top-1 right-1 w-4.5 h-4.5 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-full text-[8px] font-bold flex items-center justify-center ring-2 ring-white">
-                                        {unreadCount}
-                                    </span>
-                                )}
+                    {/* Bottom Deck: Primary Header */}
+                    <header className="h-16 bg-white flex items-center justify-between px-6 md:px-10 border-b border-slate-200">
+                        <div className="flex items-center gap-3">
+                            <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 -ml-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors">
+                                <Menu size={20} />
                             </button>
-                        )}
+                            <div className="hidden lg:flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-lg bg-[#0a4a83] text-white flex items-center justify-center font-bold text-sm">
+                                    SSO
+                                </div>
+                                <h2 className="text-[15px] font-bold text-slate-800 tracking-tight">
+                                    {lang === "EN" ? "Citizen Dashboard" : "नागरिक डैशबोर्ड"}
+                                </h2>
+                                <span className="text-slate-350 font-normal">/</span>
+                                <span className="text-[13px] text-[#0a4a83] font-semibold">
+                                    {lang === "EN" ? navigationItems.find(i => i.id === activeTab)?.label : navigationItems.find(i => i.id === activeTab)?.labelHi}
+                                </span>
+                            </div>
+                            <div className="lg:hidden flex items-center gap-2">
+                                <Logo className="w-8 h-8 rounded-lg" />
+                                <span className="text-slate-800 font-extrabold text-[14px]">e-Mitra Portal</span>
+                            </div>
+                        </div>
 
-                        <button onClick={() => fetchAllData(true)} disabled={refreshing} className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-all cursor-pointer">
-                            <RefreshCw size={15} className={refreshing ? "animate-spin text-[var(--color-primary)]" : ""} />
-                        </button>
+                        <div className="flex items-center gap-4">
+                            {isLoggedIn && (
+                                <button 
+                                    onClick={() => setActiveTab("overview")} 
+                                    className="p-2 rounded-xl hover:bg-slate-100 text-slate-455 hover:text-slate-700 transition-all relative cursor-pointer"
+                                    title="Inbox Notifications"
+                                >
+                                    <Bell size={16} />
+                                    {unreadCount > 0 && (
+                                        <span className="absolute top-1 right-1 w-4.5 h-4.5 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-full text-[8px] font-bold flex items-center justify-center ring-2 ring-white">
+                                            {unreadCount}
+                                        </span>
+                                    )}
+                                </button>
+                            )}
 
-                        <button onClick={toggleLanguage} className="text-slate-700 hover:text-slate-900 transition-all text-[11px] font-bold flex items-center gap-1.5 bg-white hover:bg-slate-50 px-3.5 py-1.8 rounded-xl border border-slate-200/80 shadow-sm cursor-pointer">
-                            <Globe size={13} className="text-slate-400" /> {lang === 'EN' ? 'हिन्दी' : 'English'}
-                        </button>
-                    </div>
-                </header>
+                            <button onClick={() => fetchAllData(true)} disabled={refreshing} className="p-2 rounded-xl hover:bg-slate-100 text-slate-455 hover:text-slate-700 transition-all cursor-pointer">
+                                <RefreshCw size={15} className={refreshing ? "animate-spin text-[#0a4a83]" : ""} />
+                            </button>
+
+                            <button onClick={toggleLanguage} className="text-slate-700 hover:text-slate-900 transition-all text-[11px] font-bold flex items-center gap-1.5 bg-white hover:bg-slate-50 px-3.5 py-1.8 rounded-xl border border-slate-200 shadow-sm cursor-pointer">
+                                <Globe size={13} className="text-slate-400" /> {lang === 'EN' ? 'हिन्दी' : 'English'}
+                            </button>
+                        </div>
+                    </header>
+
+                    {/* Saffron and Green Tricolor border bottom */}
+                    <div className="sso-tricolor-line" />
+                </div>
 
                 {/* ── MOBILE MENU DRAWER ── */}
                 <AnimatePresence>
@@ -866,7 +921,24 @@ export default function StudentPanel() {
 
                 <div className="flex flex-1 w-full overflow-hidden items-start">
                     {/* ── CENTER WORKSPACE ── */}
-                    <div className="flex-1 min-w-0 h-[calc(100vh-80px)] overflow-y-auto scroll-container-smooth flex flex-col justify-between">
+                    <div className="flex-1 min-w-0 h-[calc(100vh-108px)] overflow-y-auto scroll-container-smooth flex flex-col justify-between">
+                        {/* Official Bulletin Notice Ticker */}
+                        {upcomingDeadlines.length > 0 && (
+                            <div className="bg-[#fff4ee] text-slate-700 text-[11px] font-semibold py-2 px-6 overflow-hidden flex items-center border-b border-orange-100 shadow-inner relative shrink-0">
+                                <div className="flex items-center gap-1.5 shrink-0 bg-[#fff4ee] z-10 pr-4 mr-4 text-[#f26522] font-black uppercase tracking-wider relative">
+                                    <Clock size={12} className="animate-pulse" /> 
+                                    {lang === "EN" ? "URGENT NOTICES" : "आवश्यक सूचना"}
+                                    <div className="absolute right-0 top-0 bottom-0 w-3 bg-gradient-to-r from-transparent to-black/5 pointer-events-none translate-x-full" />
+                                </div>
+                                <div className="flex items-center gap-12 whitespace-nowrap marquee-track">
+                                    {upcomingDeadlines.map((ex, idx) => (
+                                        <span key={idx} className="inline-flex items-center gap-1 text-[11.5px]">
+                                            📢 <span className="font-extrabold text-slate-800">{ex.name}</span>: {lang === "EN" ? "Submission closes on" : "आवेदन की अंतिम तिथि"} <span className="text-[#f26522] font-bold">{new Date(ex.end_date).toLocaleDateString("en-IN")}</span>
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                         {/* ── CANVAS MAIN CONTENT ── */}
                         <main className="max-w-[1140px] w-full mx-auto px-6 md:px-10 py-8 flex-1">
                     
@@ -1024,7 +1096,7 @@ export default function StudentPanel() {
 
                     {/* ── RIGHT PREMIUM NOTIFICATION PANEL ── */}
                     {!loading && (
-                        <aside className="hidden xl:flex w-[340px] border-l border-[var(--color-outline-variant)] h-[calc(100vh-80px)] shrink-0 p-6 flex-col overflow-y-auto scroll-container-smooth bg-[var(--color-surface-base)] relative">
+                        <aside className="hidden xl:flex w-[340px] border-l border-slate-200 h-[calc(100vh-108px)] shrink-0 p-6 flex-col overflow-y-auto scroll-container-smooth bg-slate-50 relative">
                             {renderNotificationsPanel(true)}
                         </aside>
                     )}

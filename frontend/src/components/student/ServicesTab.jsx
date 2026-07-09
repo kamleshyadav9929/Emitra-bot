@@ -1,6 +1,52 @@
 import { Fragment } from "react"
 import { Search, AlertCircle, CheckCircle2, Check, Info, MessageSquare } from "lucide-react"
 
+const getStatusDetails = (status, hasRemarks) => {
+    if (status === "completed") {
+        return {
+            label: "Completed",
+            labelHi: "पूर्ण",
+            colorClass: "bg-emerald-50 text-emerald-700 border-emerald-100",
+            badgeClass: "bg-emerald-500",
+            stepIndex: 3
+        }
+    }
+    if (status === "processing") {
+        return {
+            label: "Processing",
+            labelHi: "प्रक्रिया में",
+            colorClass: "bg-blue-50 text-blue-700 border-blue-100",
+            badgeClass: "bg-blue-500 animate-pulse",
+            stepIndex: 2
+        }
+    }
+    if (status === "pending") {
+        if (hasRemarks) {
+            return {
+                label: "Action Required",
+                labelHi: "कार्रवाई आवश्यक",
+                colorClass: "bg-amber-50 text-amber-700 border-amber-200 animate-pulse",
+                badgeClass: "bg-amber-500",
+                stepIndex: 1
+            }
+        }
+        return {
+            label: "Under Review",
+            labelHi: "समीक्षा के तहत",
+            colorClass: "bg-orange-50 text-orange-700 border-orange-100",
+            badgeClass: "bg-orange-500",
+            stepIndex: 1
+        }
+    }
+    return {
+        label: "Rejected",
+        labelHi: "अस्वीकृत",
+        colorClass: "bg-red-50 text-red-700 border-red-100",
+        badgeClass: "bg-red-500",
+        stepIndex: 1
+    }
+}
+
 export default function ServicesTab({
     lang,
     isLoggedIn,
@@ -57,29 +103,67 @@ export default function ServicesTab({
 
             {(!isLoggedIn || servicesSubTab === "catalog") ? (
                 <div className="space-y-6">
-                    {/* Catalog Filters */}
-                    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                        <div className="relative w-full sm:w-72">
-                            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <input 
-                                type="text"
-                                value={serviceSearch}
-                                onChange={e => setServiceSearch(e.target.value)}
-                                placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
-                                className="w-full bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] text-[13px] text-[var(--color-on-surface)] placeholder:text-gray-400 pl-11 pr-8 py-2.5 rounded-xl focus:outline-none focus:border-[var(--color-primary)] transition-all shadow-sm font-semibold"
-                            />
+                    {/* Catalog Search & SSO App Grid */}
+                    <div className="space-y-5">
+                        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                            <h3 className="text-[13.5px] font-bold text-slate-700 tracking-tight">
+                                {lang === 'EN' ? 'SSO Application Launcher' : 'एसएसओ एप्लिकेशन लांचर'}
+                            </h3>
+                            <div className="relative w-full sm:w-72">
+                                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                                <input 
+                                    type="text"
+                                    value={serviceSearch}
+                                    onChange={e => setServiceSearch(e.target.value)}
+                                    placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
+                                    className="w-full bg-white border border-slate-200 text-[13px] placeholder:text-gray-400 pl-11 pr-8 py-2.5 rounded-xl focus:outline-none focus:border-[#0a4a83] transition-all shadow-sm font-semibold animate-fadeIn"
+                                />
+                            </div>
                         </div>
 
-                        <select
-                            value={serviceCatFilter}
-                            onChange={e => setServiceCatFilter(e.target.value)}
-                            className="px-4 py-2.5 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] text-[13px] text-[var(--color-on-surface)] rounded-xl focus:outline-none focus:border-[var(--color-primary)] transition-all shadow-sm cursor-pointer font-semibold"
-                        >
-                            <option value="ALL">{lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां'}</option>
-                            {Object.entries(services).map(([k, cat]) => (
-                                <option key={k} value={k}>{cat.label}</option>
-                            ))}
-                        </select>
+                        {/* SSO App Icons Grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 py-2">
+                            {/* All Services Card */}
+                            <div 
+                                onClick={() => setServiceCatFilter("ALL")}
+                                className={`sso-app-card ${serviceCatFilter === "ALL" ? "border-[#0a4a83] bg-[#e5effa] ring-2 ring-[#0a4a83]/20" : ""}`}
+                            >
+                                <div className="sso-app-icon-wrapper bg-[#e5effa] text-[#0a4a83]">
+                                    <span className="text-xl">🏛️</span>
+                                </div>
+                                <h4 className="text-[12px] font-bold text-slate-800 tracking-tight leading-tight">
+                                    {lang === 'EN' ? 'All Services' : 'सभी सेवाएँ'}
+                                </h4>
+                            </div>
+
+                            {/* Dynamic Category Cards */}
+                            {Object.entries(services).map(([catKey, cat]) => {
+                                const CAT_STYLES = {
+                                    DOCUMENTS: { icon: "📁", bg: "bg-emerald-50 text-emerald-600 border-emerald-100", labelHi: "राजस्व दस्तावेज़", labelEn: "Revenue Certs" },
+                                    UTILITY: { icon: "⚡", bg: "bg-amber-50 text-amber-600 border-amber-100", labelHi: "उपयोगिता बिल", labelEn: "Discom Bills" },
+                                    SCHEMES: { icon: "🏢", bg: "bg-purple-50 text-purple-600 border-purple-100", labelHi: "सरकारी योजनाएं", labelEn: "Govt Schemes" },
+                                    RECRUITMENT: { icon: "✍️", bg: "bg-rose-50 text-rose-600 border-rose-100", labelHi: "भर्ती परीक्षा", labelEn: "Recruitment Portal" },
+                                    GENERAL: { icon: "📋", bg: "bg-sky-50 text-sky-600 border-sky-100", labelHi: "सामान्य सेवाएँ", labelEn: "General Services" },
+                                    DEFAULT: { icon: "🏢", bg: "bg-slate-50 text-slate-600 border-slate-200", labelHi: "अन्य सेवाएँ", labelEn: "Other Desk" }
+                                }
+                                const style = CAT_STYLES[catKey.toUpperCase()] || CAT_STYLES.DEFAULT
+                                const isSelected = serviceCatFilter === catKey
+                                return (
+                                    <div 
+                                        key={catKey}
+                                        onClick={() => setServiceCatFilter(catKey)}
+                                        className={`sso-app-card ${isSelected ? "border-[#0a4a83] bg-[#e5effa] ring-2 ring-[#0a4a83]/20" : ""}`}
+                                    >
+                                        <div className={`sso-app-icon-wrapper ${style.bg}`}>
+                                            <span className="text-xl">{style.icon}</span>
+                                        </div>
+                                        <h4 className="text-[12px] font-bold text-slate-800 tracking-tight leading-tight">
+                                            {lang === 'EN' ? style.labelEn : style.labelHi}
+                                        </h4>
+                                    </div>
+                                )
+                            })}
+                        </div>
                     </div>
 
                     {/* Categorized Grid */}
@@ -149,16 +233,16 @@ export default function ServicesTab({
                             No submitted requests found.
                         </div>
                     ) : (
-                        <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl overflow-hidden shadow-sm border-solid">
+                        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm border-solid">
                             <div className="overflow-x-auto">
-                                <table className="w-full text-[12.5px] border-collapse text-left">
+                                <table className="w-full text-[12px] border-collapse text-left">
                                     <thead>
-                                        <tr className="bg-[var(--color-surface-low)] border-b border-[var(--color-outline-variant)] text-gray-400 font-bold tracking-wider text-[10px] uppercase">
-                                            <th className="py-4 px-5">ID</th>
-                                            <th className="py-4 px-4">Service Details</th>
-                                            <th className="py-4 px-4">Filing Date</th>
-                                            <th className="py-4 px-4">Status</th>
-                                            <th className="py-4 px-4 text-right pr-6">Remarks / Action</th>
+                                        <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-black tracking-wider text-[9.5px] uppercase">
+                                            <th className="py-4 px-5">{lang === 'EN' ? 'TOKEN / TRANSACTION ID' : 'टोकन संख्या / ट्रांजैक्शन आईडी'}</th>
+                                            <th className="py-4 px-4">{lang === 'EN' ? 'OFFICIAL SERVICE DETAILS' : 'सरकारी सेवा का नाम'}</th>
+                                            <th className="py-4 px-4">{lang === 'EN' ? 'FILING DATE' : 'आवेदन तिथि'}</th>
+                                            <th className="py-4 px-4">{lang === 'EN' ? 'TRANSACTION STATUS' : 'लेनदेन की स्थिति'}</th>
+                                            <th className="py-4 px-4 text-right pr-6">{lang === 'EN' ? 'DESK REMARKS' : 'कार्रवाई / टिप्पणी'}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-[var(--color-outline-variant)]/60 text-[13px] font-medium">
