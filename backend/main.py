@@ -652,7 +652,38 @@ def send_receipt():
 def complete_service_request_endpoint(request_id):
     """Allows admin to mark a request as completed directly without sending a receipt."""
     try:
+        # Load request details to find telegram_id / phone
+        req_res = database.supabase.table("service_requests").select("*").eq("id", request_id).execute()
+        req_data = req_res.data[0] if req_res.data else None
+        
         database.complete_service_request(request_id)
+        
+        if req_data:
+            telegram_id = req_data.get("telegram_id")
+            phone = req_data.get("phone_number")
+            service_name = req_data.get("service_name")
+            
+            # If telegram_id is not set but phone is, try looking up telegram_id
+            if not telegram_id and phone:
+                clean_phone = phone.strip().replace(" ", "").replace("-", "")
+                if clean_phone.startswith("+"):
+                    clean_phone = clean_phone[1:]
+                clean_phone = clean_phone[-10:]
+                
+                student_res = database.supabase.table("students").select("telegram_id").ilike("phone_number", f"%{clean_phone}").execute()
+                if student_res.data and student_res.data[0].get("telegram_id"):
+                    telegram_id = student_res.data[0]["telegram_id"]
+                    # Backport telegram_id to this request
+                    database.supabase.table("service_requests").update({"telegram_id": telegram_id}).eq("id", request_id).execute()
+                    
+            if telegram_id:
+                msg = (
+                    f"✅ *Seva Completed!*\n\n"
+                    f"Aapki *{service_name}* seva ki request successfully process ho gayi hai. 🙏\n\n"
+                    f"Krishna Emitra par bharosa karne ke liye dhanyawad!"
+                )
+                notifier.send_message_to_user(config.TELEGRAM_BOT_TOKEN, telegram_id, msg, parse_mode="Markdown")
+                
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -984,7 +1015,55 @@ def admin_update_application(app_id):
     if not status:
         return jsonify({"success": False, "error": "Status is required"}), 400
         
+    # Get application details before update to get student phone and exam name
+    app_details = database.get_application_details(app_id)
+    
     database.update_application_status(app_id, status, remarks)
+    
+    # Notify student via Telegram if they are registered in the Bot
+    if app_details:
+        phone = app_details.get("phone_number")
+        exam_name = app_details.get("exam_name", "Exam")
+        if phone:
+            # Look up student's telegram_id using the phone number
+            clean_phone = phone.strip().replace(" ", "").replace("-", "")
+            if clean_phone.startswith("+"):
+                clean_phone = clean_phone[1:]
+            clean_phone = clean_phone[-10:] # last 10 digits
+            
+            try:
+                # Query student record
+                student_res = database.supabase.table("students").select("telegram_id").ilike("phone_number", f"%{clean_phone}").execute()
+                if student_res.data and student_res.data[0].get("telegram_id"):
+                    telegram_id = student_res.data[0]["telegram_id"]
+                    status_text = status.upper()
+                    
+                    if status == "completed":
+                        msg = (
+                            f"✅ *Application Processed!*\n\n"
+                            f"Aapka *{exam_name}* form filing application successfully process ho gaya hai. 🙏\n"
+                        )
+                    elif status == "rejected":
+                        msg = (
+                            f"❌ *Application Rejected!*\n\n"
+                            f"Aapka *{exam_name}* form filing application reject ho gaya hai.\n\n"
+                        )
+                    else:
+                        msg = (
+                            f"ℹ️ *Application Status Update!*\n\n"
+                            f"Aapka *{exam_name}* form filing application status: *{status_text}*.\n\n"
+                        )
+                    
+                    if remarks:
+                        msg += f"*Admin Remarks:* {remarks}\n\n"
+                    
+                    msg += "Aap website portal ya bot par status check kar sakte hain."
+                    
+                    # Send telegram message
+                    notifier.send_message_to_user(config.TELEGRAM_BOT_TOKEN, telegram_id, msg, parse_mode="Markdown")
+            except Exception as e:
+                print(f"Error sending application status notification: {e}")
+                
     return jsonify({"success": True})
 
 
@@ -1034,6 +1113,141 @@ def serve_frontend(path):
     else:
         # For SPA routing, return index.html for all non-found paths
         return send_from_directory(os.path.join(app.root_path, "../frontend/dist"), "index.html")
+
+
+# ── Scheduled Announcements APIs ──────────────────────────────────────────────
+
+@app.route("/api/admin/announcements", methods=["GET"])
+@token_required
+def admin_get_announcements():
+    try:
+        rows = database.get_all_announcements_raw()
+        announcements = []
+        for row in rows:
+            announcements.append({
+                "id": row["id"],
+                "exam": row["title"],          # map title to exam
+                "message": row["content"],     # map content to message
+                "runAt": row["links"],         # map links to runAt
+                "sent": row["is_active"] == 0  # if is_active is 0, it means sent
+            })
+        return jsonify({"success": True, "announcements": announcements})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/admin/announcements", methods=["POST"])
+@token_required
+def admin_create_announcement():
+    try:
+        data = request.json or {}
+        exam = data.get("exam", "ALL").strip()
+        message = data.get("message", "").strip()
+        run_at = data.get("runAt", "").strip()
+
+        if not message or not run_at:
+            return jsonify({"success": False, "error": "Message and runAt are required"}), 400
+
+        ann_id = database.add_scheduled_announcement(exam, message, run_at)
+        return jsonify({"success": True, "id": ann_id})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/admin/announcements/<int:ann_id>", methods=["PUT"])
+@token_required
+def admin_update_announcement(ann_id):
+    try:
+        data = request.json or {}
+        exam = data.get("exam", "ALL").strip()
+        message = data.get("message", "").strip()
+        run_at = data.get("runAt", "").strip()
+        sent = data.get("sent", False)
+
+        if not message or not run_at:
+            return jsonify({"success": False, "error": "Message and runAt are required"}), 400
+
+        database.update_scheduled_announcement(ann_id, exam, message, run_at, 0 if sent else 1)
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/admin/announcements/<int:ann_id>", methods=["DELETE"])
+@token_required
+def admin_delete_announcement(ann_id):
+    try:
+        database.delete_scheduled_announcement(ann_id)
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ── Background Scheduler for Announcements ────────────────────────────────────
+
+def check_and_send_scheduled_announcements():
+    """Periodically checks and sends scheduled announcements."""
+    import datetime
+    import time as _time_lib
+    
+    print("Scheduled announcements background runner started.")
+    while True:
+        try:
+            # Fetch all active scheduled announcements
+            active_anns = database.get_all_active_announcements()
+            
+            for ann in active_anns:
+                run_at_str = ann.get("links")
+                if not run_at_str:
+                    continue
+                try:
+                    # run_at_str is in format: "YYYY-MM-DDTHH:MM" (naive local time)
+                    run_dt = datetime.datetime.fromisoformat(run_at_str)
+                    
+                    # Compare naive local time of server
+                    now_naive = datetime.datetime.now()
+                    if now_naive >= run_dt:
+                        exam = ann.get("title", "ALL")
+                        message = ann.get("content", "")
+                        ann_id = ann.get("id")
+                        
+                        print(f"[Scheduler] Time reached for scheduled announcement ID={ann_id} (exam={exam})")
+                        
+                        # 1. Mark as sent immediately to avoid double-processing
+                        database.mark_announcement_sent(ann_id)
+                        
+                        # 2. Get eligible students
+                        students = database.get_students_by_exam(exam)
+                        if students:
+                            total = len(students)
+                            try:
+                                # Send sequential broadcast
+                                success_count = notifier.broadcast(
+                                    config.TELEGRAM_BOT_TOKEN,
+                                    students,
+                                    message
+                                )
+                                # Log broadcast history
+                                database.log_message(exam, message, success_count)
+                                print(f"[Scheduler] Announcement ID={ann_id} sent to {success_count}/{total} students.")
+                            except Exception as e:
+                                print(f"[Scheduler] Error broadcasting ID={ann_id}: {e}")
+                        else:
+                            # No students found
+                            database.log_message(exam, message, 0)
+                            print(f"[Scheduler] Announcement ID={ann_id} logged with 0 recipients (no students).")
+                except Exception as e:
+                    print(f"[Scheduler] Error processing scheduled announcement ID={ann.get('id')}: {e}")
+        except Exception as e:
+            print(f"[Scheduler] Critical error in runner loop: {e}")
+            
+        _time_lib.sleep(30)
+
+
+# Start background thread for scheduled announcements, avoiding duplication in Flask debug mode
+if os.environ.get("WERKZEUG_RUN_MAIN") == "true" or not app.debug:
+    t_scheduler = threading.Thread(target=check_and_send_scheduled_announcements, daemon=True)
+    t_scheduler.start()
 
 
 if __name__ == "__main__":

@@ -1,40 +1,24 @@
 import { useState, useEffect } from "react"
 import {
-  MessageSquare, Wrench, Megaphone, Settings,
-  Plus, Pencil, Trash2, ToggleLeft, ToggleRight,
+  MessageSquare, Megaphone, Settings,
+  Plus, Pencil, Trash2,
   Save, CheckCircle2, Clock, BotMessageSquare,
   X, Bell, Languages,
 } from "lucide-react"
 import {
-  getExams, createExam, deleteExamApi
+  getExams, createExam, deleteExamApi,
+  getBotSettings, saveBotSettings,
+  getScheduledAnnouncements, createScheduledAnnouncement,
+  updateScheduledAnnouncement, deleteScheduledAnnouncement
 } from "../../api"
 import { getExamColor } from "../../constants/examColors"
 
-// ── Local storage helpers ───────────────────────────────────────────────────────
-const LS = {
-  get: (key, fallback) => { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback } catch { return fallback } },
-  set: (key, val) => { try { localStorage.setItem(key, JSON.stringify(val)) } catch {} },
-}
-
 // ── Default values ──────────────────────────────────────────────────────────────
 const DEFAULT_MESSAGES = {
-  welcome:      "🙏 Krishna Emitra Seva mein aapka swagat hai!\n\nAap yahan se aadhar, PAN, income certificate aur bahut saari sarkaari seva le sakte hain.\n\n/help se sab options dekhein.",
+  welcome:      "🙏 Namaste! Krishna Emitra Seva mein aapka swagat hai.\n\nPehle apna mobile number share karein taaki hum aapko updates bhi bhej sakein:\n(Neeche button dabayein)",
   exam_confirm: "✅ Aapka exam {exam} set ho gaya hai!\n\nAb aap exam se related updates seedhe yahan paayenge.",
   unsubscribe:  "😢 Aapko Krishna Emitra notifications se unsubscribe kar diya gaya hai.\n\nWapas subscribe karne ke liye /start karein.",
 }
-
-const DEFAULT_SERVICES = [
-  { id: 1, name: "Aadhar Update",       desc: "Naam, address, DOB update",    price: "₹50",  enabled: true  },
-  { id: 2, name: "PAN Card",            desc: "Naye PAN ke liye apply karein", price: "₹110", enabled: true  },
-  { id: 3, name: "Income Certificate",  desc: "Tehsil se income certificate",  price: "₹30",  enabled: true  },
-  { id: 4, name: "Domicile Certificate",desc: "Niwas praman patra",            price: "₹30",  enabled: false },
-  { id: 5, name: "Driving License",     desc: "DL ke liye apply / renew",      price: "₹200", enabled: true  },
-]
-
-const DEFAULT_ANNOUNCEMENTS = [
-  { id: 1, exam: "JEE",  message: "JEE Mains ka admit card kal se download hoga!",     runAt: "2026-01-15T09:00", sent: false },
-  { id: 2, exam: "NEET", message: "NEET 2026 registration form bharna shuru ho gaya.", runAt: "2026-02-01T10:00", sent: false },
-]
 
 const DEFAULT_SETTINGS = {
   botName:    "Krishna Emitra Seva",
@@ -53,7 +37,7 @@ function Toast({ visible, message }) {
 }
 
 // ── Tab button ──────────────────────────────────────────────────────────────────
-function TabBtn({ id, label, icon: Icon, active, onClick, accent }) {
+function TabBtn({ id, label, icon: Icon, active, onClick }) {
   return (
     <button
       onClick={() => onClick(id)}
@@ -70,24 +54,34 @@ function TabBtn({ id, label, icon: Icon, active, onClick, accent }) {
 }
 
 const TABS = [
-  { id: "messages",      label: "Default Messages",    icon: MessageSquare, accent: "#3B82F6" },
-  { id: "exams",         label: "Exams",               icon: Plus,          accent: "#EF4444" },
-  { id: "announcements", label: "Auto Announcements",  icon: Megaphone,     accent: "#F97316" },
-  { id: "settings",      label: "Bot Settings",        icon: Settings,      accent: "#A855F7" },
+  { id: "messages",      label: "Default Messages",    icon: MessageSquare },
+  { id: "exams",         label: "Exams",               icon: Plus },
+  { id: "announcements", label: "Auto Announcements",  icon: Megaphone },
+  { id: "settings",      label: "Bot Settings",        icon: Settings },
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
 // TAB 1 — Default Messages
 // ══════════════════════════════════════════════════════════════════════════════
-function MessagesTab({ toast }) {
-  const [msgs, setMsgs] = useState(() => LS.get("bot_messages", DEFAULT_MESSAGES))
+function MessagesTab({ botSettings, onSave, toast }) {
+  const [msgs, setMsgs] = useState(botSettings)
   const [saved, setSaved] = useState({})
 
-  const save = (key) => {
-    LS.set("bot_messages", msgs)
-    setSaved(p => ({ ...p, [key]: true }))
-    toast("Message saved!")
-    setTimeout(() => setSaved(p => ({ ...p, [key]: false })), 1500)
+  useEffect(() => {
+    setMsgs(botSettings)
+  }, [botSettings])
+
+  const save = async (key) => {
+    const dbKey = key === "welcome" ? "welcome_message" : key === "exam_confirm" ? "exam_confirm_message" : "unsubscribe_message"
+    try {
+      await saveBotSettings({ [dbKey]: msgs[key] })
+      onSave(key, msgs[key])
+      setSaved(p => ({ ...p, [key]: true }))
+      toast("Message saved on server!")
+      setTimeout(() => setSaved(p => ({ ...p, [key]: false })), 1500)
+    } catch {
+      toast("Failed to save message")
+    }
   }
 
   const DEFS = [
@@ -118,12 +112,12 @@ function MessagesTab({ toast }) {
           <div className="p-6">
             <textarea
               rows={5}
-              value={msgs[key]}
+              value={msgs[key] || ""}
               onChange={e => setMsgs(p => ({ ...p, [key]: e.target.value }))}
               className="w-full border border-[var(--color-outline-variant)] px-5 py-4 text-[13px] text-[var(--color-on-surface)] bg-[var(--color-surface-lowest)] focus:outline-none shadow-sm resize-none transition-all leading-relaxed rounded-xl"
               placeholder="Message yahan likhein..."
             />
-            <p className="text-[11px] text-gray-400 font-medium mt-2">{msgs[key].length} chars</p>
+            <p className="text-[11px] text-gray-400 font-medium mt-2">{(msgs[key] || "").length} chars</p>
           </div>
         </div>
       ))}
@@ -132,16 +126,8 @@ function MessagesTab({ toast }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// TAB 2 — Services Manager (API-driven — changes reflect in bot immediately)
-// ══════════════════════════════════════════════════════════════════════════════
-
-
-
-
-// ══════════════════════════════════════════════════════════════════════════════
 // TAB 3 — Auto Announcements
 // ══════════════════════════════════════════════════════════════════════════════
-
 function AnnouncementModal({ ann, onSave, onClose, examOpts }) {
   const [form, setForm] = useState(ann || { exam: "ALL", message: "", runAt: "" })
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
@@ -207,20 +193,51 @@ function AnnouncementModal({ ann, onSave, onClose, examOpts }) {
 }
 
 function AnnouncementsTab({ toast }) {
-  const [anns, setAnns] = useState(() => LS.get("bot_announcements", DEFAULT_ANNOUNCEMENTS))
+  const [anns, setAnns] = useState([])
+  const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
   const [examOpts, setExamOpts] = useState(["ALL"])
 
+  const load = () => {
+    setLoading(true)
+    getScheduledAnnouncements()
+      .then(d => {
+        setAnns(d.announcements || [])
+      })
+      .catch(() => toast("Failed to load announcements"))
+      .finally(() => setLoading(false))
+  }
+
   useEffect(() => {
+    load()
     getExams().then(d => setExamOpts(["ALL", ...d.exams.map(e => e.name)])).catch(console.error)
   }, [])
 
-  const persist = (updated) => { setAnns(updated); LS.set("bot_announcements", updated) }
-  const remove = (id) => { if (window.confirm("Delete this scheduled announcement?")) persist(anns.filter(a => a.id !== id)) }
-  const handleSave = (form) => {
-    if (modal === "add") { persist([...anns, { ...form, id: Date.now(), sent: false }]); toast("Announcement scheduled!") }
-    else { persist(anns.map(a => a.id === modal.id ? { ...a, ...form } : a)); toast("Announcement updated!") }
-    setModal(null)
+  const remove = async (id) => {
+    if (!window.confirm("Delete this scheduled announcement?")) return
+    try {
+      await deleteScheduledAnnouncement(id)
+      toast("Announcement deleted")
+      load()
+    } catch {
+      toast("Failed to delete announcement")
+    }
+  }
+
+  const handleSave = async (form) => {
+    try {
+      if (modal === "add") {
+        await createScheduledAnnouncement(form)
+        toast("Announcement scheduled!")
+      } else {
+        await updateScheduledAnnouncement(modal.id, form)
+        toast("Announcement updated!")
+      }
+      setModal(null)
+      load()
+    } catch (err) {
+      toast(err.message || "Failed to save announcement")
+    }
   }
 
   const fmt = (dt) => new Date(dt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
@@ -241,53 +258,58 @@ function AnnouncementsTab({ toast }) {
       </div>
 
       <div className="bg-[var(--color-surface-lowest)] rounded-xl overflow-hidden shadow-ambient border-none">
-        {anns.length === 0 && (
+        {loading ? (
+          <div className="py-16 flex justify-center">
+            <div className="w-6 h-6 border-2 border-[#164FA8] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : anns.length === 0 ? (
           <div className="py-16 text-center">
             <p className="text-[13px] text-gray-500 font-medium">Koi scheduled announcement nahi hai.</p>
           </div>
-        )}
-        {[...anns].sort((a, b) => new Date(a.runAt) - new Date(b.runAt)).map(ann => {
-          const past = isPast(ann.runAt)
-          return (
-            <div key={ann.id} className={`flex flex-col sm:flex-row sm:items-start gap-4 px-6 py-6 transition-colors odd:bg-[var(--color-surface-low)] even:bg-[var(--color-surface-lowest)] hover:bg-[var(--color-surface-bright)] ${past ? "opacity-60 grayscale-[0.3]" : ""}`}>
-              {/* Exam pill */}
-              <span
-                className="flex-shrink-0 mt-1 px-3 py-1 text-[11px] font-bold tracking-widest text-white uppercase rounded-[8px]"
-                style={{ backgroundColor: getExamColor(ann.exam) }}
-              >
-                {ann.exam}
-              </span>
+        ) : (
+          [...anns].sort((a, b) => new Date(a.runAt) - new Date(b.runAt)).map(ann => {
+            const past = isPast(ann.runAt)
+            return (
+              <div key={ann.id} className={`flex flex-col sm:flex-row sm:items-start gap-4 px-6 py-6 transition-colors odd:bg-[var(--color-surface-low)] even:bg-[var(--color-surface-lowest)] hover:bg-[var(--color-surface-bright)] ${past ? "opacity-60 grayscale-[0.3]" : ""}`}>
+                {/* Exam pill */}
+                <span
+                  className="flex-shrink-0 mt-1 px-3 py-1 text-[11px] font-bold tracking-widest text-white uppercase rounded-[8px]"
+                  style={{ backgroundColor: getExamColor(ann.exam) }}
+                >
+                  {ann.exam}
+                </span>
 
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <p className="text-[14px] font-bold text-gray-900 leading-relaxed max-w-3xl">{ann.message}</p>
-                <div className="flex items-center gap-2 mt-2 text-[12px] text-gray-500 font-medium">
-                  <Clock size={12} />
-                  <span>{fmt(ann.runAt)}</span>
-                  {past && <span className="text-[10px] font-bold text-[#10B981] bg-emerald-50 px-2 py-0.5 ml-1 rounded-full uppercase tracking-widest">DONE</span>}
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-[14px] font-bold text-gray-900 leading-relaxed max-w-3xl">{ann.message}</p>
+                  <div className="flex items-center gap-2 mt-2 text-[12px] text-gray-500 font-medium">
+                    <Clock size={12} />
+                    <span>{fmt(ann.runAt)}</span>
+                    {(past || ann.sent) && <span className="text-[10px] font-bold text-[#10B981] bg-emerald-50 px-2 py-0.5 ml-1 rounded-full uppercase tracking-widest">SENT</span>}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {!(past || ann.sent) && (
+                    <button
+                      onClick={() => setModal(ann)}
+                      className="w-9 h-9 bg-transparent flex items-center justify-center text-gray-500 hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-bright)] transition-all rounded-md"
+                    >
+                      <Pencil size={14} />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => remove(ann.id)}
+                    className="w-9 h-9 bg-transparent flex items-center justify-center text-gray-500 hover:text-red-500 hover:bg-[#fef2f2] transition-all rounded-md"
+                  >
+                    <Trash2 size={14} />
+                  </button>
                 </div>
               </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {!past && (
-                  <button
-                    onClick={() => setModal(ann)}
-                    className="w-9 h-9 bg-transparent flex items-center justify-center text-gray-500 hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-bright)] transition-all rounded-md"
-                  >
-                    <Pencil size={14} />
-                  </button>
-                )}
-                <button
-                  onClick={() => remove(ann.id)}
-                  className="w-9 h-9 bg-transparent flex items-center justify-center text-gray-500 hover:text-red-500 hover:bg-[#fef2f2] transition-all rounded-md"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            </div>
-          )
-        })}
+            )
+          })
+        )}
       </div>
     </div>
   )
@@ -399,13 +421,30 @@ function ExamsTab({ toast }) {
 // ══════════════════════════════════════════════════════════════════════════════
 // TAB 4 — Bot Settings
 // ══════════════════════════════════════════════════════════════════════════════
-function SettingsTab({ toast }) {
-  const [settings, setSettings] = useState(() => LS.get("bot_settings", DEFAULT_SETTINGS))
+function SettingsTab({ botSettings, onSaveAll, toast }) {
+  const [settings, setSettings] = useState(botSettings)
+  const [saving, setSaving] = useState(false)
   const set = (k, v) => setSettings(p => ({ ...p, [k]: v }))
 
-  const save = () => {
-    LS.set("bot_settings", settings)
-    toast("Settings saved!")
+  useEffect(() => {
+    setSettings(botSettings)
+  }, [botSettings])
+
+  const save = async () => {
+    setSaving(true)
+    try {
+      await saveBotSettings({
+        bot_name: settings.botName,
+        language: settings.language,
+        max_msg_per_day: String(settings.maxMsgDay)
+      })
+      onSaveAll(settings)
+      toast("Settings saved on server!")
+    } catch {
+      toast("Failed to save settings")
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -421,7 +460,7 @@ function SettingsTab({ toast }) {
         <div className="px-6 py-5">
           <input
             type="text"
-            value={settings.botName}
+            value={settings.botName || ""}
             onChange={e => set("botName", e.target.value)}
             className="w-full border border-[var(--color-outline-variant)] px-5 py-3.5 text-[13px] text-[var(--color-on-surface)] bg-transparent focus:outline-none focus:ring-0 shadow-sm transition-all rounded-xl"
             placeholder="e.g. Krishna Emitra Seva"
@@ -477,7 +516,7 @@ function SettingsTab({ toast }) {
               <input
                 type="number"
                 min={1} max={20}
-                value={settings.maxMsgDay}
+                value={settings.maxMsgDay || 3}
                 onChange={e => set("maxMsgDay", Number(e.target.value))}
                 className="w-20 border border-[var(--color-outline-variant)] px-3 py-2 text-[14px] font-bold text-[var(--color-on-surface)] bg-transparent text-center focus:outline-none focus:ring-0 shadow-sm transition-all rounded-xl"
               />
@@ -491,10 +530,11 @@ function SettingsTab({ toast }) {
       {/* Save */}
       <button
         onClick={save}
-        className="flex items-center justify-center gap-2 w-full py-4 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] text-white text-[14px] font-bold transition-all rounded-xl shadow-ambient hover:shadow-lg hover:-translate-y-0.5"
+        disabled={saving}
+        className="flex items-center justify-center gap-2 w-full py-4 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] text-white text-[14px] font-bold transition-all rounded-xl shadow-ambient hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Save size={16} />
-        Save All Settings
+        {saving ? "Saving Settings..." : "Save All Settings"}
       </button>
     </div>
   )
@@ -507,6 +547,15 @@ export default function BotManager() {
   const [activeTab, setActiveTab] = useState("messages")
   const [toastVisible, setToastVisible] = useState(false)
   const [toastMsg, setToastMsg] = useState("")
+  const [botSettings, setBotSettings] = useState({
+    welcome: DEFAULT_MESSAGES.welcome,
+    exam_confirm: DEFAULT_MESSAGES.exam_confirm,
+    unsubscribe: DEFAULT_MESSAGES.unsubscribe,
+    botName: DEFAULT_SETTINGS.botName,
+    language: DEFAULT_SETTINGS.language,
+    maxMsgDay: DEFAULT_SETTINGS.maxMsgDay,
+  })
+  const [loading, setLoading] = useState(true)
 
   const showToast = (msg) => {
     setToastMsg(msg)
@@ -514,6 +563,30 @@ export default function BotManager() {
     setTimeout(() => setToastVisible(false), 2500)
   }
 
+  const loadSettings = async () => {
+    setLoading(true)
+    try {
+      const res = await getBotSettings()
+      if (res && res.settings) {
+        setBotSettings({
+          welcome: res.settings.welcome_message || DEFAULT_MESSAGES.welcome,
+          exam_confirm: res.settings.exam_confirm_message || DEFAULT_MESSAGES.exam_confirm,
+          unsubscribe: res.settings.unsubscribe_message || DEFAULT_MESSAGES.unsubscribe,
+          botName: res.settings.bot_name || DEFAULT_SETTINGS.botName,
+          language: res.settings.language || DEFAULT_SETTINGS.language,
+          maxMsgDay: Number(res.settings.max_msg_per_day || DEFAULT_SETTINGS.maxMsgDay),
+        })
+      }
+    } catch {
+      showToast("Failed to load bot settings from server")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadSettings()
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -545,10 +618,18 @@ export default function BotManager() {
 
       {/* Tab content */}
       <div>
-        {activeTab === "messages"      && <MessagesTab      toast={showToast} />}
-        {activeTab === "exams"         && <ExamsTab         toast={showToast} />}
-        {activeTab === "announcements" && <AnnouncementsTab toast={showToast} />}
-        {activeTab === "settings"      && <SettingsTab      toast={showToast} />}
+        {loading && activeTab !== "exams" && activeTab !== "announcements" ? (
+          <div className="py-12 flex justify-center">
+             <div className="w-6 h-6 border-2 border-[#164FA8] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : (
+          <>
+            {activeTab === "messages"      && <MessagesTab      botSettings={botSettings} onSave={(key, val) => setBotSettings(p => ({ ...p, [key]: val }))} toast={showToast} />}
+            {activeTab === "exams"         && <ExamsTab         toast={showToast} />}
+            {activeTab === "announcements" && <AnnouncementsTab toast={showToast} />}
+            {activeTab === "settings"      && <SettingsTab      botSettings={botSettings} onSaveAll={(newSettings) => setBotSettings(newSettings)} toast={showToast} />}
+          </>
+        )}
       </div>
     </div>
   )

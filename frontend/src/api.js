@@ -304,3 +304,28 @@ export const updateStudentCategory = async (studentId, category) =>
   })
 
 
+// ── Scheduled Announcements API ──────────────────────────────────────────────
+export const getScheduledAnnouncements = async () =>
+  requestJson(`/api/admin/announcements`, { headers: await getAuthHeaders() })
+
+export const createScheduledAnnouncement = async (data) =>
+  requestJson(`/api/admin/announcements`, {
+    method: "POST",
+    headers: await getAuthHeaders(),
+    body: JSON.stringify(data)
+  })
+
+export const updateScheduledAnnouncement = async (id, data) =>
+  requestJson(`/api/admin/announcements/${id}`, {
+    method: "PUT",
+    headers: await getAuthHeaders(),
+    body: JSON.stringify(data)
+  })
+
+export const deleteScheduledAnnouncement = async (id) =>
+  requestJson(`/api/admin/announcements/${id}`, {
+    method: "DELETE",
+    headers: await getAuthHeaders()
+  })
+
+

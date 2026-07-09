@@ -40,7 +40,7 @@ else:
     print("WARNING: SUPABASE_URL and SUPABASE_KEY are not configured.")
 
 def init_db():
-    """Verify connection and seed default services/exams if tables are empty."""
+    """Verify connection and seed default services/exams/settings if tables are empty."""
     if not supabase:
         print("WARNING: Supabase is not initialized. Skipping DB initialization.")
         return
@@ -56,6 +56,12 @@ def init_db():
         if res_ex.count == 0:
             _seed_default_exams()
             print("Successfully seeded default exams to Supabase.")
+
+        # Check if bot_settings table is empty
+        res_set = supabase.table("bot_settings").select("key", count="exact").limit(1).execute()
+        if res_set.count == 0:
+            _seed_default_settings()
+            print("Successfully seeded default bot settings to Supabase.")
     except Exception as e:
         print(f"Database initialization warning: {e}. Please ensure you ran supabase_schema.sql on your Supabase dashboard.")
 
@@ -157,6 +163,18 @@ def _seed_default_exams():
     supabase.table("exams").insert(rows).execute()
 
 
+def _seed_default_settings():
+    defaults = [
+        {"key": "welcome_message",      "value": "🙏 Namaste! Krishna Emitra Seva mein aapka swagat hai.\n\nPehle apna mobile number share karein taaki hum aapko updates bhi bhej sakein:\n(Neeche button dabayein)"},
+        {"key": "exam_confirm_message", "value": "✅ Aapka exam {exam} set ho gaya hai!\n\nAb aap exam se related updates seedhe yahan paayenge."},
+        {"key": "unsubscribe_message",  "value": "😢 Aapko Krishna Emitra notifications se unsubscribe kar diya gaya hai.\n\nWapas subscribe karne ke liye /start karein."},
+        {"key": "bot_name",             "value": "Krishna Emitra Seva"},
+        {"key": "language",             "value": "hinglish"},
+        {"key": "max_msg_per_day",      "value": "3"}
+    ]
+    supabase.table("bot_settings").insert(defaults).execute()
+
+
 # ── Student helpers ──────────────────────────────────────────────────────────
 
 def is_new_user(telegram_id):
@@ -240,6 +258,9 @@ def update_phone_number(telegram_id, phone_number):
                     "last_active": now_str,
                     "is_registered": 1
                 }).eq("id", existing["id"]).execute()
+                
+                # 3. Backport telegram_id to past service requests
+                supabase.table("service_requests").update({"telegram_id": str(telegram_id)}).eq("phone_number", clean_phone).execute()
             except Exception as e:
                 print(f"Error merging student rows: {e}")
         return
@@ -250,8 +271,11 @@ def update_phone_number(telegram_id, phone_number):
             "phone_number": clean_phone,
             "last_active": now_str
         }).eq("telegram_id", str(telegram_id)).execute()
+        
+        # Backport telegram_id to past service requests
+        supabase.table("service_requests").update({"telegram_id": str(telegram_id)}).eq("phone_number", clean_phone).execute()
     except Exception as e:
-        print(f"Error updating phone number: {e}")
+        print(f"Error updating phone number/backporting requests: {e}")
 
 
 def update_exam_preference(telegram_id, exam):
@@ -320,8 +344,8 @@ def get_student_history(phone_number):
     students_res = supabase.table("students").select("telegram_id").ilike("phone_number", pattern).execute()
     telegram_ids = [s["telegram_id"] for s in students_res.data if s.get("telegram_id")]
     
-    # Query service requests
-    query = supabase.table("service_requests").select("service_name,status,requested_at")
+    # Query service requests with ID, category, status, requested_at, completed_at
+    query = supabase.table("service_requests").select("id,service_name,category,status,requested_at,completed_at")
     if telegram_ids:
         # Create an OR condition
         tg_filters = ",".join(f"telegram_id.eq.{tid}" for tid in telegram_ids)
@@ -863,3 +887,48 @@ def get_student_applications_by_phone(phone_number):
         row["documents"] = docs_res.data
         apps.append(row)
     return apps
+
+
+# ── Scheduled Announcements Helper Functions ─────────────────────────────────
+
+def get_all_announcements_raw():
+    """Fetch all announcements from the Supabase database."""
+    res = supabase.table("announcements").select("*").order("created_at", desc=True).execute()
+    return res.data or []
+
+
+def get_all_active_announcements():
+    """Fetch pending active scheduled announcements."""
+    res = supabase.table("announcements").select("*").eq("is_active", 1).execute()
+    return res.data or []
+
+
+def add_scheduled_announcement(exam, message, run_at):
+    """Insert a new scheduled announcement."""
+    res = supabase.table("announcements").insert({
+        "title": exam,
+        "content": message,
+        "links": run_at,
+        "is_active": 1
+    }).execute()
+    return res.data[0]["id"]
+
+
+def update_scheduled_announcement(ann_id, exam, message, run_at, is_active):
+    """Update an existing scheduled announcement."""
+    supabase.table("announcements").update({
+        "title": exam,
+        "content": message,
+        "links": run_at,
+        "is_active": is_active
+    }).eq("id", ann_id).execute()
+
+
+def mark_announcement_sent(ann_id):
+    """Mark an announcement as sent/inactive."""
+    supabase.table("announcements").update({"is_active": 0}).eq("id", ann_id).execute()
+
+
+def delete_scheduled_announcement(ann_id):
+    """Permanently delete a scheduled announcement."""
+    supabase.table("announcements").delete().eq("id", ann_id).execute()
