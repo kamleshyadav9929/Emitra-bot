@@ -291,96 +291,98 @@ export default function Landing() {
             )}
 
             {/* ── HERO & ONBOARDING SECTION ── */}
-            <section className="relative px-6 lg:px-12 py-12 lg:py-24 max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                {/* Hero Left */}
-                <div className="lg:col-span-7 space-y-6 text-left">
-                    <h1 className="text-4xl md:text-5xl lg:text-[46px] font-semibold leading-[1.1] tracking-tight text-[#1d1d1f] font-display" style={{ letterSpacing: "-0.5px" }}>
-                        Track your exam deadlines and govt forms, all in one place
-                    </h1>
-                    <p className="text-[15px] text-[#7a7a7a] leading-relaxed max-w-2xl font-normal">
-                        SSC, Railway, NEET counselling, and state services — all updates delivered directly to your Telegram, for free.
-                    </p>
+            <div className="w-full bg-cover bg-center bg-no-repeat relative border-b border-[#c2c6d4]/10" style={{ backgroundImage: "url('/hero-bg.png')" }}>
+                <section className="relative px-6 lg:px-12 py-12 lg:py-24 max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    {/* Hero Left */}
+                    <div className="lg:col-span-7 space-y-6 text-left">
+                        <h1 className="text-4xl md:text-5xl lg:text-[46px] font-semibold leading-[1.1] tracking-tight text-[#1d1d1f] font-display" style={{ letterSpacing: "-0.5px" }}>
+                            Track your exam deadlines and govt forms, all in one place
+                        </h1>
+                        <p className="text-[15px] text-[#7a7a7a] leading-relaxed max-w-2xl font-normal">
+                            SSC, Railway, NEET counselling, and state services — all updates delivered directly to your Telegram, for free.
+                        </p>
 
-                    {/* Action Buttons */}
-                    <div className="flex flex-wrap items-center gap-4 pt-2">
-                        <button
-                            onClick={handleJoinTelegram}
-                            className="px-6 py-3 bg-[#0066cc] hover:bg-[#0071e3] text-white text-[13px] font-medium rounded-full shadow-sm hover:shadow-md transition-all active:scale-[0.97] cursor-pointer border-none flex items-center gap-2"
-                        >
-                            <Send size={14} /> Join Telegram assistant
-                        </button>
-                        <button
-                            onClick={() => scrollToSection("what-we-do")}
-                            className="px-6 py-3 bg-white hover:bg-slate-50 text-[#0066cc] border border-[#0066cc] text-[13px] font-medium rounded-full shadow-sm transition-all active:scale-[0.97] cursor-pointer"
-                        >
-                            Browse services
-                        </button>
+                        {/* Action Buttons */}
+                        <div className="flex flex-wrap items-center gap-4 pt-2">
+                            <button
+                                onClick={handleJoinTelegram}
+                                className="px-6 py-3 bg-[#0066cc] hover:bg-[#0071e3] text-white text-[13px] font-medium rounded-full shadow-sm hover:shadow-md transition-all active:scale-[0.97] cursor-pointer border-none flex items-center gap-2"
+                            >
+                                <Send size={14} /> Join Telegram assistant
+                            </button>
+                            <button
+                                onClick={() => scrollToSection("what-we-do")}
+                                className="px-6 py-3 bg-white hover:bg-slate-50 text-[#0066cc] border border-[#0066cc] text-[13px] font-medium rounded-full shadow-sm transition-all active:scale-[0.97] cursor-pointer"
+                            >
+                                Browse services
+                            </button>
+                        </div>
+
+                        {/* Stats Counters */}
+                        <div className="grid grid-cols-3 gap-6 pt-8 border-t border-slate-100 max-w-md">
+                            <div>
+                                <span className="block text-2xl font-semibold text-[#1d1d1f] tracking-tight">12,000+</span>
+                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 block">Students served</span>
+                            </div>
+                            <div>
+                                <span className="block text-2xl font-semibold text-[#1d1d1f] tracking-tight">10+</span>
+                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 block">Exams tracked</span>
+                            </div>
+                            <div>
+                                <span className="block text-2xl font-semibold text-[#1d1d1f] tracking-tight">Free</span>
+                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 block">Status alerts</span>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Stats Counters */}
-                    <div className="grid grid-cols-3 gap-6 pt-8 border-t border-slate-100 max-w-md">
-                        <div>
-                            <span className="block text-2xl font-semibold text-[#1d1d1f] tracking-tight">12,000+</span>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 block">Students served</span>
-                        </div>
-                        <div>
-                            <span className="block text-2xl font-semibold text-[#1d1d1f] tracking-tight">10+</span>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 block">Exams tracked</span>
-                        </div>
-                        <div>
-                            <span className="block text-2xl font-semibold text-[#1d1d1f] tracking-tight">Free</span>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 block">Status alerts</span>
-                        </div>
-                    </div>
-                </div>
+                    {/* Hero Right - Onboarding Card (The 2 Step Wizard) */}
+                    <div className="lg:col-span-5 relative">
+                        <div className="bg-white border border-slate-200 rounded-3xl p-6 lg:p-8 space-y-6 text-left">
+                            <div>
+                                <h3 className="text-lg font-semibold text-[#1d1d1f] font-display" style={{ letterSpacing: "-0.2px" }}>Get started in 2 steps</h3>
+                                <p className="text-[12.5px] text-gray-400 mt-1">Get your student dashboard ready in two minutes.</p>
+                            </div>
 
-                {/* Hero Right - Onboarding Card (The 2 Step Wizard) */}
-                <div className="lg:col-span-5 relative">
-                    <div className="bg-white border border-slate-200 rounded-3xl p-6 lg:p-8 space-y-6 text-left">
-                        <div>
-                            <h3 className="text-lg font-semibold text-[#1d1d1f] font-display" style={{ letterSpacing: "-0.2px" }}>Get started in 2 steps</h3>
-                            <p className="text-[12.5px] text-gray-400 mt-1">Get your student dashboard ready in two minutes.</p>
-                        </div>
+                            <div className="space-y-4">
+                                {/* STEP 1: JOIN TELEGRAM */}
+                                <div className="border border-slate-250 rounded-2xl p-5 bg-white flex flex-col gap-4">
+                                    <div className="flex gap-4">
+                                        <div className="w-8 h-8 rounded-full bg-blue-50 text-[#0066cc] border border-blue-100 flex items-center justify-center text-[12px] font-bold shrink-0">
+                                            1
+                                        </div>
+                                        <div className="space-y-1">
+                                            <h4 className="text-[13px] font-semibold text-[#1d1d1f]">Join Telegram assistant</h4>
+                                            <p className="text-[11.5px] text-gray-400 font-normal leading-normal">Exam dates and form PDFs directly in your chat.</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={handleJoinTelegram}
+                                        className="w-full py-2.5 bg-[#0066cc] hover:bg-[#0071e3] text-white text-[12.5px] font-medium rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm border-none"
+                                    >
+                                        <Send size={13} /> Open Telegram bot
+                                    </button>
+                                </div>
 
-                        <div className="space-y-4">
-                            {/* STEP 1: JOIN TELEGRAM */}
-                            <div className="border border-slate-250 rounded-2xl p-5 bg-white flex flex-col gap-4">
-                                <div className="flex gap-4">
-                                    <div className="w-8 h-8 rounded-full bg-blue-50 text-[#0066cc] border border-blue-100 flex items-center justify-center text-[12px] font-bold shrink-0">
-                                        1
+                                {/* STEP 2: SIGN IN TO PANEL */}
+                                <div
+                                    onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
+                                    className="border border-slate-200 rounded-2xl p-5 bg-white flex gap-4 cursor-pointer hover:border-blue-200 hover:bg-slate-50/40 transition-all"
+                                >
+                                    <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-[12px] font-bold shrink-0">
+                                        2
                                     </div>
                                     <div className="space-y-1">
-                                        <h4 className="text-[13px] font-semibold text-[#1d1d1f]">Join Telegram assistant</h4>
-                                        <p className="text-[11.5px] text-gray-400 font-normal leading-normal">Exam dates and form PDFs directly in your chat.</p>
+                                        <h4 className="text-[13px] font-semibold text-[#1d1d1f] flex items-center gap-1.5">
+                                            Sign in to student panel {isLoggedIn && <Check size={12} className="text-emerald-500" />}
+                                        </h4>
+                                        <p className="text-[11.5px] text-gray-400 font-normal leading-normal">Full dashboard, service requests and history.</p>
                                     </div>
-                                </div>
-                                <button
-                                    onClick={handleJoinTelegram}
-                                    className="w-full py-2.5 bg-[#0066cc] hover:bg-[#0071e3] text-white text-[12.5px] font-medium rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm border-none"
-                                >
-                                    <Send size={13} /> Open Telegram bot
-                                </button>
-                            </div>
-
-                            {/* STEP 2: SIGN IN TO PANEL */}
-                            <div
-                                onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
-                                className="border border-slate-200 rounded-2xl p-5 bg-white flex gap-4 cursor-pointer hover:border-blue-200 hover:bg-slate-50/40 transition-all"
-                            >
-                                <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-[12px] font-bold shrink-0">
-                                    2
-                                </div>
-                                <div className="space-y-1">
-                                    <h4 className="text-[13px] font-semibold text-[#1d1d1f] flex items-center gap-1.5">
-                                        Sign in to student panel {isLoggedIn && <Check size={12} className="text-emerald-500" />}
-                                    </h4>
-                                    <p className="text-[11.5px] text-gray-400 font-normal leading-normal">Full dashboard, service requests and history.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
 
             {/* ── WHAT WE DO & HOW WE DO IT ── */}
             <section id="what-we-do" className="bg-[#f8fcff] border-y border-[#c2c6d4]/10 py-20 px-6 lg:px-12">
