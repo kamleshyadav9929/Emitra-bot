@@ -572,7 +572,6 @@ def send_notification():
 
     # FIX: Run in background thread so the HTTP request returns immediately.
     # Without this, 4000 students × 50ms = 200s → guaranteed timeout on PythonAnywhere.
-    import uuid
     job_id = str(uuid.uuid4())[:8]
     database.create_broadcast_job(job_id, exam, total)
 
