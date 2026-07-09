@@ -291,10 +291,11 @@ export default function Landing() {
             )}
 
             {/* ── HERO & ONBOARDING SECTION ── */}
-            <div className="w-full bg-white border-b border-[#c2c6d4]/10">
+            <div 
+                className="w-full bg-white border-b border-[#c2c6d4]/10 bg-hero-responsive bg-cover bg-bottom bg-no-repeat"
+            >
                 <section 
-                    className="relative px-6 lg:px-12 py-12 lg:py-24 max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center bg-cover bg-bottom bg-no-repeat"
-                    style={{ backgroundImage: "url('/hero-bg.png')" }}
+                    className="relative px-6 lg:px-12 py-12 lg:py-24 max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center"
                 >
                     {/* Hero Left */}
                     <div className="lg:col-span-7 space-y-6 text-left">
