@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { ClerkProvider } from '@clerk/react'
+import { ErrorBoundary } from './components/common/ErrorBoundary.jsx'
 import App from './App.jsx'
 import './index.css'
 
@@ -66,16 +67,18 @@ const clerkAppearance = {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ClerkProvider
-      publishableKey={clerkPubKey}
-      afterSignOutUrl="/login"
-      appearance={clerkAppearance}
-    >
-      <HelmetProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </HelmetProvider>
-    </ClerkProvider>
+    <ErrorBoundary>
+      <ClerkProvider
+        publishableKey={clerkPubKey}
+        afterSignOutUrl="/login"
+        appearance={clerkAppearance}
+      >
+        <HelmetProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </HelmetProvider>
+      </ClerkProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
 )
