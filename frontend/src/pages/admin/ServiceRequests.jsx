@@ -186,19 +186,29 @@ export default function ServiceRequests() {
   const [selectedDocsReq, setSelectedDocsReq] = useState(null)
   const [stats, setStats] = useState({ total: 0, pending: 0 })
   const [completingId, setCompletingId] = useState(null)
+  
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const limit = 20
 
   const fetchRequests = useCallback(async () => {
     setLoading(true); setError(null)
     try {
-      const data = await getServiceRequests(filter)
+      const data = await getServiceRequests(filter, page, limit)
       setRequests(data.requests || [])
       setStats({ total: data.total || 0, pending: data.pending || 0 })
+      setTotal(data.total || 0)
     } catch (err) {
       setError(err?.message || "Failed to fetch requests."); setRequests([])
     } finally { setLoading(false) }
-  }, [filter])
+  }, [filter, page])
 
   useEffect(() => { fetchRequests() }, [fetchRequests])
+
+  // Reset page to 1 when filter changes
+  useEffect(() => {
+    setPage(1)
+  }, [filter])
 
   const handleSent = (id) => {
     setCompletingId(id)
@@ -491,6 +501,29 @@ export default function ServiceRequests() {
                 </tbody>
               </table>
             </div>
+            
+            {/* Pagination Controls */}
+            {Math.ceil(total / limit) > 1 && (
+              <div className="flex items-center justify-between p-6 border-t border-[var(--color-outline-variant)] bg-[var(--color-surface-lowest)]">
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="px-4 py-2 border border-[var(--color-outline-variant)] text-[13px] font-bold rounded-xl bg-[var(--color-surface-lowest)] hover:bg-[var(--color-surface-low)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <span className="text-[13px] text-gray-500 font-medium">
+                  Page <span className="font-semibold text-gray-700">{page}</span> of <span className="font-semibold text-gray-700">{Math.ceil(total / limit)}</span> (Total: {total})
+                </span>
+                <button
+                  onClick={() => setPage(p => Math.min(Math.ceil(total / limit), p + 1))}
+                  disabled={page === Math.ceil(total / limit)}
+                  className="px-4 py-2 border border-[var(--color-outline-variant)] text-[13px] font-bold rounded-xl bg-[var(--color-surface-lowest)] hover:bg-[var(--color-surface-low)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>

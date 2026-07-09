@@ -439,11 +439,22 @@ def public_log_intent():
 @token_required
 def get_students():
     exam = request.args.get("exam", "ALL")
-    if exam == "ALL":
-        students = database.get_all_students()
-    else:
-        students = database.get_students_by_exam(exam)
-    return jsonify({"students": students, "total": len(students)})
+    page = int(request.args.get("page", 1))
+    limit = int(request.args.get("limit", 20))
+    search = request.args.get("search", "").strip()
+
+    data, total_count = database.get_students_paginated(
+        exam=exam,
+        page=page,
+        limit=limit,
+        search=search
+    )
+    return jsonify({
+        "students": data,
+        "total": total_count,
+        "page": page,
+        "limit": limit
+    })
 
 
 @app.route("/api/students", methods=["POST"])
@@ -611,13 +622,22 @@ def broadcast_status(job_id):
 @token_required
 def get_service_requests():
     status = request.args.get("status")
-    # get_service_requests now returns rows already joined with student info
-    enriched = database.get_service_requests(status=status)
+    page = int(request.args.get("page", 1))
+    limit = int(request.args.get("limit", 20))
+
+    enriched, total_count = database.get_service_requests_paginated(
+        status=status,
+        page=page,
+        limit=limit
+    )
+    pending_count = database.get_pending_count()
 
     return jsonify({
         "requests": enriched,
-        "total": len(enriched),
-        "pending": sum(1 for r in enriched if r["status"] == "pending"),
+        "total": total_count,
+        "pending": pending_count,
+        "page": page,
+        "limit": limit
     })
 
 

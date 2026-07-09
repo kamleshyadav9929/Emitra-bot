@@ -932,3 +932,86 @@ def mark_announcement_sent(ann_id):
 def delete_scheduled_announcement(ann_id):
     """Permanently delete a scheduled announcement."""
     supabase.table("announcements").delete().eq("id", ann_id).execute()
+
+
+# ── Pagination Helper Functions ──────────────────────────────────────────────
+
+def get_students_paginated(exam="ALL", page=1, limit=20, search=""):
+    """
+    Returns a paginated list of students filtered by exam preference and search text.
+    Also returns the total count of matching records.
+    """
+    query = supabase.table("students").select("*", count="exact")
+    
+    if exam != "ALL":
+        query = query.eq("exam_preference", exam)
+        
+    if search:
+        pattern = f"%{search}%"
+        # Search across name, phone_number, username, telegram_id
+        query = query.or_(f"name.ilike.{pattern},phone_number.ilike.{pattern},telegram_id.ilike.{pattern},username.ilike.{pattern}")
+        
+    start = (page - 1) * limit
+    end = start + limit - 1
+    
+    res = query.order("joined_at", desc=True).range(start, end).execute()
+    total = res.count if res.count is not None else len(res.data)
+    return res.data or [], total
+
+
+def get_service_requests_paginated(status=None, page=1, limit=20):
+    """Fetch paginated service requests with student info."""
+    query = supabase.table("service_requests").select(
+        "id,telegram_id,phone_number,service_name,category,status,requested_at,completed_at",
+        count="exact"
+    )
+    if status:
+        query = query.eq("status", status)
+        
+    start = (page - 1) * limit
+    end = start + limit - 1
+    
+    res = query.order("requested_at", desc=True).range(start, end).execute()
+    total = res.count if res.count is not None else len(res.data)
+    requests_data = res.data or []
+    
+    if not requests_data:
+        return [], total
+
+    telegram_ids = list(set(row["telegram_id"] for row in requests_data if row.get("telegram_id")))
+    
+    students_map = {}
+    if telegram_ids:
+        try:
+            student_res = supabase.table("students").select("telegram_id,name,phone_number,username").in_("telegram_id", telegram_ids).execute()
+            for s in (student_res.data or []):
+                if s.get("telegram_id"):
+                    students_map[s["telegram_id"]] = s
+        except Exception as e:
+            print(f"Error fetching students for join: {e}")
+            
+    records = []
+    for row in requests_data:
+        tid = row.get("telegram_id")
+        student = students_map.get(tid) if tid else None
+        
+        phone_raw = row.get("phone_number") or ""
+        parsed_name = None
+        if " | " in phone_raw:
+            parts = phone_raw.split(" | ", 1)
+            parsed_name = parts[0].strip()
+            phone_raw = parts[1].strip()
+
+        records.append({
+            "id": row["id"],
+            "telegram_id": row["telegram_id"],
+            "service_name": row["service_name"],
+            "category": row["category"],
+            "status": row["status"],
+            "requested_at": row["requested_at"],
+            "completed_at": row["completed_at"],
+            "student_name": student.get("name") if student else (parsed_name or "Unknown"),
+            "student_phone": (student.get("phone_number") if student else None) or phone_raw,
+            "student_username": student.get("username") if student else ""
+        })
+    return records, total

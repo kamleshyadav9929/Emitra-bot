@@ -17,6 +17,11 @@ export default function Students() {
   const [error, setError] = useState(null)
   const [activeFilter, setActiveFilter] = useState("ALL")
   const [search, setSearch] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const limit = 20
+
   const [changingExam, setChangingExam] = useState(null)
   const [examList, setExamList] = useState(DEFAULT_FILTERS)
   const changeRef = useRef(null)
@@ -61,23 +66,42 @@ export default function Students() {
   }, [])
 
   useEffect(() => {
+    setPage(1)
+  }, [activeFilter])
+
+  // Search debounce effect
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(search)
+      setPage(1)
+    }, 300)
+    return () => clearTimeout(t)
+  }, [search])
+
+  useEffect(() => {
     let cancelled = false
     setLoading(true)
     setError(null)
-    getStudents(activeFilter)
-      .then(r => { if (!cancelled) setStudents(r.students || []) })
-      .catch(err => { if (!cancelled) { setStudents([]); setError(err?.message || "Failed to fetch.") } })
-      .finally(() => { if (!cancelled) setLoading(false) })
+    getStudents(activeFilter, page, limit, debouncedSearch)
+      .then(r => {
+        if (!cancelled) {
+          setStudents(r.students || [])
+          setTotal(r.total || 0)
+        }
+      })
+      .catch(err => {
+        if (!cancelled) {
+          setStudents([])
+          setError(err?.message || "Failed to fetch.")
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
     return () => { cancelled = true }
-  }, [activeFilter])
+  }, [activeFilter, page, debouncedSearch])
 
-  const filtered = search.trim()
-    ? students.filter(s =>
-        s.name?.toLowerCase().includes(search.toLowerCase()) ||
-        s.phone_number?.includes(search) ||
-        String(s.telegram_id).includes(search)
-      )
-    : students
+  const filtered = students
 
   const exportCSV = () => {
     const headers = ["Name", "Telegram ID", "Exam", "Phone Number", "Username", "Joined"]
@@ -497,6 +521,29 @@ export default function Students() {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      {Math.ceil(total / limit) > 1 && (
+        <div className="flex items-center justify-between pt-6 border-t border-[var(--color-outline-variant)]">
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="px-4 py-2 border border-[var(--color-outline-variant)] text-[13px] font-bold rounded-xl bg-[var(--color-surface-lowest)] hover:bg-[var(--color-surface-low)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+          <span className="text-[13px] text-gray-500 font-medium">
+            Page <span className="font-semibold text-gray-700">{page}</span> of <span className="font-semibold text-gray-700">{Math.ceil(total / limit)}</span> (Total: {total})
+          </span>
+          <button
+            onClick={() => setPage(p => Math.min(Math.ceil(total / limit), p + 1))}
+            disabled={page === Math.ceil(total / limit)}
+            className="px-4 py-2 border border-[var(--color-outline-variant)] text-[13px] font-bold rounded-xl bg-[var(--color-surface-lowest)] hover:bg-[var(--color-surface-low)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
         </div>
       )}
 

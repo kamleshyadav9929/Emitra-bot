@@ -36,8 +36,15 @@ const getAuthHeaders = async () => {
 export const getStats = async () =>
   requestJson(`/api/stats`, { headers: await getAuthHeaders() })
 
-export const getStudents = async (exam = "ALL") =>
-  requestJson(`/api/students?exam=${exam}`, { headers: await getAuthHeaders() })
+export const getStudents = async (exam = "ALL", page = 1, limit = 20, search = "") => {
+  const queryParams = new URLSearchParams({
+    exam,
+    page: String(page),
+    limit: String(limit),
+    search: search.trim()
+  }).toString()
+  return requestJson(`/api/students?${queryParams}`, { headers: await getAuthHeaders() })
+}
 
 export const addStudent = async (studentData) =>
   requestJson(`/api/students`, {
@@ -79,8 +86,14 @@ export const getLogs = async () =>
 export const getBroadcastStatus = async (jobId) =>
   requestJson(`/api/broadcast-status/${jobId}`, { headers: await getAuthHeaders() })
 
-export const getServiceRequests = async (status = "") =>
-  requestJson(`/api/service-requests${status ? `?status=${status}` : ""}`, { headers: await getAuthHeaders() })
+export const getServiceRequests = async (status = "", page = 1, limit = 20) => {
+  const queryParams = new URLSearchParams({
+    ...(status ? { status } : {}),
+    page: String(page),
+    limit: String(limit)
+  }).toString()
+  return requestJson(`/api/service-requests?${queryParams}`, { headers: await getAuthHeaders() })
+}
 
 export const completeServiceRequest = async (requestId) =>
   requestJson(`/api/service-requests/${requestId}/complete`, {
