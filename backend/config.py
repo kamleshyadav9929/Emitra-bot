@@ -33,9 +33,12 @@ def _normalize_pem_key(raw):
     Handles:
       - Literal \\n escape sequences (single-line .env value)
       - Actual newlines (multi-line .env value)
+      - Malformed PEM headers (wrong number of dashes, e.g. ---- vs -----)
       - Raw base64 without PEM headers
       - Already-valid PEM
     """
+    import re
+
     if not raw:
         return ""
     key = raw.strip().strip('"').strip("'")
@@ -43,17 +46,19 @@ def _normalize_pem_key(raw):
     # Replace literal \n sequences (common when pasting into .env files)
     key = key.replace("\\n", "\n")
 
-    if "-----BEGIN" in key:
-        # Extract the base64 body, strip all whitespace, and re-wrap at 64 chars
-        inner = key.replace("-----BEGIN PUBLIC KEY-----", "") \
-                   .replace("-----END PUBLIC KEY-----", "") \
-                   .replace("\n", "").replace("\r", "").replace(" ", "").strip()
-        wrapped = "\n".join(inner[i:i+64] for i in range(0, len(inner), 64))
-        return f"-----BEGIN PUBLIC KEY-----\n{wrapped}\n-----END PUBLIC KEY-----"
+    # Strip ANY variation of BEGIN/END PUBLIC KEY headers using regex
+    # Matches: any number of dashes + BEGIN/END PUBLIC KEY + any number of dashes
+    key = re.sub(r'-+\s*BEGIN\s+PUBLIC\s+KEY\s*-+', '', key)
+    key = re.sub(r'-+\s*END\s+PUBLIC\s+KEY\s*-+', '', key)
 
-    # Raw base64 without PEM headers — wrap it
-    key_clean = key.replace("\n", "").replace("\r", "").replace(" ", "")
-    wrapped = "\n".join(key_clean[i:i+64] for i in range(0, len(key_clean), 64))
+    # Now extract only valid base64 characters (A-Z, a-z, 0-9, +, /, =)
+    inner = re.sub(r'[^A-Za-z0-9+/=]', '', key)
+
+    if not inner:
+        return ""
+
+    # Re-wrap with proper 64-char line breaks (standard PEM format)
+    wrapped = "\n".join(inner[i:i+64] for i in range(0, len(inner), 64))
     return f"-----BEGIN PUBLIC KEY-----\n{wrapped}\n-----END PUBLIC KEY-----"
 
 
