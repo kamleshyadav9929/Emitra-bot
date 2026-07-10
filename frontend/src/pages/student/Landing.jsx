@@ -390,105 +390,100 @@ export default function Landing() {
                 <div className="max-w-[1240px] mx-auto space-y-20">
 
                     {/* How It Works - Process Flow */}
-                    <div id="how-it-works" className="space-y-12">
+                    <div id="how-it-works" className="space-y-12 pb-8">
                         <div className="text-center max-w-xl mx-auto space-y-3">
-                            <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "How It Works" : "यह कैसे काम करता है"}</p>
-                            <h3 className="text-3xl font-black text-[#0A1A40] font-display">
-                                {lang === "EN" ? "Our Seamless 4-Step Process" : "हमारी सरल 4-चरणीय प्रक्रिया"}
+                            <h3 className="text-3xl font-normal text-slate-800 font-display">
+                                {lang === "EN" ? "Just a few steps left" : "बस कुछ ही कदम बाकी हैं"}
                             </h3>
-                            <p className="text-[13px] text-gray-500 font-normal leading-relaxed">
-                                {lang === "EN"
-                                    ? "How we process your application form filing request from start to finish."
-                                    : "शुरू से अंत तक आपकी आवेदन प्रक्रिया को हम कैसे पूरा करते हैं।"}
-                            </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative text-center">
-                            {/* Connecting Line (Desktop) */}
-                            <div className="hidden lg:block absolute top-[28px] left-[15%] right-[15%] h-[1.5px] bg-[#c2c6d4]/20 -z-10" />
-
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[1000px] mx-auto">
                             {/* STEP 1 */}
-                            <div className="flex flex-col items-center space-y-3 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-                                <div className="w-14 h-14 rounded-full bg-slate-900 border-4 border-white shadow-md text-white flex items-center justify-center font-bold text-sm">
-                                    01
+                            <div className="flex flex-col bg-[#eef4ff] p-8 rounded-3xl border border-blue-50/50 shadow-sm relative overflow-hidden h-[400px]">
+                                <div className="bg-white text-slate-600 px-3 py-1.5 rounded-full text-[12px] font-medium w-fit shadow-sm">
+                                    Step 1
                                 </div>
-                                <h4 className="text-[13.5px] font-bold text-[#0A1A40]">
-                                    {lang === 'EN' ? 'Add Telegram Bot' : 'टेलीग्राम बॉट जोड़ें'}
+                                <h4 className="text-[26px] font-normal text-[#1a73e8] mt-8 mb-4">
+                                    {lang === 'EN' ? 'Connect' : 'जुड़ें'}
                                 </h4>
-                                <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs min-h-[50px]">
+                                <p className="text-[14.5px] text-slate-600 font-normal leading-relaxed">
                                     {lang === 'EN'
-                                        ? 'Start our interactive bot on Telegram to receive live alerts and pick filing services.'
-                                        : 'लाइव अलर्ट प्राप्त करने और सेवाएं चुनने के लिए टेलीग्राम पर हमारे इंटरैक्टिव बॉट को शुरू करें।'}
+                                        ? 'Sign in to our portal or add our Telegram bot to start receiving live alerts.'
+                                        : 'पोर्टल में साइन इन करें या लाइव अलर्ट प्राप्त करने के लिए हमारे टेलीग्राम बॉट को जोड़ें।'}
                                 </p>
-                                <button
-                                    onClick={handleJoinTelegram}
-                                    className="mt-2 text-[#164FA8] hover:text-[#0A1A40] text-[12px] font-bold flex items-center gap-1 bg-transparent border-none cursor-pointer hover:underline"
-                                >
-                                    {lang === 'EN' ? 'Open Telegram Bot' : 'टेलीग्राम बॉट खोलें'} <ExternalLink size={12} />
-                                </button>
+                                
+                                {/* Mockup Div */}
+                                <div className="absolute bottom-6 left-6 right-6 h-[88px] bg-white rounded-[14px] shadow-sm p-4 border border-slate-100 flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-[#eef4ff] rounded-lg flex items-center justify-center">
+                                            <div className="w-5 h-5 bg-[#1a73e8] rounded-md opacity-80" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-[13px] font-bold text-slate-800">EmitraBotConnect</span>
+                                            <span className="text-[11px] text-slate-500">Secure • Verified</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* STEP 2 */}
-                            <div className="flex flex-col items-center space-y-3 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-                                <div className="w-14 h-14 rounded-full bg-[#164FA8] border-4 border-white shadow-md text-white flex items-center justify-center font-bold text-sm">
-                                    02
+                            <div className="flex flex-col bg-[#e6f5ea] p-8 rounded-3xl border border-green-50/50 shadow-sm relative overflow-hidden h-[400px]">
+                                <div className="bg-white text-slate-600 px-3 py-1.5 rounded-full text-[12px] font-medium w-fit shadow-sm">
+                                    Step 2
                                 </div>
-                                <h4 className="text-[13.5px] font-bold text-[#0A1A40]">
-                                    {lang === 'EN' ? 'Request a Service' : 'सेवा का अनुरोध करें'}
+                                <h4 className="text-[26px] font-normal text-[#1e8e3e] mt-8 mb-4">
+                                    {lang === 'EN' ? 'Request' : 'अनुरोध'}
                                 </h4>
-                                <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs min-h-[50px]">
+                                <p className="text-[14.5px] text-slate-600 font-normal leading-relaxed">
                                     {lang === 'EN'
-                                        ? 'Select the specific government form, exam filing, or state service you wish to request.'
-                                        : 'उस विशिष्ट सरकारी फॉर्म या सेवा का चयन करें जिसके लिए आप आवेदन करना चाहते हैं।'}
+                                        ? 'Choose your desired service and submit the required details securely.'
+                                        : 'अपनी वांछित सेवा चुनें और सुरक्षित रूप से आवश्यक विवरण जमा करें।'}
                                 </p>
-                                <button
-                                    onClick={() => scrollToSection("services-catalog")}
-                                    className="mt-2 text-[#164FA8] hover:text-[#0A1A40] text-[12px] font-bold flex items-center gap-1 bg-transparent border-none cursor-pointer hover:underline"
-                                >
-                                    {lang === 'EN' ? 'Browse Catalog' : 'कैटलॉग ब्राउज़ करें'} <ChevronDown size={12} />
-                                </button>
+                                
+                                {/* Mockup Div */}
+                                <div className="absolute bottom-6 left-6 right-6 h-auto min-h-[120px] bg-white rounded-[14px] shadow-sm p-5 border border-slate-100 flex flex-col">
+                                    <div className="text-[11px] font-bold text-slate-800 mb-3 flex justify-between items-center">
+                                        <span>Submit request form?</span>
+                                        <X size={12} className="text-slate-400" />
+                                    </div>
+                                    <div className="space-y-1.5 mb-5">
+                                        <div className="text-[9px] text-slate-400 flex gap-1 items-center">
+                                            <span className="w-12 text-right">Service:</span> 
+                                            <span className="text-slate-600">Document verification</span>
+                                        </div>
+                                        <div className="text-[9px] text-slate-400 flex gap-1 items-center">
+                                            <span className="w-12 text-right">To:</span> 
+                                            <span className="text-slate-600">Emitra Admin</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-end gap-2 mt-auto">
+                                        <div className="px-4 py-1.5 rounded border border-slate-200 text-[11px] text-slate-600 font-medium">Cancel</div>
+                                        <div className="px-4 py-1.5 rounded bg-white border border-[#1a73e8] text-[#1a73e8] text-[11px] font-medium">Submit</div>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* STEP 3 */}
-                            <div className="flex flex-col items-center space-y-3 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-                                <div className="w-14 h-14 rounded-full bg-[#164FA8] border-4 border-white shadow-md text-white flex items-center justify-center font-bold text-sm">
-                                    03
+                            <div className="flex flex-col bg-[#fff3db] p-8 rounded-3xl border border-orange-50/50 shadow-sm relative overflow-hidden h-[400px]">
+                                <div className="bg-white text-slate-600 px-3 py-1.5 rounded-full text-[12px] font-medium w-fit shadow-sm">
+                                    Step 3
                                 </div>
-                                <h4 className="text-[13.5px] font-bold text-[#0A1A40]">
-                                    {lang === 'EN' ? 'Complete via WhatsApp' : 'व्हाट्सएप पर पूरा करें'}
+                                <h4 className="text-[26px] font-normal text-[#f9ab00] mt-8 mb-4">
+                                    {lang === 'EN' ? 'Complete' : 'पूरा करें'}
                                 </h4>
-                                <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs min-h-[50px]">
+                                <p className="text-[14.5px] text-slate-600 font-normal leading-relaxed">
                                     {lang === 'EN'
-                                        ? 'Connect on WhatsApp to securely upload your documents and complete the filing details with our operator.'
-                                        : 'सुरक्षित रूप से दस्तावेज़ अपलोड करने और हमारे ऑपरेटर के साथ आवेदन विवरण पूरा करने के लिए व्हाट्सएप पर जुड़ें।'}
+                                        ? 'Wait for processing to finish. You will receive the receipt automatically.'
+                                        : 'प्रसंस्करण समाप्त होने की प्रतीक्षा करें। आपको रसीद स्वचालित रूप से प्राप्त होगी।'}
                                 </p>
-                                <button
-                                    onClick={handleWhatsAppFiling}
-                                    className="mt-2 text-[#164FA8] hover:text-[#0A1A40] text-[12px] font-bold flex items-center gap-1 bg-transparent border-none cursor-pointer hover:underline"
-                                >
-                                    {lang === 'EN' ? 'Chat on WhatsApp' : 'व्हाट्सएप चैट करें'} <ExternalLink size={12} />
-                                </button>
-                            </div>
-
-                            {/* STEP 4 */}
-                            <div className="flex flex-col items-center space-y-3 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-                                <div className="w-14 h-14 rounded-full bg-emerald-500 border-4 border-white shadow-md text-white flex items-center justify-center font-bold text-sm">
-                                    04
+                                
+                                {/* Mockup Div */}
+                                <div className="absolute bottom-6 left-6 right-6 h-[88px] bg-white rounded-[14px] shadow-sm px-6 py-0 border border-slate-100 flex flex-col justify-center items-center gap-3">
+                                    <span className="text-[12px] font-medium text-slate-800">Processing...</span>
+                                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                        <div className="w-[45%] h-full bg-[#1a73e8] rounded-full"></div>
+                                    </div>
                                 </div>
-                                <h4 className="text-[13.5px] font-bold text-[#0A1A40]">
-                                    {lang === 'EN' ? 'Get Final Receipt' : 'अंतिम रसीद प्राप्त करें'}
-                                </h4>
-                                <p className="text-[11.5px] text-gray-500 font-normal leading-relaxed max-w-xs min-h-[50px]">
-                                    {lang === 'EN'
-                                        ? 'Once verified and submitted, get your official government transaction receipt and filled PDF printout.'
-                                        : 'सत्यापन और सबमिशन के बाद, सीधे अपने चैट में आधिकारिक सरकारी लेनदेन रसीद और भरा हुआ आवेदन पीडीएफ प्राप्त करें।'}
-                                </p>
-                                <button
-                                    onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
-                                    className="mt-2 text-[#164FA8] hover:text-[#0A1A40] text-[12px] font-bold flex items-center gap-1 bg-transparent border-none cursor-pointer hover:underline"
-                                >
-                                    {lang === 'EN' ? 'Student Portal' : 'छात्र पोर्टल'} <ExternalLink size={12} />
-                                </button>
                             </div>
                         </div>
                     </div>
