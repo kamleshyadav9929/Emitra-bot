@@ -29,10 +29,11 @@ if ('serviceWorker' in navigator) {
         console.error('[SW] Registration failed:', err);
       });
 
-    // Reload the page after the new SW takes control
+    // Reload the page only if there was an existing active controller (i.e. this is an update)
     var refreshing = false;
+    var hasController = !!navigator.serviceWorker.controller;
     navigator.serviceWorker.addEventListener('controllerchange', function () {
-      if (!refreshing) {
+      if (!refreshing && hasController) {
         refreshing = true;
         window.location.reload();
       }
