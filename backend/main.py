@@ -19,10 +19,16 @@ import database
 import notifier
 import bot as bot_handlers
 import jwt
-from jwt import PyJWKClient
+try:
+    from jwt import PyJWKClient
+    HAS_CRYPTO = True
+except ImportError:
+    PyJWKClient = None
+    HAS_CRYPTO = False
+    print("WARNING: pyjwt[crypto] (cryptography) is not installed. Clerk RS256 token verification will be disabled.")
 
 jwks_client = None
-if config.CLERK_JWKS_URL and not config.CLERK_JWT_PUBLIC_KEY:
+if HAS_CRYPTO and config.CLERK_JWKS_URL and not config.CLERK_JWT_PUBLIC_KEY:
     try:
         jwks_client = PyJWKClient(config.CLERK_JWKS_URL, timeout=5)
     except Exception as e:
@@ -122,6 +128,8 @@ def get_bot_and_loop():
 # ── Authentication ─────────────────────────────────────────────────────────────
 
 def verify_clerk_token(token):
+    if not HAS_CRYPTO:
+        return None
     # Priority 1: High-Performance Offline Verification (No network calls)
     if config.CLERK_JWT_PUBLIC_KEY:
         try:
