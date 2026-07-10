@@ -702,9 +702,6 @@ export default function StudentPanel() {
                 {isLoggedIn && (
                     <div className="px-4 py-4 border-b border-slate-100 bg-[#f8fafc]/50">
                         <div className="bg-white border border-slate-200 rounded-xl p-4 text-center relative overflow-hidden shadow-sm">
-                            <div className="absolute top-0 right-0 bg-[#138808] text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-bl">
-                                Verified
-                            </div>
                             <div className="w-12 h-12 mx-auto mb-2 rounded-full border-2 border-[#0a4a83]/20 bg-slate-50 flex items-center justify-center text-[#0a4a83] text-base font-black shadow-inner overflow-hidden">
                                 {user?.imageUrl ? (
                                     <img src={user.imageUrl} alt={user.name} className="w-full h-full object-cover" />
@@ -713,12 +710,9 @@ export default function StudentPanel() {
                                 )}
                             </div>
                             <h4 className="text-[12.5px] font-bold text-slate-800 tracking-tight leading-tight mb-0.5">{user?.name}</h4>
-                            <p className="text-[9.5px] font-mono text-slate-400 select-all">
-                                SSOID: <span className="font-extrabold text-[#0a4a83]">RAJ_{String(user?.phone || user?.telegram_id || 'CITIZEN').slice(-8).toUpperCase()}</span>
+                            <p className="text-[10px] font-mono text-slate-500 select-all">
+                                ID: <span className="font-extrabold text-slate-700">{user?.telegram_id || 'N/A'}</span>
                             </p>
-                            <div className="mt-2.5 py-1 bg-[#e7f6e7] border border-[rgba(19,136,8,0.15)] text-[#138808] text-[9px] font-black uppercase tracking-wider rounded-lg flex items-center justify-center gap-1">
-                                <ShieldCheck size={11} /> verified citizen
-                            </div>
                         </div>
                     </div>
                 )}
