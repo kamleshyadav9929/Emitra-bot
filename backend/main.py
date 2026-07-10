@@ -869,7 +869,7 @@ def _run_broadcast_in_background(job_id, exam, message, students, token, image_u
                 
         log_text = message or ""
         if image_url:
-            log_text = f"[Image] " + log_text
+            log_text = f"[Image]({image_url})\n\n" + log_text
             
         database.log_message(exam, log_text, success_count)
         database.update_broadcast_status(job_id, "done", sent_count=success_count)
