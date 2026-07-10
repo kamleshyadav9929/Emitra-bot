@@ -147,9 +147,12 @@ export function AuthProvider({ children }) {
 
     const isLoggedIn = isLocalLoggedIn || (isClerkSignedIn && user && !token)
     const needsOnboarding = isLoggedIn && user && (!user.exam_preferences || user.exam_preferences.length === 0)
+    
+    // If Clerk says we are signed in, but we haven't fetched our local user object yet, consider it still loading
+    const isFullyLoaded = isLoaded && isClerkLoaded && !(isClerkSignedIn && !user && !token)
 
     return (
-        <AuthContext.Provider value={{ user, isLoggedIn, needsOnboarding, isLoaded: isLoaded && isClerkLoaded, login: handleLogin, logout: handleLogout }}>
+        <AuthContext.Provider value={{ user, isLoggedIn, needsOnboarding, isLoaded: isFullyLoaded, login: handleLogin, logout: handleLogout }}>
             {children}
         </AuthContext.Provider>
     )
