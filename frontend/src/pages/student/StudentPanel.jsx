@@ -296,11 +296,17 @@ export default function StudentPanel() {
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;");
         
+        // Handle images: ![alt](url)
+        formatted = formatted.replace(/!\[(.*?)\]\((.*?)\)/g, "<div class='mt-2 mb-2'><img src='$2' alt='$1' class='w-full rounded-[8px] border border-slate-200 object-cover shadow-sm' /></div>");
+        
+        // Handle [Image](url) format
+        formatted = formatted.replace(/\[Image\]\((.*?)\)/gi, "<div class='mt-2 mb-2'><img src='$1' alt='Notification Image' class='w-full rounded-[8px] border border-slate-200 object-cover shadow-sm' /></div>");
+
         // Markdown links [text](url)
-        formatted = formatted.replace(/\[(.*?)\]\((.*?)\)/g, "<a href='$2' target='_blank' rel='noopener noreferrer' class='text-[#0a66c2] hover:underline'>$1</a>");
+        formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, "<a href='$2' target='_blank' rel='noopener noreferrer' class='text-[#0a66c2] hover:underline font-semibold'>$1</a>");
         
         // Raw URLs (basic)
-        formatted = formatted.replace(/(?<!href=')(https?:\/\/[^\s<]+)/g, "<a href='$1' target='_blank' rel='noopener noreferrer' class='text-[#0a66c2] hover:underline'>$1</a>");
+        formatted = formatted.replace(/(?<!href=')(https?:\/\/[^\s<]+)/g, "<a href='$1' target='_blank' rel='noopener noreferrer' class='text-[#0a66c2] hover:underline font-semibold'>$1</a>");
         
         // Bold *text*
         formatted = formatted.replace(/\*(.*?)\*/g, "<strong>$1</strong>");
@@ -314,8 +320,8 @@ export default function StudentPanel() {
 
     const renderNotificationsPanel = (isSticky = true) => {
         return (
-            <div className={`flex flex-col h-full bg-white border border-slate-200 rounded-[12px] ${!isSticky ? "shadow-sm" : ""}`}>
-                <div className="border-b border-slate-200 px-5 py-4 flex items-center gap-3">
+            <div className={`flex flex-col h-full bg-white ${isSticky ? "rounded-none w-full" : "border border-slate-200 rounded-[12px] shadow-sm"}`}>
+                <div className="border-b border-slate-200 px-5 py-5 flex items-center gap-3">
                     <h3 className="text-[20px] font-medium text-slate-900 tracking-tight font-sans">
                         Notification
                     </h3>
@@ -336,25 +342,24 @@ export default function StudentPanel() {
                         </div>
                     </div>
                 ) : (
-                    <div className="flex-1 overflow-y-auto p-5 space-y-5 scrollbar-thin">
+                    <div className="flex-1 overflow-y-auto p-5 space-y-7 scrollbar-thin">
                         {subNotifications.map((ann, idx) => {
                             return (
                                 <div 
                                     key={ann.id || idx} 
                                     onClick={() => handleMarkNotificationRead(ann.id)}
-                                    className="flex items-start gap-3 group text-left"
+                                    className="flex items-start gap-4 group text-left"
                                 >
-                                    <div className="text-[#ef4444] mt-0.5 flex-shrink-0 text-[16px] transform rotate-[-45deg]">
+                                    <div className="text-[#ef4444] mt-0.5 flex-shrink-0 text-[18px]">
                                         📌
                                     </div>
-                                    <div className="text-[14.5px] text-slate-800 leading-relaxed font-sans w-full announcement-content">
-                                        {ann.title && <strong className="block mb-1">{ann.title}</strong>}
+                                    <div className="text-[15px] font-bold text-slate-800 leading-relaxed font-sans w-full announcement-content tracking-tight">
                                         {formatTelegramMessage(ann.content)}
                                         {ann.links && (
-                                            <div className="mt-1">
+                                            <div className="mt-1.5">
                                                 <a 
                                                     href={ann.links} target="_blank" rel="noopener noreferrer"
-                                                    className="text-[#0a66c2] hover:underline inline-flex items-center gap-1"
+                                                    className="text-[#0a66c2] hover:underline inline-flex items-center gap-1 font-semibold"
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
                                                     View Document
@@ -938,7 +943,7 @@ export default function StudentPanel() {
 
                     {/* ── RIGHT PREMIUM NOTIFICATION PANEL ── */}
                     {!loading && (
-                        <aside className="hidden xl:flex w-[340px] border-l border-slate-200 h-[calc(100vh-108px)] shrink-0 p-6 flex-col overflow-y-auto scroll-container-smooth bg-slate-50 relative">
+                        <aside className="hidden xl:flex w-[340px] border-l border-slate-200 h-[calc(100vh-108px)] shrink-0 flex-col overflow-y-auto scroll-container-smooth bg-white relative">
                             {renderNotificationsPanel(true)}
                         </aside>
                     )}
