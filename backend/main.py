@@ -501,6 +501,8 @@ def public_login_status(token):
             "exp": datetime.utcnow() + timedelta(days=30)
         }
         jwt_token = jwt.encode(payload, config.JWT_SECRET_KEY, algorithm="HS256")
+        user = database.get_user_by_telegram_id(student["telegram_id"])
+        subs = database.get_user_exam_subscriptions(user["id"]) if user else []
         return jsonify({
             "success": True,
             "status": "success",
@@ -509,6 +511,7 @@ def public_login_status(token):
                 "name": student["name"],
                 "phone_number": student["phone_number"],
                 "telegram_id": student["telegram_id"],
+                "exam_preferences": subs,
                 "exam_preference": student["exam_preference"]
             }
         })
@@ -524,17 +527,19 @@ def public_login_status(token):
 @student_token_required
 def student_profile():
     telegram_id = request.student_payload.get("sub")
-    student = database.get_student(telegram_id)
-    if not student:
+    user = database.get_user_by_telegram_id(telegram_id)
+    if not user:
         return jsonify({"success": False, "error": "Student not found"}), 404
         
+    subs = database.get_user_exam_subscriptions(user["id"])
     return jsonify({
         "success": True,
         "student": {
-            "name": student["name"],
-            "phone_number": student["phone_number"],
-            "telegram_id": student["telegram_id"],
-            "exam_preference": student["exam_preference"]
+            "name": user["name"],
+            "phone_number": user["phone"],
+            "telegram_id": user["telegram_id"],
+            "exam_preferences": subs,
+            "exam_preference": subs[0] if subs else "NONE"
         }
     })
 
@@ -543,13 +548,22 @@ def student_profile():
 @student_token_required
 def student_update_preference():
     data = request.json or {}
-    category = data.get("category")
-    if not category:
-        return jsonify({"success": False, "error": "Category is required"}), 400
+    categories = data.get("categories") or data.get("category")
+    if not categories:
+        return jsonify({"success": False, "error": "Exam selection is required"}), 400
         
     telegram_id = request.student_payload.get("sub")
-    database.update_exam_preference(telegram_id, category)
-    return jsonify({"success": True, "category": category})
+    user = database.get_user_by_telegram_id(telegram_id)
+    if not user:
+        return jsonify({"success": False, "error": "User not found"}), 404
+        
+    if isinstance(categories, list):
+        database.update_user_exam_subscriptions(user["id"], categories)
+    else:
+        database.update_user_exam_subscriptions(user["id"], [categories])
+        
+    synced = database.get_user_exam_subscriptions(user["id"])
+    return jsonify({"success": True, "categories": synced})
 
 
 @app.route("/api/student/history", methods=["GET"])
@@ -676,19 +690,39 @@ def update_student_category(student_id):
 def _run_broadcast_in_background(job_id, exam, message, students, token, image_url=None):
     """Runs in a daemon thread — broadcasts to all students without blocking the HTTP response."""
     database.update_broadcast_status(job_id, "running")
+    success_count = 0
+    total = len(students)
+    
     try:
-        success_count = notifier.broadcast(
-            token, 
-            students, 
-            message,
-            image_url=image_url,
-            on_progress=lambda count: database.update_broadcast_status(job_id, "running", sent_count=count)
-        )
+        for i, student in enumerate(students):
+            tg_id = student.get("telegram_id")
+            if not tg_id or tg_id.startswith("BOT_TEMP_"):
+                database.add_notification_history(student["id"], job_id, "failed", "No Telegram linked")
+                continue
+                
+            ok = notifier.send_message_to_user(token, tg_id, message, image_url=image_url)
+            status = "sent" if ok else "failed"
+            error = None if ok else "Telegram send failure"
+            
+            if ok:
+                success_count += 1
+                
+            database.add_notification_history(student["id"], job_id, status, error)
+            
+            if (i + 1) % 10 == 0:
+                database.update_broadcast_status(job_id, "running", sent_count=success_count)
+                
+            if i < total - 1:
+                import time
+                time.sleep(notifier.BROADCAST_DELAY_SECONDS)
+                
         log_text = message or ""
         if image_url:
             log_text = f"[Image] " + log_text
+            
         database.log_message(exam, log_text, success_count)
         database.update_broadcast_status(job_id, "done", sent_count=success_count)
+        
     except Exception as e:
         print(f"CRITICAL: Broadcast Background Error: {e}")
         database.update_broadcast_status(job_id, "error", error_msg=str(e))

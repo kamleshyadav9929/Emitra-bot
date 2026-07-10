@@ -361,11 +361,11 @@ export const getStudentProfile = async (customToken) => {
   })
 }
 
-export const updateStudentPreference = async (category) =>
+export const updateStudentPreference = async (categories) =>
   requestJson(`/api/student/update-preference`, {
     method: "POST",
     headers: await getAuthHeaders(),
-    body: JSON.stringify({ category })
+    body: JSON.stringify({ categories })
   })
 
 export const getStudentHistorySecure = async () =>

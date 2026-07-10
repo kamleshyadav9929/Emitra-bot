@@ -129,13 +129,22 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def prompt_exam_selection(update: Update):
+    chat_id = update.effective_chat.id
+    user = database.get_user_by_telegram_id(chat_id)
+    if not user:
+        return
+        
+    current_subs = database.get_user_exam_subscriptions(user["id"])
     exams = database.get_all_exams()
+    
     keyboard = []
     current_row = []
     
     for exam in exams:
         name = exam["name"]
-        current_row.append(InlineKeyboardButton(name, callback_data=f"exam_{name}"))
+        is_subbed = name in current_subs
+        label = f"✅ {name}" if is_subbed else f"☐ {name}"
+        current_row.append(InlineKeyboardButton(label, callback_data=f"toggleexam_{name}"))
         if len(current_row) == 2:
             keyboard.append(current_row)
             current_row = []
@@ -143,20 +152,27 @@ async def prompt_exam_selection(update: Update):
     if current_row:
         keyboard.append(current_row)
         
-    # Always append "Sabhi Exams" at the end
-    keyboard.append([InlineKeyboardButton("Sabhi Exams", callback_data="exam_ALL")])
+    is_all = "ALL" in current_subs
+    all_label = "✅ Sabhi Exams" if is_all else "☐ Sabhi Exams"
+    keyboard.append([InlineKeyboardButton(all_label, callback_data="toggleexam_ALL")])
+    keyboard.append([InlineKeyboardButton("🏁 Save Subscriptions", callback_data="exams_SAVE")])
     
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     welcome_text = get_msg(
         "exam_select_message",
-        "✅ Number save ho gaya!\n\n"
-        "Ab bataiye — aap kis exam ki taiyari kar rahe hain?\n"
-        "Neeche se select karein:"
+        "✅ Preferred exams select karein (Aap ek se zyada select kar sakte hain):\n\n"
+        "Tapping an exam will toggle it. Click Save when finished."
     )
 
     if update.callback_query:
-        await update.callback_query.message.reply_text(welcome_text, reply_markup=reply_markup)
+        try:
+            await update.callback_query.edit_message_text(welcome_text, reply_markup=reply_markup)
+        except Exception:
+            try:
+                await update.callback_query.edit_message_reply_markup(reply_markup=reply_markup)
+            except Exception:
+                pass
     elif update.message:
         await update.message.reply_text(welcome_text, reply_markup=reply_markup)
 
@@ -209,22 +225,37 @@ async def button_callback_handler(update: Update, context):
     await query.answer()
     data = query.data
 
-    # ── Exam selection ──────────────────────────────────────────
-    if data.startswith("exam_"):
+    # ── Exam selection toggle ───────────────────────────────────
+    if data.startswith("toggleexam_"):
         exam_choice = data.split("_")[1]
         chat_id = update.effective_chat.id
-        database.update_exam_preference(chat_id, exam_choice)
+        user = database.get_user_by_telegram_id(chat_id)
+        if user:
+            current_subs = database.get_user_exam_subscriptions(user["id"])
+            if exam_choice == "ALL":
+                if "ALL" in current_subs:
+                    new_subs = []
+                else:
+                    new_subs = ["ALL"]
+            else:
+                new_subs = [s for s in current_subs if s != "ALL"]
+                if exam_choice in new_subs:
+                    new_subs.remove(exam_choice)
+                else:
+                    new_subs.append(exam_choice)
+            database.update_user_exam_subscriptions(user["id"], new_subs)
+            await prompt_exam_selection(update)
 
-        if exam_choice == "ALL":
-            msg = (
-                "🎉 Badhai ho! Aap sabhi exams ke updates ke liye enrolled ho gaye hain!\n\n"
-                "📌 Krishna Emitra ki kisi seva ke liye type karein: /services"
-            )
-        else:
-            msg = (
-                f"🎉 Badhai ho! Aap *{exam_choice}* exam ke updates ke liye enrolled ho gaye hain!\n\n"
-                f"📌 Krishna Emitra ki kisi seva ke liye type karein: /services"
-            )
+    elif data == "exams_SAVE":
+        chat_id = update.effective_chat.id
+        user = database.get_user_by_telegram_id(chat_id)
+        current_subs = database.get_user_exam_subscriptions(user["id"]) if user else []
+        subs_str = ", ".join(current_subs) if current_subs else "None"
+        msg = (
+            f"🎉 *Subscriptions Saved!*\n\n"
+            f"Aap *{subs_str}* exams ke updates ke liye successfully enrolled ho gaye hain!\n\n"
+            f"📌 Krishna Emitra ki kisi seva ke liye type/click karein: /services"
+        )
         await query.edit_message_text(text=msg, parse_mode="Markdown")
 
     # ── Service category back button ────────────────────────────

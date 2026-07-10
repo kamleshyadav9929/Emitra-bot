@@ -4,15 +4,11 @@ from supabase import create_client, Client
 import config
 
 # ── In-memory TTL cache ──────────────────────────────────────────────────────
-# Eliminates redundant Supabase round-trips on hot bot paths.
-# Services/exams/settings rarely change but are fetched on EVERY interaction.
-
 _cache = {}          # key -> (value, expiry_timestamp)
 _CACHE_TTL = 300     # 5 minutes
 
 
 def _cache_get(key):
-    """Return cached value if present and not expired, else None."""
     entry = _cache.get(key)
     if entry and entry[1] > _time.monotonic():
         return entry[0]
@@ -20,14 +16,13 @@ def _cache_get(key):
 
 
 def _cache_set(key, value):
-    """Store a value in cache with TTL."""
     _cache[key] = (value, _time.monotonic() + _CACHE_TTL)
 
 
 def _cache_invalidate(*keys):
-    """Remove specific cache entries (call after admin writes)."""
     for key in keys:
         _cache.pop(key, None)
+
 
 # Initialize Supabase client
 supabase: Client = None
@@ -38,6 +33,7 @@ if config.SUPABASE_URL and config.SUPABASE_KEY:
         print(f"ERROR: Failed to initialize Supabase client: {e}")
 else:
     print("WARNING: SUPABASE_URL and SUPABASE_KEY are not configured.")
+
 
 def init_db():
     """Verify connection and seed default services/exams/settings if tables are empty."""
@@ -68,59 +64,59 @@ def init_db():
 
 def _seed_default_services():
     defaults = [
-        ("cert", "Pramaan Patra (Certificates)", "Mool Niwas (Domicile)",          "Niwas praman patra",          "₹30"),
-        ("cert", "Pramaan Patra (Certificates)", "Jati Pramaan (Caste SC/ST/OBC)", "Jati praman patra",           "₹30"),
-        ("cert", "Pramaan Patra (Certificates)", "Aay Pramaan (Income)",            "Aay praman patra",            "₹30"),
-        ("cert", "Pramaan Patra (Certificates)", "Janma/Mrityu (Birth/Death)",      "Janm/mrityu praman",          "₹20"),
-        ("cert", "Pramaan Patra (Certificates)", "Vivah Panjiyan (Marriage)",        "Vivah panjiyan",              "₹50"),
-        ("cert", "Pramaan Patra (Certificates)", "Charitra Pramaan (Character)",    "Charitra praman patra",       "₹30"),
-        ("cert", "Pramaan Patra (Certificates)", "Minority Certificate",             "Alpasankhyak praman patra",   "₹30"),
-        ("cert", "Pramaan Patra (Certificates)", "EWS Certificate",                 "EWS praman patra",            "₹30"),
+        ("cert", "Pramaan Patra (Certificates)", "Mool Niwas (Domicile)",          "Niwas praman patra",          30.00),
+        ("cert", "Pramaan Patra (Certificates)", "Jati Pramaan (Caste SC/ST/OBC)", "Jati praman patra",           30.00),
+        ("cert", "Pramaan Patra (Certificates)", "Aay Pramaan (Income)",            "Aay praman patra",            30.00),
+        ("cert", "Pramaan Patra (Certificates)", "Janma/Mrityu (Birth/Death)",      "Janm/mrityu praman",          20.00),
+        ("cert", "Pramaan Patra (Certificates)", "Vivah Panjiyan (Marriage)",        "Vivah panjiyan",              50.00),
+        ("cert", "Pramaan Patra (Certificates)", "Charitra Pramaan (Character)",    "Charitra praman patra",       30.00),
+        ("cert", "Pramaan Patra (Certificates)", "Minority Certificate",             "Alpasankhyak praman patra",   30.00),
+        ("cert", "Pramaan Patra (Certificates)", "EWS Certificate",                 "EWS praman patra",            30.00),
 
-        ("id",   "Pehchan (IDs & Updates)",      "Aadhar Card (New/Update)",        "Aadhar naam/address update",  "₹50"),
-        ("id",   "Pehchan (IDs & Updates)",      "Jan Aadhar (New/Update)",         "Jan Aadhar card",             "₹0"),
-        ("id",   "Pehchan (IDs & Updates)",      "PAN Card (New/Correction)",       "Naye PAN ke liye apply",      "₹110"),
-        ("id",   "Pehchan (IDs & Updates)",      "Voter ID (New/Correction)",       "Voter ID banwao ya sudhar",   "₹0"),
-        ("id",   "Pehchan (IDs & Updates)",      "PVC Aadhar Card Print",           "PVC Aadhar card print",       "₹50"),
-        ("id",   "Pehchan (IDs & Updates)",      "SSO ID Creation",                 "Rajasthan SSO ID banao",      "₹0"),
-        ("id",   "Pehchan (IDs & Updates)",      "Ration Card Correction",          "Ration card mein sudhar",     "₹0"),
-        ("id",   "Pehchan (IDs & Updates)",      "Passport Apply",                  "Passport ke liye apply",      "₹1500"),
+        ("id",   "Pehchan (IDs & Updates)",      "Aadhar Card (New/Update)",        "Aadhar naam/address update",  50.00),
+        ("id",   "Pehchan (IDs & Updates)",      "Jan Aadhar (New/Update)",         "Jan Aadhar card",             0.00),
+        ("id",   "Pehchan (IDs & Updates)",      "PAN Card (New/Correction)",       "Naye PAN ke liye apply",      110.00),
+        ("id",   "Pehchan (IDs & Updates)",      "Voter ID (New/Correction)",       "Voter ID banwao ya sudhar",   0.00),
+        ("id",   "Pehchan (IDs & Updates)",      "PVC Aadhar Card Print",           "PVC Aadhar card print",       50.00),
+        ("id",   "Pehchan (IDs & Updates)",      "SSO ID Creation",                 "Rajasthan SSO ID banao",      0.00),
+        ("id",   "Pehchan (IDs & Updates)",      "Ration Card Correction",          "Ration card mein sudhar",     0.00),
+        ("id",   "Pehchan (IDs & Updates)",      "Passport Apply",                  "Passport ke liye apply",      1500.00),
 
-        ("bills","Bills, Recharge & Taxes",       "Bijli Bill (Electricity)",        "Bijli bill payment",          "Free"),
-        ("bills","Bills, Recharge & Taxes",       "Pani Bill (Water)",               "Pani bill payment",           "Free"),
-        ("bills","Bills, Recharge & Taxes",       "Mobile/DTH Recharge",             "Mobile ya DTH recharge",      "Free"),
-        ("bills","Bills, Recharge & Taxes",       "Gas Cylinder Booking",            "LPG cylinder booking",        "Free"),
-        ("bills","Bills, Recharge & Taxes",       "FASTag Recharge",                 "FASTag recharge",             "Free"),
-        ("bills","Bills, Recharge & Taxes",       "ITR (Income Tax Return)",         "Income tax return file karo", "₹200"),
-        ("bills","Bills, Recharge & Taxes",       "CM Helpline Sikayat",             "CM helpline complaint",       "Free"),
-        ("bills","Bills, Recharge & Taxes",       "Traffic Challan Pay",             "Traffic challan payment",     "Free"),
+        ("bills","Bills, Recharge & Taxes",       "Bijli Bill (Electricity)",        "Bijli bill payment",          0.00),
+        ("bills","Bills, Recharge & Taxes",       "Pani Bill (Water)",               "Pani bill payment",           0.00),
+        ("bills","Bills, Recharge & Taxes",       "Mobile/DTH Recharge",             "Mobile ya DTH recharge",      0.00),
+        ("bills","Bills, Recharge & Taxes",       "Gas Cylinder Booking",            "LPG cylinder booking",        0.00),
+        ("bills","Bills, Recharge & Taxes",       "FASTag Recharge",                 "FASTag recharge",             0.00),
+        ("bills","Bills, Recharge & Taxes",       "ITR (Income Tax Return)",         "Income tax return file karo", 200.00),
+        ("bills","Bills, Recharge & Taxes",       "CM Helpline Sikayat",             "CM helpline complaint",       0.00),
+        ("bills","Bills, Recharge & Taxes",       "Traffic Challan Pay",             "Traffic challan payment",     0.00),
 
-        ("forms","Siksha & Exams (Forms)",        "Govt. Job Form (RPSC/RSMSSB)",   "Sarkari naukri form",         "₹100"),
-        ("forms","Siksha & Exams (Forms)",        "College Admission Form",          "College admission form",      "₹50"),
-        ("forms","Siksha & Exams (Forms)",        "Scholarship (Chatravriti)",       "Chatravriti ke liye apply",   "Free"),
-        ("forms","Siksha & Exams (Forms)",        "RTE Form (Free Education)",       "RTE ke liye form",            "Free"),
-        ("forms","Siksha & Exams (Forms)",        "Gargi Puraskar Form",             "Gargi puraskar form",         "Free"),
-        ("forms","Siksha & Exams (Forms)",        "REET/CET/Police Form",            "REET, CET, Police form",      "₹100"),
-        ("forms","Siksha & Exams (Forms)",        "Rojgar Panjiyan",                 "Rachayment panjiyan",         "Free"),
-        ("forms","Siksha & Exams (Forms)",        "Berojgari Bhatta",                "Berojgari bhatta ke liye",    "Free"),
+        ("forms","Siksha & Exams (Forms)",        "Govt. Job Form (RPSC/RSMSSB)",   "Sarkari naukri form",         100.00),
+        ("forms","Siksha & Exams (Forms)",        "College Admission Form",          "College admission form",      50.00),
+        ("forms","Siksha & Exams (Forms)",        "Scholarship (Chatravriti)",       "Chatravriti ke liye apply",   0.00),
+        ("forms","Siksha & Exams (Forms)",        "RTE Form (Free Education)",       "RTE ke liye form",            0.00),
+        ("forms","Siksha & Exams (Forms)",        "Gargi Puraskar Form",             "Gargi puraskar form",         0.00),
+        ("forms","Siksha & Exams (Forms)",        "REET/CET/Police Form",            "REET, CET, Police form",      100.00),
+        ("forms","Siksha & Exams (Forms)",        "Rojgar Panjiyan",                 "Rachayment panjiyan",         0.00),
+        ("forms","Siksha & Exams (Forms)",        "Berojgari Bhatta",                "Berojgari bhatta ke liye",    0.00),
 
-        ("schemes","Yojana & Pension",            "Vridhavastha Pension",            "Budhape ki pension",          "Free"),
-        ("schemes","Yojana & Pension",            "Vidhwa Pension",                  "Vidhwa pension",              "Free"),
-        ("schemes","Yojana & Pension",            "Viklang Pension",                 "Viklang pension",             "Free"),
-        ("schemes","Yojana & Pension",            "Palanhar Yojana",                 "Palanhar yojana form",        "Free"),
-        ("schemes","Yojana & Pension",            "Shramik/Labour Card",             "Shramik card banao",          "Free"),
-        ("schemes","Yojana & Pension",            "PM Awas Yojana",                  "PM Awas yojana",              "Free"),
-        ("schemes","Yojana & Pension",            "PM Kisaan Samman Nidhi",          "PM Kisaan samman nidhi",      "Free"),
-        ("schemes","Yojana & Pension",            "Ayushman/Chiranjeevi Card",       "Ayushman card banao",         "Free"),
+        ("schemes","Yojana & Pension",            "Vridhavastha Pension",            "Budhape ki pension",          0.00),
+        ("schemes","Yojana & Pension",            "Vidhwa Pension",                  "Vidhwa pension",              0.00),
+        ("schemes","Yojana & Pension",            "Viklang Pension",                 "Viklang pension",             0.00),
+        ("schemes","Yojana & Pension",            "Palanhar Yojana",                 "Palanhar yojana form",        0.00),
+        ("schemes","Yojana & Pension",            "Shramik/Labour Card",             "Shramik card banao",          0.00),
+        ("schemes","Yojana & Pension",            "PM Awas Yojana",                  "PM Awas yojana",              0.00),
+        ("schemes","Yojana & Pension",            "PM Kisaan Samman Nidhi",          "PM Kisaan samman nidhi",      0.00),
+        ("schemes","Yojana & Pension",            "Ayushman/Chiranjeevi Card",       "Ayushman card banao",         0.00),
 
-        ("land_auto","Krishi, Khata & Vahan",    "Khasra/Jamabandi Nakal",          "Khasra/jamabandi nakal",      "₹20"),
-        ("land_auto","Krishi, Khata & Vahan",    "Tarbandi Subsidy",                "Tarbandi subsidy",            "Free"),
-        ("land_auto","Krishi, Khata & Vahan",    "Fasal Bima (Crop Insurance)",     "Fasal bima",                  "Free"),
-        ("land_auto","Krishi, Khata & Vahan",    "Krishi Yantra Subsidy",           "Krishi yantra subsidy",       "Free"),
-        ("land_auto","Krishi, Khata & Vahan",    "Driving License (DL)",            "DL banao ya renew karo",      "₹200"),
-        ("land_auto","Krishi, Khata & Vahan",    "Vahan RC Print/Transfer",         "RC print ya transfer",        "₹100"),
-        ("land_auto","Krishi, Khata & Vahan",    "Police Verification",             "Police verification",         "₹50"),
-        ("land_auto","Krishi, Khata & Vahan",    "Hasiyat Pramaan (Solvency)",      "Hasiyat praman patra",        "₹30"),
+        ("land_auto","Krishi, Khata & Vahan",    "Khasra/Jamabandi Nakal",          "Khasra/jamabandi nakal",      20.00),
+        ("land_auto","Krishi, Khata & Vahan",    "Tarbandi Subsidy",                "Tarbandi subsidy",            0.00),
+        ("land_auto","Krishi, Khata & Vahan",    "Fasal Bima (Crop Insurance)",     "Fasal bima",                  0.00),
+        ("land_auto","Krishi, Khata & Vahan",    "Krishi Yantra Subsidy",           "Krishi yantra subsidy",       0.00),
+        ("land_auto","Krishi, Khata & Vahan",    "Driving License (DL)",            "DL banao ya renew karo",      200.00),
+        ("land_auto","Krishi, Khata & Vahan",    "Vahan RC Print/Transfer",         "RC print ya transfer",        100.00),
+        ("land_auto","Krishi, Khata & Vahan",    "Police Verification",             "Police verification",         50.00),
+        ("land_auto","Krishi, Khata & Vahan",    "Hasiyat Pramaan (Solvency)",      "Hasiyat praman patra",        30.00),
     ]
     rows = []
     for i, row in enumerate(defaults):
@@ -166,7 +162,7 @@ def _seed_default_exams():
 def _seed_default_settings():
     defaults = [
         {"key": "welcome_message",      "value": "🙏 Namaste! Krishna Emitra Seva mein aapka swagat hai.\n\nPehle apna mobile number share karein taaki hum aapko updates bhi bhej sakein:\n(Neeche button dabayein)"},
-        {"key": "exam_confirm_message", "value": "✅ Aapka exam {exam} set ho gaya hai!\n\nAb aap exam se related updates seedhe yahan paayenge."},
+        {"key": "exam_confirm_message", "value": "✅ Aapke subscribed exams save ho gaye hain!"},
         {"key": "unsubscribe_message",  "value": "😢 Aapko Krishna Emitra notifications se unsubscribe kar diya gaya hai.\n\nWapas subscribe karne ke liye /start karein."},
         {"key": "bot_name",             "value": "Krishna Emitra Seva"},
         {"key": "language",             "value": "hinglish"},
@@ -175,270 +171,327 @@ def _seed_default_settings():
     supabase.table("bot_settings").insert(defaults).execute()
 
 
-# ── Student helpers ──────────────────────────────────────────────────────────
+# ── User Helpers ─────────────────────────────────────────────────────────────
+
+def get_user_by_telegram_id(telegram_id):
+    res = supabase.table("users").select("*").eq("telegram_id", str(telegram_id)).execute()
+    return res.data[0] if res.data else None
+
+
+def get_user_by_phone(phone):
+    clean_phone = phone.strip().lstrip('+').lstrip('91')[-10:]
+    pattern = f"%{clean_phone}"
+    res = supabase.table("users").select("*").ilike("phone", pattern).execute()
+    return res.data[0] if res.data else None
+
+
+def get_user_by_id(user_id):
+    res = supabase.table("users").select("*").eq("id", user_id).execute()
+    return res.data[0] if res.data else None
+
+
+def get_student(telegram_id):
+    """Alias for backwards compatibility with bot/main.py"""
+    user = get_user_by_telegram_id(telegram_id)
+    if user:
+        # Map for backwards compatibility
+        user["phone_number"] = user["phone"]
+        subs = get_user_exam_subscriptions(user["id"])
+        user["exam_preference"] = subs[0] if subs else "NONE"
+    return user
+
 
 def is_new_user(telegram_id):
-    res = supabase.table("students").select("telegram_id").eq("telegram_id", str(telegram_id)).execute()
-    return len(res.data) == 0
+    return get_user_by_telegram_id(telegram_id) is None
 
 
 def register_user(telegram_id, name, username):
-    """Bot registration: uses upsert to avoid a separate is_new_user check.
-    If the user already exists, this is a no-op (does not overwrite existing data)."""
+    """Bot registration: upsert a student profile record."""
     try:
-        supabase.table("students").upsert({
-            "telegram_id": str(telegram_id),
-            "name": name,
-            "username": username,
-            "phone_number": f"BOT_TEMP_{telegram_id}",
-            "is_registered": 1
-        }, on_conflict="telegram_id", ignore_duplicates=True).execute()
-    except Exception:
-        pass  # User already exists — safe to ignore
+        user = get_user_by_telegram_id(telegram_id)
+        if not user:
+            supabase.table("users").insert({
+                "telegram_id": str(telegram_id),
+                "name": name,
+                "username": username,
+                "phone": f"BOT_TEMP_{telegram_id}",
+                "is_telegram_linked": True
+            }).execute()
+    except Exception as e:
+        print(f"Error registering Telegram user: {e}")
 
 
 def register_student_web(name, phone_number, exam_pref):
-    """Public Website registration: no telegram_id yet."""
+    """Public Website registration: creates/registers a user."""
     try:
-        res = supabase.table("students").insert({
-            "name": name,
-            "phone_number": phone_number,
-            "exam_preference": exam_pref,
-            "is_registered": 1
-        }).execute()
-        return True, res.data[0]["id"]
+        # Check if already exists
+        existing = get_user_by_phone(phone_number)
+        if existing:
+            # Update name if guest
+            if existing.get("name") == "Web Guest":
+                supabase.table("users").update({"name": name}).eq("id", existing["id"]).execute()
+            user_id = existing["id"]
+        else:
+            res = supabase.table("users").insert({
+                "name": name,
+                "phone": phone_number,
+                "role": "student"
+            }).execute()
+            user_id = res.data[0]["id"]
+
+        if exam_pref and exam_pref != "NONE":
+            update_user_exam_subscriptions(user_id, [exam_pref])
+
+        return True, user_id
     except Exception as e:
-        return False, f"Phone number already registered or error: {str(e)}"
+        return False, f"Error: {str(e)}"
 
 
 def add_student_admin(name, phone_number, exam_pref="NONE"):
-    """Admin-initiated manual student addition. Bypasses Telegram requirement."""
+    """Admin-initiated manual student addition."""
     try:
-        res = supabase.table("students").insert({
+        existing = get_user_by_phone(phone_number)
+        if existing:
+            return False, "A user with this phone number already exists."
+        
+        res = supabase.table("users").insert({
             "name": name.strip(),
-            "phone_number": phone_number.strip(),
-            "exam_preference": exam_pref or "NONE",
-            "is_registered": 1
+            "phone": phone_number.strip(),
+            "role": "student"
         }).execute()
-        return True, res.data[0]["id"]
+        user_id = res.data[0]["id"]
+
+        if exam_pref and exam_pref != "NONE":
+            update_user_exam_subscriptions(user_id, [exam_pref])
+            
+        return True, user_id
     except Exception as e:
-        return False, f"A student with this phone number already exists or error: {str(e)}"
+        return False, str(e)
 
 
 def update_phone_number(telegram_id, phone_number):
-    now_str = datetime.utcnow().isoformat()
-    # Clean phone number to exactly the last 10 digits to match website registration format
+    """Verify & link phone from bot contact button."""
     clean_phone = phone_number.strip().replace(" ", "").replace("-", "")
     if clean_phone.startswith("+"):
         clean_phone = clean_phone[1:]
     if len(clean_phone) > 10 and (clean_phone.startswith("91") or clean_phone.startswith("091")):
         clean_phone = clean_phone[-10:]
-    elif len(clean_phone) > 10:
-        clean_phone = clean_phone[-10:]
-        
-    # 1. Check if there is an existing student record with this phone number (e.g., from web registration)
-    try:
-        res = supabase.table("students").select("*").eq("phone_number", clean_phone).execute()
-        existing = res.data[0] if res.data else None
-    except Exception as e:
-        print(f"Error checking existing student by phone: {e}")
-        existing = None
+    
+    # Find user linked to telegram
+    tg_user = get_user_by_telegram_id(telegram_id)
+    # Find user linked to phone
+    phone_user = get_user_by_phone(clean_phone)
 
-    if existing:
-        # If an existing student record is found with the same phone number
-        existing_tg_id = existing.get("telegram_id")
-        if not existing_tg_id or existing_tg_id != str(telegram_id):
-            try:
-                # 1. Delete the temporary student record first to release the telegram_id unique constraint
-                supabase.table("students").delete().eq("telegram_id", str(telegram_id)).neq("id", existing["id"]).execute()
-                
-                # 2. Merge the records: Associate the existing row with this telegram_id
-                supabase.table("students").update({
-                    "telegram_id": str(telegram_id),
-                    "last_active": now_str,
-                    "is_registered": 1
-                }).eq("id", existing["id"]).execute()
-                
-                # 3. Backport telegram_id to past service requests
-                supabase.table("service_requests").update({"telegram_id": str(telegram_id)}).eq("phone_number", clean_phone).execute()
-            except Exception as e:
-                print(f"Error merging student rows: {e}")
-        return
+    if tg_user and phone_user and tg_user["id"] != phone_user["id"]:
+        # Merge: Phone user wins, delete temporary Telegram user
+        try:
+            # Delete temp user
+            supabase.table("users").delete().eq("id", tg_user["id"]).execute()
+            # Link phone user to telegram
+            supabase.table("users").update({
+                "telegram_id": str(telegram_id),
+                "is_telegram_linked": True
+            }).eq("id", phone_user["id"]).execute()
+            
+            # Backport service requests
+            supabase.table("service_requests").update({"user_id": phone_user["id"]}).eq("user_id", tg_user["id"]).execute()
+        except Exception as e:
+            print(f"Error merging users: {e}")
+    elif tg_user:
+        # Safe update
+        try:
+            supabase.table("users").update({
+                "phone": clean_phone
+            }).eq("id", tg_user["id"]).execute()
+        except Exception as e:
+            print(f"Error updating phone: {e}")
 
-    # 2. If no duplicate exists, update the current student row with the phone number
+
+# ── Exam Subscriptions Helpers ────────────────────────────────────────────────
+
+def get_user_exam_subscriptions(user_id):
+    res = supabase.table("user_exam_subscriptions")\
+        .select("exams(name)")\
+        .eq("user_id", user_id)\
+        .execute()
+    return [row["exams"]["name"] for row in res.data if row.get("exams")]
+
+
+def update_user_exam_subscriptions(user_id, exam_names):
+    """Sync user's many-to-many exam subscriptions."""
     try:
-        supabase.table("students").update({
-            "phone_number": clean_phone,
-            "last_active": now_str
-        }).eq("telegram_id", str(telegram_id)).execute()
+        # Delete old subscriptions
+        supabase.table("user_exam_subscriptions").delete().eq("user_id", user_id).execute()
         
-        # Backport telegram_id to past service requests
-        supabase.table("service_requests").update({"telegram_id": str(telegram_id)}).eq("phone_number", clean_phone).execute()
+        if not exam_names or "NONE" in exam_names:
+            return
+            
+        # Get matching exam ids
+        exams_res = supabase.table("exams").select("id,name").in_("name", exam_names).execute()
+        exam_ids = [e["id"] for e in exams_res.data]
+        
+        if exam_ids:
+            rows = [{"user_id": user_id, "exam_id": eid} for eid in exam_ids]
+            supabase.table("user_exam_subscriptions").insert(rows).execute()
     except Exception as e:
-        print(f"Error updating phone number/backporting requests: {e}")
+        print(f"Error syncing subscriptions: {e}")
 
 
 def update_exam_preference(telegram_id, exam):
-    now_str = datetime.utcnow().isoformat()
-    supabase.table("students").update({
-        "exam_preference": exam,
-        "is_registered": 1,
-        "last_active": now_str
-    }).eq("telegram_id", str(telegram_id)).execute()
+    """Backwards compatibility for Bot: links single preference."""
+    user = get_user_by_telegram_id(telegram_id)
+    if user:
+        update_user_exam_subscriptions(user["id"], [exam])
 
 
 def update_student_category(student_id, category):
-    """Update exam preference by primary key ID (useful for manually added students)."""
-    now_str = datetime.utcnow().isoformat()
-    supabase.table("students").update({
-        "exam_preference": category,
-        "last_active": now_str
-    }).eq("id", student_id).execute()
-
-
-def get_student(telegram_id):
-    """Fetch a single student by telegram_id."""
-    res = supabase.table("students").select("*").eq("telegram_id", str(telegram_id)).execute()
-    return res.data[0] if res.data else None
+    """Backwards compatibility for Admin: updates preference."""
+    update_user_exam_subscriptions(student_id, [category])
 
 
 def get_students_by_exam(exam):
-    """
-    Returns students to notify for a given exam target.
-    - exam = "ALL"  → everyone who has selected ANY exam (excludes NONE and BLOCKED)
-    - exam = "JEE"  → JEE students + students who opted into ALL
-    """
+    """Returns users subscribed to a given exam (or all students if 'ALL')."""
     if exam == "ALL":
-        res = supabase.table("students").select("*")\
-            .neq("exam_preference", "NONE")\
-            .neq("exam_preference", "BLOCKED")\
-            .execute()
-    else:
-        res = supabase.table("students").select("*")\
-            .or_(f"exam_preference.eq.{exam},exam_preference.eq.ALL")\
-            .execute()
-    return res.data
-
-
-def get_announcements(limit=5):
-    """Fetch latest active announcements for the website ticker."""
-    res = supabase.table("announcements").select("*")\
-        .eq("is_active", 1)\
-        .order("created_at", desc=True)\
-        .limit(limit)\
+        res = supabase.table("users").select("*").neq("role", "admin").execute()
+        return res.data
+    
+    # Retrieve exam id
+    exam_res = supabase.table("exams").select("id").eq("name", exam).execute()
+    if not exam_res.data:
+        return []
+    eid = exam_res.data[0]["id"]
+    
+    # Find matching users
+    res = supabase.table("user_exam_subscriptions")\
+        .select("users(*)")\
+        .eq("exam_id", eid)\
         .execute()
-    return res.data
+    return [row["users"] for row in res.data if row.get("users")]
 
 
-def get_student_history(identifier):
-    """
-    Fetch request history for a student by identifier (phone or email).
-    Works for both:
-    - Web users: phone_number stored directly in service_requests via log_service_intent.
-    - Bot users: telegram_id stored in service_requests; we join via students table.
-    """
-    if "@" in identifier:
-        return [] # service_requests table currently doesn't store email, so return empty for email identifiers
-
-    clean_phone = identifier.strip().lstrip('+').lstrip('91')[-10:]
-    pattern = f"%{clean_phone}"
+def get_students_paginated(exam="ALL", page=1, limit=20, search=""):
+    start = (page - 1) * limit
+    end = start + limit - 1
     
-    # First, let's find the student's telegram_id if they exist
-    students_res = supabase.table("students").select("telegram_id").ilike("phone_number", pattern).execute()
-    telegram_ids = [s["telegram_id"] for s in students_res.data if s.get("telegram_id")]
+    # Build join selection
+    query = supabase.table("users").select("*, user_exam_subscriptions(exams(name))", count="exact").neq("role", "admin")
     
-    # Query service requests with ID, category, status, requested_at, completed_at
-    query = supabase.table("service_requests").select("id,service_name,category,status,requested_at,completed_at")
-    if telegram_ids:
-        # Create an OR condition
-        tg_filters = ",".join(f"telegram_id.eq.{tid}" for tid in telegram_ids)
-        query = query.or_(f"phone_number.ilike.{pattern},{tg_filters}")
-    else:
-        query = query.ilike("phone_number", pattern)
+    if search:
+        pattern = f"%{search}%"
+        query = query.or_(f"name.ilike.{pattern},phone.ilike.{pattern},telegram_id.ilike.{pattern},username.ilike.{pattern}")
         
-    res = query.order("requested_at", desc=True).limit(20).execute()
-    return res.data
+    res = query.order("created_at", desc=True).range(start, end).execute()
+    total = res.count if res.count is not None else len(res.data)
+    
+    records = []
+    for row in (res.data or []):
+        subs = [sub["exams"]["name"] for sub in row.get("user_exam_subscriptions", []) if sub.get("exams")]
+        records.append({
+            "id": row["id"],
+            "telegram_id": row["telegram_id"],
+            "name": row["name"],
+            "phone_number": row["phone"],
+            "username": row["username"],
+            "exam_preference": ", ".join(subs) if subs else "NONE",
+            "created_at": row["created_at"]
+        })
+        
+    # Optional exam filter in memory if specified
+    if exam != "ALL":
+        records = [r for r in records if exam in r["exam_preference"]]
+        total = len(records)
+        
+    return records, total
 
 
 def get_all_students():
-    """Returns every student (for admin listing, includes NONE)."""
-    res = supabase.table("students").select("*").order("joined_at", desc=True).execute()
-    return res.data
+    res = supabase.table("users").select("*").neq("role", "admin").order("created_at", desc=True).execute()
+    records = []
+    for row in res.data:
+        subs = get_user_exam_subscriptions(row["id"])
+        row["phone_number"] = row["phone"]
+        row["exam_preference"] = ", ".join(subs) if subs else "NONE"
+        records.append(row)
+    return records
 
 
 def block_student(telegram_id):
-    """Marks a student as blocked — they stay in DB but won't receive broadcasts."""
-    supabase.table("students").update({
-        "exam_preference": "BLOCKED",
-        "is_registered": 0
-    }).eq("telegram_id", str(telegram_id)).execute()
+    user = get_user_by_telegram_id(telegram_id)
+    if user:
+        update_user_exam_subscriptions(user["id"], ["BLOCKED"])
 
 
 def delete_student(telegram_id):
-    """Permanently removes a student and all their associated data."""
-    tid = str(telegram_id)
-    supabase.table("service_requests").delete().eq("telegram_id", tid).execute()
-    supabase.table("user_documents").delete().eq("telegram_id", tid).execute()
-    supabase.table("students").delete().eq("telegram_id", tid).execute()
+    user = get_user_by_telegram_id(telegram_id)
+    if user:
+        supabase.table("users").delete().eq("id", user["id"]).execute()
 
 
 def get_stats():
-    # Count total
-    total_res = supabase.table("students").select("id", count="exact").execute()
+    total_res = supabase.table("users").select("id", count="exact").neq("role", "admin").execute()
     total = total_res.count if total_res.count is not None else 0
     
-    # Fetch all exam names dynamically to initialize the counts
+    by_exam = {}
     try:
         exams_res = supabase.table("exams").select("name").execute()
-        by_exam = {exam["name"]: 0 for exam in (exams_res.data or [])}
-    except Exception as e:
-        print(f"Error fetching exams for stats: {e}")
-        by_exam = {}
+        for e in exams_res.data:
+            by_exam[e["name"]] = 0
+    except Exception:
+        pass
         
     by_exam["ALL"] = 0
     by_exam["NONE"] = 0
     by_exam["BLOCKED"] = 0
     
-    # Fetch all students to count by exam preference in Python
-    students = supabase.table("students").select("exam_preference").execute().data
-    for s in students:
-        pref = s.get("exam_preference") or "NONE"
-        if pref in by_exam:
-            by_exam[pref] += 1
-        else:
-            by_exam[pref] = 1
-            
+    res = supabase.table("user_exam_subscriptions").select("exams(name)").execute()
+    for row in (res.data or []):
+        if row.get("exams"):
+            name = row["exams"]["name"]
+            by_exam[name] = by_exam.get(name, 0) + 1
+
     return {"total_students": total, "by_exam": by_exam}
 
 
 def get_public_stats():
-    """Returns a slightly padded count for marketing purposes if real count is low."""
     stats = get_stats()
     real_total = stats["total_students"]
     display_total = max(real_total, 4000) if real_total < 4000 else real_total
     return {"total_students": display_total, "is_growing": real_total < 4000}
 
 
-# ── Message log helpers ──────────────────────────────────────────────────────
+# ── Message log & Broadcast helpers ──────────────────────────────────────────
 
 def log_message(target_exam, message_text, count):
+    # Retrieve exam ID
+    eid = None
+    if target_exam != "ALL":
+        ex_res = supabase.table("exams").select("id").eq("name", target_exam).execute()
+        if ex_res.data:
+            eid = ex_res.data[0]["id"]
+            
     supabase.table("message_logs").insert({
-        "target_exam": target_exam,
+        "exam_id": eid,
         "message_text": message_text,
         "total_recipients": count
     }).execute()
 
 
 def get_logs():
-    res = supabase.table("message_logs").select("*").order("sent_at", desc=True).execute()
-    return res.data
+    res = supabase.table("message_logs").select("*, exams(name)").order("sent_at", desc=True).execute()
+    records = []
+    for row in res.data:
+        records.append({
+            "id": row["id"],
+            "target_exam": row["exams"]["name"] if row.get("exams") else "ALL",
+            "message_text": row["message_text"],
+            "total_recipients": row["total_recipients"],
+            "sent_at": row["sent_at"]
+        })
+    return records
 
 
 def get_public_news(limit=6):
-    """Returns latest admin broadcasted messages as public news items.
-    Strips excessively long messages to a preview length for the sidebar."""
-    res = supabase.table("message_logs").select("id,target_exam,message_text,total_recipients,sent_at")\
-        .order("sent_at", desc=True).limit(limit).execute()
+    res = supabase.table("message_logs").select("*, exams(name)").order("sent_at", desc=True).limit(limit).execute()
     news = []
     for row in res.data:
         text = row.get("message_text") or ""
@@ -448,86 +501,135 @@ def get_public_news(limit=6):
             "id": row["id"],
             "message": text,
             "preview": text[:120] + ("..." if len(text) > 120 else ""),
-            "exam": row["target_exam"],
+            "exam": row["exams"]["name"] if row.get("exams") else "ALL",
             "recipients": row["total_recipients"],
             "sent_at": row["sent_at"],
         })
     return news
 
 
-# ── Service Request helpers ──────────────────────────────────────────────────
+def create_broadcast_job(job_id, target_exam, total_count):
+    eid = None
+    if target_exam != "ALL":
+        ex_res = supabase.table("exams").select("id").eq("name", target_exam).execute()
+        if ex_res.data:
+            eid = ex_res.data[0]["id"]
+            
+    supabase.table("broadcast_jobs").insert({
+        "id": str(job_id),
+        "target_exam_id": eid,
+        "total_count": total_count,
+        "status": "queued"
+    }).execute()
+
+
+def update_broadcast_status(job_id, status, sent_count=None, error_msg=None):
+    now_str = datetime.utcnow().isoformat()
+    updates = {"status": status, "updated_at": now_str}
+    if sent_count is not None:
+        updates["sent_count"] = sent_count
+    if error_msg is not None:
+        updates["error_msg"] = error_msg
+    if status == "running" and not _cache_get(f"broadcast_start:{job_id}"):
+        updates["started_at"] = now_str
+        _cache_set(f"broadcast_start:{job_id}", True)
+    elif status in ["done", "error"]:
+        updates["finished_at"] = now_str
+        
+    supabase.table("broadcast_jobs").update(updates).eq("id", str(job_id)).execute()
+
+
+def get_broadcast_status(job_id):
+    res = supabase.table("broadcast_jobs").select("*, exams(name)").eq("id", str(job_id)).execute()
+    if not res.data:
+        return None
+    row = res.data[0]
+    return {
+        "id": row["id"],
+        "status": row["status"],
+        "sent": row["sent_count"],
+        "total": row["total_count"],
+        "exam": row["exams"]["name"] if row.get("exams") else "ALL",
+        "error": row["error_msg"],
+        "updated_at": row["updated_at"]
+    }
+
+
+def add_notification_history(user_id, broadcast_id, status, error=None):
+    try:
+        supabase.table("notification_history").insert({
+            "user_id": user_id,
+            "broadcast_id": broadcast_id,
+            "status": status,
+            "error": error
+        }).execute()
+    except Exception as e:
+        print(f"Error logging notification history: {e}")
+
+
+# ── Service Request Helpers ──────────────────────────────────────────────────
+
+def get_service_by_name(name):
+    res = supabase.table("services").select("id").eq("name", name).execute()
+    return res.data[0]["id"] if res.data else None
+
 
 def add_service_request(telegram_id, service_name, category):
+    user = get_user_by_telegram_id(telegram_id)
+    if not user:
+        return None
+    sid = get_service_by_name(service_name)
     res = supabase.table("service_requests").insert({
-        "telegram_id": str(telegram_id),
-        "service_name": service_name,
-        "category": category
+        "user_id": user["id"],
+        "service_id": sid,
+        "status": "pending"
     }).execute()
     return res.data[0]["id"]
 
 
 def log_service_intent(phone_number, service_name, category):
-    """Logs an application intent from the web (before user goes to WhatsApp)."""
+    # Lookup or create Web Guest
+    user = get_user_by_phone(phone_number)
+    if not user:
+        res_usr = supabase.table("users").insert({
+            "name": "Web Guest",
+            "phone": phone_number
+        }).execute()
+        uid = res_usr.data[0]["id"]
+    else:
+        uid = user["id"]
+        
+    sid = get_service_by_name(service_name)
     res = supabase.table("service_requests").insert({
-        "phone_number": phone_number,
-        "service_name": service_name,
-        "category": category,
+        "user_id": uid,
+        "service_id": sid,
         "status": "pending"
     }).execute()
     return res.data[0]["id"]
 
 
 def get_service_requests(status=None):
-    """Fetch service requests with student info via manual memory join (bypasses missing FK relation)."""
-    query = supabase.table("service_requests").select(
-        "id,telegram_id,phone_number,service_name,category,status,requested_at,completed_at"
-    )
+    query = supabase.table("service_requests").select("*, users(*), services(*)")
     if status:
         res = query.eq("status", status).order("requested_at", desc=True).execute()
     else:
         res = query.order("requested_at", desc=True).execute()
         
-    requests_data = res.data or []
-    if not requests_data:
-        return []
-
-    # Batch fetch matching student details using unique telegram_ids
-    telegram_ids = list(set(row["telegram_id"] for row in requests_data if row.get("telegram_id")))
-    
-    students_map = {}
-    if telegram_ids:
-        try:
-            student_res = supabase.table("students").select("telegram_id,name,phone_number,username").in_("telegram_id", telegram_ids).execute()
-            for s in (student_res.data or []):
-                if s.get("telegram_id"):
-                    students_map[s["telegram_id"]] = s
-        except Exception as e:
-            print(f"Error fetching students for join: {e}")
-            
     records = []
-    for row in requests_data:
-        tid = row.get("telegram_id")
-        student = students_map.get(tid) if tid else None
-        
-        # Parse name & phone if saved in format "Name | Phone" for anonymous web requests
-        phone_raw = row.get("phone_number") or ""
-        parsed_name = None
-        if " | " in phone_raw:
-            parts = phone_raw.split(" | ", 1)
-            parsed_name = parts[0].strip()
-            phone_raw = parts[1].strip()
-
+    for row in (res.data or []):
+        usr = row.get("users") or {}
+        svc = row.get("services") or {}
         records.append({
             "id": row["id"],
-            "telegram_id": row["telegram_id"],
-            "service_name": row["service_name"],
-            "category": row["category"],
+            "telegram_id": usr.get("telegram_id"),
+            "service_name": svc.get("name", "Unknown"),
+            "category": svc.get("category_label", "Other"),
             "status": row["status"],
             "requested_at": row["requested_at"],
             "completed_at": row["completed_at"],
-            "student_name": student.get("name") if student else (parsed_name or "Unknown"),
-            "student_phone": (student.get("phone_number") if student else None) or phone_raw,
-            "student_username": student.get("username") if student else ""
+            "student_name": usr.get("name", "Unknown"),
+            "student_phone": usr.get("phone", ""),
+            "student_username": usr.get("username", "")
         })
     return records
 
@@ -545,23 +647,102 @@ def complete_service_request(request_id):
     }).eq("id", request_id).execute()
 
 
+def get_service_requests_paginated(status=None, page=1, limit=20):
+    start = (page - 1) * limit
+    end = start + limit - 1
+    
+    query = supabase.table("service_requests").select("*, users(*), services(*)", count="exact")
+    if status:
+        query = query.eq("status", status)
+        
+    res = query.order("requested_at", desc=True).range(start, end).execute()
+    total = res.count if res.count is not None else len(res.data)
+    
+    records = []
+    for row in (res.data or []):
+        usr = row.get("users") or {}
+        svc = row.get("services") or {}
+        records.append({
+            "id": row["id"],
+            "telegram_id": usr.get("telegram_id"),
+            "service_name": svc.get("name", "Unknown"),
+            "category": svc.get("category_label", "Other"),
+            "status": row["status"],
+            "requested_at": row["requested_at"],
+            "completed_at": row["completed_at"],
+            "student_name": usr.get("name", "Unknown"),
+            "student_phone": usr.get("phone", ""),
+            "student_username": usr.get("username", "")
+        })
+    return records, total
+
+
+def get_student_history(identifier):
+    """Returns requests and applications history combined for a user."""
+    user = None
+    if "@" in identifier:
+        # Suppress email checks or query user by email from Clerk
+        return []
+    else:
+        user = get_user_by_phone(identifier)
+        if not user:
+            # Check by Telegram ID
+            try:
+                user = get_user_by_telegram_id(int(identifier))
+            except ValueError:
+                user = get_user_by_telegram_id(identifier)
+                
+    if not user:
+        return []
+
+    res = supabase.table("service_requests")\
+        .select("id, status, requested_at, completed_at, services(name, category_label)")\
+        .eq("user_id", user["id"])\
+        .order("requested_at", desc=True)\
+        .limit(20)\
+        .execute()
+        
+    history = []
+    for row in res.data:
+        svc = row.get("services") or {}
+        history.append({
+            "id": row["id"],
+            "service_name": svc.get("name", "Unknown"),
+            "category": svc.get("category_label", "Other"),
+            "status": row["status"],
+            "requested_at": row["requested_at"],
+            "completed_at": row["completed_at"]
+        })
+    return history
+
+
 # ── Document Handling ────────────────────────────────────────────────────────
 
 def save_document(telegram_id, file_id, file_type, file_name=""):
-    supabase.table("user_documents").insert({
-        "telegram_id": str(telegram_id),
-        "file_id": str(file_id),
-        "file_type": str(file_type),
-        "file_name": str(file_name)
-    }).execute()
+    user = get_user_by_telegram_id(telegram_id)
+    if user:
+        supabase.table("user_documents").insert({
+            "user_id": user["id"],
+            "file_id": str(file_id),
+            "file_type": str(file_type),
+            "file_name": str(file_name)
+        }).execute()
 
 
 def get_user_documents(telegram_id):
+    user = get_user_by_telegram_id(telegram_id)
+    if not user:
+        return []
     res = supabase.table("user_documents").select("*")\
-        .eq("telegram_id", str(telegram_id))\
+        .eq("user_id", user["id"])\
         .order("uploaded_at", desc=True)\
         .execute()
     return res.data
+
+
+def get_document_url(file_id):
+    # Lookup file details if needed - backwards compatibility shim
+    return {"file_id": file_id}
 
 
 # ── Bot Settings CRUD ────────────────────────────────────────────────────────
@@ -589,7 +770,6 @@ def set_bot_setting(key, value):
 
 
 def set_bot_settings_bulk(settings_dict):
-    """Upsert multiple settings at once."""
     rows = [{"key": str(k), "value": str(v)} for k, v in settings_dict.items()]
     if rows:
         supabase.table("bot_settings").upsert(rows).execute()
@@ -600,7 +780,6 @@ def set_bot_settings_bulk(settings_dict):
 # ── Services CRUD ─────────────────────────────────────────────────────────────
 
 def get_all_services():
-    """Returns all services ordered by category and sort_order."""
     res = supabase.table("services").select("*")\
         .order("sort_order", desc=False)\
         .order("id", desc=False)\
@@ -630,7 +809,7 @@ def get_services_as_dict():
         result[key]["services"].append({
             "name": row["name"],
             "description": row["description"],
-            "price": row["price"]
+            "price": f"₹{row['price']:.2f}"
         })
     _cache_set("services_dict", result)
     return result
@@ -658,13 +837,13 @@ def get_public_services_as_dict():
         result[key]["services"].append({
             "name": row["name"],
             "description": row["description"],
-            "price": row["price"]
+            "price": f"₹{row['price']:.2f}"
         })
     _cache_set("public_services_dict", result)
     return result
 
 
-def add_service(category_key, category_label, name, description="", price="", enabled=True, show_in_web=True):
+def add_service(category_key, category_label, name, description="", price=0.0, enabled=True, show_in_web=True):
     res_max = supabase.table("services").select("sort_order").eq("category_key", category_key).order("sort_order", desc=True).limit(1).execute()
     max_order = res_max.data[0]["sort_order"] if res_max.data else 0
     next_order = max_order + 1
@@ -674,7 +853,7 @@ def add_service(category_key, category_label, name, description="", price="", en
         "category_label": category_label,
         "name": name,
         "description": description,
-        "price": price,
+        "price": float(price),
         "enabled": 1 if enabled else 0,
         "show_in_web": 1 if show_in_web else 0,
         "sort_order": next_order
@@ -690,6 +869,8 @@ def update_service(service_id, **fields):
         updates["enabled"] = 1 if updates["enabled"] else 0
     if "show_in_web" in updates:
         updates["show_in_web"] = 1 if updates["show_in_web"] else 0
+    if "price" in updates:
+        updates["price"] = float(updates["price"])
         
     if updates:
         supabase.table("services").update(updates).eq("id", service_id).execute()
@@ -713,7 +894,6 @@ def delete_service(service_id):
 # ── Exams Management ─────────────────────────────────────────────────────────
 
 def get_all_exams():
-    """Returns list of enabled exams."""
     cached = _cache_get("all_exams")
     if cached is not None:
         return cached
@@ -736,67 +916,26 @@ def delete_exam(exam_id):
     _cache_invalidate("all_exams")
 
 
-# ── Broadcast Jobs persistence ─────────────────────────────────────────────
-
-def create_broadcast_job(job_id, target_exam, total_count):
-    supabase.table("broadcast_jobs").insert({
-        "id": str(job_id),
-        "target_exam": target_exam,
-        "total_count": total_count,
-        "status": "queued"
-    }).execute()
-
-
-def update_broadcast_status(job_id, status, sent_count=None, error_msg=None):
-    now_str = datetime.utcnow().isoformat()
-    updates = {"status": status, "updated_at": now_str}
-    if sent_count is not None:
-        updates["sent_count"] = sent_count
-    if error_msg is not None:
-        updates["error_msg"] = error_msg
-        
-    supabase.table("broadcast_jobs").update(updates).eq("id", str(job_id)).execute()
-
-
-def get_broadcast_job(job_id):
-    res = supabase.table("broadcast_jobs").select("*").eq("id", str(job_id)).execute()
-    if not res.data:
-        return None
-    row = res.data[0]
-    return {
-        "id": row["id"],
-        "status": row["status"],
-        "sent": row["sent_count"],
-        "total": row["total_count"],
-        "exam": row["target_exam"],
-        "error": row["error_msg"],
-        "updated_at": row["updated_at"]
-    }
-
-
-# ── Exam Manager Extensions (Admin CRUD) ───────────────────────────────────
-
 def get_all_exams_admin():
-    """Returns list of all exams (both enabled & disabled) for admin portal."""
     res = supabase.table("exams").select("*").order("id", desc=True).execute()
     return res.data
 
 
 def add_exam_details(name, description='', category='UG', start_date='', end_date='', exam_date='', fees_gen_obc='', fees_sc_st='', eligibility='', official_url='', enabled=True, required_documents=''):
     try:
+        # Convert empty strings to None for DB dates
         res = supabase.table("exams").insert({
             "name": name.strip(),
             "description": description,
             "category": category,
-            "start_date": start_date,
-            "end_date": end_date,
-            "exam_date": exam_date,
+            "start_date": start_date or None,
+            "end_date": end_date or None,
+            "exam_date": exam_date or None,
             "fees_gen_obc": fees_gen_obc,
             "fees_sc_st": fees_sc_st,
             "eligibility": eligibility,
             "official_url": official_url,
-            "enabled": 1 if enabled else 0,
-            "required_documents": required_documents
+            "enabled": 1 if enabled else 0
         }).execute()
         _cache_invalidate("all_exams")
         return True, res.data[0]["id"]
@@ -810,15 +949,14 @@ def update_exam_details(exam_id, name, description, category, start_date, end_da
             "name": name.strip(),
             "description": description,
             "category": category,
-            "start_date": start_date,
-            "end_date": end_date,
-            "exam_date": exam_date,
+            "start_date": start_date or None,
+            "end_date": end_date or None,
+            "exam_date": exam_date or None,
             "fees_gen_obc": fees_gen_obc,
             "fees_sc_st": fees_sc_st,
             "eligibility": eligibility,
             "official_url": official_url,
-            "enabled": 1 if enabled else 0,
-            "required_documents": required_documents
+            "enabled": 1 if enabled else 0
         }).eq("id", exam_id).execute()
         _cache_invalidate("all_exams")
         return True
@@ -828,15 +966,34 @@ def update_exam_details(exam_id, name, description, category, start_date, end_da
 
 # ── Form Applications CRUD ────────────────────────────────────────────────
 
+def get_exam_by_name(name):
+    res = supabase.table("exams").select("id").eq("name", name).execute()
+    return res.data[0]["id"] if res.data else None
+
+
 def submit_form_application(student_name, phone_number, email, dob, gender, category, exam_name, academic_qualification, doc_submission_method='upload'):
+    # Lookup or create user by phone
+    user = get_user_by_phone(phone_number)
+    if not user:
+        res_usr = supabase.table("users").insert({
+            "name": student_name,
+            "phone": phone_number
+        }).execute()
+        uid = res_usr.data[0]["id"]
+    else:
+        uid = user["id"]
+        # Update name if guest
+        if user.get("name") == "Web Guest":
+            supabase.table("users").update({"name": student_name}).eq("id", uid).execute()
+            
+    eid = get_exam_by_name(exam_name)
     res = supabase.table("form_applications").insert({
-        "student_name": student_name,
-        "phone_number": phone_number,
+        "user_id": uid,
+        "exam_id": eid,
         "email": email,
-        "dob": dob,
+        "dob": dob or None,
         "gender": gender,
         "category": category,
-        "exam_name": exam_name,
         "academic_qualification": academic_qualification,
         "status": "pending",
         "doc_submission_method": doc_submission_method
@@ -854,18 +1011,58 @@ def add_application_document(application_id, file_type, file_path, file_name):
 
 
 def get_all_applications(status=None):
+    query = supabase.table("form_applications").select("*, users(*), exams(*)")
     if status:
-        res = supabase.table("form_applications").select("*").eq("status", status).order("submitted_at", desc=True).execute()
+        res = query.eq("status", status).order("submitted_at", desc=True).execute()
     else:
-        res = supabase.table("form_applications").select("*").order("submitted_at", desc=True).execute()
-    return res.data
+        res = query.order("submitted_at", desc=True).execute()
+        
+    records = []
+    for row in (res.data or []):
+        usr = row.get("users") or {}
+        ex = row.get("exams") or {}
+        records.append({
+            "id": row["id"],
+            "student_name": usr.get("name", "Unknown"),
+            "phone_number": usr.get("phone", ""),
+            "email": row["email"],
+            "dob": row["dob"],
+            "gender": row["gender"],
+            "category": row["category"],
+            "exam_name": ex.get("name", "Unknown"),
+            "academic_qualification": row["academic_qualification"],
+            "status": row["status"],
+            "submitted_at": row["submitted_at"],
+            "completed_at": row["completed_at"],
+            "doc_submission_method": row["doc_submission_method"]
+        })
+    return records
 
 
 def get_application_details(app_id):
-    res = supabase.table("form_applications").select("*").eq("id", app_id).execute()
+    res = supabase.table("form_applications").select("*, users(*), exams(*)").eq("id", app_id).execute()
     if not res.data:
         return None
-    app_dict = res.data[0]
+    row = res.data[0]
+    usr = row.get("users") or {}
+    ex = row.get("exams") or {}
+    
+    app_dict = {
+        "id": row["id"],
+        "student_name": usr.get("name", "Unknown"),
+        "phone_number": usr.get("phone", ""),
+        "email": row["email"],
+        "dob": row["dob"],
+        "gender": row["gender"],
+        "category": row["category"],
+        "exam_name": ex.get("name", "Unknown"),
+        "academic_qualification": row["academic_qualification"],
+        "status": row["status"],
+        "remarks": row["remarks"],
+        "submitted_at": row["submitted_at"],
+        "completed_at": row["completed_at"],
+        "doc_submission_method": row["doc_submission_method"]
+    }
     
     docs_res = supabase.table("application_documents").select("*").eq("application_id", app_id).execute()
     app_dict["documents"] = docs_res.data
@@ -880,38 +1077,56 @@ def update_application_status(app_id, status, remarks=None):
 
 
 def get_student_applications_by_phone(identifier):
+    user = None
     if "@" in identifier:
-        res = supabase.table("form_applications").select("*").ilike("email", f"%{identifier}%").order("submitted_at", desc=True).execute()
+        res = supabase.table("form_applications").select("*, users(*), exams(*)").ilike("email", f"%{identifier}%").order("submitted_at", desc=True).execute()
     else:
-        clean_phone = identifier.strip().lstrip('+').lstrip('91')[-10:]
-        pattern = f"%{clean_phone}"
-        res = supabase.table("form_applications").select("*").ilike("phone_number", pattern).order("submitted_at", desc=True).execute()
+        user = get_user_by_phone(identifier)
+        if not user:
+            return []
+        res = supabase.table("form_applications").select("*, users(*), exams(*)").eq("user_id", user["id"]).order("submitted_at", desc=True).execute()
     
     apps = []
-    for row in res.data:
+    for row in (res.data or []):
+        usr = row.get("users") or {}
+        ex = row.get("exams") or {}
+        
         app_id = row["id"]
         docs_res = supabase.table("application_documents").select("*").eq("application_id", app_id).execute()
-        row["documents"] = docs_res.data
-        apps.append(row)
+        
+        apps.append({
+            "id": row["id"],
+            "student_name": usr.get("name", "Unknown"),
+            "phone_number": usr.get("phone", ""),
+            "email": row["email"],
+            "dob": row["dob"],
+            "gender": row["gender"],
+            "category": row["category"],
+            "exam_name": ex.get("name", "Unknown"),
+            "academic_qualification": row["academic_qualification"],
+            "status": row["status"],
+            "remarks": row["remarks"],
+            "submitted_at": row["submitted_at"],
+            "completed_at": row["completed_at"],
+            "doc_submission_method": row["doc_submission_method"],
+            "documents": docs_res.data
+        })
     return apps
 
 
 # ── Scheduled Announcements Helper Functions ─────────────────────────────────
 
 def get_all_announcements_raw():
-    """Fetch all announcements from the Supabase database."""
     res = supabase.table("announcements").select("*").order("created_at", desc=True).execute()
     return res.data or []
 
 
 def get_all_active_announcements():
-    """Fetch pending active scheduled announcements."""
     res = supabase.table("announcements").select("*").eq("is_active", 1).execute()
     return res.data or []
 
 
 def add_scheduled_announcement(exam, message, run_at):
-    """Insert a new scheduled announcement."""
     res = supabase.table("announcements").insert({
         "title": exam,
         "content": message,
@@ -922,7 +1137,6 @@ def add_scheduled_announcement(exam, message, run_at):
 
 
 def update_scheduled_announcement(ann_id, exam, message, run_at, is_active):
-    """Update an existing scheduled announcement."""
     supabase.table("announcements").update({
         "title": exam,
         "content": message,
@@ -932,109 +1146,22 @@ def update_scheduled_announcement(ann_id, exam, message, run_at, is_active):
 
 
 def mark_announcement_sent(ann_id):
-    """Mark an announcement as sent/inactive."""
     supabase.table("announcements").update({"is_active": 0}).eq("id", ann_id).execute()
 
 
 def delete_scheduled_announcement(ann_id):
-    """Permanently delete a scheduled announcement."""
     supabase.table("announcements").delete().eq("id", ann_id).execute()
 
 
-# ── Pagination Helper Functions ──────────────────────────────────────────────
-
-def get_students_paginated(exam="ALL", page=1, limit=20, search=""):
-    """
-    Returns a paginated list of students filtered by exam preference and search text.
-    Also returns the total count of matching records.
-    """
-    query = supabase.table("students").select("*", count="exact")
-    
-    if exam != "ALL":
-        query = query.eq("exam_preference", exam)
-        
-    if search:
-        pattern = f"%{search}%"
-        # Search across name, phone_number, username, telegram_id
-        query = query.or_(f"name.ilike.{pattern},phone_number.ilike.{pattern},telegram_id.ilike.{pattern},username.ilike.{pattern}")
-        
-    start = (page - 1) * limit
-    end = start + limit - 1
-    
-    res = query.order("joined_at", desc=True).range(start, end).execute()
-    total = res.count if res.count is not None else len(res.data)
-    return res.data or [], total
-
-
-def get_service_requests_paginated(status=None, page=1, limit=20):
-    """Fetch paginated service requests with student info."""
-    query = supabase.table("service_requests").select(
-        "id,telegram_id,phone_number,service_name,category,status,requested_at,completed_at",
-        count="exact"
-    )
-    if status:
-        query = query.eq("status", status)
-        
-    start = (page - 1) * limit
-    end = start + limit - 1
-    
-    res = query.order("requested_at", desc=True).range(start, end).execute()
-    total = res.count if res.count is not None else len(res.data)
-    requests_data = res.data or []
-    
-    if not requests_data:
-        return [], total
-
-    telegram_ids = list(set(row["telegram_id"] for row in requests_data if row.get("telegram_id")))
-    
-    students_map = {}
-    if telegram_ids:
-        try:
-            student_res = supabase.table("students").select("telegram_id,name,phone_number,username").in_("telegram_id", telegram_ids).execute()
-            for s in (student_res.data or []):
-                if s.get("telegram_id"):
-                    students_map[s["telegram_id"]] = s
-        except Exception as e:
-            print(f"Error fetching students for join: {e}")
-            
-    records = []
-    for row in requests_data:
-        tid = row.get("telegram_id")
-        student = students_map.get(tid) if tid else None
-        
-        phone_raw = row.get("phone_number") or ""
-        parsed_name = None
-        if " | " in phone_raw:
-            parts = phone_raw.split(" | ", 1)
-            parsed_name = parts[0].strip()
-            phone_raw = parts[1].strip()
-
-        records.append({
-            "id": row["id"],
-            "telegram_id": row["telegram_id"],
-            "service_name": row["service_name"],
-            "category": row["category"],
-            "status": row["status"],
-            "requested_at": row["requested_at"],
-            "completed_at": row["completed_at"],
-            "student_name": student.get("name") if student else (parsed_name or "Unknown"),
-            "student_phone": (student.get("phone_number") if student else None) or phone_raw,
-            "student_username": student.get("username") if student else ""
-        })
-    return records, total
-
-
-# ── Telegram Login Token Helpers ──────────────────────────────────────────────
+# ── Login Tokens Helpers ──────────────────────────────────────────────────────
 
 def create_login_token(token, expires_at):
-    """Inserts a new login token and removes expired tokens first."""
     try:
-        # Cleanup expired tokens
         now_str = datetime.utcnow().isoformat()
         try:
             supabase.table("login_tokens").delete().lt("expires_at", now_str).execute()
         except Exception:
-            pass  # Safe to ignore if table doesn't exist yet (will print error below)
+            pass
 
         supabase.table("login_tokens").insert({
             "token": token,
@@ -1042,12 +1169,11 @@ def create_login_token(token, expires_at):
         }).execute()
         return True
     except Exception as e:
-        print(f"WARNING: Error inserting login token: {e}. Ensure login_tokens table exists in Supabase.")
+        print(f"WARNING: Error inserting login token: {e}")
         return False
 
 
 def link_login_token(token, telegram_id):
-    """Links a token to a telegram ID if valid and not expired."""
     try:
         res = supabase.table("login_tokens").select("*").eq("token", token).execute()
         if not res.data:
@@ -1058,8 +1184,12 @@ def link_login_token(token, telegram_id):
         if exp.replace(tzinfo=None) < datetime.utcnow():
             return False
             
+        user = get_user_by_telegram_id(telegram_id)
+        if not user:
+            return False
+
         supabase.table("login_tokens").update({
-            "telegram_id": str(telegram_id)
+            "user_id": user["id"]
         }).eq("token", token).execute()
         return True
     except Exception as e:
@@ -1068,7 +1198,6 @@ def link_login_token(token, telegram_id):
 
 
 def get_login_token_status(token):
-    """Gets status of token linking."""
     try:
         res = supabase.table("login_tokens").select("*").eq("token", token).execute()
         if not res.data:
@@ -1079,21 +1208,46 @@ def get_login_token_status(token):
         if exp.replace(tzinfo=None) < datetime.utcnow():
             return {"status": "expired"}
             
-        tid = row.get("telegram_id")
-        if not tid:
+        uid = row.get("user_id")
+        if not uid:
             return {"status": "pending"}
             
         # Check if student is fully registered
-        student = get_student(tid)
-        if not student or not student.get("phone_number") or student.get("phone_number").startswith("BOT_TEMP_"):
-            return {"status": "awaiting_onboarding", "telegram_id": tid}
+        student = get_user_by_id(uid)
+        if not student or not student.get("phone") or student.get("phone").startswith("BOT_TEMP_"):
+            return {"status": "awaiting_onboarding", "telegram_id": student.get("telegram_id") if student else ""}
             
+        # Add backwards-compatibility mapped field for main.py JWT generation
+        student["phone_number"] = student["phone"]
+        subs = get_user_exam_subscriptions(uid)
+        student["exam_preference"] = subs[0] if subs else "NONE"
+
         return {
             "status": "success",
-            "telegram_id": tid,
+            "telegram_id": student["telegram_id"],
             "student": student
         }
     except Exception as e:
-        print(f"Error checking login token status: {e}")
+        print(f"Error checking login status: {e}")
         return {"status": "error", "error": str(e)}
 
+
+# ── Audit Log Helpers ────────────────────────────────────────────────────────
+
+def add_audit_log(admin_name, action):
+    try:
+        supabase.table("audit_logs").insert({
+            "admin_name": admin_name,
+            "action": action
+        }).execute()
+    except Exception as e:
+        print(f"Error creating audit log: {e}")
+
+
+def get_audit_logs():
+    try:
+        res = supabase.table("audit_logs").select("*").order("created_at", desc=True).limit(100).execute()
+        return res.data or []
+    except Exception as e:
+        print(f"Error fetching audit logs: {e}")
+        return []

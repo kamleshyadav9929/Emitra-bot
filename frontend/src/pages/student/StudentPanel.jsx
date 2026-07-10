@@ -180,8 +180,14 @@ export default function StudentPanel() {
             const reads = localStorage.getItem(`${storagePrefix}_readNotifications`)
             const prefs = localStorage.getItem(`${storagePrefix}_notificationPrefs`)
             
-            if (subs) setSubscribedExams(JSON.parse(subs))
-            else setSubscribedExams([])
+            if (user.exam_preferences) {
+                setSubscribedExams(user.exam_preferences)
+                localStorage.setItem(`${storagePrefix}_subscribedExams`, JSON.stringify(user.exam_preferences))
+            } else if (subs) {
+                setSubscribedExams(JSON.parse(subs))
+            } else {
+                setSubscribedExams([])
+            }
 
             if (reads) setReadNotifications(JSON.parse(reads))
             else setReadNotifications([])
@@ -190,7 +196,7 @@ export default function StudentPanel() {
 
             setEditableProfile({
                 name: user.name || "",
-                phone: user.phone || "",
+                phone: user.phone_number || user.phone || "",
                 email: user.email || ""
             })
         }
@@ -207,9 +213,16 @@ export default function StudentPanel() {
     }, [announcements, activeTab, isLoggedIn])
 
     // Save exam preferences
-    const handleSaveExamSubscriptions = (updatedList) => {
+    const handleSaveExamSubscriptions = async (updatedList) => {
         setSubscribedExams(updatedList)
         localStorage.setItem(`${storagePrefix}_subscribedExams`, JSON.stringify(updatedList))
+        if (isLoggedIn) {
+            try {
+                await api.updateStudentPreference(updatedList)
+            } catch (err) {
+                console.error("Failed to sync subscriptions to database", err)
+            }
+        }
     }
 
     // Toggle single subscription
