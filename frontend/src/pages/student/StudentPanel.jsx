@@ -296,6 +296,12 @@ export default function StudentPanel() {
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;");
         
+        // Markdown links [text](url)
+        formatted = formatted.replace(/\[(.*?)\]\((.*?)\)/g, "<a href='$2' target='_blank' rel='noopener noreferrer' class='text-[#0a66c2] hover:underline'>$1</a>");
+        
+        // Raw URLs (basic)
+        formatted = formatted.replace(/(?<!href=')(https?:\/\/[^\s<]+)/g, "<a href='$1' target='_blank' rel='noopener noreferrer' class='text-[#0a66c2] hover:underline'>$1</a>");
+        
         // Bold *text*
         formatted = formatted.replace(/\*(.*?)\*/g, "<strong>$1</strong>");
         // Underscore _italic_
@@ -307,178 +313,58 @@ export default function StudentPanel() {
     }
 
     const renderNotificationsPanel = (isSticky = true) => {
-        // Group notifications by date
-        const grouped = [];
-        const groups = {};
-        
-        subNotifications.forEach(ann => {
-            const dateObj = new Date(ann.created_at || ann.sent_at || Date.now());
-            const today = new Date();
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-            
-            let dateStr = "";
-            if (dateObj.toDateString() === today.toDateString()) {
-                dateStr = lang === 'EN' ? 'Today' : 'आज';
-            } else if (dateObj.toDateString() === yesterday.toDateString()) {
-                dateStr = lang === 'EN' ? 'Yesterday' : 'कल';
-            } else {
-                dateStr = dateObj.toLocaleDateString("en-IN", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric"
-                });
-            }
-            
-            if (!groups[dateStr]) {
-                groups[dateStr] = [];
-            }
-            groups[dateStr].push(ann);
-        });
-
         return (
-            <div className={`flex flex-col space-y-4 h-full ${isSticky ? "" : "bg-white border border-[var(--color-outline-variant)] rounded-3xl p-6 shadow-ambient"}`}>
-                <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
-                    <div>
-                        <h3 className="text-[14.5px] font-extrabold text-slate-900 font-display flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse" />
-                            {lang === 'EN' ? 'Alert Inbox' : 'अलर्ट इनबॉक्स'}
-                        </h3>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5 tracking-wide">
-                            {lang === 'EN' ? 'Subscribed Alerts' : 'सदस्यता प्राप्त अलर्ट'}
-                        </p>
-                    </div>
-                    {subNotifications.length > 0 && (
-                        <span className="px-2 py-0.5 bg-[var(--color-surface-low)] border border-[var(--color-outline-variant)] text-[var(--color-primary)] text-[9.5px] font-extrabold rounded-md">
-                            {subNotifications.length} Active
-                        </span>
-                    )}
+            <div className={`flex flex-col h-full bg-white border border-slate-200 rounded-[12px] ${!isSticky ? "shadow-sm" : ""}`}>
+                <div className="border-b border-slate-200 px-5 py-4 flex items-center gap-3">
+                    <h3 className="text-[20px] font-medium text-slate-900 tracking-tight font-sans">
+                        Notification
+                    </h3>
+                    <span className="bg-[#4863d4] text-white text-[12px] font-medium px-2.5 py-0.5 rounded-full">
+                        {subNotifications.length}
+                    </span>
                 </div>
 
                 {subNotifications.length === 0 ? (
-                    <div className="py-8 px-4 text-center space-y-6 flex flex-col items-center justify-center my-auto">
-                        <div className="w-14 h-14 bg-[var(--color-surface-low)] text-[var(--color-primary)] flex items-center justify-center rounded-2xl border border-[var(--color-outline-variant)] shadow-sm animate-pulse">
-                            <Bell size={24} />
-                        </div>
+                    <div className="py-8 px-4 text-center space-y-4 flex flex-col items-center justify-center my-auto">
                         <div className="space-y-2">
-                            <h4 className="text-[13.5px] font-extrabold text-slate-900 font-display">
-                                {lang === 'EN' ? 'No Subscribed Updates' : 'कोई सदस्यता अलर्ट नहीं'}
+                            <h4 className="text-[14px] font-medium text-slate-900">
+                                {lang === 'EN' ? 'No Notifications' : 'कोई सूचना नहीं'}
                             </h4>
-                            <p className="text-[11.5px] text-slate-450 leading-relaxed font-semibold">
-                                {lang === 'EN' 
-                                    ? 'Select your target exams to receive verified portal updates, or join our community networks.' 
-                                    : 'सत्यापित पोर्टल अपडेट प्राप्त करने के लिए अपनी लक्षित परीक्षाओं का चयन करें, या हमारे समुदाय में शामिल हों।'}
+                            <p className="text-[13px] text-slate-500">
+                                {lang === 'EN' ? 'You are all caught up.' : 'आप सभी अपडेट हैं।'}
                             </p>
-                        </div>
-                        
-                        <div className="space-y-2.5 w-full">
-                            <button 
-                                onClick={() => setActiveTab("exams")} 
-                                className="w-full px-4.5 py-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white rounded-xl text-[11px] font-extrabold transition-all shadow-ambient flex items-center justify-center gap-1.5 cursor-pointer border-none"
-                            >
-                                <Award size={13} /> {lang === 'EN' ? 'Select Exams' : 'परीक्षाएं चुनें'}
-                            </button>
-                            
-                            <a 
-                                href={`https://wa.me/${config.whatsapp_number || "916377964293"}?text=${encodeURIComponent("Hello! I want to join the WhatsApp alerts group.")}`}
-                                target="_blank" rel="noopener noreferrer"
-                                className="w-full px-4.5 py-3 bg-white hover:bg-slate-50 text-slate-700 border border-[var(--color-outline-variant)] rounded-xl text-[11px] font-extrabold transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
-                            >
-                                <MessageSquare size={13} className="text-emerald-500" /> {lang === 'EN' ? 'Join WhatsApp Alerts' : 'व्हाट्सएप से जुड़ें'}
-                            </a>
-                            
-                            <a 
-                                href={config.telegram_bot_url || "https://t.me/Kamlesh6377_bot"}
-                                target="_blank" rel="noopener noreferrer"
-                                className="w-full px-4.5 py-3 bg-white hover:bg-slate-50 text-slate-700 border border-[var(--color-outline-variant)] rounded-xl text-[11px] font-extrabold transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
-                            >
-                                <Send size={13} className="text-sky-500" /> {lang === 'EN' ? 'Join Telegram Bot' : 'टेलीग्राम से जुड़ें'}
-                            </a>
                         </div>
                     </div>
                 ) : (
-                    <div className="flex-1 overflow-y-auto pr-1 scrollbar-thin p-3 rounded-2xl bg-slate-50/70 border border-slate-100/80 flex flex-col space-y-4">
-                        {Object.entries(groups).map(([dateStr, items]) => (
-                            <div key={dateStr} className="space-y-4 flex flex-col">
-                                {/* Centered Date Label */}
-                                <div className="flex justify-center my-1.5">
-                                    <span className="bg-slate-200/80 text-slate-600 text-[9.5px] font-extrabold px-3 py-0.5 rounded-full tracking-wide shadow-sm uppercase">
-                                        {dateStr}
-                                    </span>
+                    <div className="flex-1 overflow-y-auto p-5 space-y-5 scrollbar-thin">
+                        {subNotifications.map((ann, idx) => {
+                            return (
+                                <div 
+                                    key={ann.id || idx} 
+                                    onClick={() => handleMarkNotificationRead(ann.id)}
+                                    className="flex items-start gap-3 group text-left"
+                                >
+                                    <div className="text-[#ef4444] mt-0.5 flex-shrink-0 text-[16px] transform rotate-[-45deg]">
+                                        📌
+                                    </div>
+                                    <div className="text-[14.5px] text-slate-800 leading-relaxed font-sans w-full announcement-content">
+                                        {ann.title && <strong className="block mb-1">{ann.title}</strong>}
+                                        {formatTelegramMessage(ann.content)}
+                                        {ann.links && (
+                                            <div className="mt-1">
+                                                <a 
+                                                    href={ann.links} target="_blank" rel="noopener noreferrer"
+                                                    className="text-[#0a66c2] hover:underline inline-flex items-center gap-1"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    View Document
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                                
-                                {/* Messages */}
-                                {items.map((ann, idx) => {
-                                    const isRead = readNotifications.includes(ann.id);
-                                    const formattedTime = new Date(ann.created_at || ann.sent_at || Date.now()).toLocaleTimeString("en-IN", {
-                                        hour: "numeric",
-                                        minute: "2-digit",
-                                        hour12: true
-                                    });
-
-                                    return (
-                                        <div 
-                                            key={ann.id || idx} 
-                                            onClick={() => handleMarkNotificationRead(ann.id)}
-                                            className={`relative w-full rounded-2xl p-4 shadow-sm transition-all border border-solid group text-left cursor-pointer flex flex-col ${
-                                                isRead
-                                                    ? "bg-white border-slate-200 text-slate-700 hover:border-slate-350 hover:shadow-md"
-                                                    : "bg-[#e3f2fd] border-blue-200 text-slate-900 hover:border-blue-300 hover:shadow-md ring-1 ring-blue-100/50"
-                                            }`}
-                                        >
-                                            {/* Message title */}
-                                            {ann.title && (
-                                                <h4 className="text-[13px] font-bold text-slate-900 leading-snug mb-2 font-display">
-                                                    {ann.title}
-                                                </h4>
-                                            )}
-
-                                            {/* Message body */}
-                                            <div className="text-[12px] text-slate-650 font-normal leading-relaxed whitespace-pre-wrap break-words font-sans">
-                                                {formatTelegramMessage(ann.content)}
-                                            </div>
-
-                                            {/* Document download link */}
-                                            {ann.links && (
-                                                <div className="pt-2">
-                                                    <a 
-                                                        href={ann.links} target="_blank" rel="noopener noreferrer"
-                                                        className="text-[var(--color-primary)] text-[10px] font-bold hover:text-[var(--color-primary-container)] inline-flex items-center gap-1 hover:underline"
-                                                        onClick={(e) => e.stopPropagation()}
-                                                    >
-                                                        Download Attachment <ExternalLink size={10} />
-                                                    </a>
-                                                </div>
-                                            )}
-
-                                            {/* Message Footer Row with Category and Time */}
-                                            <div className="flex justify-between items-center mt-3.5 pt-2.5 border-t border-slate-100/80">
-                                                <span className={`text-[8.5px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
-                                                    isRead 
-                                                        ? "bg-slate-100 text-slate-500" 
-                                                        : "bg-blue-100 text-blue-700"
-                                                }`}>
-                                                    {ann.category || "General Update"}
-                                                </span>
-
-                                                <div className="flex items-center gap-1.5 select-none">
-                                                    <span className="text-[8.5px] text-slate-400 font-bold uppercase">
-                                                        {formattedTime}
-                                                    </span>
-                                                    {isRead ? (
-                                                        <span className="text-blue-500 flex items-center" title="Read">
-                                                            <Check size={11} strokeWidth={3} />
-                                                        </span>
-                                                    ) : (
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" title="Unread" />
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>
