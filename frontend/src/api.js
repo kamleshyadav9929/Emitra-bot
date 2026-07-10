@@ -345,8 +345,11 @@ export const deleteScheduledAnnouncement = async (id) =>
   })
 
 // ── Telegram Student Auth APIs ────────────────────────────────────────────────
-export const createLoginToken = () =>
-  requestJson(`/api/public/login/token`, { method: "POST" })
+export const createLoginToken = async () =>
+  requestJson(`/api/public/login/token`, { 
+    method: "POST", 
+    headers: await getAuthHeaders() 
+  })
 
 export const checkLoginStatus = (token) =>
   requestJson(`/api/public/login/status/${token}`)

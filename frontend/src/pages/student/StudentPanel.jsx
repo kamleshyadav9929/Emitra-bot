@@ -197,7 +197,8 @@ export default function StudentPanel() {
             setEditableProfile({
                 name: user.name || "",
                 phone: user.phone_number || user.phone || "",
-                email: user.email || ""
+                email: user.email || "",
+                telegram_id: user.telegram_id || null
             })
         }
     }, [user, storagePrefix])
@@ -1054,6 +1055,7 @@ export default function StudentPanel() {
                                     notificationPrefs={notificationPrefs}
                                     setNotificationPrefs={setNotificationPrefs}
                                     handleSaveProfile={handleSaveProfile}
+                                    onLinkTelegram={() => setShowLoginModal(true)}
                                 />
                             )}
 

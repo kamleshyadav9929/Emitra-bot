@@ -500,7 +500,20 @@ def public_login_token():
     token = "tg_auth_" + uuid.uuid4().hex
     expires_at = datetime.utcnow() + timedelta(minutes=5)
     
-    success = database.create_login_token(token, expires_at)
+    # Check if request is authenticated (e.g., logged-in Clerk user linking Telegram)
+    auth_user_id = None
+    if "Authorization" in request.headers:
+        auth_header = request.headers["Authorization"]
+        if auth_header.startswith("Bearer "):
+            auth_token = auth_header.split(" ")[1]
+            payload = verify_clerk_token(auth_token)
+            if payload:
+                clerk_id = payload.get("sub")
+                user = database.get_user_by_clerk_id(clerk_id)
+                if user:
+                    auth_user_id = user["id"]
+
+    success = database.create_login_token(token, expires_at, auth_user_id)
     if not success:
         return jsonify({"success": False, "error": "Failed to create login session"}), 500
         

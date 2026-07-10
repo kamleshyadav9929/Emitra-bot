@@ -1178,7 +1178,7 @@ def delete_scheduled_announcement(ann_id):
 
 # ── Login Tokens Helpers ──────────────────────────────────────────────────────
 
-def create_login_token(token, expires_at):
+def create_login_token(token, expires_at, user_id=None):
     try:
         now_str = datetime.utcnow().isoformat()
         try:
@@ -1186,10 +1186,14 @@ def create_login_token(token, expires_at):
         except Exception:
             pass
 
-        supabase.table("login_tokens").insert({
+        insert_data = {
             "token": token,
             "expires_at": expires_at.isoformat()
-        }).execute()
+        }
+        if user_id:
+            insert_data["user_id"] = user_id
+
+        supabase.table("login_tokens").insert(insert_data).execute()
         return True
     except Exception as e:
         print(f"WARNING: Error inserting login token: {e}")
@@ -1207,13 +1211,34 @@ def link_login_token(token, telegram_id):
         if exp.replace(tzinfo=None) < datetime.utcnow():
             return False
             
-        user = get_user_by_telegram_id(telegram_id)
-        if not user:
+        tg_user = get_user_by_telegram_id(telegram_id)
+        if not tg_user:
             return False
 
-        supabase.table("login_tokens").update({
-            "user_id": user["id"]
-        }).eq("token", token).execute()
+        existing_user_id = row.get("user_id")
+        if existing_user_id and existing_user_id != tg_user["id"]:
+            # Merge: link telegram_id to the Clerk user record and delete temporary Telegram user
+            try:
+                # Transfer subscriptions and requests
+                supabase.table("user_exam_subscriptions").update({"user_id": existing_user_id}).eq("user_id", tg_user["id"]).execute()
+                supabase.table("service_requests").update({"user_id": existing_user_id}).eq("user_id", tg_user["id"]).execute()
+                
+                # Delete temporary Telegram user first to free up the unique telegram_id constraint
+                supabase.table("users").delete().eq("id", tg_user["id"]).execute()
+
+                # Update the Clerk user record with Telegram details
+                supabase.table("users").update({
+                    "telegram_id": str(telegram_id),
+                    "is_telegram_linked": True
+                }).eq("id", existing_user_id).execute()
+            except Exception as merge_err:
+                print(f"Error merging user via login token: {merge_err}")
+        else:
+            # Normal link
+            supabase.table("login_tokens").update({
+                "user_id": tg_user["id"]
+            }).eq("token", token).execute()
+            
         return True
     except Exception as e:
         print(f"Error linking login token: {e}")
@@ -1325,7 +1350,7 @@ def sync_clerk_user(clerk_id, email, phone, name):
         res = supabase.table("users").insert({
             "clerk_user_id": clerk_id,
             "name": name or "Student",
-            "phone": clean_phone or f"CLERK_TEMP_{clerk_id[:10]}",
+            "phone": clean_phone or f"CLERK_TEMP_{clerk_id[-10:]}",
             "role": "student"
         }).execute()
         return res.data[0] if res.data else None

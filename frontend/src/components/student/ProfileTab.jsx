@@ -1,3 +1,5 @@
+import { Send } from "lucide-react"
+
 export default function ProfileTab({
     lang,
     profileSavedMessage,
@@ -5,7 +7,8 @@ export default function ProfileTab({
     setEditableProfile,
     notificationPrefs,
     setNotificationPrefs,
-    handleSaveProfile
+    handleSaveProfile,
+    onLinkTelegram
 }) {
     return (
         <div className="space-y-8 animate-fadeIn text-left">
@@ -57,6 +60,30 @@ export default function ProfileTab({
                                     className="w-full p-3.5 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl text-[13px] font-semibold outline-none focus:border-[var(--color-primary)] transition-all shadow-sm border-solid text-[var(--color-on-surface)]"
                                 />
                             </div>
+                        </div>
+
+                        {/* Telegram Link Status Block */}
+                        <div className="pt-2">
+                            <label className="text-[9.5px] font-extrabold uppercase text-slate-400 tracking-wider block mb-1">Telegram Bot Link Status</label>
+                            {editableProfile.telegram_id ? (
+                                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-[12.5px] font-semibold flex items-center justify-between">
+                                    <span className="text-slate-650">Linked to Chat ID: <span className="font-mono font-extrabold text-[#0a4a83]">{editableProfile.telegram_id}</span></span>
+                                    <span className="text-xs text-emerald-600 font-extrabold flex items-center gap-1.5">
+                                        <span className="w-2 h-2 rounded-full bg-emerald-500" /> Connected
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-[12.5px] font-semibold flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                                    <span className="text-slate-500 font-normal leading-relaxed">Receive alerts and check service status directly on Telegram.</span>
+                                    <button
+                                        type="button"
+                                        onClick={onLinkTelegram}
+                                        className="px-4 py-2.5 bg-[#229ED9] hover:bg-[#1c8ec4] text-white text-[11px] font-extrabold rounded-xl transition-all shadow-sm border-none cursor-pointer flex items-center gap-1.5"
+                                    >
+                                        <Send size={11} /> {lang === 'EN' ? 'Link Telegram Bot' : 'टेलीग्राम बॉट लिंक करें'}
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
 
