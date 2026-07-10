@@ -364,6 +364,13 @@ export const getStudentProfile = async (customToken) => {
   })
 }
 
+export const onboardStudent = async (data) =>
+  requestJson(`/api/student/onboard`, {
+    method: "POST",
+    headers: await getAuthHeaders(),
+    body: JSON.stringify(data)
+  })
+
 export const updateStudentPreference = async (categories) =>
   requestJson(`/api/student/update-preference`, {
     method: "POST",

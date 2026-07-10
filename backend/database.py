@@ -283,6 +283,19 @@ def add_student_admin(name, phone_number, exam_pref="NONE"):
         return False, str(e)
 
 
+def update_student_profile(user_id, name, phone):
+    """Update student name and optional phone number."""
+    try:
+        update_data = {"name": name.strip()}
+        if phone:
+            update_data["phone"] = phone.strip()
+            
+        supabase.table("users").update(update_data).eq("id", user_id).execute()
+        return True, "Profile updated"
+    except Exception as e:
+        return False, str(e)
+
+
 def update_phone_number(telegram_id, phone_number):
     """Verify & link phone from bot contact button."""
     clean_phone = phone_number.strip().replace(" ", "").replace("-", "")

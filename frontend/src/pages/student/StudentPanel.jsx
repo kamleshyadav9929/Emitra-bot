@@ -12,6 +12,7 @@ import {
 
 import "../../portal.css"
 import LoginModal from "../../components/student/LoginModal"
+import OnboardingModal from "../../components/student/OnboardingModal"
 import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
@@ -31,7 +32,7 @@ export default function StudentPanel() {
     const [showLoginModal, setShowLoginModal] = useState(false)
     const { category: catParam } = useParams()
     const { lang, toggleLanguage, t } = useLanguage()
-    const { user, isLoggedIn, logout } = useAuth()
+    const { user, isLoggedIn, needsOnboarding, logout } = useAuth()
 
     // Navigation and tab states
     const [activeTab, setActiveTab] = useState("overview")
@@ -680,6 +681,8 @@ export default function StudentPanel() {
 
     return (
         <div className="min-h-screen flex text-slate-800 font-sans antialiased relative bg-[var(--color-surface-base)] w-full">
+            <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+            <OnboardingModal isOpen={needsOnboarding} exams={exams} />
             
             {/* ── DESKTOP SIDEBAR ── */}
             <aside className="w-[280px] bg-white border-r border-slate-200 hidden lg:flex flex-col sticky top-0 h-screen shrink-0 z-20">
@@ -1155,7 +1158,6 @@ export default function StudentPanel() {
                 </div>
             )}
 
-            <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
         </div>
     )
 }

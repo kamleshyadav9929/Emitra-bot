@@ -647,6 +647,49 @@ def student_profile():
     })
 
 
+@app.route("/api/student/onboard", methods=["POST"])
+@student_token_required
+def student_onboard():
+    data = request.json or {}
+    name = data.get("name")
+    phone = data.get("phone")
+    categories = data.get("exam_preferences", [])
+    
+    if not name:
+        return jsonify({"success": False, "error": "Name is required"}), 400
+        
+    telegram_id = request.student_payload.get("sub")
+    user = database.get_user_by_telegram_id(telegram_id)
+    if not user:
+        return jsonify({"success": False, "error": "User not found"}), 404
+        
+    # Update profile
+    success, msg = database.update_student_profile(user["id"], name, phone)
+    if not success:
+        return jsonify({"success": False, "error": msg}), 500
+        
+    # Update exams
+    if isinstance(categories, list) and categories:
+        database.update_user_exam_subscriptions(user["id"], categories)
+    elif categories and not isinstance(categories, list):
+        database.update_user_exam_subscriptions(user["id"], [categories])
+        
+    # Fetch latest user data to return
+    updated_user = database.get_user_by_id(user["id"])
+    synced = database.get_user_exam_subscriptions(user["id"])
+    
+    return jsonify({
+        "success": True, 
+        "student": {
+            "name": updated_user["name"],
+            "phone_number": updated_user["phone"],
+            "telegram_id": updated_user["telegram_id"],
+            "exam_preferences": synced,
+            "exam_preference": synced[0] if synced else "NONE"
+        }
+    })
+
+
 @app.route("/api/student/update-preference", methods=["POST"])
 @student_token_required
 def student_update_preference():
