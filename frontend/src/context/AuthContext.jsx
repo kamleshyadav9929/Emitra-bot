@@ -1,20 +1,27 @@
 import { createContext, useContext, useState, useEffect } from "react"
+import { useAuth as useClerkAuth, useUser } from "@clerk/react"
 import * as api from "../api"
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
+    const { isSignedIn: isClerkSignedIn, isLoaded: isClerkLoaded, signOut } = useClerkAuth()
+    const { user: clerkUser } = useUser()
+
     const [user, setUser] = useState(null)
     const [token, setToken] = useState(() => localStorage.getItem("student_token") || null)
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [isLocalLoggedIn, setIsLocalLoggedIn] = useState(false)
     const [isLoaded, setIsLoaded] = useState(false)
 
+    // Load student profile if token is present
     useEffect(() => {
         const loadProfile = async () => {
             if (!token) {
                 setUser(null)
-                setIsLoggedIn(false)
-                setIsLoaded(true)
+                setIsLocalLoggedIn(false)
+                if (isClerkLoaded) {
+                    setIsLoaded(true)
+                }
                 return
             }
             try {
@@ -24,9 +31,10 @@ export function AuthProvider({ children }) {
                         name: res.student.name,
                         phone: res.student.phone_number,
                         telegram_id: res.student.telegram_id,
-                        exam_preference: res.student.exam_preference
+                        exam_preference: res.student.exam_preference,
+                        exam_preferences: res.student.exam_preferences || []
                     })
-                    setIsLoggedIn(true)
+                    setIsLocalLoggedIn(true)
                 } else {
                     handleLogout()
                 }
@@ -38,7 +46,39 @@ export function AuthProvider({ children }) {
             }
         }
         loadProfile()
-    }, [token])
+    }, [token, isClerkLoaded])
+
+    // Monitor Clerk session as a secondary login
+    useEffect(() => {
+        if (isClerkLoaded) {
+            if (isClerkSignedIn && clerkUser && !token) {
+                const email = clerkUser.primaryEmailAddress?.emailAddress?.toLowerCase() || ""
+                const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || "")
+                    .split(",")
+                    .map(e => e.trim().toLowerCase())
+                    .filter(Boolean)
+                
+                const isAdmin = adminEmails.includes(email)
+                
+                if (!isAdmin) {
+                    setUser({
+                        name: clerkUser.fullName || clerkUser.username || "Student",
+                        phone: clerkUser.primaryPhoneNumber?.phoneNumber || "",
+                        email: email,
+                        telegram_id: null,
+                        exam_preference: "NONE",
+                        exam_preferences: []
+                    })
+                    setIsLocalLoggedIn(true)
+                }
+            }
+            if (!isClerkSignedIn && !token) {
+                setIsLocalLoggedIn(false)
+                setUser(null)
+            }
+            setIsLoaded(true)
+        }
+    }, [isClerkSignedIn, clerkUser, isClerkLoaded, token])
 
     const handleLogin = (newToken, studentData) => {
         localStorage.setItem("student_token", newToken)
@@ -50,20 +90,30 @@ export function AuthProvider({ children }) {
             name: studentData.name,
             phone: studentData.phone_number,
             telegram_id: studentData.telegram_id,
-            exam_preference: studentData.exam_preference
+            exam_preference: studentData.exam_preference,
+            exam_preferences: studentData.exam_preferences || []
         })
-        setIsLoggedIn(true)
+        setIsLocalLoggedIn(true)
     }
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         localStorage.removeItem("student_token")
         setToken(null)
         setUser(null)
-        setIsLoggedIn(false)
+        setIsLocalLoggedIn(false)
+        if (isClerkSignedIn) {
+            try {
+                await signOut()
+            } catch (err) {
+                console.error("Clerk signout failed", err)
+            }
+        }
     }
 
+    const isLoggedIn = isLocalLoggedIn || (isClerkSignedIn && user && !token)
+
     return (
-        <AuthContext.Provider value={{ user, isLoggedIn, isLoaded, login: handleLogin, logout: handleLogout }}>
+        <AuthContext.Provider value={{ user, isLoggedIn, isLoaded: isLoaded && isClerkLoaded, login: handleLogin, logout: handleLogout }}>
             {children}
         </AuthContext.Provider>
     )

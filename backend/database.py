@@ -285,6 +285,11 @@ def update_phone_number(telegram_id, phone_number):
     if tg_user and phone_user and tg_user["id"] != phone_user["id"]:
         # Merge: Phone user wins, delete temporary Telegram user
         try:
+            # Transfer login tokens to the phone user to prevent cascade deletion
+            supabase.table("login_tokens").update({
+                "user_id": phone_user["id"]
+            }).eq("user_id", tg_user["id"]).execute()
+
             # Delete temp user
             supabase.table("users").delete().eq("id", tg_user["id"]).execute()
             # Link phone user to telegram

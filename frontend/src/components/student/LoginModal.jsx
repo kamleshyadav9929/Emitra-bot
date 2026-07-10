@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from "motion/react"
 import { MessageSquare, Loader2, CheckCircle2, AlertCircle, X, ExternalLink } from "lucide-react"
 import { useAuth } from "../../context/AuthContext"
 import { useLanguage } from "../../context/LanguageContext"
+import { useClerk } from "@clerk/react"
 import * as api from "../../api"
 
 export default function LoginModal({ isOpen, onClose }) {
     const { login } = useAuth()
     const { lang } = useLanguage()
+    const { openSignIn } = useClerk()
     const [token, setToken] = useState(null)
     const [botUrl, setBotUrl] = useState("")
     const [status, setStatus] = useState("idle") // idle, loading, pending, awaiting_onboarding, success, expired, error
@@ -215,6 +217,29 @@ export default function LoginModal({ isOpen, onClose }) {
                                         <span>{lang === "EN" ? "Open Telegram Bot" : "टेलीग्राम बॉट खोलें"}</span>
                                         <ExternalLink size={14} />
                                     </a>
+                                </div>
+
+                                <div className="relative flex py-2 items-center">
+                                    <div className="flex-grow border-t border-slate-200"></div>
+                                    <span className="flex-shrink mx-4 text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+                                        {lang === "EN" ? "Or" : "या"}
+                                    </span>
+                                    <div className="flex-grow border-t border-slate-200"></div>
+                                </div>
+
+                                <div>
+                                    <button
+                                        onClick={() => {
+                                            onClose()
+                                            openSignIn({
+                                                afterSignInUrl: window.location.origin + "/dashboard",
+                                                afterSignUpUrl: window.location.origin + "/dashboard",
+                                            })
+                                        }}
+                                        className="w-full py-3 border border-slate-200 hover:bg-slate-50 text-slate-700 text-[13px] font-bold rounded-2xl transition-all shadow-sm cursor-pointer bg-white"
+                                    >
+                                        {lang === "EN" ? "Sign in with Google / Email" : "गूगल / ईमेल से साइन इन करें"}
+                                    </button>
                                 </div>
 
                                 {/* Polling State Message */}
