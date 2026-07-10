@@ -66,60 +66,24 @@ export default function ServicesTab({
     config
 }) {
     return (
-        <div className="space-y-8 animate-fadeIn text-left">
-            <div className="border-b border-[var(--color-outline-variant)] pb-4">
-                <h2 className="text-xl font-black text-slate-900 font-display">
-                    {lang === 'EN' ? 'Official e-Mitra Filing Services' : 'आधिकारिक ई-मित्र सेवाएँ'}
-                </h2>
-                <p className="text-[12px] text-slate-400 mt-0.5">
-                    {lang === 'EN' ? 'Browse official government documents and request quick filing desk help.' : 'आधिकारिक सरकारी दस्तावेजों को ब्राउज़ करें और त्वरित सहायता के लिए अनुरोध दर्ज करें।'}
-                </p>
-            </div>
-
-            {isLoggedIn && (
-                <div className="flex bg-[var(--color-surface-low)] p-1 rounded-xl border border-[var(--color-outline-variant)] w-fit mb-6 shadow-inner">
-                    <button
-                        onClick={() => setServicesSubTab("catalog")}
-                        className={`py-2 px-5 text-[13px] font-semibold rounded-lg transition-all cursor-pointer border-none ${
-                            servicesSubTab === "catalog"
-                                ? "bg-[var(--color-surface-base)] text-[var(--color-primary)] shadow-sm"
-                                : "text-gray-400 hover:text-gray-700"
-                        }`}
-                    >
-                        {lang === 'EN' ? 'Services Catalog' : 'सेवाएं सूची'}
-                    </button>
-                    <button
-                        onClick={() => setServicesSubTab("requests")}
-                        className={`py-2 px-5 text-[13px] font-semibold rounded-lg transition-all cursor-pointer border-none ${
-                            servicesSubTab === "requests"
-                                ? "bg-[var(--color-surface-base)] text-[var(--color-primary)] shadow-sm"
-                                : "text-gray-400 hover:text-gray-700"
-                        }`}
-                    >
-                        {lang === 'EN' ? 'My Filings' : 'मेरे आवेदन'}
-                    </button>
-                </div>
-            )}
-
+        <div className="animate-fadeIn text-left">
             {(!isLoggedIn || servicesSubTab === "catalog") ? (
                 <div className="space-y-6">
-                    {/* Catalog Search & SSO App Grid */}
-                    <div className="space-y-5">
-                        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                            <h3 className="text-[13.5px] font-bold text-slate-700 tracking-tight">
-                                {lang === 'EN' ? 'SSO Application Launcher' : 'एसएसओ एप्लिकेशन लांचर'}
-                            </h3>
-                            <div className="relative w-full sm:w-72">
-                                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input 
-                                    type="text"
-                                    value={serviceSearch}
-                                    onChange={e => setServiceSearch(e.target.value)}
-                                    placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
-                                    className="w-full bg-white border border-slate-200 text-[13px] placeholder:text-gray-400 pl-11 pr-8 py-2.5 rounded-xl focus:outline-none focus:border-[#0a4a83] transition-all shadow-sm font-semibold animate-fadeIn"
-                                />
-                            </div>
+                    {/* Sticky Search Bar */}
+                    <div className="sticky top-0 z-20 bg-[var(--color-surface-base)] pb-4 pt-2 -mt-2">
+                        <div className="relative w-full">
+                            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                            <input 
+                                type="text"
+                                value={serviceSearch}
+                                onChange={e => setServiceSearch(e.target.value)}
+                                placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
+                                className="w-full bg-white border border-slate-200 text-[14px] placeholder:text-slate-400 pl-12 pr-8 py-3.5 rounded-2xl focus:outline-none focus:border-[#0a4a83] focus:ring-4 focus:ring-[#0a4a83]/10 transition-all shadow-sm font-semibold"
+                            />
                         </div>
+                    </div>
+
+                    <div className="space-y-5">
 
                         {/* SSO App Icons Grid */}
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 py-2">

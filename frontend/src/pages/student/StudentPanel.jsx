@@ -892,7 +892,7 @@ export default function StudentPanel() {
                     {/* ── CENTER WORKSPACE ── */}
                     <div className="flex-1 min-w-0 h-[calc(100vh-108px)] overflow-y-auto scroll-container-smooth flex flex-col justify-between">
                         {/* Official Bulletin Notice Ticker */}
-                        {upcomingDeadlines.length > 0 && (
+                        {upcomingDeadlines.length > 0 && activeTab !== "services" && (
                             <div className="bg-[#fff4ee] text-slate-700 text-[11px] font-semibold py-2 px-6 overflow-hidden flex items-center border-b border-orange-100 shadow-inner relative shrink-0">
                                 <div className="flex items-center gap-1.5 shrink-0 bg-[#fff4ee] z-10 pr-4 mr-4 text-[#f26522] font-black uppercase tracking-wider relative">
                                     <Clock size={12} className="animate-pulse" /> 
