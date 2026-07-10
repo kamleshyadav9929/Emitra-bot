@@ -24,7 +24,7 @@ from jwt import PyJWKClient
 jwks_client = None
 if config.CLERK_JWKS_URL and not config.CLERK_JWT_PUBLIC_KEY:
     try:
-        jwks_client = PyJWKClient(config.CLERK_JWKS_URL)
+        jwks_client = PyJWKClient(config.CLERK_JWKS_URL, timeout=5)
     except Exception as e:
         print(f"JWKS Client initialization failed: {e}")
 
