@@ -90,24 +90,24 @@ export default function ExamsTab({
                     </div>
 
                     {/* Action Blocks */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                        <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 flex items-center justify-between shadow-sm hover:border-[var(--color-primary)]/30 transition-all border-solid">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                        <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 flex flex-col gap-4 shadow-sm hover:border-[var(--color-primary)]/30 transition-all border-solid justify-between">
                             <div className="space-y-1 text-left">
                                 <h4 className="text-[13.5px] font-extrabold text-slate-900 font-display">Official Website</h4>
-                                <p className="text-[11.5px] text-slate-400">View official board notice.</p>
+                                <p className="text-[11px] text-slate-400 leading-tight">View official board notice.</p>
                             </div>
                             <a 
                                 href={activeExamForTimeline.official_url} target="_blank" rel="noopener noreferrer"
-                                className="px-4 py-2 bg-[var(--color-surface-low)] hover:bg-slate-100 text-slate-700 border border-[var(--color-outline-variant)] hover:border-slate-350 text-[11px] font-semibold rounded-xl shadow-sm transition-all flex items-center gap-1.5 border-solid cursor-pointer decoration-none"
+                                className="w-full justify-center px-4 py-2.5 bg-[var(--color-surface-low)] hover:bg-slate-100 text-slate-700 border border-[var(--color-outline-variant)] hover:border-slate-350 text-[11.5px] font-semibold rounded-xl shadow-sm transition-all flex items-center gap-1.5 border-solid cursor-pointer decoration-none whitespace-nowrap"
                             >
-                                Official Link <ExternalLink size={12} />
+                                Official Link <ExternalLink size={14} />
                             </a>
                         </div>
 
-                        <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 flex items-center justify-between shadow-sm hover:border-[var(--color-primary)]/30 transition-all border-solid">
+                        <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 flex flex-col gap-4 shadow-sm hover:border-[var(--color-primary)]/30 transition-all border-solid justify-between">
                             <div className="space-y-1 text-left">
                                 <h4 className="text-[13.5px] font-extrabold text-slate-900 font-display">Filing Assistant</h4>
-                                <p className="text-[11.5px] text-slate-400">Apply form via bureau desk.</p>
+                                <p className="text-[11px] text-slate-400 leading-tight">Apply form via bureau desk.</p>
                             </div>
                             <button
                                 onClick={() => {
@@ -117,23 +117,23 @@ export default function ExamsTab({
                                         setIsWizardOpen(true)
                                     }
                                 }}
-                                className="px-4 py-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white text-[11px] font-semibold rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer border-none"
+                                className="w-full justify-center px-4 py-2.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white text-[11.5px] font-semibold rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer border-none whitespace-nowrap"
                             >
-                                Apply Now <Sparkles size={12} className="text-white animate-pulse" />
+                                Apply Now <Sparkles size={14} className="text-white animate-pulse" />
                             </button>
                         </div>
 
-                        <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 flex items-center justify-between shadow-sm hover:border-[var(--color-primary)]/30 transition-all border-solid">
+                        <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 flex flex-col gap-4 shadow-sm hover:border-[var(--color-primary)]/30 transition-all border-solid justify-between">
                             <div className="space-y-1 text-left">
                                 <h4 className="text-[13.5px] font-extrabold text-slate-900 font-display">Ask Operator</h4>
-                                <p className="text-[11.5px] text-slate-400">Ask support on WhatsApp.</p>
+                                <p className="text-[11px] text-slate-400 leading-tight">Ask support on WhatsApp.</p>
                             </div>
                             <a 
                                 href={`https://wa.me/${config.whatsapp_number || "916377964293"}?text=${encodeURIComponent(`Hi Support! I have a question regarding the ${activeExamForTimeline.name} exam.`)}`}
                                 target="_blank" rel="noopener noreferrer"
-                                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-semibold rounded-xl shadow-sm transition-all flex items-center gap-1.5 border-solid cursor-pointer decoration-none text-center"
+                                className="w-full justify-center px-4 py-2.5 bg-[#128C7E] hover:bg-[#075E54] text-white text-[11.5px] font-semibold rounded-xl shadow-sm transition-all flex items-center gap-1.5 border-solid cursor-pointer decoration-none whitespace-nowrap"
                             >
-                                WhatsApp <MessageSquare size={12} />
+                                WhatsApp <MessageSquare size={14} />
                             </a>
                         </div>
                     </div>
