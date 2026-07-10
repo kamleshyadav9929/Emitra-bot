@@ -773,54 +773,22 @@ export default function StudentPanel() {
             {/* ── MAIN PORTAL CANVAS ── */}
             <div className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden relative">
                 
-                {/* ── DOUBLE-DECKER GOVT HEADER ── */}
+                {/* ── SINGLE CLEAN HEADER ── */}
                 <div className="flex flex-col sticky top-0 z-30 shrink-0 shadow-sm">
-                    {/* Top Deck: Gov Info & Support Banner */}
-                    <div className="h-10 bg-[#072146] text-white flex items-center justify-between px-6 md:px-10 text-[11px] font-medium border-b border-[#0f3460]">
-                        <div className="flex items-center gap-2">
-                            <span className="text-[12px]">🏛️</span>
-                            <span className="tracking-wide text-white/90">
-                                {lang === "EN" ? "Government of Rajasthan" : "राजस्थान सरकार"}
-                            </span>
-                            <span className="text-slate-500 font-bold">|</span>
-                            <span className="text-slate-300">
-                                {lang === "EN" ? "Single Sign-On (SSO)" : "सिंगल साइन-ऑन पोर्टल"}
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-4 text-white/80">
-                            <span className="hidden sm:inline">📞 Helpline: <span className="font-bold text-amber-400">1800-180-6127</span></span>
-                            {isLoggedIn && (
-                                <span className="text-slate-400 hidden md:inline">
-                                    IP: <span className="font-mono">10.140.23.{String(user?.telegram_id || '99').slice(-2)}</span>
-                                </span>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Bottom Deck: Primary Header */}
                     <header className="h-16 bg-white flex items-center justify-between px-6 md:px-10 border-b border-slate-200">
+                        {/* Left Side: Navigation / Tab Title */}
                         <div className="flex items-center gap-3">
                             <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 -ml-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors">
                                 <Menu size={20} />
                             </button>
-                            <div className="hidden lg:flex items-center gap-2.5">
-                                <div className="w-8 h-8 rounded-lg bg-[#0a4a83] text-white flex items-center justify-center font-bold text-sm">
-                                    SSO
-                                </div>
-                                <h2 className="text-[15px] font-bold text-slate-800 tracking-tight">
-                                    {lang === "EN" ? "Citizen Dashboard" : "नागरिक डैशबोर्ड"}
-                                </h2>
-                                <span className="text-slate-350 font-normal">/</span>
-                                <span className="text-[13px] text-[#0a4a83] font-semibold">
+                            <div className="flex items-center gap-2.5">
+                                <h2 className="text-[16px] font-bold text-[#0a4a83] tracking-tight">
                                     {lang === "EN" ? navigationItems.find(i => i.id === activeTab)?.label : navigationItems.find(i => i.id === activeTab)?.labelHi}
-                                </span>
-                            </div>
-                            <div className="lg:hidden flex items-center gap-2">
-                                <img src="/logo.png" alt="Logo" className="w-8 h-8 rounded-lg object-contain bg-white shadow-sm" />
-                                <span className="text-slate-800 font-extrabold text-[14px]">Krishna Emitra</span>
+                                </h2>
                             </div>
                         </div>
 
+                        {/* Right Side: Actions */}
                         <div className="flex items-center gap-4">
                             {isLoggedIn && (
                                 <button 
@@ -846,9 +814,6 @@ export default function StudentPanel() {
                             </button>
                         </div>
                     </header>
-
-                    {/* Saffron and Green Tricolor border bottom */}
-                    <div className="sso-tricolor-line" />
                 </div>
 
                 {/* ── MOBILE MENU DRAWER ── */}
