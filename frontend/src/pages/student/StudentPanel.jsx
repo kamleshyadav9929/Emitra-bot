@@ -690,11 +690,9 @@ export default function StudentPanel() {
                 {/* SSO / e-Mitra Kiosk Header */}
                 <div className="h-16 flex items-center px-5 border-b border-slate-200 bg-[#f8fafc]">
                     <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab("overview")}>
-                        <div className="w-8 h-8 rounded-lg bg-[#0a4a83] text-white flex items-center justify-center font-bold text-sm shadow-md">
-                            SSO
-                        </div>
+                        <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-lg object-contain shadow-sm bg-white" />
                         <div className="leading-tight">
-                            <span className="text-slate-800 font-extrabold text-[13.5px] tracking-tight block">Citizen SSO Portal</span>
+                            <span className="text-slate-800 font-extrabold text-[14px] tracking-tight block">Krishna Emitra</span>
                             <span className="text-[9px] text-[#f26522] font-black tracking-widest uppercase block">कृष्णा ई-मित्र</span>
                         </div>
                     </div>
@@ -824,8 +822,8 @@ export default function StudentPanel() {
                                 </span>
                             </div>
                             <div className="lg:hidden flex items-center gap-2">
-                                <Logo className="w-8 h-8 rounded-lg" />
-                                <span className="text-slate-800 font-extrabold text-[14px]">e-Mitra Portal</span>
+                                <img src="/logo.png" alt="Logo" className="w-8 h-8 rounded-lg object-contain bg-white shadow-sm" />
+                                <span className="text-slate-800 font-extrabold text-[14px]">Krishna Emitra</span>
                             </div>
                         </div>
 
