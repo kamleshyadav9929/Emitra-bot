@@ -83,52 +83,7 @@ export default function ServicesTab({
                         </div>
                     </div>
 
-                    <div className="space-y-5">
 
-                        {/* SSO App Icons Grid */}
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 py-2">
-                            {/* All Services Card */}
-                            <div 
-                                onClick={() => setServiceCatFilter("ALL")}
-                                className={`sso-app-card ${serviceCatFilter === "ALL" ? "border-[#0a4a83] bg-[#e5effa] ring-2 ring-[#0a4a83]/20" : ""}`}
-                            >
-                                <div className="sso-app-icon-wrapper bg-[#e5effa] text-[#0a4a83]">
-                                    <span className="text-xl">🏛️</span>
-                                </div>
-                                <h4 className="text-[12px] font-bold text-slate-800 tracking-tight leading-tight">
-                                    {lang === 'EN' ? 'All Services' : 'सभी सेवाएँ'}
-                                </h4>
-                            </div>
-
-                            {/* Dynamic Category Cards */}
-                            {Object.entries(services).map(([catKey, cat]) => {
-                                const CAT_STYLES = {
-                                    DOCUMENTS: { icon: "📁", bg: "bg-emerald-50 text-emerald-600 border-emerald-100", labelHi: "राजस्व दस्तावेज़", labelEn: "Revenue Certs" },
-                                    UTILITY: { icon: "⚡", bg: "bg-amber-50 text-amber-600 border-amber-100", labelHi: "उपयोगिता बिल", labelEn: "Discom Bills" },
-                                    SCHEMES: { icon: "🏢", bg: "bg-purple-50 text-purple-600 border-purple-100", labelHi: "सरकारी योजनाएं", labelEn: "Govt Schemes" },
-                                    RECRUITMENT: { icon: "✍️", bg: "bg-rose-50 text-rose-600 border-rose-100", labelHi: "भर्ती परीक्षा", labelEn: "Recruitment Portal" },
-                                    GENERAL: { icon: "📋", bg: "bg-sky-50 text-sky-600 border-sky-100", labelHi: "सामान्य सेवाएँ", labelEn: "General Services" },
-                                    DEFAULT: { icon: "🏢", bg: "bg-slate-50 text-slate-600 border-slate-200", labelHi: "अन्य सेवाएँ", labelEn: "Other Desk" }
-                                }
-                                const style = CAT_STYLES[catKey.toUpperCase()] || CAT_STYLES.DEFAULT
-                                const isSelected = serviceCatFilter === catKey
-                                return (
-                                    <div 
-                                        key={catKey}
-                                        onClick={() => setServiceCatFilter(catKey)}
-                                        className={`sso-app-card ${isSelected ? "border-[#0a4a83] bg-[#e5effa] ring-2 ring-[#0a4a83]/20" : ""}`}
-                                    >
-                                        <div className={`sso-app-icon-wrapper ${style.bg}`}>
-                                            <span className="text-xl">{style.icon}</span>
-                                        </div>
-                                        <h4 className="text-[12px] font-bold text-slate-800 tracking-tight leading-tight">
-                                            {lang === 'EN' ? style.labelEn : style.labelHi}
-                                        </h4>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div>
 
                     {/* Categorized Grid */}
                     {flatServicesList.length === 0 ? (
