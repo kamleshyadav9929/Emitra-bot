@@ -1,3 +1,5 @@
+TRUNCATE TABLE "public"."services" CASCADE;
+
 INSERT INTO "public"."services" ("id", "category_key", "category_label", "name", "description", "price", "enabled", "show_in_web", "sort_order") VALUES 
 (1, 'cert', 'Pramaan Patra (Certificates)', 'Mool Niwas (Domicile)', 'Niwas praman patra', 250.00, 1, 1, 0), 
 (2, 'cert', 'Pramaan Patra (Certificates)', 'Jati Pramaan (Caste SC/ST/OBC)', 'Jati praman patra', 30.00, 1, 1, 1), 
