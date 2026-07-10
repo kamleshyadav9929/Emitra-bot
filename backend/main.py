@@ -658,8 +658,13 @@ def student_onboard():
     if not name:
         return jsonify({"success": False, "error": "Name is required"}), 400
         
-    telegram_id = request.student_payload.get("sub")
-    user = database.get_user_by_telegram_id(telegram_id)
+    user_id = request.student_payload.get("user_id")
+    if user_id:
+        user = database.get_user_by_id(user_id)
+    else:
+        telegram_id = request.student_payload.get("sub")
+        user = database.get_user_by_telegram_id(telegram_id)
+        
     if not user:
         return jsonify({"success": False, "error": "User not found"}), 404
         
