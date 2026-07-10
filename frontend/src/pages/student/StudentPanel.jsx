@@ -60,6 +60,7 @@ export default function StudentPanel() {
     const [servicesSubTab, setServicesSubTab] = useState("catalog")
     const [notificationsSubTab, setNotificationsSubTab] = useState("all")
     const [expandedAppId, setExpandedAppId] = useState(null)
+    const [visibleCount, setVisibleCount] = useState(30)
 
     // LocalStorage-backed states linked to student
     const storagePrefix = user?.phone || user?.email || "anonymous"
@@ -302,6 +303,9 @@ export default function StudentPanel() {
         // Handle [Image](url) format
         formatted = formatted.replace(/\[Image\]\((.*?)\)/gi, "<div class='mt-2 mb-2'><img src='$1' alt='Notification Image' class='w-full rounded-[8px] border border-slate-200 object-cover shadow-sm' /></div>");
 
+        // Handle [Image] url format
+        formatted = formatted.replace(/\[Image\]\s*(https?:\/\/[^\s<]+)/gi, "<div class='mt-2 mb-2'><img src='$1' alt='Notification Image' class='w-full rounded-[8px] border border-slate-200 object-cover shadow-sm' /></div>");
+
         // Markdown links [text](url)
         formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, "<a href='$2' target='_blank' rel='noopener noreferrer' class='text-[#0a66c2] hover:underline font-semibold'>$1</a>");
         
@@ -319,6 +323,8 @@ export default function StudentPanel() {
     }
 
     const renderNotificationsPanel = (isSticky = true) => {
+        const visibleNotifications = subNotifications.slice(0, visibleCount);
+
         return (
             <div className={`flex flex-col h-full bg-white ${isSticky ? "rounded-none w-full" : "border border-slate-200 rounded-[12px] shadow-sm"}`}>
                 <div className="border-b border-slate-200 px-5 py-5 flex items-center gap-3">
@@ -343,7 +349,7 @@ export default function StudentPanel() {
                     </div>
                 ) : (
                     <div className="flex-1 overflow-y-auto p-5 space-y-7 scrollbar-thin">
-                        {subNotifications.map((ann, idx) => {
+                        {visibleNotifications.map((ann, idx) => {
                             return (
                                 <div 
                                     key={ann.id || idx} 
@@ -370,6 +376,17 @@ export default function StudentPanel() {
                                 </div>
                             );
                         })}
+                        
+                        {subNotifications.length > visibleCount && (
+                            <div className="pt-2 pb-4 flex justify-center">
+                                <button 
+                                    onClick={() => setVisibleCount(prev => prev + 30)}
+                                    className="px-5 py-2 rounded-full border border-slate-200 text-[#0a66c2] text-[13px] font-bold hover:bg-slate-50 transition-colors"
+                                >
+                                    {lang === 'EN' ? 'Load More' : 'और लोड करें'}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
