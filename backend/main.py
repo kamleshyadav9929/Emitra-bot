@@ -117,12 +117,12 @@ def get_bot_and_loop():
     """Lazily initializes the event loop and bot after the WSGI worker has forked."""
     global _global_loop, _global_bot
     if _global_loop is None:
+        import asyncio
         _global_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(_global_loop)
         if config.TELEGRAM_BOT_TOKEN:
             import os
             from telegram.request import HTTPXRequest
-            import asyncio
             proxy = os.environ.get("HTTP_PROXY") or os.environ.get("http_proxy")
             if proxy:
                 req = HTTPXRequest(proxy_url=proxy)
