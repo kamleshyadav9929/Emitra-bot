@@ -31,12 +31,16 @@ import Logo from "../../components/common/Logo"
 export default function StudentPanel() {
     const navigate = useNavigate()
     const [showLoginModal, setShowLoginModal] = useState(false)
-    const { category: catParam } = useParams()
+    const { tab: tabParam, category: catParam } = useParams()
     const { lang, toggleLanguage, t } = useLanguage()
     const { user, isLoggedIn, needsOnboarding, logout } = useAuth()
 
     // Navigation and tab states
-    const [activeTab, setActiveTab] = useState("overview")
+    const activeTab = catParam ? "services" : (tabParam || "dashboard")
+    const setActiveTab = (newTab) => {
+        navigate(`/${newTab}`)
+    }
+
     const [activeExamForTimeline, setActiveExamForTimeline] = useState(null)
     const [activeServiceForForm, setActiveServiceForForm] = useState(null)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -159,7 +163,6 @@ export default function StudentPanel() {
     // React to category URL slug
     useEffect(() => {
         if (catParam) {
-            setActiveTab("services")
             setServicesSubTab("catalog")
             setServiceCatFilter(catParam.toUpperCase())
         }
@@ -208,7 +211,7 @@ export default function StudentPanel() {
 
     // Automatic Announcement Carousel rotation (every 4s)
     useEffect(() => {
-        if (announcements.length > 0 && activeTab === "overview" && !isLoggedIn) {
+        if (announcements.length > 0 && activeTab === "dashboard" && !isLoggedIn) {
             const timer = setInterval(() => {
                 setCarouselIndex(prev => (prev + 1) % Math.min(announcements.length, 4))
             }, 4000)
@@ -587,7 +590,7 @@ export default function StudentPanel() {
     }
 
     const navigationItems = [
-        { id: "overview", label: "Dashboard", labelHi: "डैशबोर्ड", icon: LayoutDashboard },
+        { id: "dashboard", label: "Dashboard", labelHi: "डैशबोर्ड", icon: LayoutDashboard },
         { id: "recruitments", label: "Recruitments", labelHi: "भर्तियां", icon: Award },
         { id: "services", label: "Browse Services", labelHi: "सरकारी सेवाएँ", icon: ClipboardList },
         { id: "exams", label: "Exam Alerts", labelHi: "परीक्षा अलर्ट", icon: Bell },
@@ -608,7 +611,7 @@ export default function StudentPanel() {
 
                 {/* SSO / e-Mitra Kiosk Header */}
                 <div className="h-16 flex items-center px-5 border-b border-slate-200 bg-[#f8fafc]">
-                    <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab("overview")}>
+                    <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab("dashboard")}>
                         <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-lg object-contain shadow-sm bg-white" />
                         <div className="leading-tight">
                             <span className="text-slate-800 font-extrabold text-[14px] tracking-tight block">Krishna Emitra</span>
@@ -711,7 +714,7 @@ export default function StudentPanel() {
                         <div className="flex items-center gap-4">
                             {isLoggedIn && (
                                 <button 
-                                    onClick={() => setActiveTab("overview")} 
+                                    onClick={() => setActiveTab("dashboard")} 
                                     className="p-2 rounded-xl hover:bg-slate-100 text-slate-455 hover:text-slate-700 transition-all relative cursor-pointer"
                                     title="Inbox Notifications"
                                 >
@@ -839,7 +842,7 @@ export default function StudentPanel() {
                         <div className="space-y-8 animate-fadeIn">
                             
                             {/* ── Tab 1: Overview ── */}
-                            {activeTab === "overview" && (
+                            {activeTab === "dashboard" && (
                                 !isLoggedIn ? (
                                     <PublicOverview 
                                         announcements={announcements}

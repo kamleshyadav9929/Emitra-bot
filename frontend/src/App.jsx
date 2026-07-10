@@ -158,7 +158,7 @@ function App() {
         <Routes>
             {/* ── Public Student Portal ─────────────────────────────────────── */}
             <Route path="/" element={<StudentPortalHome />} />
-            <Route path="/dashboard" element={<StudentDashboardRoute />} />
+            <Route path="/:tab" element={<StudentPanel />} />
             <Route path="/services/:category" element={<StudentPanel />} />
 
 
