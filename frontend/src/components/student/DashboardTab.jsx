@@ -12,7 +12,7 @@ export default function DashboardTab({
     return (
         <div className="space-y-8 text-left animate-fadeIn">
             {/* Bento Stats Widgets Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 lg:grid-cols-2 gap-5">
                 {/* Total Requests */}
                 <div 
                     onClick={() => setActiveTab("services")}
@@ -25,21 +25,6 @@ export default function DashboardTab({
                     <div className="flex items-center gap-1.5 z-10 relative mt-auto text-[12px] font-bold text-[#0a4a83]">
                         <ClipboardList size={14} />
                         <span>View Status Circulars</span>
-                    </div>
-                </div>
-
-                {/* Under Review */}
-                <div 
-                    onClick={() => setActiveTab("services")}
-                    className="bg-[#fff4ee] border border-[#f26522]/30 rounded-xl p-5 flex flex-col justify-between h-[160px] relative overflow-hidden cursor-pointer hover:border-[#f26522] transition-all group text-left shadow-sm"
-                >
-                    <div className="z-10 relative">
-                        <p className="text-[10px] font-black tracking-wider uppercase text-[#f26522]">UNDER REVIEW / लंबित आवेदन</p>
-                        <p className="text-4xl font-extrabold text-[#b83b00] mt-3 group-hover:scale-105 transition-transform origin-left">{statsProgress.active}</p>
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-auto z-10 relative text-[12px] font-bold text-[#f26522]">
-                        <Clock size={14} className="animate-pulse" />
-                        <span>Operator Reviewing</span>
                     </div>
                 </div>
 
@@ -56,56 +41,53 @@ export default function DashboardTab({
                         <span className="flex items-center gap-1"><CheckCircle2 size={14} /> Receipts Issued</span>
                     </div>
                 </div>
-
-                {/* Action Needed */}
-                <div 
-                    onClick={() => setActiveTab("services")}
-                    className="bg-red-50 border border-red-200 rounded-xl p-5 flex flex-col justify-between h-[160px] relative overflow-hidden cursor-pointer hover:border-red-500 transition-all group text-left shadow-sm"
-                >
-                    {statsProgress.actionRequired > 0 && (
-                        <div className="absolute top-4 right-4 w-2 h-2 bg-red-650 rounded-full animate-ping z-20"></div>
-                    )}
-                    <div className="z-10 relative">
-                        <p className="text-[10px] font-black tracking-wider uppercase text-red-655">ACTION REQUIRED / त्रुटि सुधार</p>
-                        <p className="text-4xl font-extrabold text-red-900 mt-3 group-hover:scale-105 transition-transform origin-left">
-                            {statsProgress.actionRequired}
-                        </p>
-                    </div>
-                    <span className="text-[11.5px] font-black text-red-655 uppercase tracking-wide underline underline-offset-2 hover:text-red-700 transition-colors mt-auto z-10 relative block">
-                        Fix Rejected Forms
-                    </span>
-                </div>
             </div>
 
-            {/* Quick Action Desk */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 bg-[#f8fafc] border border-slate-200 rounded-xl p-5 shadow-inner">
-                <button onClick={() => setActiveTab("exams")} className="flex flex-col items-center gap-2 group cursor-pointer border-none bg-transparent">
-                    <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 text-[#0a4a83] flex items-center justify-center shadow-sm group-hover:border-[#0a4a83] group-hover:bg-[#e5effa] transition-all duration-200">
-                        <Award size={18} />
-                    </div>
-                    <span className="text-[12px] font-bold text-slate-700 group-hover:text-[#0a4a83] transition-colors">Select Exams / परीक्षा चयन</span>
-                </button>
-
-                <button onClick={() => setActiveTab("services")} className="flex flex-col items-center gap-2 group cursor-pointer border-none bg-transparent">
-                    <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 text-emerald-600 flex items-center justify-center shadow-sm group-hover:border-emerald-600 group-hover:bg-emerald-50 transition-all duration-200">
-                        <ClipboardList size={18} />
-                    </div>
-                    <span className="text-[12px] font-bold text-slate-700 group-hover:text-emerald-600 transition-colors">My Services / मेरी सेवाएं</span>
-                </button>
-
-                <button onClick={() => setActiveTab("neet")} className="flex flex-col items-center gap-2 group cursor-pointer border-none bg-transparent">
-                    <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 text-purple-600 flex items-center justify-center shadow-sm group-hover:border-purple-600 group-hover:bg-purple-50 transition-all duration-200">
-                        <BookOpen size={18} />
-                    </div>
-                    <span className="text-[12px] font-bold text-slate-700 group-hover:text-purple-600 transition-colors">NEET Desk / नीट हेल्प</span>
-                </button>
-
-                <button onClick={() => setActiveTab("profile")} className="flex flex-col items-center gap-2 group cursor-pointer border-none bg-transparent">
-                    <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 text-[#f26522] flex items-center justify-center shadow-sm group-hover:border-[#f26522] group-hover:bg-[#fff4ee] transition-all duration-200">
-                        <Settings size={18} />
-                    </div>
-                    <span className="text-[12px] font-bold text-slate-700 group-hover:text-[#f26522] transition-colors">SSO Profile / प्रोफ़ाइल</span>
-                </button>
+            {/* Ongoing Recruitments */}
+            <div className="bg-white border border-slate-200 rounded-[16px] shadow-sm overflow-hidden">
+                <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-[#F8FAFC]">
+                    <h3 className="text-[18px] font-semibold text-slate-900 tracking-tight">Ongoing Recruitments</h3>
+                    <button onClick={() => setActiveTab("exams")} className="text-[13px] font-medium text-[#4162EE] hover:underline bg-transparent border-none cursor-pointer">
+                        View All
+                    </button>
+                </div>
+                <div className="p-6 space-y-4">
+                    {exams.filter(ex => !ex.end_date || new Date(ex.end_date) >= new Date()).slice(0, 3).map((ex, idx) => (
+                        <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-[12px] border border-[#4162EE] bg-white transition-shadow hover:shadow-md">
+                            <div className="flex items-center gap-5">
+                                <img 
+                                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(ex.category || ex.name)}&background=random&color=fff&size=64&bold=true`} 
+                                    alt={ex.category}
+                                    className="w-[60px] h-[60px] rounded-full object-cover shadow-sm border border-slate-200"
+                                />
+                                <div className="space-y-1">
+                                    <h4 className="text-[15px] font-semibold text-slate-800 uppercase tracking-tight line-clamp-2 pr-4">{ex.name}</h4>
+                                    <p className="text-[14px] text-slate-500 uppercase">({ex.category || "GOVT"})</p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col items-center sm:items-end gap-2 shrink-0">
+                                <button
+                                    onClick={() => {
+                                        setActiveExamForTimeline(ex);
+                                        setActiveTab("exams");
+                                    }}
+                                    className="px-8 py-2.5 bg-[#4162EE] hover:bg-[#3451D4] text-white text-[15px] font-medium rounded-[8px] transition-colors border-none shadow-sm cursor-pointer w-full sm:w-auto text-center"
+                                >
+                                    Apply Now
+                                </button>
+                                <span className="text-[13px] text-slate-600 font-medium">
+                                    {ex.end_date ? new Date(ex.end_date).toLocaleDateString("en-GB", { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : "TBD"}
+                                </span>
+                            </div>
+                        </div>
+                    ))}
+                    
+                    {exams.filter(ex => !ex.end_date || new Date(ex.end_date) >= new Date()).length === 0 && (
+                        <div className="text-center py-8 text-slate-500 text-[14px]">
+                            No ongoing recruitments at the moment.
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Subscribed Exams list */}

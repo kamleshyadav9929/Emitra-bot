@@ -1447,7 +1447,7 @@ def public_download_document(filename):
     if not os.path.exists(os.path.join(UPLOAD_FOLDER, clean_filename)):
         return jsonify({"error": "File not found"}), 404
         
-    return send_from_directory(UPLOAD_FOLDER, clean_filename, as_attachment=True)
+    return send_from_directory(UPLOAD_FOLDER, clean_filename)
 
 
 
