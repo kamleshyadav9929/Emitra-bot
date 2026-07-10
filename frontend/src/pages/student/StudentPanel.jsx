@@ -298,19 +298,26 @@ export default function StudentPanel() {
             .replace(/>/g, "&gt;");
         
         // Handle images: ![alt](url)
-        formatted = formatted.replace(/!\[(.*?)\]\((.*?)\)/g, "<div class='mt-2 mb-2'><img src='$2' alt='$1' class='w-full rounded-[8px] border border-slate-200 object-cover shadow-sm' /></div>");
+        formatted = formatted.replace(/!\[(.*?)\]\((.*?)\)/g, "<div class='mt-2 mb-2 w-full max-w-sm'><img src='$2' alt='$1' class='w-full rounded-[8px] border border-slate-200 object-cover shadow-sm' /></div>");
         
         // Handle [Image](url) format
-        formatted = formatted.replace(/\[Image\]\((.*?)\)/gi, "<div class='mt-2 mb-2'><img src='$1' alt='Notification Image' class='w-full rounded-[8px] border border-slate-200 object-cover shadow-sm' /></div>");
+        formatted = formatted.replace(/\[Image\]\((.*?)\)/gi, "<div class='mt-2 mb-2 w-full max-w-sm'><img src='$1' alt='Notification Image' class='w-full rounded-[8px] border border-slate-200 object-cover shadow-sm' /></div>");
 
         // Handle [Image] url format
-        formatted = formatted.replace(/\[Image\]\s*(https?:\/\/[^\s<]+)/gi, "<div class='mt-2 mb-2'><img src='$1' alt='Notification Image' class='w-full rounded-[8px] border border-slate-200 object-cover shadow-sm' /></div>");
+        formatted = formatted.replace(/\[Image\]\s*(https?:\/\/[^\s<]+)/gi, "<div class='mt-2 mb-2 w-full max-w-sm'><img src='$1' alt='Notification Image' class='w-full rounded-[8px] border border-slate-200 object-cover shadow-sm' /></div>");
 
         // Markdown links [text](url)
         formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, "<a href='$2' target='_blank' rel='noopener noreferrer' class='text-[#0a66c2] hover:underline font-semibold'>$1</a>");
         
-        // Raw URLs (basic)
-        formatted = formatted.replace(/(?<!href=')(https?:\/\/[^\s<]+)/g, "<a href='$1' target='_blank' rel='noopener noreferrer' class='text-[#0a66c2] hover:underline font-semibold'>$1</a>");
+        // Raw URLs (basic) - split by HTML tags to avoid replacing URLs inside href/src attributes
+        const parts = formatted.split(/(<[^>]+>)/g);
+        for (let i = 0; i < parts.length; i++) {
+            if (i % 2 === 0) {
+                // It's a text node
+                parts[i] = parts[i].replace(/(https?:\/\/[^\s<]+)/g, "<a href='$1' target='_blank' rel='noopener noreferrer' class='text-[#0a66c2] hover:underline font-semibold'>$1</a>");
+            }
+        }
+        formatted = parts.join("");
         
         // Bold *text*
         formatted = formatted.replace(/\*(.*?)\*/g, "<strong>$1</strong>");
@@ -359,7 +366,7 @@ export default function StudentPanel() {
                                     <div className="text-[#ef4444] mt-0.5 flex-shrink-0 text-[18px]">
                                         📌
                                     </div>
-                                    <div className="text-[15px] font-bold text-slate-800 leading-relaxed font-sans w-full announcement-content tracking-tight">
+                                    <div className="text-[15px] font-bold text-slate-800 leading-relaxed font-sans w-full announcement-content tracking-tight break-words whitespace-pre-wrap overflow-hidden">
                                         {formatTelegramMessage(ann.content)}
                                         {ann.links && (
                                             <div className="mt-1.5">
