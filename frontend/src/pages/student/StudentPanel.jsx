@@ -675,7 +675,6 @@ export default function StudentPanel() {
         { id: "exams", label: "Exam Alerts", labelHi: "परीक्षा अलर्ट", icon: Award },
         { id: "neet", label: "NEET Counselling", labelHi: "नीट काउंसलिंग", icon: BookOpen },
         { id: "profile", label: "Profile Settings", labelHi: "प्रोफ़ाइल", icon: Settings },
-        { id: "help", label: "Help Desk", labelHi: "सहायता डेस्क", icon: Info },
         { id: "about", label: "About Us", labelHi: "हमारे बारे में", icon: ShieldCheck }
     ]
 
@@ -1013,22 +1012,6 @@ export default function StudentPanel() {
                                     setNotificationPrefs={setNotificationPrefs}
                                     handleSaveProfile={handleSaveProfile}
                                     onLinkTelegram={() => setShowLoginModal(true)}
-                                />
-                            )}
-
-                            {/* ── Tab 6: Help Desk ── */}
-                            {activeTab === "help" && (
-                                <HelpDeskTab 
-                                    lang={lang}
-                                    cbSubmitted={cbSubmitted}
-                                    setCbSubmitted={setCbSubmitted}
-                                    cbName={cbName}
-                                    setCbName={setCbName}
-                                    cbPhone={cbPhone}
-                                    setCbPhone={setCbPhone}
-                                    cbQuery={cbQuery}
-                                    setCbQuery={setCbQuery}
-                                    handleCallbackQuerySubmit={handleCallbackQuerySubmit}
                                 />
                             )}
 
