@@ -843,6 +843,24 @@ def get_public_services_as_dict():
     return result
 
 
+def _clean_price(price_val):
+    if price_val is None or str(price_val).strip() == "":
+        return 0.00
+    if isinstance(price_val, (int, float)):
+        return float(price_val)
+    s = str(price_val).strip().lower()
+    if "free" in s:
+        return 0.00
+    cleaned = ""
+    for char in s:
+        if char.isdigit() or char == '.':
+            cleaned += char
+    try:
+        return float(cleaned) if cleaned else 0.00
+    except ValueError:
+        return 0.00
+
+
 def add_service(category_key, category_label, name, description="", price=0.0, enabled=True, show_in_web=True):
     res_max = supabase.table("services").select("sort_order").eq("category_key", category_key).order("sort_order", desc=True).limit(1).execute()
     max_order = res_max.data[0]["sort_order"] if res_max.data else 0
@@ -853,7 +871,7 @@ def add_service(category_key, category_label, name, description="", price=0.0, e
         "category_label": category_label,
         "name": name,
         "description": description,
-        "price": float(price),
+        "price": _clean_price(price),
         "enabled": 1 if enabled else 0,
         "show_in_web": 1 if show_in_web else 0,
         "sort_order": next_order
@@ -870,7 +888,7 @@ def update_service(service_id, **fields):
     if "show_in_web" in updates:
         updates["show_in_web"] = 1 if updates["show_in_web"] else 0
     if "price" in updates:
-        updates["price"] = float(updates["price"])
+        updates["price"] = _clean_price(updates["price"])
         
     if updates:
         supabase.table("services").update(updates).eq("id", service_id).execute()
