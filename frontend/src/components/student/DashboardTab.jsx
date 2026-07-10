@@ -7,39 +7,47 @@ export default function DashboardTab({
     subscribedExams,
     exams,
     config,
-    setActiveExamForTimeline
+    setActiveExamForTimeline,
+    setWizardExamName,
+    setIsWizardOpen,
+    triggerSignIn
 }) {
     return (
         <div className="space-y-8 text-left animate-fadeIn">
             {/* Bento Stats Widgets Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 {/* Total Requests */}
                 <div 
                     onClick={() => setActiveTab("services")}
-                    className="bg-[#e5effa] border border-[#0a4a83]/30 rounded-xl p-5 relative overflow-hidden flex flex-col justify-between h-[160px] cursor-pointer hover:border-[#0a4a83] transition-all group text-left shadow-sm"
+                    className="bg-[var(--color-primary-fixed)] border border-[var(--color-primary)]/10 shadow-sm rounded-xl p-6 relative overflow-hidden flex flex-col justify-between h-[180px] cursor-pointer hover:shadow-ambient transition-shadow group"
                 >
                     <div className="z-10 relative">
-                        <p className="text-[10px] font-black tracking-wider uppercase text-[#0a4a83]">TOTAL APPLICATIONS / कुल आवेदन</p>
-                        <p className="text-4xl font-extrabold text-[#07355e] mt-3 group-hover:scale-105 transition-transform origin-left">{statsProgress.total}</p>
+                        <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-[var(--color-primary)]">TOTAL APPLICATIONS / कुल आवेदन</p>
+                        <p className="text-5xl font-extrabold text-[#0A1A40] mt-3 group-hover:scale-105 transition-transform origin-left">{statsProgress.total}</p>
                     </div>
-                    <div className="flex items-center gap-1.5 z-10 relative mt-auto text-[12px] font-bold text-[#0a4a83]">
-                        <ClipboardList size={14} />
-                        <span>View Status Circulars</span>
+                    <div className="flex items-center gap-2 z-10 relative">
+                        <ClipboardList size={16} className="text-[var(--color-primary)]" />
+                        <span className="text-[13px] font-medium text-[var(--color-primary)]">View Status Circulars</span>
                     </div>
+                    <ClipboardList size={140} strokeWidth={1} className="absolute -bottom-6 -right-6 text-white text-opacity-50 rotate-[-5deg] pointer-events-none z-0" />
                 </div>
 
                 {/* Completed */}
                 <div 
                     onClick={() => setActiveTab("services")}
-                    className="bg-[#e7f6e7] border border-[#138808]/30 rounded-xl p-5 flex flex-col justify-between h-[160px] cursor-pointer hover:border-[#138808] transition-all group relative overflow-hidden text-left shadow-sm"
+                    className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] shadow-sm rounded-xl p-6 flex flex-col justify-between h-[180px] cursor-pointer hover:shadow-ambient transition-shadow relative overflow-hidden"
                 >
                     <div className="z-10 relative">
-                        <p className="text-[10px] font-black tracking-wider uppercase text-[#138808]">SUCCESSFULLY FILED / पूर्ण आवेदन</p>
-                        <p className="text-4xl font-extrabold text-[#0d5f05] mt-3 group-hover:scale-105 transition-transform origin-left">{statsProgress.completed}</p>
+                        <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-gray-400">SUCCESSFULLY FILED / पूर्ण आवेदन</p>
+                        <p className="text-4xl font-extrabold text-gray-900 mt-4 tracking-tight">{statsProgress.completed}</p>
                     </div>
-                    <div className="mt-auto flex items-center justify-between z-10 relative text-[12px] font-bold text-[#138808]">
-                        <span className="flex items-center gap-1"><CheckCircle2 size={14} /> Receipts Issued</span>
+                    <div className="mt-auto flex justify-between items-end z-10 relative">
+                        <div>
+                            <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide">Receipts Issued</p>
+                        </div>
+                        <CheckCircle2 size={24} className="text-gray-200" />
                     </div>
+                    <CheckCircle2 size={140} strokeWidth={1} className="absolute -bottom-8 -right-8 text-[#f3faff] rotate-[-15deg] pointer-events-none z-0" />
                 </div>
             </div>
 
@@ -47,7 +55,7 @@ export default function DashboardTab({
             <div className="bg-white border border-slate-200 rounded-[16px] shadow-sm overflow-hidden">
                 <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-[#F8FAFC]">
                     <h3 className="text-[18px] font-semibold text-slate-900 tracking-tight">Ongoing Recruitments</h3>
-                    <button onClick={() => setActiveTab("exams")} className="text-[13px] font-medium text-[#4162EE] hover:underline bg-transparent border-none cursor-pointer">
+                    <button onClick={() => setActiveTab("recruitments")} className="text-[13px] font-medium text-[#4162EE] hover:underline bg-transparent border-none cursor-pointer">
                         View All
                     </button>
                 </div>
@@ -68,8 +76,11 @@ export default function DashboardTab({
                             <div className="flex flex-col items-center sm:items-end gap-2 shrink-0">
                                 <button
                                     onClick={() => {
-                                        setActiveExamForTimeline(ex);
-                                        setActiveTab("exams");
+                                        if (!user) triggerSignIn()
+                                        else {
+                                            setWizardExamName(ex.name)
+                                            setIsWizardOpen(true)
+                                        }
                                     }}
                                     className="px-8 py-2.5 bg-[#4162EE] hover:bg-[#3451D4] text-white text-[15px] font-medium rounded-[8px] transition-colors border-none shadow-sm cursor-pointer w-full sm:w-auto text-center"
                                 >

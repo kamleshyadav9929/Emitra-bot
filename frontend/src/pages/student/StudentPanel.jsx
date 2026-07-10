@@ -24,6 +24,7 @@ import NeetCounsellingTab from "../../components/student/NeetCounsellingTab"
 import ProfileTab from "../../components/student/ProfileTab"
 import HelpDeskTab from "../../components/student/HelpDeskTab"
 import AboutUsTab from "../../components/student/AboutUsTab"
+import OngoingRecruitmentsTab from "../../components/student/OngoingRecruitmentsTab"
 import PublicOverview from "../../components/student/PublicOverview"
 import Logo from "../../components/common/Logo"
 
@@ -587,8 +588,9 @@ export default function StudentPanel() {
 
     const navigationItems = [
         { id: "overview", label: "Dashboard", labelHi: "डैशबोर्ड", icon: LayoutDashboard },
+        { id: "recruitments", label: "Recruitments", labelHi: "भर्तियां", icon: Award },
         { id: "services", label: "Browse Services", labelHi: "सरकारी सेवाएँ", icon: ClipboardList },
-        { id: "exams", label: "Exam Alerts", labelHi: "परीक्षा अलर्ट", icon: Award },
+        { id: "exams", label: "Exam Alerts", labelHi: "परीक्षा अलर्ट", icon: Bell },
         { id: "neet", label: "NEET Counselling", labelHi: "नीट काउंसलिंग", icon: BookOpen },
         { id: "profile", label: "Profile Settings", labelHi: "प्रोफ़ाइल", icon: Settings },
         { id: "about", label: "About Us", labelHi: "हमारे बारे में", icon: ShieldCheck }
@@ -855,8 +857,22 @@ export default function StudentPanel() {
                                         exams={exams}
                                         config={config}
                                         setActiveExamForTimeline={setActiveExamForTimeline}
+                                        setWizardExamName={setWizardExamName}
+                                        setIsWizardOpen={setIsWizardOpen}
+                                        triggerSignIn={triggerSignIn}
                                     />
                                 )
+                            )}
+
+                            {/* ── Tab 1b: Ongoing Recruitments ── */}
+                            {activeTab === "recruitments" && (
+                                <OngoingRecruitmentsTab 
+                                    exams={exams}
+                                    setWizardExamName={setWizardExamName}
+                                    setIsWizardOpen={setIsWizardOpen}
+                                    isLoggedIn={isLoggedIn}
+                                    triggerSignIn={triggerSignIn}
+                                />
                             )}
 
                             {/* ── Tab 2: Services ── */}
