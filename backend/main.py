@@ -121,6 +121,37 @@ def get_bot_and_loop():
 
 # ── Authentication ─────────────────────────────────────────────────────────────
 
+def verify_clerk_token(token):
+    # Priority 1: High-Performance Offline Verification (No network calls)
+    if config.CLERK_JWT_PUBLIC_KEY:
+        try:
+            payload = jwt.decode(
+                token,
+                config.CLERK_JWT_PUBLIC_KEY,
+                algorithms=["RS256"],
+                options={"verify_aud": False}
+            )
+            return payload
+        except Exception as e:
+            print(f"Clerk offline token verification failed: {e}")
+
+    # Priority 2: Online Verification (Only if offline key is missing)
+    if jwks_client:
+        try:
+            signing_key = jwks_client.get_signing_key_from_jwt(token)
+            payload = jwt.decode(
+                token,
+                signing_key.key,
+                algorithms=["RS256"],
+                options={"verify_aud": False}
+            )
+            return payload
+        except Exception as e:
+            print(f"Clerk online token verification failed: {e}")
+
+    return None
+
+
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -136,33 +167,9 @@ def token_required(f):
         if not token:
             return jsonify({"error": "Token is missing. Please log in again."}), 401
             
-        # Priority 1: High-Performance Offline Verification (No network calls)
-        # The key is pre-normalized by config._normalize_pem_key() at startup.
-        if config.CLERK_JWT_PUBLIC_KEY:
-            try:
-                jwt.decode(
-                    token,
-                    config.CLERK_JWT_PUBLIC_KEY,
-                    algorithms=["RS256"],
-                    options={"verify_aud": False}
-                )
-                return f(*args, **kwargs)
-            except Exception as e:
-                return jsonify({"error": f"Offline token verification failed: {e}"}), 401
-
-        # Priority 2: Online Verification (Only if offline key is missing)
-        if not jwks_client:
-            return jsonify({"error": "Auth is not configured securely. Provide CLERK_JWT_PUBLIC_KEY for PythonAnywhere."}), 500
-
-        try:
-            signing_key = jwks_client.get_signing_key_from_jwt(token)
-            jwt.decode(
-                token,
-                signing_key.key,
-                algorithms=["RS256"]
-            )
-        except Exception as e:
-            return jsonify({"error": f"Token verification failed: {e}"}), 401
+        payload = verify_clerk_token(token)
+        if not payload:
+            return jsonify({"error": "Invalid or expired Clerk token."}), 401
 
         return f(*args, **kwargs)
     return decorated
@@ -183,15 +190,35 @@ def student_token_required(f):
         if not token:
             return jsonify({"error": "Token is missing. Please log in."}), 401
 
+        # 1. Try local student token (HS256)
         try:
             payload = jwt.decode(token, config.JWT_SECRET_KEY, algorithms=["HS256"])
-            if payload.get("role") != "student":
-                return jsonify({"error": "Invalid token role."}), 403
-            request.student_payload = payload
-        except Exception as e:
-            return jsonify({"error": f"Invalid token: {e}"}), 401
+            if payload.get("role") == "student":
+                request.student_payload = payload
+                return f(*args, **kwargs)
+        except Exception:
+            pass
 
-        return f(*args, **kwargs)
+        # 2. Try Clerk token (RS256)
+        clerk_payload = verify_clerk_token(token)
+        if clerk_payload:
+            clerk_user_id = clerk_payload.get("sub")
+            user = database.get_user_by_clerk_id(clerk_user_id)
+            if user:
+                # Map to match standard student token payload
+                request.student_payload = {
+                    "sub": user.get("telegram_id") or f"clerk_{clerk_user_id}",
+                    "name": user["name"],
+                    "phone_number": user["phone"],
+                    "role": "student",
+                    "clerk_user_id": clerk_user_id,
+                    "user_id": user["id"]
+                }
+                return f(*args, **kwargs)
+            else:
+                return jsonify({"error": "Clerk user profile not synced. Please sync first."}), 403
+
+        return jsonify({"error": "Invalid or expired token. Please log in."}), 401
     return decorated
 
 
@@ -520,6 +547,49 @@ def public_login_status(token):
         "success": True,
         "status": status,
         "message": status_info.get("message", "")
+    })
+
+
+@app.route("/api/public/sync-clerk-student", methods=["POST"])
+@limiter.limit("20 per minute")
+def public_sync_clerk_student():
+    token = None
+    if "Authorization" in request.headers:
+        auth_header = request.headers["Authorization"]
+        if auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+
+    if not token:
+        return jsonify({"success": False, "error": "Token is missing."}), 401
+
+    payload = verify_clerk_token(token)
+    if not payload:
+        return jsonify({"success": False, "error": "Invalid Clerk token."}), 401
+
+    clerk_id = payload.get("sub")
+    data = request.json or {}
+    email = data.get("email", "").strip()
+    phone = data.get("phone", "").strip()
+    name = data.get("name", "").strip()
+
+    user = database.sync_clerk_user(clerk_id, email, phone, name)
+    if not user:
+        return jsonify({"success": False, "error": "Failed to sync user profile."}), 500
+
+    # Backwards compatibility check
+    user["phone_number"] = user["phone"]
+    subs = database.get_user_exam_subscriptions(user["id"])
+    user["exam_preference"] = subs[0] if subs else "NONE"
+
+    return jsonify({
+        "success": True,
+        "user": {
+            "name": user["name"],
+            "phone_number": user["phone"],
+            "telegram_id": user.get("telegram_id"),
+            "exam_preferences": subs,
+            "exam_preference": user["exam_preference"]
+        }
     })
 
 

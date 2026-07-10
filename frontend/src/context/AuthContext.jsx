@@ -5,7 +5,7 @@ import * as api from "../api"
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-    const { isSignedIn: isClerkSignedIn, isLoaded: isClerkLoaded, signOut } = useClerkAuth()
+    const { isSignedIn: isClerkSignedIn, isLoaded: isClerkLoaded, signOut, getToken } = useClerkAuth()
     const { user: clerkUser } = useUser()
 
     const [user, setUser] = useState(null)
@@ -50,7 +50,7 @@ export function AuthProvider({ children }) {
 
     // Monitor Clerk session as a secondary login
     useEffect(() => {
-        if (isClerkLoaded) {
+        const syncClerkSession = async () => {
             if (isClerkSignedIn && clerkUser && !token) {
                 const email = clerkUser.primaryEmailAddress?.emailAddress?.toLowerCase() || ""
                 const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || "")
@@ -61,14 +61,45 @@ export function AuthProvider({ children }) {
                 const isAdmin = adminEmails.includes(email)
                 
                 if (!isAdmin) {
-                    setUser({
-                        name: clerkUser.fullName || clerkUser.username || "Student",
-                        phone: clerkUser.primaryPhoneNumber?.phoneNumber || "",
-                        email: email,
-                        telegram_id: null,
-                        exam_preference: "NONE",
-                        exam_preferences: []
-                    })
+                    try {
+                        const name = clerkUser.fullName || clerkUser.username || "Student"
+                        const phone = clerkUser.primaryPhoneNumber?.phoneNumber || ""
+                        const clerkToken = await getToken()
+                        
+                        // Sync Clerk user with Supabase database
+                        const res = await api.syncClerkStudent(clerkToken, { email, phone, name })
+                        if (res.success && res.user) {
+                            setUser({
+                                name: res.user.name,
+                                phone: res.user.phone_number,
+                                telegram_id: res.user.telegram_id,
+                                email: email,
+                                exam_preference: res.user.exam_preference || "NONE",
+                                exam_preferences: res.user.exam_preferences || []
+                            })
+                        } else {
+                            // Fallback to local Clerk details
+                            setUser({
+                                name,
+                                phone,
+                                email,
+                                telegram_id: null,
+                                exam_preference: "NONE",
+                                exam_preferences: []
+                            })
+                        }
+                    } catch (err) {
+                        console.error("Clerk sync failed", err)
+                        // Fallback to local Clerk details
+                        setUser({
+                            name: clerkUser.fullName || clerkUser.username || "Student",
+                            phone: clerkUser.primaryPhoneNumber?.phoneNumber || "",
+                            email: email,
+                            telegram_id: null,
+                            exam_preference: "NONE",
+                            exam_preferences: []
+                        })
+                    }
                     setIsLocalLoggedIn(true)
                 }
             }
@@ -78,7 +109,11 @@ export function AuthProvider({ children }) {
             }
             setIsLoaded(true)
         }
-    }, [isClerkSignedIn, clerkUser, isClerkLoaded, token])
+
+        if (isClerkLoaded) {
+            syncClerkSession()
+        }
+    }, [isClerkSignedIn, clerkUser, isClerkLoaded, token, getToken])
 
     const handleLogin = (newToken, studentData) => {
         localStorage.setItem("student_token", newToken)

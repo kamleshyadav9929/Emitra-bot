@@ -1255,6 +1255,85 @@ def get_login_token_status(token):
         return {"status": "error", "error": str(e)}
 
 
+def get_user_by_clerk_id(clerk_id):
+    try:
+        res = supabase.table("users").select("*").eq("clerk_user_id", str(clerk_id)).execute()
+        return res.data[0] if res.data else None
+    except Exception as e:
+        print(f"Error fetching user by Clerk ID: {e}")
+        return None
+
+
+def sync_clerk_user(clerk_id, email, phone, name):
+    try:
+        clean_phone = None
+        if phone:
+            clean_phone = phone.strip().replace(" ", "").replace("-", "")
+            if clean_phone.startswith("+"):
+                clean_phone = clean_phone[1:]
+            if len(clean_phone) > 10 and (clean_phone.startswith("91") or clean_phone.startswith("091")):
+                clean_phone = clean_phone[-10:]
+
+        # 1. Check if user already exists by clerk_user_id
+        user = get_user_by_clerk_id(clerk_id)
+        if user:
+            updates = {}
+            if name and user.get("name") != name:
+                updates["name"] = name
+            
+            if clean_phone:
+                current_phone = user.get("phone")
+                if not current_phone or current_phone.startswith("CLERK_TEMP_") or current_phone.startswith("BOT_TEMP_"):
+                    # Check if another user already has this phone number
+                    phone_user = get_user_by_phone(clean_phone)
+                    if phone_user and phone_user["id"] != user["id"]:
+                        # Merge: transfer Clerk user ID to existing user and delete temporary Clerk record
+                        try:
+                            # Transfer subscriptions, requests, and tokens
+                            supabase.table("user_exam_subscriptions").update({"user_id": phone_user["id"]}).eq("user_id", user["id"]).execute()
+                            supabase.table("service_requests").update({"user_id": phone_user["id"]}).eq("user_id", user["id"]).execute()
+                            supabase.table("login_tokens").update({"user_id": phone_user["id"]}).eq("user_id", user["id"]).execute()
+                            
+                            # Link existing user to Clerk
+                            supabase.table("users").update({"clerk_user_id": clerk_id}).eq("id", phone_user["id"]).execute()
+                            
+                            # Delete the temporary Clerk record
+                            supabase.table("users").delete().eq("id", user["id"]).execute()
+                            
+                            return get_user_by_clerk_id(clerk_id)
+                        except Exception as merge_err:
+                            print(f"Error merging Clerk user: {merge_err}")
+                    else:
+                        updates["phone"] = clean_phone
+            
+            if updates:
+                supabase.table("users").update(updates).eq("id", user["id"]).execute()
+                user = get_user_by_clerk_id(clerk_id)
+            return user
+
+        # 2. Check if user exists by phone
+        if clean_phone:
+            phone_user = get_user_by_phone(clean_phone)
+            if phone_user:
+                # Link Clerk user id to this existing phone user
+                supabase.table("users").update({
+                    "clerk_user_id": clerk_id
+                }).eq("id", phone_user["id"]).execute()
+                return get_user_by_clerk_id(clerk_id)
+
+        # 3. Create a new user
+        res = supabase.table("users").insert({
+            "clerk_user_id": clerk_id,
+            "name": name or "Student",
+            "phone": clean_phone or f"CLERK_TEMP_{clerk_id[:10]}",
+            "role": "student"
+        }).execute()
+        return res.data[0] if res.data else None
+    except Exception as e:
+        print(f"Error syncing Clerk user: {e}")
+        return None
+
+
 # ── Audit Log Helpers ────────────────────────────────────────────────────────
 
 def add_audit_log(admin_name, action):

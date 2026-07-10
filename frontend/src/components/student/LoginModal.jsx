@@ -59,12 +59,14 @@ export default function LoginModal({ isOpen, onClose }) {
 
     // Effect to handle polling
     useEffect(() => {
+        let failedAttempts = 0
         if (token && (status === "pending" || status === "awaiting_onboarding")) {
             if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
 
             pollIntervalRef.current = setInterval(async () => {
                 try {
                     const res = await api.checkLoginStatus(token)
+                    failedAttempts = 0 // Reset on successful fetch
                     if (res.success) {
                         if (res.status === "success" && res.token && res.user) {
                             clearInterval(pollIntervalRef.current)
@@ -87,6 +89,17 @@ export default function LoginModal({ isOpen, onClose }) {
                     }
                 } catch (err) {
                     console.error("Polling login status failed", err)
+                    failedAttempts += 1
+                    if (failedAttempts >= 5) {
+                        clearInterval(pollIntervalRef.current)
+                        pollIntervalRef.current = null
+                        setStatus("error")
+                        setErrorMsg(
+                            lang === "EN"
+                                ? "Could not connect to backend server. Please check your internet or make sure the server is running."
+                                : "सर्वर से कनेक्ट नहीं हो सका। कृपया अपना इंटरनेट चेक करें या सुनिश्चित करें कि सर्वर चालू है।"
+                        )
+                    }
                 }
             }, 2000)
         }
@@ -97,7 +110,7 @@ export default function LoginModal({ isOpen, onClose }) {
                 pollIntervalRef.current = null
             }
         }
-    }, [token, status])
+    }, [token, status, lang])
 
     if (!isOpen) return null
 

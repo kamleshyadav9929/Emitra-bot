@@ -371,5 +371,15 @@ export const updateStudentPreference = async (categories) =>
 export const getStudentHistorySecure = async () =>
   requestJson(`/api/student/history`, { headers: await getAuthHeaders() })
 
+export const syncClerkStudent = async (clerkToken, profileData) =>
+  requestJson(`/api/public/sync-clerk-student`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${clerkToken}`
+    },
+    body: JSON.stringify(profileData)
+  })
+
 
 
