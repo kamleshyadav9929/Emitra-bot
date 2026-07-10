@@ -76,3 +76,5 @@ FLASK_PORT = int(os.getenv("PORT", os.getenv("FLASK_PORT", 5000)))
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
 
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "super-secret-jwt-key-2025")
+
