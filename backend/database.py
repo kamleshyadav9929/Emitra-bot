@@ -28,11 +28,25 @@ def _cache_invalidate(*keys):
 supabase: Client = None
 if config.SUPABASE_URL and config.SUPABASE_KEY:
     try:
-        supabase = create_client(config.SUPABASE_URL, config.SUPABASE_KEY)
+        import os
+        import httpx
+        from supabase import ClientOptions
+        
+        proxy = os.environ.get("HTTP_PROXY") or os.environ.get("http_proxy")
+        
+        if proxy:
+            custom_client = httpx.Client(proxies=proxy)
+            options = ClientOptions(httpx_client=custom_client, postgrest_client_timeout=10.0)
+            supabase = create_client(config.SUPABASE_URL, config.SUPABASE_KEY, options=options)
+        else:
+            options = ClientOptions(postgrest_client_timeout=10.0)
+            supabase = create_client(config.SUPABASE_URL, config.SUPABASE_KEY, options=options)
+            
     except Exception as e:
         print(f"ERROR: Failed to initialize Supabase client: {e}")
 else:
     print("WARNING: SUPABASE_URL and SUPABASE_KEY are not configured.")
+
 
 
 def init_db():

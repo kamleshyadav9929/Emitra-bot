@@ -120,8 +120,19 @@ def get_bot_and_loop():
         _global_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(_global_loop)
         if config.TELEGRAM_BOT_TOKEN:
-            _global_bot = Bot(token=config.TELEGRAM_BOT_TOKEN)
-            _global_loop.run_until_complete(_global_bot.initialize())
+            import os
+            from telegram.request import HTTPXRequest
+            import asyncio
+            proxy = os.environ.get("HTTP_PROXY") or os.environ.get("http_proxy")
+            if proxy:
+                req = HTTPXRequest(proxy_url=proxy)
+                _global_bot = Bot(token=config.TELEGRAM_BOT_TOKEN, request=req)
+            else:
+                _global_bot = Bot(token=config.TELEGRAM_BOT_TOKEN)
+            try:
+                _global_loop.run_until_complete(asyncio.wait_for(_global_bot.initialize(), timeout=5.0))
+            except Exception as e:
+                print(f"Warning: Failed to initialize bot: {e}")
     return _global_bot, _global_loop
 
 
@@ -490,10 +501,11 @@ def get_bot_username():
     global _bot_username
     if _bot_username is None:
         import os
+        import asyncio
         bot, loop = get_bot_and_loop()
         if bot:
             try:
-                me = loop.run_until_complete(bot.get_me())
+                me = loop.run_until_complete(asyncio.wait_for(bot.get_me(), timeout=5.0))
                 _bot_username = me.username
             except Exception as e:
                 print(f"Error fetching bot info: {e}")
