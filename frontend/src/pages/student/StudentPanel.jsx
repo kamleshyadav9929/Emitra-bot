@@ -11,7 +11,7 @@ import {
 } from "lucide-react"
 
 import "../../portal.css"
-import { useClerk } from "@clerk/react"
+import LoginModal from "../../components/student/LoginModal"
 import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
@@ -28,7 +28,7 @@ import Logo from "../../components/common/Logo"
 
 export default function StudentPanel() {
     const navigate = useNavigate()
-    const { openSignIn } = useClerk()
+    const [showLoginModal, setShowLoginModal] = useState(false)
     const { category: catParam } = useParams()
     const { lang, toggleLanguage, t } = useLanguage()
     const { user, isLoggedIn, logout } = useAuth()
@@ -558,10 +558,7 @@ export default function StudentPanel() {
     }
 
     const triggerSignIn = () => {
-        openSignIn({
-            afterSignInUrl: window.location.href,
-            afterSignUpUrl: window.location.href,
-        })
+        setShowLoginModal(true)
     }
 
     // computed stats and list filters
@@ -1203,6 +1200,7 @@ export default function StudentPanel() {
                 </div>
             )}
 
+            <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
         </div>
     )
 }

@@ -1022,3 +1022,78 @@ def get_service_requests_paginated(status=None, page=1, limit=20):
             "student_username": student.get("username") if student else ""
         })
     return records, total
+
+
+# ── Telegram Login Token Helpers ──────────────────────────────────────────────
+
+def create_login_token(token, expires_at):
+    """Inserts a new login token and removes expired tokens first."""
+    try:
+        # Cleanup expired tokens
+        now_str = datetime.utcnow().isoformat()
+        try:
+            supabase.table("login_tokens").delete().lt("expires_at", now_str).execute()
+        except Exception:
+            pass  # Safe to ignore if table doesn't exist yet (will print error below)
+
+        supabase.table("login_tokens").insert({
+            "token": token,
+            "expires_at": expires_at.isoformat()
+        }).execute()
+        return True
+    except Exception as e:
+        print(f"WARNING: Error inserting login token: {e}. Ensure login_tokens table exists in Supabase.")
+        return False
+
+
+def link_login_token(token, telegram_id):
+    """Links a token to a telegram ID if valid and not expired."""
+    try:
+        res = supabase.table("login_tokens").select("*").eq("token", token).execute()
+        if not res.data:
+            return False
+        row = res.data[0]
+        # Check expiry
+        exp = datetime.fromisoformat(row["expires_at"].replace("Z", "+00:00"))
+        if exp.replace(tzinfo=None) < datetime.utcnow():
+            return False
+            
+        supabase.table("login_tokens").update({
+            "telegram_id": str(telegram_id)
+        }).eq("token", token).execute()
+        return True
+    except Exception as e:
+        print(f"Error linking login token: {e}")
+        return False
+
+
+def get_login_token_status(token):
+    """Gets status of token linking."""
+    try:
+        res = supabase.table("login_tokens").select("*").eq("token", token).execute()
+        if not res.data:
+            return {"status": "not_found"}
+        row = res.data[0]
+        # Check expiry
+        exp = datetime.fromisoformat(row["expires_at"].replace("Z", "+00:00"))
+        if exp.replace(tzinfo=None) < datetime.utcnow():
+            return {"status": "expired"}
+            
+        tid = row.get("telegram_id")
+        if not tid:
+            return {"status": "pending"}
+            
+        # Check if student is fully registered
+        student = get_student(tid)
+        if not student or not student.get("phone_number") or student.get("phone_number").startswith("BOT_TEMP_"):
+            return {"status": "awaiting_onboarding", "telegram_id": tid}
+            
+        return {
+            "status": "success",
+            "telegram_id": tid,
+            "student": student
+        }
+    except Exception as e:
+        print(f"Error checking login token status: {e}")
+        return {"status": "error", "error": str(e)}
+

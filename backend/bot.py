@@ -77,6 +77,12 @@ def get_msg(key, default):
 async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat_id = update.effective_chat.id
+    message_text = update.message.text if update.message else ""
+
+    login_token = None
+    parts = message_text.split()
+    if len(parts) > 1 and parts[1].startswith("login_"):
+        login_token = parts[1][6:]  # strip "login_"
 
     if user:
         # Single call: register_user handles the is_new check internally via upsert-like logic
@@ -84,18 +90,42 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         name = user.first_name + (f" {user.last_name}" if user.last_name else "")
         database.register_user(chat_id, name, username)
 
-    welcome_msg = get_msg(
-        "welcome_message",
-        "🙏 Namaste! Krishna Emitra Seva mein aapka swagat hai.\n\n"
-        "Pehle apna mobile number share karein taaki hum aapko updates bhi bhej sakein:\n"
-        "(Neeche button dabayein)"
-    )
+    if login_token:
+        success = database.link_login_token(login_token, chat_id)
+        if success:
+            await update.message.reply_text(
+                "🎉 *Web Login Approved!*\n\n"
+                "Aapka account website par successfully link ho gaya hai. Aap browser par wapas ja sakte hain.",
+                parse_mode="Markdown"
+            )
+        else:
+            await update.message.reply_text(
+                "❌ *Login Link Failed!*\n\n"
+                "Yeh login link invalid ho chuka hai ya expire ho gaya hai. Kripya website par naya link generate karein.",
+                parse_mode="Markdown"
+            )
 
-    contact_button = KeyboardButton("Apna Number Share Karein", request_contact=True)
-    reply_markup = ReplyKeyboardMarkup(
-        [[contact_button]], resize_keyboard=True, one_time_keyboard=True
-    )
-    await update.message.reply_text(welcome_msg, reply_markup=reply_markup)
+    student = database.get_student(chat_id)
+    has_phone = student and student.get("phone_number") and not student.get("phone_number").startswith("BOT_TEMP_")
+
+    if not has_phone:
+        welcome_msg = get_msg(
+            "welcome_message",
+            "🙏 Namaste! Krishna Emitra Seva mein aapka swagat hai.\n\n"
+            "Pehle apna mobile number share karein taaki hum aapko updates bhi bhej sakein:\n"
+            "(Neeche button dabayein)"
+        )
+        contact_button = KeyboardButton("Apna Number Share Karein", request_contact=True)
+        reply_markup = ReplyKeyboardMarkup(
+            [[contact_button]], resize_keyboard=True, one_time_keyboard=True
+        )
+        await update.message.reply_text(welcome_msg, reply_markup=reply_markup)
+    elif not login_token:
+        await update.message.reply_text(
+            "✅ Aap already registered hain.\n\n"
+            "📌 Krishna Emitra ki kisi seva ke liye type karein: /services\n"
+            "📢 Jab updates aayenge, hum aapko notify karenge."
+        )
 
 
 async def prompt_exam_selection(update: Update):

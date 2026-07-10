@@ -13,6 +13,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from telegram import Update, Bot
 
+import uuid
 import config
 import database
 import notifier
@@ -165,6 +166,34 @@ def token_required(f):
 
         return f(*args, **kwargs)
     return decorated
+
+
+def student_token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if request.method == "OPTIONS":
+            return jsonify({"ok": True}), 200
+            
+        token = None
+        if "Authorization" in request.headers:
+            auth_header = request.headers["Authorization"]
+            if auth_header.startswith("Bearer "):
+                token = auth_header.split(" ")[1]
+
+        if not token:
+            return jsonify({"error": "Token is missing. Please log in."}), 401
+
+        try:
+            payload = jwt.decode(token, config.JWT_SECRET_KEY, algorithms=["HS256"])
+            if payload.get("role") != "student":
+                return jsonify({"error": "Invalid token role."}), 403
+            request.student_payload = payload
+        except Exception as e:
+            return jsonify({"error": f"Invalid token: {e}"}), 401
+
+        return f(*args, **kwargs)
+    return decorated
+
 
 # ── FIX #5: Telegram Webhook with secret token verification ───────────────────
 
@@ -418,6 +447,118 @@ def public_register():
         return jsonify({"success": True, "message": "Registered successfully!", "id": result})
     else:
         return jsonify({"success": False, "error": result}), 409
+
+
+_bot_username = None
+
+def get_bot_username():
+    global _bot_username
+    if _bot_username is None:
+        import os
+        bot, loop = get_bot_and_loop()
+        if bot:
+            try:
+                me = loop.run_until_complete(bot.get_me())
+                _bot_username = me.username
+            except Exception as e:
+                print(f"Error fetching bot info: {e}")
+        if _bot_username is None:
+            _bot_username = os.environ.get("TELEGRAM_BOT_USERNAME", "Kamlesh6377_bot")
+    return _bot_username
+
+
+@app.route("/api/public/login/token", methods=["POST"])
+@limiter.limit("5 per minute")
+def public_login_token():
+    token = "tg_auth_" + uuid.uuid4().hex
+    expires_at = datetime.utcnow() + timedelta(minutes=5)
+    
+    success = database.create_login_token(token, expires_at)
+    if not success:
+        return jsonify({"success": False, "error": "Failed to create login session"}), 500
+        
+    bot_user = get_bot_username()
+    bot_url = f"https://t.me/{bot_user}?start=login_{token}"
+    return jsonify({
+        "success": True,
+        "token": token,
+        "bot_url": bot_url
+    })
+
+
+@app.route("/api/public/login/status/<token>", methods=["GET"])
+def public_login_status(token):
+    status_info = database.get_login_token_status(token)
+    status = status_info["status"]
+    
+    if status == "success":
+        student = status_info["student"]
+        payload = {
+            "sub": student["telegram_id"],
+            "name": student["name"],
+            "phone_number": student["phone_number"],
+            "role": "student",
+            "exp": datetime.utcnow() + timedelta(days=30)
+        }
+        jwt_token = jwt.encode(payload, config.JWT_SECRET_KEY, algorithm="HS256")
+        return jsonify({
+            "success": True,
+            "status": "success",
+            "token": jwt_token,
+            "user": {
+                "name": student["name"],
+                "phone_number": student["phone_number"],
+                "telegram_id": student["telegram_id"],
+                "exam_preference": student["exam_preference"]
+            }
+        })
+        
+    return jsonify({
+        "success": True,
+        "status": status,
+        "message": status_info.get("message", "")
+    })
+
+
+@app.route("/api/student/profile", methods=["GET"])
+@student_token_required
+def student_profile():
+    telegram_id = request.student_payload.get("sub")
+    student = database.get_student(telegram_id)
+    if not student:
+        return jsonify({"success": False, "error": "Student not found"}), 404
+        
+    return jsonify({
+        "success": True,
+        "student": {
+            "name": student["name"],
+            "phone_number": student["phone_number"],
+            "telegram_id": student["telegram_id"],
+            "exam_preference": student["exam_preference"]
+        }
+    })
+
+
+@app.route("/api/student/update-preference", methods=["POST"])
+@student_token_required
+def student_update_preference():
+    data = request.json or {}
+    category = data.get("category")
+    if not category:
+        return jsonify({"success": False, "error": "Category is required"}), 400
+        
+    telegram_id = request.student_payload.get("sub")
+    database.update_exam_preference(telegram_id, category)
+    return jsonify({"success": True, "category": category})
+
+
+@app.route("/api/student/history", methods=["GET"])
+@student_token_required
+def student_history():
+    phone = request.student_payload.get("phone_number")
+    history = database.get_student_history(phone)
+    return jsonify({"success": True, "history": history})
+
 
 
 @app.route("/api/public/check-status", methods=["POST"])

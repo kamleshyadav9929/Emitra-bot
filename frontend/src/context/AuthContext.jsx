@@ -1,35 +1,74 @@
-// AuthContext.jsx — now a thin re-export shim over Clerk so all existing
-// consumer components (Landing, ServicesPage, StudentProfileDrawer, LandingBottomNav)
-// continue to call `useAuth()` without any changes to their import lines.
-//
-// Shape returned:
-//   { user: { name, email, imageUrl, phone },  isLoggedIn, logout }
+import { createContext, useContext, useState, useEffect } from "react"
+import * as api from "../api"
 
-import { useUser, useClerk } from "@clerk/react"
+const AuthContext = createContext(null)
 
-export function useAuth() {
-    const { user: clerkUser, isSignedIn, isLoaded } = useUser()
-    const { signOut } = useClerk()
+export function AuthProvider({ children }) {
+    const [user, setUser] = useState(null)
+    const [token, setToken] = useState(() => localStorage.getItem("student_token") || null)
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [isLoaded, setIsLoaded] = useState(false)
 
-    const user = isSignedIn
-        ? {
-              name:     clerkUser.fullName || clerkUser.firstName || clerkUser.username || "Student",
-              email:    clerkUser.primaryEmailAddress?.emailAddress || "",
-              imageUrl: clerkUser.imageUrl || "",
-              phone:    clerkUser.primaryPhoneNumber?.phoneNumber || "",
-          }
-        : null
+    useEffect(() => {
+        const loadProfile = async () => {
+            if (!token) {
+                setUser(null)
+                setIsLoggedIn(false)
+                setIsLoaded(true)
+                return
+            }
+            try {
+                const res = await api.getStudentProfile(token)
+                if (res.success && res.student) {
+                    setUser({
+                        name: res.student.name,
+                        phone: res.student.phone_number,
+                        telegram_id: res.student.telegram_id,
+                        exam_preference: res.student.exam_preference
+                    })
+                    setIsLoggedIn(true)
+                } else {
+                    handleLogout()
+                }
+            } catch (err) {
+                console.error("Failed to load student profile", err)
+                handleLogout()
+            } finally {
+                setIsLoaded(true)
+            }
+        }
+        loadProfile()
+    }, [token])
 
-    return {
-        user,
-        isLoggedIn: !!isSignedIn && isLoaded,
-        isLoaded,
-        logout: () => signOut(),
+    const handleLogin = (newToken, studentData) => {
+        localStorage.setItem("student_token", newToken)
+        if (studentData.phone_number) {
+            localStorage.setItem("phone_emitra", studentData.phone_number)
+        }
+        setToken(newToken)
+        setUser({
+            name: studentData.name,
+            phone: studentData.phone_number,
+            telegram_id: studentData.telegram_id,
+            exam_preference: studentData.exam_preference
+        })
+        setIsLoggedIn(true)
     }
+
+    const handleLogout = () => {
+        localStorage.removeItem("student_token")
+        setToken(null)
+        setUser(null)
+        setIsLoggedIn(false)
+    }
+
+    return (
+        <AuthContext.Provider value={{ user, isLoggedIn, isLoaded, login: handleLogin, logout: handleLogout }}>
+            {children}
+        </AuthContext.Provider>
+    )
 }
 
-// AuthProvider is no longer needed (Clerk manages state globally via ClerkProvider
-// in main.jsx), but we keep the export so App.jsx doesn't need editing yet.
-export function AuthProvider({ children }) {
-    return children
+export function useAuth() {
+    return useContext(AuthContext)
 }

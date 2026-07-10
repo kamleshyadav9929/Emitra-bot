@@ -128,3 +128,12 @@ CREATE TABLE IF NOT EXISTS application_documents (
     file_name TEXT NOT NULL,
     uploaded_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 12. Login tokens table for Telegram deep-link login
+CREATE TABLE IF NOT EXISTS login_tokens (
+    token TEXT PRIMARY KEY,
+    telegram_id TEXT,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMPTZ NOT NULL
+);
+

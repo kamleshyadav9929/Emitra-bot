@@ -27,6 +27,9 @@ const getAuthHeaders = async () => {
       console.error("Error getting Clerk token", e);
     }
   }
+  if (!token) {
+    token = localStorage.getItem("student_token");
+  }
   return {
     "Content-Type": "application/json",
     ...(token ? { "Authorization": `Bearer ${token}` } : {})
@@ -340,5 +343,33 @@ export const deleteScheduledAnnouncement = async (id) =>
     method: "DELETE",
     headers: await getAuthHeaders()
   })
+
+// ── Telegram Student Auth APIs ────────────────────────────────────────────────
+export const createLoginToken = () =>
+  requestJson(`/api/public/login/token`, { method: "POST" })
+
+export const checkLoginStatus = (token) =>
+  requestJson(`/api/public/login/status/${token}`)
+
+export const getStudentProfile = async (customToken) => {
+  const token = customToken || localStorage.getItem("student_token")
+  return requestJson(`/api/student/profile`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {})
+    }
+  })
+}
+
+export const updateStudentPreference = async (category) =>
+  requestJson(`/api/student/update-preference`, {
+    method: "POST",
+    headers: await getAuthHeaders(),
+    body: JSON.stringify({ category })
+  })
+
+export const getStudentHistorySecure = async () =>
+  requestJson(`/api/student/history`, { headers: await getAuthHeaders() })
+
 
 
