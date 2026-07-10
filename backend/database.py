@@ -330,14 +330,17 @@ def get_announcements(limit=5):
     return res.data
 
 
-def get_student_history(phone_number):
+def get_student_history(identifier):
     """
-    Fetch request history for a student by phone number (public lookup).
+    Fetch request history for a student by identifier (phone or email).
     Works for both:
     - Web users: phone_number stored directly in service_requests via log_service_intent.
     - Bot users: telegram_id stored in service_requests; we join via students table.
     """
-    clean_phone = phone_number.strip().lstrip('+').lstrip('91')[-10:]
+    if "@" in identifier:
+        return [] # service_requests table currently doesn't store email, so return empty for email identifiers
+
+    clean_phone = identifier.strip().lstrip('+').lstrip('91')[-10:]
     pattern = f"%{clean_phone}"
     
     # First, let's find the student's telegram_id if they exist
@@ -876,11 +879,13 @@ def update_application_status(app_id, status, remarks=None):
     supabase.table("form_applications").update(updates).eq("id", app_id).execute()
 
 
-def get_student_applications_by_phone(phone_number):
-    clean_phone = phone_number.strip().lstrip('+').lstrip('91')[-10:]
-    pattern = f"%{clean_phone}"
-    
-    res = supabase.table("form_applications").select("*").ilike("phone_number", pattern).order("submitted_at", desc=True).execute()
+def get_student_applications_by_phone(identifier):
+    if "@" in identifier:
+        res = supabase.table("form_applications").select("*").ilike("email", f"%{identifier}%").order("submitted_at", desc=True).execute()
+    else:
+        clean_phone = identifier.strip().lstrip('+').lstrip('91')[-10:]
+        pattern = f"%{clean_phone}"
+        res = supabase.table("form_applications").select("*").ilike("phone_number", pattern).order("submitted_at", desc=True).execute()
     
     apps = []
     for row in res.data:

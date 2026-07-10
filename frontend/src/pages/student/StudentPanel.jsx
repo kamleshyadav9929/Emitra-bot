@@ -115,7 +115,8 @@ export default function StudentPanel() {
             setConfig(configRes || {})
             setBroadcasts(newsRes.news || [])
 
-            const identifier = user?.phone || user?.email
+            const localPhone = localStorage.getItem(`phone_${storagePrefix}`) || ""
+            const identifier = user?.phone || localPhone || user?.email
             if (isLoggedIn && identifier) {
                 const [statusRes, applicationsRes] = await Promise.all([
                     api.publicCheckStatus(identifier).catch(() => ({ history: [] })),
