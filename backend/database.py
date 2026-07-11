@@ -474,10 +474,8 @@ def block_student(telegram_id):
         update_user_exam_subscriptions(user["id"], ["BLOCKED"])
 
 
-def delete_student(telegram_id):
-    user = get_user_by_telegram_id(telegram_id)
-    if user:
-        supabase.table("users").delete().eq("id", user["id"]).execute()
+def delete_student(student_id):
+    supabase.table("users").delete().eq("id", student_id).execute()
 
 
 def get_stats():
@@ -715,7 +713,7 @@ def get_service_requests_paginated(status=None, page=1, limit=20):
     end = start + limit - 1
     
     query = supabase.table("service_requests").select("*, users(*), services(*)", count="exact")
-    if status:
+    if status and status != "all":
         query = query.eq("status", status)
         
     res = query.order("requested_at", desc=True).range(start, end).execute()
@@ -729,7 +727,7 @@ def get_service_requests_paginated(status=None, page=1, limit=20):
             "id": row["id"],
             "telegram_id": usr.get("telegram_id"),
             "service_name": svc.get("name", "Unknown"),
-            "category": svc.get("category_label", "Other"),
+            "category": svc.get("category_key", "Other"),
             "status": row["status"],
             "requested_at": row["requested_at"],
             "completed_at": row["completed_at"],

@@ -832,12 +832,12 @@ def block_student(telegram_id):
     return jsonify({"success": True, "action": "blocked", "telegram_id": telegram_id})
 
 
-@app.route("/api/students/<telegram_id>", methods=["DELETE"])
+@app.route("/api/students/<int:student_id>", methods=["DELETE"])
 @token_required
-def delete_student(telegram_id):
+def delete_student(student_id):
     """Permanently delete a student and all their data."""
-    database.delete_student(telegram_id)
-    return jsonify({"success": True, "action": "deleted", "telegram_id": telegram_id})
+    database.delete_student(student_id)
+    return jsonify({"success": True, "action": "deleted", "student_id": student_id})
 
 
 @app.route("/api/students/<int:student_id>/category", methods=["POST"])

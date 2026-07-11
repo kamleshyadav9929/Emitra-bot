@@ -136,8 +136,8 @@ export const blockStudent = async (telegramId) =>
     headers: await getAuthHeaders()
   })
 
-export const deleteStudent = async (telegramId) =>
-  requestJson(`/api/students/${telegramId}`, {
+export const deleteStudent = async (id) =>
+  requestJson(`/api/students/${id}`, {
     method: "DELETE",
     headers: await getAuthHeaders()
   })

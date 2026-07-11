@@ -12,6 +12,33 @@ function getInitials(name) {
   return parts.map(p => p[0]).join("").substring(0, 2).toUpperCase()
 }
 
+function DeleteConfirmModal({ student, onClose, onConfirm, isDeleting }) {
+  if (!student) return null;
+  return (
+    <div className="fixed inset-0 z-50 bg-[#071e27]/40 backdrop-blur-md flex items-center justify-center px-4">
+      <div className="w-full max-w-sm bg-[var(--color-surface-lowest)] shadow-ambient rounded-[20px] overflow-hidden">
+        <div className="px-6 py-6 text-center">
+          <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4 text-red-500">
+            <Trash2 size={24} />
+          </div>
+          <h3 className="text-lg font-bold text-[#0A1A40]">Delete Student?</h3>
+          <p className="text-sm text-gray-500 mt-2">
+            Are you sure you want to permanently delete <strong>{student.name}</strong>? This action cannot be undone.
+          </p>
+        </div>
+        <div className="px-6 py-4 bg-[var(--color-surface-base)] flex gap-3">
+          <button onClick={onClose} disabled={isDeleting} className="flex-1 py-2 rounded-xl text-sm font-bold text-gray-600 bg-[var(--color-surface-low)] hover:bg-gray-100 border border-[var(--color-outline-variant)] transition-colors disabled:opacity-50">
+            Cancel
+          </button>
+          <button onClick={() => onConfirm(student.id)} disabled={isDeleting} className="flex-1 py-2 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-colors shadow-sm shadow-red-500/20 disabled:opacity-50">
+            {isDeleting ? "Deleting..." : "Delete"}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Students() {
   const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(true)
@@ -21,6 +48,8 @@ export default function Students() {
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
+  const [studentToDelete, setStudentToDelete] = useState(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const limit = 20
 
   const [changingExam, setChangingExam] = useState(null)
@@ -56,6 +85,20 @@ export default function Students() {
       }
     } catch (err) {
       setAddError(err?.message || "An error occurred")
+    }
+  }
+
+  const handleDeleteConfirm = async (id) => {
+    setIsDeleting(true)
+    try {
+      await deleteStudent(id)
+      setStudents(prev => prev.filter(s => s.id !== id))
+      setStudentToDelete(null)
+    } catch (err) {
+      console.error(err)
+      alert("Failed to delete student.")
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -367,13 +410,7 @@ export default function Students() {
                     </button>
                   )}
                   <button
-                    onClick={() => {
-                      if (window.confirm("Permanently delete this student?")) {
-                        deleteStudent(student.telegram_id).then(() => {
-                          setStudents(prev => prev.filter(s => s.id !== student.id))
-                        })
-                      }
-                    }}
+                    onClick={() => setStudentToDelete(student)}
                     className="w-8 h-8 flex items-center justify-center bg-[var(--color-surface-low)] hover:bg-red-50 text-gray-400 hover:text-red-500 border border-[var(--color-outline-variant)] rounded-lg transition-colors"
                     title="Delete Student"
                   >
@@ -499,13 +536,7 @@ export default function Students() {
                             </button>
                           )}
                           <button
-                            onClick={() => {
-                              if (window.confirm("Permanently delete this student?")) {
-                                deleteStudent(student.telegram_id).then(() => {
-                                  setStudents(prev => prev.filter(s => s.id !== student.id))
-                                })
-                              }
-                            }}
+                            onClick={() => setStudentToDelete(student)}
                             className="w-8 h-8 flex items-center justify-center bg-[var(--color-surface-low)] hover:bg-red-50 text-gray-400 hover:text-red-500 border border-[var(--color-outline-variant)] rounded-lg transition-colors"
                             title="Delete Student"
                           >
@@ -633,6 +664,13 @@ export default function Students() {
           </div>
         </div>
       )}
+
+      <DeleteConfirmModal
+        student={studentToDelete}
+        onClose={() => setStudentToDelete(null)}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isDeleting}
+      />
     </div>
   )
 }
