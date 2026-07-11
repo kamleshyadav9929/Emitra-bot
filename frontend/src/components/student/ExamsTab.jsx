@@ -82,14 +82,18 @@ export default function ExamsTab({
                                     </div>
                                     
                                     <div className="flex items-center gap-4 mb-4">
-                                        <div>
-                                            <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-0.5">Exam Date</p>
-                                            <p className="text-xs font-bold text-slate-800">{ex.exam_date ? new Date(ex.exam_date).toLocaleDateString("en-IN") : "TBD"}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-[10px] text-red-400 uppercase tracking-widest font-bold mb-0.5">Last Date</p>
-                                            <p className="text-xs font-bold text-red-600">{ex.end_date ? new Date(ex.end_date).toLocaleDateString("en-IN") : "TBD"}</p>
-                                        </div>
+                                        {ex.exam_date && (
+                                            <div>
+                                                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-0.5">Exam Date</p>
+                                                <p className="text-xs font-bold text-slate-800">{new Date(ex.exam_date).toLocaleDateString("en-IN")}</p>
+                                            </div>
+                                        )}
+                                        {ex.end_date && (
+                                            <div>
+                                                <p className="text-[10px] text-red-400 uppercase tracking-widest font-bold mb-0.5">Last Date</p>
+                                                <p className="text-xs font-bold text-red-600">{new Date(ex.end_date).toLocaleDateString("en-IN")}</p>
+                                            </div>
+                                        )}
                                     </div>
                                     
                                     <div className="flex items-center gap-2 mt-auto">

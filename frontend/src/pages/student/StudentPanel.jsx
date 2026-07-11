@@ -593,7 +593,6 @@ export default function StudentPanel() {
 
     const navigationItems = [
         { id: "dashboard", label: "Dashboard", labelHi: "डैशबोर्ड", icon: LayoutDashboard },
-        { id: "recruitments", label: "Recruitments", labelHi: "भर्तियां", icon: Award },
         { id: "services", label: "Browse Services", labelHi: "सरकारी सेवाएँ", icon: ClipboardList },
         { id: "exams", label: "Exam Alerts", labelHi: "परीक्षा अलर्ट", icon: Bell },
         { id: "neet", label: "NEET Counselling", labelHi: "नीट काउंसलिंग", icon: BookOpen },
@@ -744,7 +743,6 @@ export default function StudentPanel() {
                 <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 flex items-center justify-around px-1 pb-safe pt-1 shadow-[0_-4px_10px_rgba(0,0,0,0.03)] overflow-x-auto scrollbar-hide">
                     {[
                         { id: "dashboard", icon: LayoutDashboard, label: "Home" },
-                        { id: "recruitments", icon: Award, label: "Jobs" },
                         { id: "services", icon: ClipboardList, label: "Services" },
                         { id: "exams", icon: Bell, label: "Exams" },
                         { id: "status", icon: CheckCircle2, label: "Status" },
@@ -829,16 +827,7 @@ export default function StudentPanel() {
                                 )
                             )}
 
-                            {/* ── Tab 1b: Ongoing Recruitments ── */}
-                            {activeTab === "recruitments" && (
-                                <OngoingRecruitmentsTab 
-                                    exams={exams}
-                                    setWizardExamName={setWizardExamName}
-                                    setIsWizardOpen={setIsWizardOpen}
-                                    isLoggedIn={isLoggedIn}
-                                    triggerSignIn={triggerSignIn}
-                                />
-                            )}
+                            {/* (Recruitments tab removed) */}
 
                             {activeTab === "services" && (
                                 <ServicesTab 
@@ -935,13 +924,6 @@ export default function StudentPanel() {
                         </div>
                     )}
                 </main>
-
-                        {/* Mobile / Tablet Notifications (only visible below xl) */}
-                        {!loading && (
-                            <div className="xl:hidden mt-4 px-6 md:px-10 pb-8">
-                                {renderNotificationsPanel(false)}
-                            </div>
-                        )}
 
                         {/* Footer */}
                         <footer className="border-t border-[var(--color-outline-variant)] py-8 bg-white/50 backdrop-blur-sm mt-auto">

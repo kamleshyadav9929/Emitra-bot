@@ -19,7 +19,7 @@ export default function DashboardTab({
     // Fast Nav Items
     const fastNav = [
         { id: "services", icon: ClipboardList, label: "Apply for Service", color: "bg-blue-50 text-blue-600" },
-        { id: "recruitments", icon: Award, label: "Fill Exam Form", color: "bg-indigo-50 text-indigo-600" },
+        { id: "exams", icon: Award, label: "Fill Exam Form", color: "bg-indigo-50 text-indigo-600" },
         { id: "status", icon: CheckCircle2Icon, label: "Check Status", color: "bg-emerald-50 text-emerald-600" },
         { id: "about", icon: MessageSquare, label: "Contact Help", color: "bg-orange-50 text-orange-600" },
     ]
@@ -31,8 +31,7 @@ export default function DashboardTab({
     return (
         <div className="space-y-6 md:space-y-8 text-left animate-fadeIn pb-20">
             {/* Header: Service Counter Feel */}
-            <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#0a4a83]/5 to-transparent rounded-bl-full pointer-events-none" />
+            <div className="pt-2">
                 <h2 className="text-2xl font-black text-slate-800 tracking-tight">
                     {lang === 'EN' ? 'Namaste' : 'नमस्ते'}, {user ? user.name.split(' ')[0] : (lang === 'EN' ? 'Student' : 'विद्यार्थी')}
                 </h2>
@@ -60,31 +59,14 @@ export default function DashboardTab({
                 })}
             </div>
 
-            {/* Latest Notification Card */}
-            {latestNotification && (
-                <div 
-                    onClick={() => setActiveTab("notifications")}
-                    className="bg-[#fff8f0] border border-orange-200 rounded-xl p-4 cursor-pointer hover:shadow-sm transition-all flex items-start gap-3"
-                >
-                    <Bell size={18} className="text-orange-500 shrink-0 mt-0.5" />
-                    <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-black uppercase text-orange-500 tracking-wider mb-1">Latest Update</p>
-                        <p className="text-sm font-bold text-slate-800 leading-snug line-clamp-2">
-                            {latestNotification.content?.replace(/[*_~`]/g, '').slice(0, 100)}...
-                        </p>
-                    </div>
-                    <ChevronRight size={16} className="text-orange-300" />
-                </div>
-            )}
-
             {/* Upcoming Deadlines (Compact) */}
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
                     <h3 className="text-sm font-black text-slate-800 uppercase tracking-wide">Upcoming Deadlines</h3>
-                    <button onClick={() => setActiveTab("recruitments")} className="text-[11px] font-bold text-[#0a4a83] hover:underline">View All</button>
+                    <button onClick={() => setActiveTab("exams")} className="text-[11px] font-bold text-[#0a4a83] hover:underline">View All</button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {exams.filter(ex => !ex.end_date || new Date(ex.end_date) >= new Date()).slice(0, 2).map((ex, idx) => (
+                    {exams.filter(ex => ex.end_date && new Date(ex.end_date) >= new Date()).slice(0, 2).map((ex, idx) => (
                         <div key={idx} className="bg-white border border-slate-200 rounded-xl p-3.5 flex items-center justify-between shadow-sm">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
@@ -93,7 +75,7 @@ export default function DashboardTab({
                                 <div>
                                     <h4 className="text-[13px] font-bold text-slate-800 line-clamp-1 pr-2">{ex.name}</h4>
                                     <p className="text-[11px] text-red-500 font-bold mt-0.5">
-                                        Closes: {ex.end_date ? new Date(ex.end_date).toLocaleDateString("en-IN", {day:'numeric', month:'short'}) : "TBD"}
+                                        Closes: {new Date(ex.end_date).toLocaleDateString("en-IN", {day:'numeric', month:'short'})}
                                     </p>
                                 </div>
                             </div>
