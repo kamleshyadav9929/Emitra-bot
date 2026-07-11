@@ -149,7 +149,9 @@ export function AuthProvider({ children }) {
     const needsOnboarding = isLoggedIn && user && (!user.exam_preferences || user.exam_preferences.length === 0)
     
     // If Clerk says we are signed in, but we haven't fetched our local user object yet, consider it still loading
-    const isFullyLoaded = isLoaded && isClerkLoaded && !(isClerkSignedIn && !user && !token)
+    // Exception: If they are an Admin, we don't sync a local user, so we are fully loaded immediately.
+    const isAdmin = clerkUser && (import.meta.env.VITE_ADMIN_EMAILS || "").split(",").map(e => e.trim().toLowerCase()).includes(clerkUser.primaryEmailAddress?.emailAddress?.toLowerCase() || "")
+    const isFullyLoaded = isLoaded && isClerkLoaded && !(isClerkSignedIn && !user && !token && !isAdmin)
 
     return (
         <AuthContext.Provider value={{ user, isLoggedIn, needsOnboarding, isLoaded: isFullyLoaded, login: handleLogin, logout: handleLogout }}>

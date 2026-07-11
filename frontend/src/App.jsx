@@ -36,11 +36,25 @@ function StudentDashboardRoute() {
 
 // ── Loading Spinner ───────────────────────────────────────────────────────────
 import { Loader2 } from "lucide-react"
+import { useState, useEffect } from "react"
 
 function ClerkLoadingSpinner() {
+    const [showWake, setShowWake] = useState(false)
+    
+    useEffect(() => {
+        const timer = setTimeout(() => setShowWake(true), 4000)
+        return () => clearTimeout(timer)
+    }, [])
+
     return (
-        <div className="min-h-screen flex items-center justify-center bg-transparent">
+        <div className="min-h-screen flex flex-col gap-4 items-center justify-center bg-transparent">
             <Loader2 className="w-8 h-8 animate-spin text-[#164FA8]" />
+            {showWake && (
+                <div className="text-center animate-fadeIn">
+                    <p className="text-[13px] text-gray-600 font-bold tracking-wide uppercase">Waking up server...</p>
+                    <p className="text-[11px] text-gray-400 mt-1 max-w-xs">Free tier servers spin down when inactive. This may take up to 60 seconds.</p>
+                </div>
+            )}
         </div>
     )
 }
