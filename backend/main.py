@@ -250,6 +250,13 @@ def student_token_required(f):
                 }
                 return f(*args, **kwargs)
             else:
+                if request.path == "/api/student/onboard":
+                    request.student_payload = {
+                        "sub": f"clerk_{clerk_user_id}",
+                        "clerk_user_id": clerk_user_id,
+                        "role": "student"
+                    }
+                    return f(*args, **kwargs)
                 return jsonify({"error": "Clerk user profile not synced. Please sync first."}), 403
 
         return jsonify({"error": "Invalid or expired token. Please log in."}), 401
@@ -674,8 +681,15 @@ def student_onboard():
         return jsonify({"success": False, "error": "Name is required"}), 400
         
     user_id = request.student_payload.get("user_id")
+    clerk_user_id = request.student_payload.get("clerk_user_id")
+    
     if user_id:
         user = database.get_user_by_id(user_id)
+    elif clerk_user_id:
+        user = database.get_user_by_clerk_id(clerk_user_id)
+        if not user:
+            # Sync / Create the user since they don't exist yet!
+            user = database.sync_clerk_user(clerk_user_id, "", phone, name)
     else:
         telegram_id = request.student_payload.get("sub")
         user = database.get_user_by_telegram_id(telegram_id)
