@@ -108,23 +108,22 @@ export default function DashboardTab({
                             <div 
                                 key={idx}
                                 onClick={() => setActiveTab("notifications")}
-                                className="bg-white border border-slate-200 rounded-xl p-3.5 cursor-pointer hover:shadow-sm transition-all flex items-start gap-3"
+                                className="bg-[#fff8f0] border border-orange-200 rounded-xl p-4 cursor-pointer hover:shadow-sm transition-all flex items-start gap-3"
                             >
-                                <Bell size={16} className="text-[#0a4a83] shrink-0 mt-0.5" />
+                                <Bell size={18} className="text-orange-500 shrink-0 mt-0.5" />
                                 <div className="flex-1 min-w-0">
+                                    <p className="text-[10px] font-black uppercase text-orange-500 tracking-wider mb-1">Latest Update</p>
                                     <p className="text-sm font-bold text-slate-800 leading-snug line-clamp-2">
                                         {ann.content?.replace(/[*_~`]/g, '').slice(0, 100)}...
                                     </p>
-                                    <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">
-                                        {new Date(ann.created_at || ann.sent_at).toLocaleDateString('en-IN', {day:'numeric', month:'short'})}
-                                    </p>
                                 </div>
+                                <ChevronRight size={16} className="text-orange-300" />
                             </div>
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-6 bg-slate-50 border border-slate-200 rounded-xl">
-                        <p className="text-slate-500 text-xs">No recent notifications</p>
+                    <div className="text-center py-6 bg-[#fff8f0] border border-orange-200 rounded-xl">
+                        <p className="text-orange-500 text-xs font-bold">No recent notifications</p>
                     </div>
                 )}
             </div>

@@ -37,7 +37,7 @@ export default function ServicesTab({
                 </div>
 
                 {/* Horizontal Category Chips */}
-                <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+                <div className="flex flex-wrap gap-2 pb-2">
                     {categories.map((catKey) => {
                         const label = catKey === "ALL" ? "All Services" : (services[catKey]?.label || catKey)
                         const isActive = activeCategory === catKey

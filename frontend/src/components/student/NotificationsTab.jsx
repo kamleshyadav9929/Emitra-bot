@@ -26,7 +26,7 @@ export default function NotificationsTab({ notifications, formatMessage, onMarkR
                 </button>
             </div>
 
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+            <div className="flex flex-wrap gap-2 pb-2">
                 {["all", "exams", "services"].map((f) => (
                     <button
                         key={f}
