@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, X, Calendar, DollarSign, Globe, Award } from "lucide-react"
 import * as api from "../../api"
+import { TableSkeleton } from "../../components/common/Skeleton"
 
 // Helper Toast
 function Toast({ visible, message }) {
@@ -313,9 +314,7 @@ export default function AdminExams() {
       {/* Grid List */}
       <div className="bg-[var(--color-surface-lowest)] overflow-hidden rounded-[20px] shadow-ambient">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-          </div>
+          <TableSkeleton />
         ) : exams.length === 0 ? (
           <div className="py-20 text-center">
             <p className="text-[13px] text-gray-500 font-medium">No exam profiles configured. Click 'Create Exam Profile' to add one.</p>

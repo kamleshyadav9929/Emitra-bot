@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { CheckCircle2, Send, Clock, MessageSquare, ClipboardList, AlertTriangle, Filter } from "lucide-react"
 import { getLogs } from "../../api"
 import ExamBadge from "../../components/common/ExamBadge"
+import { TableSkeleton } from "../../components/common/Skeleton"
 
 const LOG_FILTERS = ["All", "Messages", "Requests", "Errors"]
 
@@ -74,9 +75,7 @@ export default function ActivityLogs() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-        </div>
+        <TableSkeleton />
       ) : filteredLogs.length === 0 ? (
         <div className="bg-[var(--color-surface-lowest)] py-20 text-center rounded-[20px] shadow-ambient">
           <Send size={24} className="mx-auto text-gray-300 mb-4" />

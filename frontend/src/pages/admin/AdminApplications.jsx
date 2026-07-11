@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react"
 import { ClipboardList, Clock, CheckCircle, Send, X, Phone, Mail, RefreshCw, Paperclip, FileText, Image as ImageIcon, Download, Search, CheckCircle2, XCircle } from "lucide-react"
 import * as api from "../../api"
+import { TableSkeleton } from "../../components/common/Skeleton"
 
 // Helper Toast
 function Toast({ visible, message }) {
@@ -343,9 +344,7 @@ export default function AdminApplications() {
       {/* Grid list */}
       <div className="bg-[var(--color-surface-lowest)] overflow-hidden rounded-[20px] shadow-ambient">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-          </div>
+          <TableSkeleton />
         ) : error ? (
           <div className="py-20 text-center px-8">
             <p className="text-red-500 text-[13px] mb-2">{error}</p>

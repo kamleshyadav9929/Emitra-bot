@@ -138,6 +138,7 @@ def get_bot_and_loop():
             from telegram.request import HTTPXRequest
             proxy = os.environ.get("HTTP_PROXY") or os.environ.get("http_proxy")
             if proxy:
+                # pyrefly: ignore [unexpected-keyword]
                 req = HTTPXRequest(proxy_url=proxy)
                 _global_bot = Bot(token=config.TELEGRAM_BOT_TOKEN, request=req)
             else:

@@ -12,6 +12,7 @@ import {
   updateScheduledAnnouncement, deleteScheduledAnnouncement
 } from "../../api"
 import { getExamColor } from "../../constants/examColors"
+import { TableSkeleton } from "../../components/common/Skeleton"
 
 // ── Default values ──────────────────────────────────────────────────────────────
 const DEFAULT_MESSAGES = {
@@ -259,9 +260,7 @@ function AnnouncementsTab({ toast }) {
 
       <div className="bg-[var(--color-surface-lowest)] rounded-xl overflow-hidden shadow-ambient border-none">
         {loading ? (
-          <div className="py-16 flex justify-center">
-            <div className="w-6 h-6 border-2 border-[#164FA8] border-t-transparent rounded-full animate-spin" />
-          </div>
+          <TableSkeleton />
         ) : anns.length === 0 ? (
           <div className="py-16 text-center">
             <p className="text-[13px] text-gray-500 font-medium">Koi scheduled announcement nahi hai.</p>
@@ -386,9 +385,7 @@ function ExamsTab({ toast }) {
 
       <div className="bg-[var(--color-surface-lowest)] rounded-xl overflow-hidden shadow-ambient border-none">
         {loading ? (
-          <div className="py-12 flex justify-center">
-             <div className="w-6 h-6 border-2 border-[#164FA8] border-t-transparent rounded-full animate-spin" />
-          </div>
+          <TableSkeleton />
         ) : exams.length === 0 ? (
           <div className="py-12 text-center text-[13px] text-gray-500 font-medium">No exams found</div>
         ) : (
@@ -619,9 +616,7 @@ export default function BotManager() {
       {/* Tab content */}
       <div>
         {loading && activeTab !== "exams" && activeTab !== "announcements" ? (
-          <div className="py-12 flex justify-center">
-             <div className="w-6 h-6 border-2 border-[#164FA8] border-t-transparent rounded-full animate-spin" />
-          </div>
+          <TableSkeleton />
         ) : (
           <>
             {activeTab === "messages"      && <MessagesTab      botSettings={botSettings} onSave={(key, val) => setBotSettings(p => ({ ...p, [key]: val }))} toast={showToast} />}

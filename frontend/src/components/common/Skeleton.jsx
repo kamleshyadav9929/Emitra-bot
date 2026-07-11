@@ -136,3 +136,74 @@ export function ProfileSkeleton() {
     </div>
   )
 }
+
+// Specifically for Admin Dashboard
+export function AdminDashboardSkeleton() {
+  return (
+    <div className="animate-fadeIn space-y-12 pb-10">
+      <div className="flex justify-between items-center pb-6 border-b border-gray-100">
+        <Skeleton className="h-8 w-64 rounded" />
+        <Skeleton className="h-6 w-32 rounded" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="bg-white rounded-[20px] p-6 shadow-sm border border-gray-50 flex flex-col justify-between">
+            <div className="flex justify-between items-center mb-4">
+              <Skeleton className="h-10 w-10 rounded-xl" />
+              <Skeleton className="h-8 w-16 rounded" />
+            </div>
+            <Skeleton className="h-4 w-24 rounded mt-4" />
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-white rounded-[20px] p-8 shadow-sm border border-gray-50">
+          <Skeleton className="h-6 w-48 rounded mb-6" />
+          <Skeleton className="h-64 w-full rounded-xl" />
+        </div>
+        <div className="flex flex-col gap-6 lg:col-span-1">
+          <div className="bg-white rounded-[20px] p-7 shadow-sm border border-gray-50">
+            <Skeleton className="h-10 w-10 rounded mb-4" />
+            <Skeleton className="h-6 w-32 rounded mb-2" />
+            <Skeleton className="h-4 w-full rounded mb-6" />
+            <Skeleton className="h-4 w-24 rounded" />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Generic Table Skeleton for Admin Lists
+export function TableSkeleton({ rows = 5 }) {
+  return (
+    <div className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-6 animate-fadeIn">
+      <div className="overflow-x-auto">
+        <table className="w-full text-left min-w-[700px]">
+          <thead>
+            <tr className="bg-[var(--color-surface-base)]">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <th key={i} className="py-4 px-6">
+                  <Skeleton className="h-3 w-20 rounded" />
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {Array.from({ length: rows }).map((_, i) => (
+              <tr key={i} className="bg-white">
+                {Array.from({ length: 5 }).map((_, j) => (
+                  <td key={j} className="py-5 px-6">
+                    <Skeleton className="h-4 w-full max-w-[150px] rounded" />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}

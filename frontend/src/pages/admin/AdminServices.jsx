@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, X, CheckCircle2 } from "lucide-react"
 import { getServices, createService, updateService, toggleService, deleteServiceApi } from "../../api"
+import { TableSkeleton } from "../../components/common/Skeleton"
 
 // ── Toast ───────────────────────────────────────────────────────────────────────
 function Toast({ visible, message }) {
@@ -222,9 +223,7 @@ export default function AdminServices() {
       </div>
 
       {loading ? (
-        <div className="py-16 flex justify-center">
-          <div className="w-6 h-6 border-2 border-[#164FA8] border-t-transparent rounded-full animate-spin" />
-        </div>
+        <TableSkeleton />
       ) : (
         <div className="space-y-6">
           {Object.entries(grouped).map(([catLabel, items]) => (

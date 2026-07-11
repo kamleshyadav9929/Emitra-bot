@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react"
 import { getStudents, blockStudent, deleteStudent, addStudent, getExams, updateStudentCategory } from "../../api"
 import ExamBadge from "../../components/common/ExamBadge"
 import { Phone, MessagesSquare, Search, X, Download, ChevronDown, Trash2, Plus, Grid, List } from "lucide-react"
+import { TableSkeleton } from "../../components/common/Skeleton"
 
 const DEFAULT_FILTERS = ["ALL", "JEE", "NEET", "SSC", "UPSC", "CUET"]
 
@@ -234,10 +235,7 @@ export default function Students() {
 
       {/* Main Content Area */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-24 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl">
-          <div className="w-7 h-7 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[11px] text-gray-400 font-bold tracking-widest uppercase mt-4">Loading directory</p>
-        </div>
+        <TableSkeleton />
       ) : error ? (
         <div className="py-20 text-center px-8 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl">
           <p className="text-red-500 text-[14px] font-medium mb-3">{error}</p>

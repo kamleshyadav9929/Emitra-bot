@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import { ClipboardList, TrendingUp, Megaphone, ArrowRight, ExternalLink, Activity, FileText, CheckCircle, Users, Send } from "lucide-react"
 import { getStats, getStudents, getLogs, getServiceRequests } from "../../api"
+import { AdminDashboardSkeleton } from "../../components/common/Skeleton"
 
 const EXAM_COLORS = {
   JEE:  { bar: "#3B82F6", text: "#1D4ED8", bg: "#EFF6FF" },
@@ -49,14 +50,7 @@ export default function Dashboard() {
 
   useEffect(() => { fetchAll() }, [fetchAll])
 
-  if (loading) return (
-    <div className="flex items-center justify-center h-64 w-full">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-5 h-5 border-2 border-[#164FA8] border-t-transparent rounded-full animate-spin" />
-        <p className="text-[11px] text-[#164FA8] font-bold tracking-wide uppercase">Loading Panel Data</p>
-      </div>
-    </div>
-  )
+  if (loading) return <AdminDashboardSkeleton />
 
   if (error) {
     return (

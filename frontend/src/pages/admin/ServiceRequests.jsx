@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { getServiceRequests, sendReceipt, getStudentDocuments, getDocumentUrl, completeServiceRequest } from "../../api"
 import { ClipboardList, Clock, CheckCircle, Check, Send, X, Phone, MessageSquare, RefreshCw, Paperclip, FileText, Image as ImageIcon, Download } from "lucide-react"
+import { TableSkeleton } from "../../components/common/Skeleton"
 
 const CATEGORY_EMOJI = {
   documents: "📄", utility: "💡", schemes: "🏛️", license: "🚗", land: "🌾",
@@ -349,9 +350,7 @@ export default function ServiceRequests() {
       {/* Table */}
       <div className="bg-[var(--color-surface-lowest)] overflow-hidden rounded-[20px] shadow-ambient">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-          </div>
+          <TableSkeleton />
         ) : error ? (
           <div className="py-20 text-center px-8">
             <p className="text-red-500 text-[13px] mb-2">{error}</p>

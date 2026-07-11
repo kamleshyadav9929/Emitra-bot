@@ -35,10 +35,14 @@ function StudentDashboardRoute() {
 }
 
 // ── Loading Spinner ───────────────────────────────────────────────────────────
-import { StudentPortalSkeleton } from "./components/common/Skeleton"
+import { Loader2 } from "lucide-react"
 
 function ClerkLoadingSpinner() {
-    return <StudentPortalSkeleton />
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-transparent">
+            <Loader2 className="w-8 h-8 animate-spin text-[#164FA8]" />
+        </div>
+    )
 }
 
 // ── Admin allowlist — loaded from env at build time ──────────────────────────
