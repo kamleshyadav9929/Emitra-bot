@@ -36,8 +36,6 @@ function StudentDashboardRoute() {
 
 // ── Loading Spinner ───────────────────────────────────────────────────────────
 import { Loader2 } from "lucide-react"
-import { useState, useEffect } from "react"
-
 function ClerkLoadingSpinner() {
     const [showWake, setShowWake] = useState(false)
     
