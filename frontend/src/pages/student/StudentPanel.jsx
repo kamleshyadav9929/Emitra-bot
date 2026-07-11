@@ -11,7 +11,7 @@ import {
 } from "lucide-react"
 
 import "../../portal.css"
-import { PageSkeleton } from "../../components/common/Skeleton"
+import { StudentPortalSkeleton } from "../../components/common/Skeleton"
 import LoginModal from "../../components/student/LoginModal"
 import OnboardingModal from "../../components/student/OnboardingModal"
 import { useLanguage } from "../../context/LanguageContext"
@@ -793,7 +793,7 @@ export default function StudentPanel() {
                         <main className="max-w-[1140px] w-full mx-auto px-3 md:px-10 py-4 md:py-8 flex-1">
                     
                     {loading ? (
-                        <PageSkeleton />
+                        <StudentPortalSkeleton />
                     ) : (
                         <div className="space-y-8 animate-fadeIn">
                             

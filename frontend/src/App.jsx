@@ -35,10 +35,10 @@ function StudentDashboardRoute() {
 }
 
 // ── Loading Spinner ───────────────────────────────────────────────────────────
-import { PageSkeleton } from "./components/common/Skeleton"
+import { StudentPortalSkeleton } from "./components/common/Skeleton"
 
 function ClerkLoadingSpinner() {
-    return <PageSkeleton />
+    return <StudentPortalSkeleton />
 }
 
 // ── Admin allowlist — loaded from env at build time ──────────────────────────
