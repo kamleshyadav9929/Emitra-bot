@@ -304,12 +304,14 @@ def add_student_admin(name, phone_number, exam_pref="NONE"):
         return False, str(e)
 
 
-def update_student_profile(user_id, name, phone):
-    """Update student name and optional phone number."""
+def update_student_profile(user_id, name, phone, gender=None):
+    """Update student name, phone number, and gender."""
     try:
         update_data = {"name": name.strip()}
         if phone:
             update_data["phone"] = phone.strip()
+        if gender:
+            update_data["gender"] = gender.strip()
             
         supabase.table("users").update(update_data).eq("id", user_id).execute()
         return True, "Profile updated"

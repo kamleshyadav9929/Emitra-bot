@@ -675,6 +675,7 @@ def student_onboard():
     data = request.json or {}
     name = data.get("name")
     phone = data.get("phone")
+    gender = data.get("gender")
     categories = data.get("exam_preferences", [])
     
     if not name:
@@ -698,7 +699,7 @@ def student_onboard():
         return jsonify({"success": False, "error": "User not found"}), 404
         
     # Update profile
-    success, msg = database.update_student_profile(user["id"], name, phone)
+    success, msg = database.update_student_profile(user["id"], name, phone, gender)
     if not success:
         return jsonify({"success": False, "error": msg}), 500
         
