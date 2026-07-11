@@ -35,15 +35,10 @@ function StudentDashboardRoute() {
 }
 
 // ── Loading Spinner ───────────────────────────────────────────────────────────
+import { PageSkeleton } from "./components/common/Skeleton"
+
 function ClerkLoadingSpinner() {
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-[var(--color-surface-base)]">
-            <div className="flex flex-col items-center gap-4">
-                <div className="w-8 h-8 rounded-full border-[3px] border-[var(--color-primary)]/20 border-t-[var(--color-primary)] animate-spin" />
-                <span className="text-[12px] text-gray-400 font-bold tracking-widest uppercase">Loading</span>
-            </div>
-        </div>
-    )
+    return <PageSkeleton />
 }
 
 // ── Admin allowlist — loaded from env at build time ──────────────────────────

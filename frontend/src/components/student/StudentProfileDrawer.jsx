@@ -6,6 +6,7 @@ import {
 } from "lucide-react"
 import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
+import { ProfileSkeleton } from "../common/Skeleton"
 
 export default function StudentProfileDrawer({ isOpen, onClose }) {
     const { user, logout } = useAuth()
@@ -207,10 +208,7 @@ export default function StudentProfileDrawer({ isOpen, onClose }) {
                                 </div>
 
                                 {loading ? (
-                                    <div className="bg-white rounded-3xl border border-[#e5e5e7] p-10 flex flex-col items-center justify-center shadow-sm">
-                                        <Loader2 size={24} className="animate-spin text-[#0071e3]" />
-                                        <p className="text-[12px] font-semibold text-[#86868b] mt-3">Fetching records...</p>
-                                    </div>
+                                    <ProfileSkeleton />
                                 ) : history.length === 0 ? (
                                     <div className="bg-white rounded-3xl border border-[#e5e5e7] p-8 text-center space-y-4 shadow-sm">
                                         <div className="w-12 h-12 bg-[#f5f5f7] border border-[#e5e5e7] rounded-2xl flex items-center justify-center mx-auto text-[#86868b]">

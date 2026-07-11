@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { useNavigate } from "react-router-dom"
+import { CardSkeleton, ListSkeleton } from "../../components/common/Skeleton"
 import LoginModal from "../../components/student/LoginModal"
 import {
     Send, Clock, Bell, Globe, ExternalLink,
@@ -536,9 +537,10 @@ export default function Landing() {
 
                         {/* Available Services Grouped by Category Grid */}
                         {loading ? (
-                            <div className="flex flex-col items-center justify-center py-12 gap-2">
-                                <div className="w-6 h-6 border-2 border-[#164FA8] border-t-transparent rounded-full animate-spin" />
-                                <span className="text-[11px] text-gray-400 font-bold tracking-widest uppercase">Loading Services...</span>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                                <CardSkeleton />
+                                <CardSkeleton />
+                                <CardSkeleton />
                             </div>
                         ) : Object.keys(services).length === 0 ? (
                             <div className="text-center py-12 text-gray-400">
@@ -670,9 +672,8 @@ export default function Landing() {
                         </div>
 
                         {loading ? (
-                            <div className="flex flex-col items-center justify-center py-20 gap-2">
-                                <div className="w-5 h-5 border-2 border-[#164FA8] border-t-transparent rounded-full animate-spin" />
-                                <span className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Fetching circulars</span>
+                            <div className="mt-6">
+                                <ListSkeleton count={3} />
                             </div>
                         ) : filteredAnnouncements.length === 0 ? (
                             <div className="text-center py-20 text-gray-400">
