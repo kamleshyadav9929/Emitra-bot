@@ -441,7 +441,12 @@ def get_public_services():
 
 @app.route("/api/public/exams", methods=["GET"])
 def get_public_exams():
-    return jsonify({"exams": database.get_all_exams()})
+    try:
+        exams = database.get_all_exams()
+        return jsonify({"exams": exams})
+    except Exception as e:
+        print(f"Error fetching exams: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 @app.route("/api/public/announcements", methods=["GET"])
