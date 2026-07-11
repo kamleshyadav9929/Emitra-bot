@@ -12,7 +12,6 @@ import BotManager from "./pages/admin/BotManager"
 import AdminServices from "./pages/admin/AdminServices"
 import AdminApplications from "./pages/admin/AdminApplications"
 import AdminExams from "./pages/admin/AdminExams"
-import Login from "./pages/admin/Login"
 import StudentPanel from "./pages/student/StudentPanel"
 import Landing from "./pages/student/Landing"
 
@@ -97,7 +96,7 @@ function PrivateRoute({ children }) {
     const { user } = useUser()
 
     if (!isLoaded) return <ClerkLoadingSpinner />
-    if (!isSignedIn) return <Navigate to="/login" replace />
+    if (!isSignedIn) return <Navigate to="/" replace />
 
     // Check email against allowlist
     const email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || ""
@@ -112,7 +111,6 @@ function PrivateRoute({ children }) {
 function AdminLayout({ children }) {
     const location = useLocation()
     const navigate = useNavigate()
-    const isLoginPage = location.pathname === "/login"
     const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
@@ -137,23 +135,21 @@ function AdminLayout({ children }) {
 
     return (
         <div className="flex flex-col lg:flex-row bg-[var(--color-surface-base)] text-[var(--color-on-surface)] min-h-screen">
-            {!isLoginPage && (
-                <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-            )}
-            {!isLoginPage && isCommandPaletteOpen && (
+            <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+            
+            {isCommandPaletteOpen && (
                 <CommandPalette onClose={() => setIsCommandPaletteOpen(false)} />
             )}
-            <main className={`flex-1 min-w-0 flex flex-col ${!isLoginPage ? "lg:ml-[280px]" : ""}`}>
-                {!isLoginPage && (
-                    <button
-                        onClick={() => setIsSidebarOpen(true)}
-                        className="lg:hidden fixed top-4 left-4 z-40 p-2.5 bg-white text-gray-600 border border-[var(--color-outline-variant)] rounded-xl shadow-sm hover:text-[var(--color-primary)] transition-all cursor-pointer"
-                        aria-label="Open Menu"
-                    >
-                        <Menu size={20} />
-                    </button>
-                )}
-                <div className={`max-w-[1200px] w-full mx-auto ${!isLoginPage ? "px-4 sm:px-10 py-6 sm:py-10" : "flex-1 flex flex-col"}`}>
+            
+            <main className="flex-1 min-w-0 flex flex-col lg:ml-[280px]">
+                <button
+                    onClick={() => setIsSidebarOpen(true)}
+                    className="lg:hidden fixed top-4 left-4 z-40 p-2.5 bg-white text-gray-600 border border-[var(--color-outline-variant)] rounded-xl shadow-sm hover:text-[var(--color-primary)] transition-all cursor-pointer"
+                    aria-label="Open Menu"
+                >
+                    <Menu size={20} />
+                </button>
+                <div className="max-w-[1200px] w-full mx-auto px-4 sm:px-10 py-6 sm:py-10">
                     {children}
                 </div>
             </main>
@@ -174,7 +170,6 @@ function App() {
 
 
             {/* ── Admin Auth ────────────────────────────────────────────────── */}
-            <Route path="/login" element={<AdminLayout><Login /></AdminLayout>} />
 
             {/* ── Admin Dashboard (Nested) ──────────────────────────────────── */}
             <Route path="/admin" element={<PrivateRoute><AdminLayout><Dashboard /></AdminLayout></PrivateRoute>} />
