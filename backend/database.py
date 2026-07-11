@@ -50,11 +50,24 @@ else:
 
 
 def init_db():
-    """Verify connection and seed default services/exams/settings if tables are empty."""
+    """Verify connection, create storage buckets, and seed default data."""
     if not supabase:
         print("WARNING: Supabase is not initialized. Skipping DB initialization.")
         return
     try:
+        # Create required storage buckets if they don't exist
+        try:
+            supabase.storage.get_bucket("student_documents")
+        except Exception:
+            supabase.storage.create_bucket("student_documents", options={"public": False})
+            print("Created private bucket: student_documents")
+            
+        try:
+            supabase.storage.get_bucket("broadcast_images")
+        except Exception:
+            supabase.storage.create_bucket("broadcast_images", options={"public": True})
+            print("Created public bucket: broadcast_images")
+
         # Check if services table is empty
         res = supabase.table("services").select("id", count="exact").limit(1).execute()
         if res.count == 0:

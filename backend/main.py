@@ -910,12 +910,18 @@ def send_notification():
             if file and file.filename != "":
                 orig_filename = secure_filename(file.filename)
                 unique_name = f"broadcast_{uuid.uuid4().hex[:8]}_{orig_filename}"
-                file_path = os.path.join(UPLOAD_FOLDER, unique_name)
-                file.save(file_path)
                 
-                # Construct public URL
-                base_url = request.host_url.rstrip('/')
-                image_url = f"{base_url}/api/public/documents/download/{unique_name}"
+                # Upload to Supabase public bucket
+                file_bytes = file.read()
+                from database import supabase
+                supabase.storage.from_("broadcast_images").upload(
+                    file=file_bytes,
+                    path=unique_name,
+                    file_options={"content-type": file.content_type}
+                )
+                
+                # Get public URL directly from Supabase
+                image_url = supabase.storage.from_("broadcast_images").get_public_url(unique_name)
     else:
         # Fallback to JSON
         data = request.json or {}
@@ -1235,9 +1241,6 @@ import os
 import uuid
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = os.path.join(app.root_path, "uploads")
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
 # ── Public APIs ─────────────────────────────────────────────────────────────
 
 @app.route("/api/public/submit-application", methods=["POST"])
@@ -1274,8 +1277,15 @@ def public_submit_application():
                 orig_filename = secure_filename(file.filename)
                 # Generate unique name: appid_uuid_origfilename
                 unique_name = f"{app_id}_{uuid.uuid4().hex[:8]}_{orig_filename}"
-                file_path = os.path.join(UPLOAD_FOLDER, unique_name)
-                file.save(file_path)
+                
+                # Upload to Supabase private bucket
+                file_bytes = file.read()
+                from database import supabase
+                supabase.storage.from_("student_documents").upload(
+                    file=file_bytes,
+                    path=unique_name,
+                    file_options={"content-type": file.content_type}
+                )
                 
                 # Log file in database using doc_key (which is the document label like '10th Marksheet') as file_type
                 database.add_application_document(app_id, doc_key, unique_name, file.filename)
@@ -1448,20 +1458,37 @@ def admin_update_application(app_id):
 def admin_download_document(filename):
     """Securely serve uploaded student application documents only to authenticated admins."""
     clean_filename = secure_filename(filename)
-    if not os.path.exists(os.path.join(UPLOAD_FOLDER, clean_filename)):
-        return jsonify({"error": "File not found"}), 404
+    from database import supabase
+    from flask import redirect
+    try:
+        # Create a signed URL that expires in 60 seconds
+        res = supabase.storage.from_("student_documents").create_signed_url(clean_filename, 60)
+        signed_url = res.get("signedURL") or res.get("signedUrl") if isinstance(res, dict) else getattr(res, "signedURL", getattr(res, "signedUrl", None))
         
-    return send_from_directory(UPLOAD_FOLDER, clean_filename, as_attachment=True)
+        # Sometimes supabase-py returns the string directly in newer versions
+        if isinstance(res, str):
+            signed_url = res
+            
+        if not signed_url:
+            return jsonify({"error": "File not found"}), 404
+        return redirect(signed_url)
+    except Exception as e:
+        print(f"Error retrieving document: {e}")
+        return jsonify({"error": "Failed to retrieve document"}), 500
 
 
 @app.route("/api/public/documents/download/<path:filename>", methods=["GET"])
 def public_download_document(filename):
-    """Serve uploaded student documents (filenames are cryptographically secure with UUIDs)."""
+    """Serve broadcast images publicly, but deny access to student documents."""
     clean_filename = secure_filename(filename)
-    if not os.path.exists(os.path.join(UPLOAD_FOLDER, clean_filename)):
-        return jsonify({"error": "File not found"}), 404
+    from flask import redirect
+    
+    if clean_filename.startswith("broadcast_"):
+        from database import supabase
+        public_url = supabase.storage.from_("broadcast_images").get_public_url(clean_filename)
+        return redirect(public_url)
         
-    return send_from_directory(UPLOAD_FOLDER, clean_filename)
+    return jsonify({"error": "Forbidden: Student documents can only be accessed by authenticated administrators."}), 403
 
 
 
