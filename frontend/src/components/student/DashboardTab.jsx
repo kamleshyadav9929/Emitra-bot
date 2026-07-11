@@ -96,23 +96,38 @@ export default function DashboardTab({
                 </div>
             </div>
 
-            {/* Activity Summary (Compact) */}
-            {user && (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    <div className="bg-white p-4 border border-slate-200 rounded-xl shadow-sm text-center cursor-pointer" onClick={() => setActiveTab("status")}>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Active</p>
-                        <p className="text-2xl font-black text-[#0a4a83]">{statsProgress.active || 0}</p>
-                    </div>
-                    <div className="bg-white p-4 border border-slate-200 rounded-xl shadow-sm text-center cursor-pointer" onClick={() => setActiveTab("status")}>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Completed</p>
-                        <p className="text-2xl font-black text-emerald-600">{statsProgress.completed || 0}</p>
-                    </div>
-                    <div className="bg-white p-4 border border-slate-200 rounded-xl shadow-sm text-center cursor-pointer col-span-2 md:col-span-1" onClick={() => setActiveTab("exams")}>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Saved Exams</p>
-                        <p className="text-2xl font-black text-indigo-600">{subscribedExams.length}</p>
-                    </div>
+            {/* Recent Notifications */}
+            <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-wide">Recent Notifications</h3>
+                    <button onClick={() => setActiveTab("notifications")} className="text-[11px] font-bold text-[#0a4a83] hover:underline">View All</button>
                 </div>
-            )}
+                {subNotifications && subNotifications.length > 0 ? (
+                    <div className="space-y-2.5">
+                        {subNotifications.slice(0, 2).map((ann, idx) => (
+                            <div 
+                                key={idx}
+                                onClick={() => setActiveTab("notifications")}
+                                className="bg-white border border-slate-200 rounded-xl p-3.5 cursor-pointer hover:shadow-sm transition-all flex items-start gap-3"
+                            >
+                                <Bell size={16} className="text-[#0a4a83] shrink-0 mt-0.5" />
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-bold text-slate-800 leading-snug line-clamp-2">
+                                        {ann.content?.replace(/[*_~`]/g, '').slice(0, 100)}...
+                                    </p>
+                                    <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">
+                                        {new Date(ann.created_at || ann.sent_at).toLocaleDateString('en-IN', {day:'numeric', month:'short'})}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-6 bg-slate-50 border border-slate-200 rounded-xl">
+                        <p className="text-slate-500 text-xs">No recent notifications</p>
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

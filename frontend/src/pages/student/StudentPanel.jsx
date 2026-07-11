@@ -907,6 +907,9 @@ export default function StudentPanel() {
                                     isLoggedIn={isLoggedIn}
                                     triggerSignIn={triggerSignIn}
                                     lang={lang}
+                                    statsProgress={statsProgress}
+                                    subscribedExams={subscribedExams}
+                                    setActiveTab={setActiveTab}
                                 />
                             )}
 
