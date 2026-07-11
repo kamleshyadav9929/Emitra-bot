@@ -969,7 +969,7 @@ def send_notification():
 @token_required
 def broadcast_status(job_id):
     """Frontend polls this to show real-time broadcast progress from DB."""
-    job = database.get_broadcast_job(job_id)
+    job = database.get_broadcast_status(job_id)
     if not job:
         return jsonify({"error": "Job not found"}), 404
     return jsonify(job)
