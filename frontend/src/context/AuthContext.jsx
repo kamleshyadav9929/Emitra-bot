@@ -146,7 +146,8 @@ export function AuthProvider({ children }) {
     }
 
     const isLoggedIn = isLocalLoggedIn || (isClerkSignedIn && user && !token)
-    const needsOnboarding = isLoggedIn && user && (!user.exam_preferences || user.exam_preferences.length === 0)
+    const hasValidPhone = user?.phone && !user.phone.startsWith("CLERK_TEMP_") && !user.phone.startsWith("BOT_TEMP_")
+    const needsOnboarding = isLoggedIn && user && (!user.exam_preferences || user.exam_preferences.length === 0 || !hasValidPhone)
     
     // If Clerk says we are signed in, but we haven't fetched our local user object yet, consider it still loading
     // Exception: If they are an Admin, we don't sync a local user, so we are fully loaded immediately.

@@ -9,11 +9,10 @@ export default function OnboardingModal({ isOpen, exams }) {
     const { user, login } = useAuth()
     const { lang } = useLanguage()
     
-    // Default name if user exists but we want them to correct it
     const defaultName = user?.name && user.name !== "Unknown" ? user.name : ""
-    
     const [name, setName] = useState(defaultName)
-    const [phone, setPhone] = useState(user?.phone || "")
+    const initialPhone = (user?.phone && !user.phone.startsWith("CLERK_TEMP_") && !user.phone.startsWith("BOT_TEMP_")) ? user.phone : ""
+    const [phone, setPhone] = useState(initialPhone)
     const [selectedExams, setSelectedExams] = useState([])
     const [status, setStatus] = useState("idle") // idle, loading, success, error
     const [errorMsg, setErrorMsg] = useState("")
@@ -34,13 +33,19 @@ export default function OnboardingModal({ isOpen, exams }) {
             return
         }
 
+        const cleanPhone = phone.replace(/\D/g, '').slice(-10)
+        if (!cleanPhone || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+            setErrorMsg(lang === "EN" ? "Please enter a valid 10-digit Indian phone number." : "कृपया वैध 10-अंकीय भारतीय फोन नंबर दर्ज करें।")
+            return
+        }
+
         setStatus("loading")
         setErrorMsg("")
         
         try {
             const res = await api.onboardStudent({
                 name: name.trim(),
-                phone: phone.trim(),
+                phone: cleanPhone,
                 exam_preferences: selectedExams
             })
 
