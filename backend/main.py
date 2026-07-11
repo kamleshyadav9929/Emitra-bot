@@ -1269,12 +1269,12 @@ def public_submit_application():
         dob = request.form.get("dob", "").strip()
         gender = request.form.get("gender", "").strip()
         category = request.form.get("category", "").strip()
-        exam_name = request.form.get("exam", "").strip()
+        exam_cycle_id = request.form.get("exam_cycle_id", "").strip()
         qualification = request.form.get("qualification", "").strip()
         doc_submission_method = request.form.get("docSubmissionMethod", "upload").strip()
 
-        if not student_name or not phone_number or not exam_name:
-            return jsonify({"success": False, "error": "Name, Phone and Exam are required"}), 400
+        if not student_name or not phone_number or not exam_cycle_id:
+            return jsonify({"success": False, "error": "Name, Phone and Exam Cycle are required"}), 400
 
         # Validate phone
         if not re.match(r"^[6-9]\d{9}$", phone_number):
@@ -1282,7 +1282,7 @@ def public_submit_application():
 
         # 2. Insert form application to get ID
         app_id = database.submit_form_application(
-            student_name, phone_number, email, dob, gender, category, exam_name, qualification, doc_submission_method
+            student_name, phone_number, email, dob, gender, category, exam_cycle_id, qualification, doc_submission_method
         )
 
         # 3. Process files
@@ -1337,7 +1337,8 @@ def admin_create_exam():
         return jsonify({"success": False, "error": "Exam name is required"}), 400
         
     desc = data.get("description", "")
-    cat = data.get("category", "UG")
+    category_id = data.get("category_id")
+    cycle_year = data.get("cycle_year")
     start = data.get("start_date", "")
     end = data.get("end_date", "")
     exam_d = data.get("exam_date", "")
@@ -1346,10 +1347,9 @@ def admin_create_exam():
     elig = data.get("eligibility", "")
     url = data.get("official_url", "")
     enabled = data.get("enabled", True)
-    req_docs = data.get("required_documents", "")
 
     success, result = database.add_exam_details(
-        name, desc, cat, start, end, exam_d, fees_gen, fees_sc, elig, url, enabled, req_docs
+        name, desc, category_id, url, enabled, cycle_year, start, end, exam_d, fees_gen, fees_sc, elig
     )
     if success:
         return jsonify({"success": True, "id": result})
@@ -1366,7 +1366,9 @@ def admin_update_exam(exam_id):
         return jsonify({"success": False, "error": "Exam name is required"}), 400
         
     desc = data.get("description", "")
-    cat = data.get("category", "UG")
+    category_id = data.get("category_id")
+    cycle_id = data.get("cycle_id")
+    cycle_year = data.get("cycle_year")
     start = data.get("start_date", "")
     end = data.get("end_date", "")
     exam_d = data.get("exam_date", "")
@@ -1375,10 +1377,9 @@ def admin_update_exam(exam_id):
     elig = data.get("eligibility", "")
     url = data.get("official_url", "")
     enabled = data.get("enabled", True)
-    req_docs = data.get("required_documents", "")
 
-    success = database.update_exam_details(
-        exam_id, name, desc, cat, start, end, exam_d, fees_gen, fees_sc, elig, url, enabled, req_docs
+    success, result = database.update_exam_details(
+        exam_id, name, desc, category_id, url, enabled, cycle_id, cycle_year, start, end, exam_d, fees_gen, fees_sc, elig
     )
     if success:
         return jsonify({"success": True})

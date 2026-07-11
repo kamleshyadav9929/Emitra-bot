@@ -12,11 +12,23 @@ function Toast({ visible, message }) {
   )
 }
 
+const CATEGORIES = [
+  { id: 1, label: "Engineering", key: "engineering" },
+  { id: 2, label: "Medical", key: "medical" },
+  { id: 3, label: "Central Government", key: "central_govt" },
+  { id: 4, label: "Rajasthan Government", key: "rajasthan_govt" },
+  { id: 5, label: "Banking & Finance", key: "banking" },
+  { id: 6, label: "Defense", key: "defense" },
+  { id: 7, label: "Teaching & Education", key: "teaching" },
+  { id: 8, label: "Other", key: "other" }
+]
+
 function ExamModal({ exam, onSave, onClose, loading }) {
   const defaultForm = {
     name: "",
     description: "",
-    category: "UG",
+    category_id: 1,
+    cycle_year: new Date().getFullYear(),
     start_date: "",
     end_date: "",
     exam_date: "",
@@ -24,14 +36,15 @@ function ExamModal({ exam, onSave, onClose, loading }) {
     fees_sc_st: "",
     eligibility: "",
     official_url: "",
-    enabled: true,
-    required_documents: "Passport Photo, Signature, 10th Marksheet, 12th Marksheet"
+    enabled: true
   }
 
   const [form, setForm] = useState(exam ? {
     name: exam.name,
     description: exam.description || "",
-    category: exam.category || "UG",
+    category_id: exam.category_id || 1,
+    cycle_year: exam.cycle_year || new Date().getFullYear(),
+    cycle_id: exam.cycle_id,
     start_date: exam.start_date || "",
     end_date: exam.end_date || "",
     exam_date: exam.exam_date || "",
@@ -39,8 +52,7 @@ function ExamModal({ exam, onSave, onClose, loading }) {
     fees_sc_st: exam.fees_sc_st || "",
     eligibility: exam.eligibility || "",
     official_url: exam.official_url || "",
-    enabled: exam.enabled === 1 || exam.enabled === true,
-    required_documents: exam.required_documents || ""
+    enabled: exam.enabled === 1 || exam.enabled === true
   } : defaultForm)
 
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
@@ -86,26 +98,21 @@ function ExamModal({ exam, onSave, onClose, loading }) {
             </div>
 
             <div className="col-span-2">
-              <label className="text-[10px] text-gray-500 font-bold tracking-widest uppercase block mb-1.5">Required Documents (Comma-separated) *</label>
-              <textarea
-                value={form.required_documents} onChange={e => set("required_documents", e.target.value)}
-                className="w-full border border-gray-200 px-4 py-2.5 text-[13px] text-gray-900 rounded-xl focus:border-[#164FA8] focus:ring-1 focus:ring-[#164FA8] outline-none h-16 resize-none"
-                placeholder="e.g. Passport Photo, Signature, 10th Marksheet, 12th Marksheet"
-                required
+              <label className="text-[10px] text-gray-500 font-bold tracking-widest uppercase block mb-1.5">Cycle Year</label>
+              <input
+                type="number" value={form.cycle_year} onChange={e => set("cycle_year", e.target.value)}
+                className="w-full border border-gray-200 px-4 py-2.5 text-[13px] text-gray-900 rounded-xl focus:border-[#164FA8] focus:ring-1 focus:ring-[#164FA8] outline-none"
+                placeholder="2024"
               />
             </div>
 
             <div>
               <label className="text-[10px] text-gray-500 font-bold tracking-widest uppercase block mb-1.5">Category</label>
               <select
-                value={form.category} onChange={e => set("category", e.target.value)}
+                value={form.category_id} onChange={e => set("category_id", parseInt(e.target.value))}
                 className="w-full border border-gray-200 px-4 py-2.5 text-[13px] text-gray-900 bg-white rounded-xl focus:border-[#164FA8] outline-none"
               >
-                <option value="UG">UG Admissions</option>
-                <option value="PG">PG Admissions</option>
-                <option value="Govt Job">Govt. Job Recruitment</option>
-                <option value="Board">Board Exams</option>
-                <option value="Scholarship">Scholarship / Entrance</option>
+                {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
               </select>
             </div>
 
@@ -216,7 +223,29 @@ export default function AdminExams() {
   const load = () => {
     setLoading(true)
     api.getAdminExams()
-      .then(d => setExams(d.exams || []))
+      .then(d => {
+        const mappedExams = (d.exams || []).map(ex => {
+          const cycle = ex.exam_cycles && ex.exam_cycles.length > 0 ? ex.exam_cycles[0] : {}
+          return {
+            id: ex.id,
+            name: ex.name,
+            description: ex.description,
+            category_id: ex.category_id,
+            category_label: ex.exam_categories?.label || "Unknown",
+            official_url: ex.official_url,
+            enabled: ex.is_active ? 1 : 0,
+            cycle_id: cycle.id,
+            cycle_year: cycle.cycle_year || new Date().getFullYear(),
+            start_date: cycle.start_date,
+            end_date: cycle.end_date,
+            exam_date: cycle.exam_date,
+            fees_gen_obc: cycle.fees_gen_obc,
+            fees_sc_st: cycle.fees_sc_st,
+            eligibility: cycle.eligibility
+          }
+        })
+        setExams(mappedExams)
+      })
       .catch(() => showToast("Failed to load examinations list"))
       .finally(() => setLoading(false))
   }
@@ -229,7 +258,9 @@ export default function AdminExams() {
       await api.updateAdminExam(exam.id, {
         name: exam.name,
         description: exam.description || "",
-        category: exam.category || "UG",
+        category_id: exam.category_id || 1,
+        cycle_id: exam.cycle_id,
+        cycle_year: exam.cycle_year,
         start_date: exam.start_date || "",
         end_date: exam.end_date || "",
         exam_date: exam.exam_date || "",
@@ -237,8 +268,7 @@ export default function AdminExams() {
         fees_sc_st: exam.fees_sc_st || "",
         eligibility: exam.eligibility || "",
         official_url: exam.official_url || "",
-        enabled: updatedEnabled,
-        required_documents: exam.required_documents || ""
+        enabled: updatedEnabled
       })
       setExams(prev => prev.map(e => e.id === exam.id ? { ...e, enabled: updatedEnabled ? 1 : 0 } : e))
       showToast(`${exam.name} status updated!`)
@@ -342,7 +372,7 @@ export default function AdminExams() {
                       </td>
                       <td className="py-5 px-6">
                         <span className="text-[10px] font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                          {exam.category || "UG"}
+                          {exam.category_label || "Unknown"}
                         </span>
                       </td>
                       <td className="py-5 px-6">

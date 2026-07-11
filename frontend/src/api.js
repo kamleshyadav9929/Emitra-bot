@@ -192,7 +192,28 @@ export const deleteExamApi = async (id) =>
 
 // ── Public API (No Auth Required) ─────────────────────────────────────────────
 export const getPublicServices      = () => requestJson(`/api/public/services`)
-export const getPublicExams         = () => requestJson(`/api/public/exams`)
+export const getPublicExams = async () => {
+  const data = await requestJson(`/api/public/exams`)
+  if (data && data.exams) {
+    data.exams = data.exams.map(ex => {
+      const cycle = ex.exam_cycles && ex.exam_cycles.length > 0 ? ex.exam_cycles[0] : {}
+      return {
+        ...ex,
+        category: ex.exam_categories?.label || "Unknown",
+        cycle_id: cycle.id,
+        cycle_year: cycle.cycle_year,
+        start_date: cycle.start_date,
+        end_date: cycle.end_date,
+        exam_date: cycle.exam_date,
+        fees_gen_obc: cycle.fees_gen_obc,
+        fees_sc_st: cycle.fees_sc_st,
+        eligibility: cycle.eligibility,
+        is_confirmed: cycle.is_confirmed
+      }
+    })
+  }
+  return data
+}
 export const getPublicAnnouncements = () => requestJson(`/api/public/announcements`)
 export const getPublicStats         = () => requestJson(`/api/public/stats`)
 export const getPublicConfig        = () => requestJson(`/api/public/config`)

@@ -135,7 +135,8 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {},
       Object.entries(formData).forEach(([key, val]) => {
         data.append(key, val)
       })
-      data.append("exam", examName)
+      const selectedExam = exams.find(e => e.name === examName)
+      data.append("exam_cycle_id", selectedExam?.cycle_id || "")
 
       // Append files only if they chose upload method
       if (formData.docSubmissionMethod === "upload") {

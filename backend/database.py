@@ -977,12 +977,14 @@ def get_all_exams():
     cached = _cache_get("all_exams")
     if cached is not None:
         return cached
-    res = supabase.table("exams").select("*").eq("enabled", 1).order("id", desc=False).execute()
+    # Fetch active exams with their category and active cycles
+    res = supabase.table("exams").select("*, exam_categories(key, label), exam_cycles(*)").eq("is_active", True).execute()
     _cache_set("all_exams", res.data)
     return res.data
 
 
 def add_exam(name):
+    # Backward compat for simple exam adding
     try:
         res = supabase.table("exams").insert({"name": name.strip()}).execute()
         _cache_invalidate("all_exams")
@@ -997,61 +999,82 @@ def delete_exam(exam_id):
 
 
 def get_all_exams_admin():
-    res = supabase.table("exams").select("*").order("id", desc=True).execute()
+    res = supabase.table("exams").select("*, exam_categories(key, label), exam_cycles(*)").order("id", desc=True).execute()
     return res.data
 
 
-def add_exam_details(name, description='', category='UG', start_date='', end_date='', exam_date='', fees_gen_obc='', fees_sc_st='', eligibility='', official_url='', enabled=True, required_documents=''):
+def add_exam_details(name, description='', category_id=None, official_url='', enabled=True, cycle_year=None, start_date='', end_date='', exam_date='', fees_gen_obc='', fees_sc_st='', eligibility=''):
     try:
-        # Convert empty strings to None for DB dates
-        res = supabase.table("exams").insert({
+        # Insert exam
+        exam_res = supabase.table("exams").insert({
             "name": name.strip(),
             "description": description,
-            "category": category,
-            "start_date": start_date or None,
-            "end_date": end_date or None,
-            "exam_date": exam_date or None,
-            "fees_gen_obc": fees_gen_obc,
-            "fees_sc_st": fees_sc_st,
-            "eligibility": eligibility,
+            "category_id": category_id,
             "official_url": official_url,
-            "enabled": 1 if enabled else 0
+            "is_active": True if enabled else False
         }).execute()
+        exam_id = exam_res.data[0]["id"]
+        
+        # Insert cycle
+        if cycle_year:
+            supabase.table("exam_cycles").insert({
+                "exam_id": exam_id,
+                "cycle_year": int(cycle_year),
+                "start_date": start_date or None,
+                "end_date": end_date or None,
+                "exam_date": exam_date or None,
+                "fees_gen_obc": fees_gen_obc,
+                "fees_sc_st": fees_sc_st,
+                "eligibility": eligibility,
+                "is_confirmed": False
+            }).execute()
+            
         _cache_invalidate("all_exams")
-        return True, res.data[0]["id"]
+        return True, exam_id
     except Exception as e:
-        return False, f"Exam already exists or error: {str(e)}"
+        return False, f"Error: {str(e)}"
 
 
-def update_exam_details(exam_id, name, description, category, start_date, end_date, exam_date, fees_gen_obc, fees_sc_st, eligibility, official_url, enabled, required_documents):
+def update_exam_details(exam_id, name, description, category_id, official_url, enabled, cycle_id=None, cycle_year=None, start_date='', end_date='', exam_date='', fees_gen_obc='', fees_sc_st='', eligibility=''):
     try:
         supabase.table("exams").update({
             "name": name.strip(),
             "description": description,
-            "category": category,
-            "start_date": start_date or None,
-            "end_date": end_date or None,
-            "exam_date": exam_date or None,
-            "fees_gen_obc": fees_gen_obc,
-            "fees_sc_st": fees_sc_st,
-            "eligibility": eligibility,
+            "category_id": category_id,
             "official_url": official_url,
-            "enabled": 1 if enabled else 0
+            "is_active": True if enabled else False
         }).eq("id", exam_id).execute()
+        
+        if cycle_year:
+            cycle_data = {
+                "cycle_year": int(cycle_year),
+                "start_date": start_date or None,
+                "end_date": end_date or None,
+                "exam_date": exam_date or None,
+                "fees_gen_obc": fees_gen_obc,
+                "fees_sc_st": fees_sc_st,
+                "eligibility": eligibility
+            }
+            if cycle_id:
+                supabase.table("exam_cycles").update(cycle_data).eq("id", cycle_id).execute()
+            else:
+                cycle_data["exam_id"] = exam_id
+                supabase.table("exam_cycles").insert(cycle_data).execute()
+
         _cache_invalidate("all_exams")
         return True
     except Exception as e:
-        return False, f"Another exam with this name already exists or error: {str(e)}"
+        return False, f"Error: {str(e)}"
 
 
 # ── Form Applications CRUD ────────────────────────────────────────────────
 
-def get_exam_by_name(name):
-    res = supabase.table("exams").select("id").eq("name", name).execute()
-    return res.data[0]["id"] if res.data else None
+def get_exam_categories():
+    res = supabase.table("exam_categories").select("*").execute()
+    return res.data
 
 
-def submit_form_application(student_name, phone_number, email, dob, gender, category, exam_name, academic_qualification, doc_submission_method='upload'):
+def submit_form_application(student_name, phone_number, email, dob, gender, category, exam_cycle_id, academic_qualification, doc_submission_method='upload'):
     # Lookup or create user by phone
     user = get_user_by_phone(phone_number)
     if not user:
@@ -1066,10 +1089,9 @@ def submit_form_application(student_name, phone_number, email, dob, gender, cate
         if user.get("name") == "Web Guest":
             supabase.table("users").update({"name": student_name}).eq("id", uid).execute()
             
-    eid = get_exam_by_name(exam_name)
     res = supabase.table("form_applications").insert({
         "user_id": uid,
-        "exam_id": eid,
+        "exam_cycle_id": int(exam_cycle_id),
         "email": email,
         "dob": dob or None,
         "gender": gender,
@@ -1091,7 +1113,7 @@ def add_application_document(application_id, file_type, file_path, file_name):
 
 
 def get_all_applications(status=None):
-    query = supabase.table("form_applications").select("*, users(*), exams(*)")
+    query = supabase.table("form_applications").select("*, users(*), exam_cycles(*, exams(*))")
     if status:
         res = query.eq("status", status).order("submitted_at", desc=True).execute()
     else:
@@ -1100,7 +1122,14 @@ def get_all_applications(status=None):
     records = []
     for row in (res.data or []):
         usr = row.get("users") or {}
-        ex = row.get("exams") or {}
+        cycle = row.get("exam_cycles") or {}
+        ex = cycle.get("exams") or {}
+        
+        # Build display name: "SSC CGL (2024)"
+        exam_display = ex.get("name", "Unknown Exam")
+        if cycle.get("cycle_year"):
+            exam_display += f" ({cycle['cycle_year']})"
+            
         records.append({
             "id": row["id"],
             "student_name": usr.get("name", "Unknown"),
@@ -1109,7 +1138,7 @@ def get_all_applications(status=None):
             "dob": row["dob"],
             "gender": row["gender"],
             "category": row["category"],
-            "exam_name": ex.get("name", "Unknown"),
+            "exam_name": exam_display,
             "academic_qualification": row["academic_qualification"],
             "status": row["status"],
             "submitted_at": row["submitted_at"],
@@ -1120,13 +1149,18 @@ def get_all_applications(status=None):
 
 
 def get_application_details(app_id):
-    res = supabase.table("form_applications").select("*, users(*), exams(*)").eq("id", app_id).execute()
+    res = supabase.table("form_applications").select("*, users(*), exam_cycles(*, exams(*))").eq("id", app_id).execute()
     if not res.data:
         return None
     row = res.data[0]
     usr = row.get("users") or {}
-    ex = row.get("exams") or {}
+    cycle = row.get("exam_cycles") or {}
+    ex = cycle.get("exams") or {}
     
+    exam_display = ex.get("name", "Unknown Exam")
+    if cycle.get("cycle_year"):
+        exam_display += f" ({cycle['cycle_year']})"
+        
     app_dict = {
         "id": row["id"],
         "student_name": usr.get("name", "Unknown"),
@@ -1135,7 +1169,7 @@ def get_application_details(app_id):
         "dob": row["dob"],
         "gender": row["gender"],
         "category": row["category"],
-        "exam_name": ex.get("name", "Unknown"),
+        "exam_name": exam_display,
         "academic_qualification": row["academic_qualification"],
         "status": row["status"],
         "remarks": row["remarks"],
