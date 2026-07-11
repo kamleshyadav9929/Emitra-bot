@@ -20,10 +20,10 @@ export default function OngoingRecruitmentsTab({ exams, setWizardExamName, setIs
     return (
         <div className="space-y-6 text-left animate-fadeIn">
             {/* Header */}
-            <div className="bg-white border border-slate-200 rounded-[16px] p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="bg-white border border-slate-200 rounded-[16px] p-4 md:p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4">
                 <div>
-                    <h2 className="text-[22px] font-bold text-slate-900 tracking-tight">Ongoing Recruitments</h2>
-                    <p className="text-[14px] text-slate-500 mt-1">Browse and apply for the latest government jobs and examinations.</p>
+                    <h2 className="text-[18px] md:text-[22px] font-bold text-slate-900 tracking-tight">Ongoing Recruitments</h2>
+                    <p className="text-[12px] md:text-[14px] text-slate-500 mt-1">Browse and apply for the latest government jobs and examinations.</p>
                 </div>
                 <div className="relative w-full md:w-auto">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -32,7 +32,7 @@ export default function OngoingRecruitmentsTab({ exams, setWizardExamName, setIs
                         placeholder="Search recruitments..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full md:w-[280px] pl-10 pr-4 py-2.5 bg-[#F8FAFC] border border-slate-200 rounded-[10px] text-[14px] focus:outline-none focus:border-[#4162EE] focus:ring-1 focus:ring-[#4162EE] transition-all"
+                        className="w-full md:w-[280px] pl-10 pr-4 py-2 md:py-2.5 bg-[#F8FAFC] border border-slate-200 rounded-[10px] text-[13px] md:text-[14px] focus:outline-none focus:border-[#4162EE] focus:ring-1 focus:ring-[#4162EE] transition-all"
                     />
                 </div>
             </div>
@@ -46,9 +46,9 @@ export default function OngoingRecruitmentsTab({ exams, setWizardExamName, setIs
                     </div>
                 ) : (
                     filteredExams.map((ex, idx) => (
-                        <div key={idx} className="bg-white border border-[#4162EE]/20 hover:border-[#4162EE] rounded-[16px] p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-5 group">
-                            <div className="flex items-center gap-5 sm:gap-6 w-full sm:w-auto">
-                                <div className="w-[64px] h-[64px] shrink-0 rounded-full border border-slate-200 p-1 bg-white shadow-sm flex items-center justify-center overflow-hidden">
+                        <div key={idx} className="bg-white border border-[#4162EE]/20 hover:border-[#4162EE] rounded-[16px] p-4 md:p-6 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-5 group">
+                            <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto">
+                                <div className="w-[48px] md:w-[64px] h-[48px] md:h-[64px] shrink-0 rounded-full border border-slate-200 p-1 bg-white shadow-sm flex items-center justify-center overflow-hidden">
                                     <img 
                                         src={getLogoUrl(ex.official_url, ex.category || ex.name)} 
                                         alt={ex.name}
@@ -60,10 +60,10 @@ export default function OngoingRecruitmentsTab({ exams, setWizardExamName, setIs
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <h4 className="text-[16px] sm:text-[18px] font-bold text-slate-800 uppercase tracking-tight leading-tight group-hover:text-[#4162EE] transition-colors">
+                                    <h4 className="text-[14px] sm:text-[18px] font-bold text-slate-800 uppercase tracking-tight leading-tight group-hover:text-[#4162EE] transition-colors">
                                         {ex.name}
                                     </h4>
-                                    <div className="flex flex-wrap items-center gap-3 text-[13px] text-slate-500 font-medium">
+                                    <div className="flex flex-wrap items-center gap-2 md:gap-3 text-[12px] md:text-[13px] text-slate-500 font-medium">
                                         {ex.category && (
                                             <span className="flex items-center gap-1">
                                                 <Building size={14} /> {ex.category}
@@ -87,11 +87,11 @@ export default function OngoingRecruitmentsTab({ exams, setWizardExamName, setIs
                                             setIsWizardOpen(true)
                                         }
                                     }}
-                                    className="w-full sm:w-auto px-8 py-2.5 bg-[#4162EE] hover:bg-[#3451D4] text-white text-[15px] font-semibold rounded-[8px] transition-colors border-none shadow-sm cursor-pointer text-center"
+                                    className="w-full sm:w-auto px-4 md:px-8 py-2 md:py-2.5 bg-[#4162EE] hover:bg-[#3451D4] text-white text-[13px] md:text-[15px] font-semibold rounded-[8px] transition-colors border-none shadow-sm cursor-pointer text-center"
                                 >
                                     Apply Now
                                 </button>
-                                <span className="text-[13px] font-semibold text-slate-600 flex items-center gap-1.5 justify-center sm:justify-end">
+                                <span className="text-[12px] md:text-[13px] font-semibold text-slate-600 flex items-center gap-1.5 justify-center sm:justify-end">
                                     <Calendar size={14} className="text-slate-400" />
                                     {ex.end_date ? new Date(ex.end_date).toLocaleDateString("en-GB", { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : "TBD"}
                                 </span>

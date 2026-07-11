@@ -1,382 +1,130 @@
 import { useState } from "react"
-import { Search, ExternalLink, Sparkles, MessageSquare, ChevronRight, Award, Settings, Globe } from "lucide-react"
+import { Search, CheckCircle2 } from "lucide-react"
 
 export default function ExamsTab({
-    activeExamForTimeline,
-    setActiveExamForTimeline,
     subscribedExams,
     handleToggleExamSubscription,
     examSearch,
     setExamSearch,
-    examCategoryFilter,
-    setExamCategoryFilter,
     filteredExamsList,
-    isLoggedIn,
     triggerSignIn,
     setWizardExamName,
     setIsWizardOpen,
-    config,
-    handleSaveExamSubscriptions,
-    exams = []
+    isLoggedIn
 }) {
-    const [isEditingSubscriptions, setIsEditingSubscriptions] = useState(false)
+    const [activeFilter, setActiveFilter] = useState("ALL")
+    
+    // Derived categories from the filtered list (could be static too)
+    const filterChips = ["ALL", "UG", "GOVT JOB", "MEDICAL", "ENGINEERING"]
 
-    // Filter exams that student has subscribed to
-    const subscribedList = exams.filter(ex => subscribedExams.includes(ex.name))
+    const displayedExams = filteredExamsList.filter(ex => {
+        const cat = (ex.category || "UG").toUpperCase()
+        if (activeFilter === "ALL") return true
+        if (activeFilter === "GOVT JOB" && cat.includes("GOVT")) return true
+        return cat === activeFilter
+    })
 
     return (
-        <div className="space-y-8 animate-fadeIn text-left">
-            {/* ── CASE 1: DETAILS TIMELINE VIEW FOR SELECTED EXAM ── */}
-            {activeExamForTimeline ? (
-                <div className="space-y-8">
-                    {/* Details Header */}
-                    <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-solid">
-                        <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                                <button 
-                                    onClick={() => setActiveExamForTimeline(null)} 
-                                    className="text-gray-400 hover:text-[var(--color-primary)] px-3 py-1 rounded-lg text-[12px] font-bold cursor-pointer transition-colors border-none bg-transparent"
-                                >
-                                    ← Go Back
-                                </button>
-                                <span className="text-[9.5px] font-extrabold text-[var(--color-primary)] bg-[var(--color-surface-low)] border border-[var(--color-outline-variant)] px-2 py-0.5 rounded tracking-wide uppercase">
-                                    {activeExamForTimeline.category || "UG"}
-                                </span>
-                            </div>
-                            <h2 className="text-lg font-extrabold text-slate-900 pr-12 line-clamp-1">{activeExamForTimeline.name}</h2>
-                            <p className="text-[12.5px] text-slate-500 font-normal leading-relaxed">{activeExamForTimeline.description || "Official government recruitment listing."}</p>
-                        </div>
-
-                        <button
-                            onClick={() => handleToggleExamSubscription(activeExamForTimeline.name)}
-                            className={`px-4 py-2.5 text-[13px] font-semibold rounded-xl transition-all cursor-pointer border-solid ${
-                                subscribedExams.includes(activeExamForTimeline.name)
-                                    ? "bg-[var(--color-surface-low)] hover:bg-gray-100 text-gray-700 border border-[var(--color-outline-variant)]"
-                                    : "bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white shadow-sm border-none"
-                            }`}
-                        >
-                            {subscribedExams.includes(activeExamForTimeline.name) ? "Unsubscribe Alerts" : "Subscribe Alerts"}
-                        </button>
-                    </div>
-
-                    {/* Visual Timeline */}
-                    <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-8 shadow-sm space-y-6 border-solid">
-                        <h3 className="text-[14px] font-extrabold text-slate-900 border-b border-[var(--color-outline-variant)] pb-3 font-display">Visual Examination Timeline</h3>
-                        
-                        <div className="relative flex justify-between items-center max-w-3xl mx-auto py-6 px-4">
-                            <div className="absolute left-0 right-0 h-0.5 bg-slate-100 top-1/2 -translate-y-1/2 z-0" />
-                            
-                            {[
-                                { label: "Registration Start", date: activeExamForTimeline.start_date },
-                                { label: "Registration Deadline", date: activeExamForTimeline.end_date },
-                                { label: "Exam Date", date: activeExamForTimeline.exam_date }
-                            ].map((item, idx) => {
-                                const isUpcoming = item.date ? new Date(item.date) >= new Date() : true
-                                return (
-                                    <div key={idx} className="relative z-10 flex flex-col items-center gap-2">
-                                        <div className={`w-7 h-7 rounded-full flex items-center justify-center border-2 font-bold text-[11px] transition-colors ${
-                                            isUpcoming 
-                                                ? "bg-white border-slate-200 text-slate-400" 
-                                                : "bg-[var(--color-primary)] border-[var(--color-primary)] text-white shadow-sm"
-                                        }`}>
-                                            {idx + 1}
-                                        </div>
-                                        <span className={`text-[10px] font-extrabold ${isUpcoming ? "text-slate-400" : "text-slate-800"}`}>{item.label}</span>
-                                        <span className="text-[11px] font-bold text-slate-500 bg-[var(--color-surface-low)] border border-[var(--color-outline-variant)] px-2 py-0.5 rounded">{item.date ? new Date(item.date).toLocaleDateString("en-IN") : "TBD"}</span>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div>
-
-                    {/* Action Blocks */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                        <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 flex flex-col gap-4 shadow-sm hover:border-[var(--color-primary)]/30 transition-all border-solid justify-between">
-                            <div className="space-y-1 text-left">
-                                <h4 className="text-[13.5px] font-extrabold text-slate-900 font-display">Official Website</h4>
-                                <p className="text-[11px] text-slate-400 leading-tight">View official board notice.</p>
-                            </div>
-                            <a 
-                                href={activeExamForTimeline.official_url} target="_blank" rel="noopener noreferrer"
-                                className="w-full justify-center px-4 py-2.5 bg-[var(--color-surface-low)] hover:bg-slate-100 text-slate-700 border border-[var(--color-outline-variant)] hover:border-slate-350 text-[11.5px] font-semibold rounded-xl shadow-sm transition-all flex items-center gap-1.5 border-solid cursor-pointer decoration-none whitespace-nowrap"
-                            >
-                                Official Link <ExternalLink size={14} />
-                            </a>
-                        </div>
-
-                        <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 flex flex-col gap-4 shadow-sm hover:border-[var(--color-primary)]/30 transition-all border-solid justify-between">
-                            <div className="space-y-1 text-left">
-                                <h4 className="text-[13.5px] font-extrabold text-slate-900 font-display">Filing Assistant</h4>
-                                <p className="text-[11px] text-slate-400 leading-tight">Apply form via bureau desk.</p>
-                            </div>
-                            <button
-                                onClick={() => {
-                                    if (!isLoggedIn) triggerSignIn()
-                                    else {
-                                        setWizardExamName(activeExamForTimeline.name)
-                                        setIsWizardOpen(true)
-                                    }
-                                }}
-                                className="w-full justify-center px-4 py-2.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white text-[11.5px] font-semibold rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer border-none whitespace-nowrap"
-                            >
-                                Apply Now <Sparkles size={14} className="text-white animate-pulse" />
-                            </button>
-                        </div>
-
-                        <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 flex flex-col gap-4 shadow-sm hover:border-[var(--color-primary)]/30 transition-all border-solid justify-between">
-                            <div className="space-y-1 text-left">
-                                <h4 className="text-[13.5px] font-extrabold text-slate-900 font-display">Ask Operator</h4>
-                                <p className="text-[11px] text-slate-400 leading-tight">Ask support on WhatsApp.</p>
-                            </div>
-                            <a 
-                                href={`https://wa.me/${config.whatsapp_number || "916377964293"}?text=${encodeURIComponent(`Hi Support! I have a question regarding the ${activeExamForTimeline.name} exam.`)}`}
-                                target="_blank" rel="noopener noreferrer"
-                                className="w-full justify-center px-4 py-2.5 bg-[#128C7E] hover:bg-[#075E54] text-white text-[11.5px] font-semibold rounded-xl shadow-sm transition-all flex items-center gap-1.5 border-solid cursor-pointer decoration-none whitespace-nowrap"
-                            >
-                                WhatsApp <MessageSquare size={14} />
-                            </a>
-                        </div>
+        <div className="animate-fadeIn text-left pb-24">
+            <div className="space-y-4">
+                {/* Search Bar */}
+                <div className="sticky top-0 z-20 bg-[var(--color-surface-base)] pb-3 pt-2">
+                    <div className="relative w-full">
+                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input 
+                            type="text"
+                            value={examSearch}
+                            onChange={e => setExamSearch(e.target.value)}
+                            placeholder="Search exams..."
+                            className="w-full bg-white border border-slate-200 text-[13px] md:text-[14px] placeholder:text-slate-400 pl-11 pr-6 py-3 rounded-xl focus:outline-none focus:border-[#0a4a83] shadow-sm font-semibold"
+                        />
                     </div>
                 </div>
-            ) : (
-                /* ── CASE 2: MAIN EXAM LIST OR PREFERENCES DASHBOARD ── */
-                isLoggedIn && subscribedList.length > 0 && !isEditingSubscriptions ? (
-                    /* ── SUBSCRIBED EXAMS DASHBOARD ("MAIN THING") ── */
-                    <div className="space-y-6">
-                        {/* Header Details */}
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[var(--color-outline-variant)] pb-5">
-                            <div>
-                                <h2 className="text-xl font-black text-slate-900 font-display">Active Subscribed Exam Alerts</h2>
-                                <p className="text-[12.5px] text-slate-400 mt-0.5">Tracking real-time dates and operator filings for your chosen exams.</p>
-                            </div>
-                            <button
-                                onClick={() => setIsEditingSubscriptions(true)}
-                                className="px-4 py-2 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] hover:border-slate-350 text-[12.5px] font-bold text-slate-705 rounded-xl transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
-                            >
-                                <Settings size={14} /> Modify Selections
-                            </button>
-                        </div>
 
-                        {/* Subscribed Cards Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {subscribedList.map((ex) => {
-                                const isClosed = ex.end_date ? new Date(ex.end_date) < new Date() : false
-                                return (
-                                    <div key={ex.id} className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 shadow-sm hover:shadow-ambient hover:border-[var(--color-primary)]/30 transition-all duration-300 flex flex-col justify-between group">
-                                        <div className="space-y-4">
-                                            {/* Category & Status */}
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[8.5px] font-extrabold text-[var(--color-primary)] bg-[var(--color-surface-low)] border border-[var(--color-outline-variant)] px-2 py-0.5 rounded uppercase tracking-wider">
-                                                    {ex.category || "UG"}
-                                                </span>
-                                                <span className="text-[8.5px] font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded uppercase tracking-wider">
-                                                    Subscribed
-                                                </span>
-                                            </div>
+                {/* Horizontal Filter Chips */}
+                <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+                    {filterChips.map(chip => (
+                        <button
+                            key={chip}
+                            onClick={() => setActiveFilter(chip)}
+                            className={`px-4 py-1.5 rounded-full text-[12px] font-bold whitespace-nowrap transition-colors ${
+                                activeFilter === chip 
+                                    ? "bg-[#0a4a83] text-white" 
+                                    : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+                            }`}
+                        >
+                            {chip}
+                        </button>
+                    ))}
+                </div>
 
-                                            {/* Exam Title */}
-                                            <div>
-                                                <h3 
-                                                    onClick={() => setActiveExamForTimeline(ex)}
-                                                    className="text-[14.5px] font-extrabold text-slate-900 group-hover:text-[var(--color-primary)] cursor-pointer line-clamp-1 transition-colors pr-4"
-                                                >
-                                                    {ex.name}
-                                                </h3>
-                                                <p className="text-[12px] text-slate-500 font-normal line-clamp-2 mt-1 leading-relaxed">
-                                                    {ex.description || "Apply for recruitment programs with verified credentials."}
-                                                </p>
-                                            </div>
-
-                                            {/* Key Dates Block */}
-                                            <div className="bg-[var(--color-surface-low)]/50 border border-[var(--color-outline-variant)]/40 rounded-lg p-3 space-y-2 text-[12px]">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-slate-400 font-bold uppercase text-[9px] tracking-wider">Deadline</span>
-                                                    <span className={`font-extrabold ${isClosed ? "text-red-500" : "text-slate-900"}`}>
-                                                        {ex.end_date ? new Date(ex.end_date).toLocaleDateString("en-IN") : "TBD"}
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-slate-400 font-bold uppercase text-[9px] tracking-wider">Exam Date</span>
-                                                    <span className="font-extrabold text-slate-900">
-                                                        {ex.exam_date ? new Date(ex.exam_date).toLocaleDateString("en-IN") : "TBD"}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Action buttons */}
-                                        <div className="space-y-2 pt-4 border-t border-slate-100 mt-4">
-                                            <div className="grid grid-cols-2 gap-2">
-                                                <button 
-                                                    onClick={() => setActiveExamForTimeline(ex)}
-                                                    className="py-2 bg-[var(--color-surface-low)] hover:bg-slate-100 text-[12px] text-slate-700 font-bold rounded-lg border border-[var(--color-outline-variant)]/60 cursor-pointer transition-all"
-                                                >
-                                                    View Details
-                                                </button>
-                                                <button 
-                                                    onClick={() => {
-                                                        setWizardExamName(ex.name)
-                                                        setIsWizardOpen(true)
-                                                    }}
-                                                    className="py-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-[12px] text-white font-bold rounded-lg cursor-pointer transition-all"
-                                                >
-                                                    Apply Form
-                                                </button>
-                                            </div>
-
-                                            {/* Social/Link triggers */}
-                                            <div className="flex items-center justify-between text-[11px] text-slate-400 font-semibold px-1 pt-1">
-                                                <a href={ex.official_url} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--color-primary)] flex items-center gap-1 decoration-none">
-                                                    <Globe size={11} /> Official Link
-                                                </a>
-                                                <a href={`https://wa.me/${config.whatsapp_number || "916377964293"}?text=${encodeURIComponent(`Hi Support! I have a question regarding the ${ex.name} exam.`)}`} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-600 flex items-center gap-1 decoration-none">
-                                                    <MessageSquare size={11} /> Ask Operator
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
+                {/* Exam List */}
+                {displayedExams.length === 0 ? (
+                    <div className="text-center py-12 text-slate-400 text-sm">
+                        No exams found for this category.
                     </div>
                 ) : (
-                    /* ── EXAMS SELECTION LIST (SHOWN IF NO SUBSCRIPTIONS OR MODIFYING PREFERENCES) ── */
-                    <div className="space-y-6">
-                        {/* List Header */}
-                        <div className="border-b border-[var(--color-outline-variant)] pb-4 space-y-3">
-                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                <div>
-                                    <h2 className="text-lg font-extrabold text-slate-900 font-display">Select Exam Circular Preferences</h2>
-                                    <p className="text-[11.5px] text-slate-400 mt-0.5">Subscribe to target notifications and countdown trackers.</p>
-                                </div>
-                                {isLoggedIn && subscribedList.length > 0 && (
-                                    <button
-                                        onClick={() => setIsEditingSubscriptions(false)}
-                                        className="px-4 py-2 bg-[var(--color-surface-low)] hover:bg-slate-100 text-[12.5px] font-bold text-slate-700 rounded-xl transition-all border border-[var(--color-outline-variant)]/60 cursor-pointer"
-                                    >
-                                        Cancel &amp; View Alerts
-                                    </button>
-                                )}
-                            </div>
-
-                            {/* Search & Category Filter chips */}
-                            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between pt-2">
-                                {/* Search bar */}
-                                <div className="relative w-full sm:w-72">
-                                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-405" />
-                                    <input 
-                                        type="text"
-                                        value={examSearch}
-                                        onChange={e => setExamSearch(e.target.value)}
-                                        placeholder="Search exam name..."
-                                        className="w-full bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] text-[13px] text-[var(--color-on-surface)] placeholder:text-gray-400 pl-11 pr-8 py-2.5 rounded-xl focus:outline-none focus:border-[var(--color-primary)] transition-all shadow-sm font-semibold"
-                                    />
-                                </div>
-
-                                {/* Filter Chips */}
-                                <div className="flex flex-wrap gap-2 items-center">
-                                    {["ALL", "SSC", "Railway", "Banking", "State PCS", "Defence", "Others"].map((chip) => (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {displayedExams.map((ex, idx) => {
+                            const isSubscribed = subscribedExams.includes(ex.name)
+                            return (
+                                <div key={idx} className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm relative overflow-hidden flex flex-col justify-between">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="pr-4">
+                                            <h4 className="text-[14px] font-bold text-slate-800 leading-snug line-clamp-1">{ex.name}</h4>
+                                            <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">{ex.category || "UG"}</span>
+                                        </div>
+                                        {isSubscribed && (
+                                            <div className="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                                                <CheckCircle2 size={10} /> Subscribed
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div>
+                                            <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-0.5">Exam Date</p>
+                                            <p className="text-xs font-bold text-slate-800">{ex.exam_date ? new Date(ex.exam_date).toLocaleDateString("en-IN") : "TBD"}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-red-400 uppercase tracking-widest font-bold mb-0.5">Last Date</p>
+                                            <p className="text-xs font-bold text-red-600">{ex.end_date ? new Date(ex.end_date).toLocaleDateString("en-IN") : "TBD"}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-2 mt-auto">
                                         <button
-                                            key={chip}
-                                            onClick={() => setExamCategoryFilter(chip)}
-                                            className={`px-4 py-1.5 text-[13px] font-medium rounded-lg border transition-all cursor-pointer ${
-                                                examCategoryFilter === chip 
-                                                    ? "bg-[var(--color-surface-low)] border-[var(--color-primary)] text-[var(--color-primary)] font-bold shadow-sm" 
-                                                    : "bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] text-gray-500 hover:border-gray-400"
+                                            onClick={() => {
+                                                if (!isLoggedIn) triggerSignIn()
+                                                else handleToggleExamSubscription(ex.name)
+                                            }}
+                                            className={`flex-1 py-2 rounded-lg text-[11px] font-bold text-center transition-colors ${
+                                                isSubscribed 
+                                                    ? "bg-slate-100 text-slate-600 hover:bg-slate-200" 
+                                                    : "bg-[#e5effa] text-[#0a4a83] hover:bg-blue-100"
                                             }`}
                                         >
-                                            {chip}
+                                            {isSubscribed ? "Unsubscribe" : "Subscribe"}
                                         </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Exams Grid */}
-                        {filteredExamsList.length === 0 ? (
-                            <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-16 text-center text-slate-450 border-solid">
-                                No exams found matching preferences.
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                                {filteredExamsList.map((ex) => {
-                                    const isSubbed = subscribedExams.includes(ex.name)
-                                    return (
-                                        <div key={ex.id} className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5.5 shadow-sm hover:shadow-ambient hover:border-[var(--color-primary)]/30 transition-all duration-300 relative flex flex-col justify-between group border-solid">
-                                            <div className="space-y-3.5 text-left">
-                                              <div className="flex items-center justify-between">
-                                                <span className="text-[8.5px] font-extrabold text-[var(--color-primary)] bg-[var(--color-surface-low)] border border-[var(--color-outline-variant)] px-2 py-0.8 rounded uppercase tracking-wider">
-                                                    {ex.category || "UG"}
-                                                </span>
-                                                
-                                                <label className="flex items-center gap-1.5 cursor-pointer" title={isSubbed ? "Subscribed Alert" : "Click to subscribe alert"}>
-                                                    <input 
-                                                        type="checkbox"
-                                                        checked={isSubbed}
-                                                        onChange={() => handleToggleExamSubscription(ex.name)}
-                                                        className="rounded-lg border-slate-350 text-[var(--color-primary)] focus:ring-[var(--color-primary)] w-4.5 h-4.5 cursor-pointer"
-                                                    />
-                                                </label>
-                                              </div>
-                                              <h3 
-                                                  onClick={() => setActiveExamForTimeline(ex)}
-                                                  className="text-[14px] font-extrabold text-slate-900 group-hover:text-[var(--color-primary)] cursor-pointer line-clamp-1 transition-colors"
-                                              >
-                                                  {ex.name}
-                                              </h3>
-                                              <p className="text-[12px] text-slate-500 font-normal line-clamp-2 leading-relaxed">
-                                                  {ex.description || "Apply for recruitment programs with verified credentials."}
-                                              </p>
-                                            </div>
-
-                                            <div className="flex items-center justify-between border-t border-slate-100 pt-3.5 mt-4">
-                                                <div>
-                                                    <span className="text-[9px] text-slate-400 font-extrabold block uppercase tracking-wider">End Date</span>
-                                                    <span className="text-[11.5px] font-extrabold text-slate-700">{ex.end_date ? new Date(ex.end_date).toLocaleDateString("en-IN") : "TBD"}</span>
-                                                </div>
-                                                <button 
-                                                    onClick={() => setActiveExamForTimeline(ex)}
-                                                    className="text-[var(--color-primary)] text-[11.5px] font-semibold hover:underline cursor-pointer group-hover:translate-x-0.5 transition-transform border-none bg-transparent"
-                                                >
-                                                    Details &amp; Timeline →
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        )}
-                        {/* Sticky saveSelections bottom banner */}
-                        {isLoggedIn && (
-                            <div className="sticky bottom-6 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-container)] text-white rounded-2xl p-5 flex items-center justify-between shadow-ambient border-none z-20 animate-slideUp">
-                                <span className="text-[12.5px] font-bold text-white">
-                                    💼 <span className="text-white font-extrabold">{subscribedExams.length}</span> Exam Preferences Active
-                                </span>
-                                <div className="flex items-center gap-2">
-                                    {subscribedList.length > 0 && (
                                         <button
-                                            onClick={() => setIsEditingSubscriptions(false)}
-                                            className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-[13px] font-semibold rounded-xl border-none cursor-pointer"
+                                            onClick={() => {
+                                                if (!isLoggedIn) triggerSignIn()
+                                                else {
+                                                    setWizardExamName(ex.name)
+                                                    setIsWizardOpen(true)
+                                                }
+                                            }}
+                                            className="flex-1 bg-[#0a4a83] hover:bg-[#164FA8] text-white py-2 rounded-lg text-[11px] font-bold text-center shadow-sm transition-colors"
                                         >
-                                            Cancel
+                                            Fill Form
                                         </button>
-                                    )}
-                                    <button
-                                        onClick={() => {
-                                            handleSaveExamSubscriptions(subscribedExams)
-                                            alert("Subscriptions updated successfully!")
-                                            setIsEditingSubscriptions(false)
-                                        }}
-                                        className="px-4 py-2 bg-white hover:bg-slate-50 text-[var(--color-primary)] text-[13px] font-semibold rounded-xl border-none cursor-pointer shadow-sm transition-all"
-                                    >
-                                        Save Selections
-                                    </button>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )
+                        })}
                     </div>
-                )
-            )}
+                )}
+            </div>
         </div>
     )
 }

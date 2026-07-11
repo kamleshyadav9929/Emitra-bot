@@ -1,4 +1,4 @@
-import { ClipboardList, Clock, CheckCircle2, AlertCircle, Award, BookOpen, Settings, MessageSquare, MapPin, ChevronRight } from "lucide-react"
+import { ClipboardList, Award, BookOpen, Settings, MessageSquare, MapPin, ChevronRight, Bell, Calendar, User } from "lucide-react"
 
 export default function DashboardTab({
     user,
@@ -10,172 +10,127 @@ export default function DashboardTab({
     setActiveExamForTimeline,
     setWizardExamName,
     setIsWizardOpen,
-    triggerSignIn
+    triggerSignIn,
+    lang,
+    subNotifications
 }) {
-    return (
-        <div className="space-y-8 text-left animate-fadeIn">
-            {/* Bento Stats Widgets Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                {/* Total Requests */}
-                <div 
-                    onClick={() => setActiveTab("services")}
-                    className="bg-[var(--color-primary-fixed)] border border-[var(--color-primary)]/10 shadow-sm rounded-xl p-6 relative overflow-hidden flex flex-col justify-between h-[180px] cursor-pointer hover:shadow-ambient transition-shadow group"
-                >
-                    <div className="z-10 relative">
-                        <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-[var(--color-primary)]">TOTAL APPLICATIONS / कुल आवेदन</p>
-                        <p className="text-5xl font-extrabold text-[#0A1A40] mt-3 group-hover:scale-105 transition-transform origin-left">{statsProgress.total}</p>
-                    </div>
-                    <div className="flex items-center gap-2 z-10 relative">
-                        <ClipboardList size={16} className="text-[var(--color-primary)]" />
-                        <span className="text-[13px] font-medium text-[var(--color-primary)]">View Status Circulars</span>
-                    </div>
-                    <ClipboardList size={140} strokeWidth={1} className="absolute -bottom-6 -right-6 text-white text-opacity-50 rotate-[-5deg] pointer-events-none z-0" />
-                </div>
+    const latestNotification = subNotifications && subNotifications.length > 0 ? subNotifications[0] : null;
 
-                {/* Completed */}
-                <div 
-                    onClick={() => setActiveTab("services")}
-                    className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] shadow-sm rounded-xl p-6 flex flex-col justify-between h-[180px] cursor-pointer hover:shadow-ambient transition-shadow relative overflow-hidden"
-                >
-                    <div className="z-10 relative">
-                        <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-gray-400">SUCCESSFULLY FILED / पूर्ण आवेदन</p>
-                        <p className="text-4xl font-extrabold text-gray-900 mt-4 tracking-tight">{statsProgress.completed}</p>
-                    </div>
-                    <div className="mt-auto flex justify-between items-end z-10 relative">
-                        <div>
-                            <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide">Receipts Issued</p>
-                        </div>
-                        <CheckCircle2 size={24} className="text-gray-200" />
-                    </div>
-                    <CheckCircle2 size={140} strokeWidth={1} className="absolute -bottom-8 -right-8 text-[#f3faff] rotate-[-15deg] pointer-events-none z-0" />
-                </div>
+    // Fast Nav Items
+    const fastNav = [
+        { id: "services", icon: ClipboardList, label: "Apply for Service", color: "bg-blue-50 text-blue-600" },
+        { id: "recruitments", icon: Award, label: "Fill Exam Form", color: "bg-indigo-50 text-indigo-600" },
+        { id: "status", icon: CheckCircle2Icon, label: "Check Status", color: "bg-emerald-50 text-emerald-600" },
+        { id: "about", icon: MessageSquare, label: "Contact Help", color: "bg-orange-50 text-orange-600" },
+    ]
+
+    function CheckCircle2Icon(props) {
+        return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+    }
+
+    return (
+        <div className="space-y-6 md:space-y-8 text-left animate-fadeIn pb-20">
+            {/* Header: Service Counter Feel */}
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#0a4a83]/5 to-transparent rounded-bl-full pointer-events-none" />
+                <h2 className="text-2xl font-black text-slate-800 tracking-tight">
+                    {lang === 'EN' ? 'Namaste' : 'नमस्ते'}, {user ? user.name.split(' ')[0] : (lang === 'EN' ? 'Student' : 'विद्यार्थी')}
+                </h2>
+                <p className="text-sm text-slate-500 font-medium mt-1">
+                    {lang === 'EN' ? 'What do you want to do today?' : 'आज आप क्या करना चाहते हैं?'}
+                </p>
             </div>
 
-            {/* Ongoing Recruitments */}
-            <div className="bg-white border border-slate-200 rounded-[16px] shadow-sm overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-[#F8FAFC]">
-                    <h3 className="text-[18px] font-semibold text-slate-900 tracking-tight">Ongoing Recruitments</h3>
-                    <button onClick={() => setActiveTab("recruitments")} className="text-[13px] font-medium text-[#4162EE] hover:underline bg-transparent border-none cursor-pointer">
-                        View All
-                    </button>
+            {/* Fast Navigation Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                {fastNav.map((nav) => {
+                    const Icon = nav.icon;
+                    return (
+                        <button 
+                            key={nav.id}
+                            onClick={() => setActiveTab(nav.id)}
+                            className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col items-center justify-center gap-3 hover:border-[#0a4a83]/30 hover:shadow-md transition-all cursor-pointer group"
+                        >
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${nav.color} group-hover:scale-110 transition-transform`}>
+                                <Icon size={22} />
+                            </div>
+                            <span className="text-xs md:text-sm font-bold text-slate-700 text-center">{nav.label}</span>
+                        </button>
+                    )
+                })}
+            </div>
+
+            {/* Latest Notification Card */}
+            {latestNotification && (
+                <div 
+                    onClick={() => setActiveTab("notifications")}
+                    className="bg-[#fff8f0] border border-orange-200 rounded-xl p-4 cursor-pointer hover:shadow-sm transition-all flex items-start gap-3"
+                >
+                    <Bell size={18} className="text-orange-500 shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-black uppercase text-orange-500 tracking-wider mb-1">Latest Update</p>
+                        <p className="text-sm font-bold text-slate-800 leading-snug line-clamp-2">
+                            {latestNotification.content?.replace(/[*_~`]/g, '').slice(0, 100)}...
+                        </p>
+                    </div>
+                    <ChevronRight size={16} className="text-orange-300" />
                 </div>
-                <div className="p-6 space-y-4">
-                    {exams.filter(ex => !ex.end_date || new Date(ex.end_date) >= new Date()).slice(0, 3).map((ex, idx) => (
-                        <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-[12px] border border-[#4162EE] bg-white transition-shadow hover:shadow-md">
-                            <div className="flex items-center gap-5">
-                                <img 
-                                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(ex.category || ex.name)}&background=random&color=fff&size=64&bold=true`} 
-                                    alt={ex.category}
-                                    className="w-[60px] h-[60px] rounded-full object-cover shadow-sm border border-slate-200"
-                                />
-                                <div className="space-y-1">
-                                    <h4 className="text-[15px] font-semibold text-slate-800 uppercase tracking-tight line-clamp-2 pr-4">{ex.name}</h4>
-                                    <p className="text-[14px] text-slate-500 uppercase">({ex.category || "GOVT"})</p>
+            )}
+
+            {/* Upcoming Deadlines (Compact) */}
+            <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-wide">Upcoming Deadlines</h3>
+                    <button onClick={() => setActiveTab("recruitments")} className="text-[11px] font-bold text-[#0a4a83] hover:underline">View All</button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {exams.filter(ex => !ex.end_date || new Date(ex.end_date) >= new Date()).slice(0, 2).map((ex, idx) => (
+                        <div key={idx} className="bg-white border border-slate-200 rounded-xl p-3.5 flex items-center justify-between shadow-sm">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                                    <Calendar size={18} />
+                                </div>
+                                <div>
+                                    <h4 className="text-[13px] font-bold text-slate-800 line-clamp-1 pr-2">{ex.name}</h4>
+                                    <p className="text-[11px] text-red-500 font-bold mt-0.5">
+                                        Closes: {ex.end_date ? new Date(ex.end_date).toLocaleDateString("en-IN", {day:'numeric', month:'short'}) : "TBD"}
+                                    </p>
                                 </div>
                             </div>
-                            <div className="flex flex-col items-center sm:items-end gap-2 shrink-0">
-                                <button
-                                    onClick={() => {
-                                        if (!user) triggerSignIn()
-                                        else {
-                                            setWizardExamName(ex.name)
-                                            setIsWizardOpen(true)
-                                        }
-                                    }}
-                                    className="px-8 py-2.5 bg-[#4162EE] hover:bg-[#3451D4] text-white text-[15px] font-medium rounded-[8px] transition-colors border-none shadow-sm cursor-pointer w-full sm:w-auto text-center"
-                                >
-                                    Apply Now
-                                </button>
-                                <span className="text-[13px] text-slate-600 font-medium">
-                                    {ex.end_date ? new Date(ex.end_date).toLocaleDateString("en-GB", { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : "TBD"}
-                                </span>
-                            </div>
+                            <button
+                                onClick={() => {
+                                    if (!user) triggerSignIn()
+                                    else {
+                                        setWizardExamName(ex.name)
+                                        setIsWizardOpen(true)
+                                    }
+                                }}
+                                className="bg-[#4162EE] text-white px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-[#3451D4]"
+                            >
+                                Apply
+                            </button>
                         </div>
                     ))}
-                    
-                    {exams.filter(ex => !ex.end_date || new Date(ex.end_date) >= new Date()).length === 0 && (
-                        <div className="text-center py-8 text-slate-500 text-[14px]">
-                            No ongoing recruitments at the moment.
-                        </div>
-                    )}
                 </div>
             </div>
 
-            {/* Subscribed Exams list */}
-            <div className="space-y-4 text-left">
-                <h3 className="text-[14.5px] font-extrabold text-slate-900 font-display">My Subscribed Exams</h3>
-                {subscribedExams.length === 0 ? (
-                    <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-8 text-center text-slate-450 max-w-md mx-auto space-y-3 shadow-sm hover:shadow-ambient transition-all duration-300 border-solid">
-                        <Award size={24} className="mx-auto text-[var(--color-primary)] animate-bounce" />
-                        <p className="text-[12.5px] font-bold text-slate-650">Select exams to start receiving updates</p>
-                        <button onClick={() => setActiveTab("exams")} className="px-5 py-2.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white text-[13px] font-semibold rounded-xl transition-all shadow-sm border-none cursor-pointer">Choose Exams</button>
+            {/* Activity Summary (Compact) */}
+            {user && (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div className="bg-white p-4 border border-slate-200 rounded-xl shadow-sm text-center cursor-pointer" onClick={() => setActiveTab("status")}>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Active</p>
+                        <p className="text-2xl font-black text-[#0a4a83]">{statsProgress.active || 0}</p>
                     </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-                        {exams.filter(ex => subscribedExams.includes(ex.name)).map((ex, exIdx) => {
-                            const isClosed = ex.end_date ? new Date(ex.end_date) < new Date() : false
-                            return (
-                                <div key={exIdx} className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 shadow-sm hover:shadow-ambient hover:border-[var(--color-primary)]/30 transition-all duration-300 space-y-4 relative flex flex-col justify-between group border-solid">
-                                    <span className="absolute top-4 right-4 text-[8.5px] font-extrabold text-[var(--color-primary)] bg-[var(--color-surface-low)] px-2 py-0.5 rounded border border-[var(--color-outline-variant)]">
-                                        {ex.category || "UG"}
-                                    </span>
-                                    <div className="space-y-2">
-                                        <h4 className="text-[13.5px] font-extrabold text-slate-900 pr-12 line-clamp-1 group-hover:text-[var(--color-primary)] transition-colors">{ex.name}</h4>
-                                        
-                                        <div className="space-y-1">
-                                            <span className="text-slate-400 font-extrabold uppercase text-[8.5px] tracking-wider block">Closing Date</span>
-                                            <span className={`text-[12.5px] font-extrabold ${isClosed ? "text-red-500" : "text-slate-900"}`}>
-                                                {ex.end_date ? new Date(ex.end_date).toLocaleDateString("en-IN") : "TBD"}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <button 
-                                        onClick={() => {
-                                            setActiveExamForTimeline(ex)
-                                            setActiveTab("exams")
-                                        }} 
-                                        className="text-[var(--color-primary)] font-semibold text-[13px] hover:underline inline-flex items-center gap-1 mt-1 cursor-pointer transition-colors border-none bg-transparent"
-                                    >
-                                        View Timeline <ChevronRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
-                                    </button>
-                                </div>
-                            )
-                        })}
+                    <div className="bg-white p-4 border border-slate-200 rounded-xl shadow-sm text-center cursor-pointer" onClick={() => setActiveTab("status")}>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Completed</p>
+                        <p className="text-2xl font-black text-emerald-600">{statsProgress.completed || 0}</p>
                     </div>
-                )}
-            </div>
-
-            {/* Support and Location Summary Dashboard Footer */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 flex items-center justify-between shadow-sm hover:shadow-ambient hover:border-[var(--color-primary)]/30 transition-all duration-300 border-solid">
-                    <div className="space-y-1">
-                        <h4 className="text-[14px] font-extrabold text-slate-900 font-display">Direct Support Line</h4>
-                        <p className="text-[12.5px] text-slate-400">Reach operator Kamlesh on WhatsApp instantly.</p>
+                    <div className="bg-white p-4 border border-slate-200 rounded-xl shadow-sm text-center cursor-pointer col-span-2 md:col-span-1" onClick={() => setActiveTab("exams")}>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Saved Exams</p>
+                        <p className="text-2xl font-black text-indigo-600">{subscribedExams.length}</p>
                     </div>
-                    <a 
-                        href={`https://wa.me/${config.whatsapp_number || "916377964293"}?text=Hello%20Krishna%20Emitra!%20I%20have%20a%20support%20request.`}
-                        target="_blank" rel="noreferrer"
-                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[13px] font-semibold rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer text-center decoration-none"
-                    >
-                        WhatsApp <MessageSquare size={13} />
-                    </a>
                 </div>
-
-                <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl p-5 flex items-center justify-between shadow-sm hover:shadow-ambient hover:border-[var(--color-primary)]/30 transition-all duration-300 border-solid">
-                    <div className="space-y-1">
-                        <h4 className="text-[14px] font-extrabold text-slate-900 font-display">Digital Seva Center</h4>
-                        <p className="text-[12.5px] text-slate-400">Main Market Road, Jodhpur, Rajasthan.</p>
-                    </div>
-                    <a 
-                        href="https://maps.google.com"
-                        target="_blank" rel="noreferrer"
-                        className="px-4 py-2 bg-[var(--color-surface-low)] hover:bg-slate-100 text-slate-700 border border-[var(--color-outline-variant)] hover:border-slate-350 text-[13px] font-semibold rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer decoration-none border-solid"
-                    >
-                        View Map <MapPin size={13} className="text-[var(--color-primary)]" />
-                    </a>
-                </div>
-            </div>
+            )}
         </div>
     )
 }

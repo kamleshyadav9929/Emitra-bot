@@ -204,6 +204,14 @@ def get_user_by_id(user_id):
     return res.data[0] if res.data else None
 
 
+def get_student_basic(telegram_id):
+    """Fast lookup for user profile without fetching exam subscriptions."""
+    user = get_user_by_telegram_id(telegram_id)
+    if user:
+        user["phone_number"] = user["phone"]
+    return user
+
+
 def get_student(telegram_id):
     """Alias for backwards compatibility with bot/main.py"""
     user = get_user_by_telegram_id(telegram_id)
@@ -606,6 +614,16 @@ def get_service_by_name(name):
     return res.data[0]["id"] if res.data else None
 
 
+def add_service_request_direct(user_id, service_id, category_label="other"):
+    """Inserts a service request directly using known user_id and service_id to save DB lookups."""
+    res = supabase.table("service_requests").insert({
+        "user_id": user_id,
+        "service_id": service_id,
+        "status": "pending"
+    }).execute()
+    return res.data[0]["id"] if res.data else None
+
+
 def add_service_request(telegram_id, service_name, category):
     user = get_user_by_telegram_id(telegram_id)
     if not user:
@@ -839,6 +857,7 @@ def get_services_as_dict():
                 "services": [],
             }
         result[key]["services"].append({
+            "id": row["id"],
             "name": row["name"],
             "description": row["description"],
             "price": f"₹{row['price']:.2f}"

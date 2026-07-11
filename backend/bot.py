@@ -59,7 +59,7 @@ def build_services_keyboard(category_key, services=None):
     for i in range(0, len(category["services"]), 2):
         row = []
         for service in category["services"][i : i + 2]:
-            row.append(InlineKeyboardButton(service["name"], callback_data=f"svc_{service['name']}"))
+            row.append(InlineKeyboardButton(service["name"], callback_data=f"svc_{service['id']}"))
         buttons.append(row)
     buttons.append([InlineKeyboardButton("⬅️ Wapas Jayein", callback_data="cat_back")])
     return InlineKeyboardMarkup(buttons)
@@ -105,7 +105,7 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 parse_mode="Markdown"
             )
 
-    student = database.get_student(chat_id)
+    student = database.get_student_basic(chat_id)
     has_phone = student and student.get("phone_number") and not student.get("phone_number").startswith("BOT_TEMP_")
 
     if not has_phone:
@@ -128,13 +128,15 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
-async def prompt_exam_selection(update: Update):
+async def prompt_exam_selection(update: Update, current_subs=None):
     chat_id = update.effective_chat.id
-    user = database.get_user_by_telegram_id(chat_id)
-    if not user:
-        return
+    if current_subs is None:
+        user = database.get_user_by_telegram_id(chat_id)
+        if not user:
+            return
+        current_subs = database.get_user_exam_subscriptions(user["id"])
         
-    current_subs = database.get_user_exam_subscriptions(user["id"])
+    # We could also cache exams in prompt_exam_selection, but it is already fast enough if we don't query subs.
     exams = database.get_all_exams()
     
     keyboard = []
@@ -195,7 +197,7 @@ async def contact_handler(update: Update, context):
 async def services_handler(update: Update, context):
     """Handles /services command — shows Krishna Emitra service categories."""
     chat_id = update.effective_chat.id
-    student = database.get_student(chat_id)
+    student = database.get_student_basic(chat_id)
 
     # Check if user has shared their phone
     if not student or not student.get("phone_number"):
@@ -244,7 +246,7 @@ async def button_callback_handler(update: Update, context):
                 else:
                     new_subs.append(exam_choice)
             database.update_user_exam_subscriptions(user["id"], new_subs)
-            await prompt_exam_selection(update)
+            await prompt_exam_selection(update, current_subs=new_subs)
 
     elif data == "exams_SAVE":
         chat_id = update.effective_chat.id
@@ -281,9 +283,9 @@ async def button_callback_handler(update: Update, context):
 
     # ── Specific service selected ───────────────────────────────
     elif data.startswith("svc_"):
-        service_name = data[4:]
+        service_id = data[4:]
         chat_id = update.effective_chat.id
-        student = database.get_student(chat_id)
+        student = database.get_student_basic(chat_id)
 
         if not student or not student.get("phone_number"):
             await query.edit_message_text(
@@ -293,17 +295,21 @@ async def button_callback_handler(update: Update, context):
 
         name = student.get("name", "Student")
         phone = student.get("phone_number", "")
+        user_id = student.get("id")
 
         # Find which category this service belongs to
+        service_name = "Service"
         category_label = "other"
         services = load_services()
         for key, cat in services.items():
-            if any(s["name"] == service_name for s in cat["services"]):
-                category_label = key
-                break
+            for s in cat["services"]:
+                if str(s["id"]) == service_id:
+                    service_name = s["name"]
+                    category_label = key
+                    break
 
-        # Save to DB
-        database.add_service_request(chat_id, service_name, category_label)
+        # Save to DB directly
+        database.add_service_request_direct(user_id, service_id, category_label)
 
         # Generate WhatsApp link
         wa_link = generate_whatsapp_link(name, phone, service_name)
@@ -352,7 +358,7 @@ async def change_handler(update: Update, context):
     Now checks if phone is already on file and skips that step.
     """
     chat_id = update.effective_chat.id
-    student = database.get_student(chat_id)
+    student = database.get_student_basic(chat_id)
 
     if student and student.get("phone_number"):
         # Already registered — just show exam selector
@@ -390,7 +396,7 @@ async def message_handler(update: Update, context):
 async def document_handler(update: Update, context):
     """Handles incoming photos and documents."""
     chat_id = update.effective_chat.id
-    student = database.get_student(chat_id)
+    student = database.get_student_basic(chat_id)
     
     if not student:
         await update.message.reply_text(

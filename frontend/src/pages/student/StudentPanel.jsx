@@ -27,6 +27,8 @@ import AboutUsTab from "../../components/student/AboutUsTab"
 import OngoingRecruitmentsTab from "../../components/student/OngoingRecruitmentsTab"
 import PublicOverview from "../../components/student/PublicOverview"
 import Logo from "../../components/common/Logo"
+import StatusTab from "../../components/student/StatusTab"
+import NotificationsTab from "../../components/student/NotificationsTab"
 
 export default function StudentPanel() {
     const navigate = useNavigate()
@@ -600,7 +602,7 @@ export default function StudentPanel() {
     ]
 
     return (
-        <div className="min-h-screen flex text-slate-800 font-sans antialiased relative bg-[var(--color-surface-base)] w-full">
+        <div className="min-h-screen flex text-slate-800 font-sans antialiased relative bg-[var(--color-surface-base)] w-full pb-16 lg:pb-0">
             <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
             <OnboardingModal isOpen={needsOnboarding} exams={exams} />
             
@@ -697,7 +699,7 @@ export default function StudentPanel() {
                 
                 {/* ── SINGLE CLEAN HEADER ── */}
                 <div className="flex flex-col sticky top-0 z-30 shrink-0 shadow-sm">
-                    <header className="h-16 bg-white flex items-center justify-between px-6 md:px-10 border-b border-slate-200">
+                    <header className="h-14 md:h-16 bg-white flex items-center justify-between px-3 md:px-10 border-b border-slate-200">
                         {/* Left Side: Navigation / Tab Title */}
                         <div className="flex items-center gap-3">
                             <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 -ml-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors">
@@ -738,85 +740,43 @@ export default function StudentPanel() {
                     </header>
                 </div>
 
-                {/* ── MOBILE MENU DRAWER ── */}
-                <AnimatePresence>
-                    {isMobileMenuOpen && (
-                        <>
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="fixed inset-0 bg-[#0A1A40]/40 backdrop-blur-sm z-50 lg:hidden"
-                            />
-                            <motion.aside
-                                initial={{ x: "-100%" }}
-                                animate={{ x: 0 }}
-                                exit={{ x: "-100%" }}
-                                transition={{ type: "spring", damping: 25, stiffness: 220 }}
-                                className="fixed top-0 bottom-0 left-0 w-[280px] bg-[var(--color-surface-base)] text-[var(--color-on-surface)] z-50 lg:hidden flex flex-col p-5 shadow-2xl border-r border-[var(--color-outline-variant)]"
+                {/* ── MOBILE BOTTOM NAV (Replaces Drawer) ── */}
+                <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 flex items-center justify-around px-1 pb-safe pt-1 shadow-[0_-4px_10px_rgba(0,0,0,0.03)] overflow-x-auto scrollbar-hide">
+                    {[
+                        { id: "dashboard", icon: LayoutDashboard, label: "Home" },
+                        { id: "recruitments", icon: Award, label: "Jobs" },
+                        { id: "services", icon: ClipboardList, label: "Services" },
+                        { id: "exams", icon: Bell, label: "Exams" },
+                        { id: "status", icon: CheckCircle2, label: "Status" },
+                        { id: "profile", icon: User, label: "Profile" }
+                    ].map(item => {
+                        const Icon = item.icon
+                        const isActive = activeTab === item.id
+                        return (
+                            <button
+                                key={item.id}
+                                onClick={() => {
+                                    setActiveTab(item.id)
+                                    setActiveExamForTimeline(null)
+                                }}
+                                className={`flex flex-col items-center justify-center w-16 py-1.5 shrink-0 transition-colors ${isActive ? "text-[#0a4a83]" : "text-slate-400 hover:text-slate-600"}`}
                             >
-                                <div className="flex items-center justify-between pb-5 border-b border-[var(--color-outline-variant)] mb-5">
-                                    <div className="flex items-center gap-2">
-                                        <Logo className="w-8 h-8 rounded-lg" />
-                                        <span className="font-extrabold text-[15px] text-[var(--color-primary)] font-display">Krishna Emitra</span>
-                                    </div>
-                                    <button onClick={() => setIsMobileMenuOpen(false)} className="p-1.5 hover:bg-[var(--color-surface-bright)] rounded-lg text-slate-400 hover:text-[var(--color-primary)] cursor-pointer transition-colors">
-                                        <X size={16} />
-                                    </button>
+                                <div className={`p-1 rounded-xl mb-0.5 transition-colors ${isActive ? "bg-[#e5effa]" : "bg-transparent"}`}>
+                                    <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
                                 </div>
-
-                                <nav className="flex-1 space-y-1.5">
-                                    {navigationItems.map(item => {
-                                        const Icon = item.icon
-                                        const isActive = activeTab === item.id
-                                        if (!isLoggedIn && ["profile"].includes(item.id)) return null;
-
-                                        return (
-                                            <button
-                                                key={item.id}
-                                                onClick={() => {
-                                                    setActiveTab(item.id)
-                                                    setActiveExamForTimeline(null)
-                                                    setIsMobileMenuOpen(false)
-                                                }}
-                                                className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-[13px] font-semibold cursor-pointer ${
-                                                    isActive ? "bg-[var(--color-surface-low)] text-[var(--color-primary)] shadow-ambient font-bold" : "text-[var(--color-on-surface)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-bright)]"
-                                                }`}
-                                            >
-                                                <Icon size={16} />
-                                                <span>{lang === "EN" ? item.label : item.labelHi}</span>
-                                            </button>
-                                        )
-                                    })}
-                                </nav>
-
-                                <div className="border-t border-[var(--color-outline-variant)] pt-4">
-                                    {isLoggedIn ? (
-                                        <button
-                                            onClick={handleLogout}
-                                            className="w-full flex items-center justify-center gap-2 py-3 border border-red-200 hover:bg-red-50 text-red-500 text-[12.5px] font-bold uppercase rounded-xl transition-all cursor-pointer"
-                                        >
-                                            <LogOut size={14} /> Log Out
-                                        </button>
-                                    ) : (
-                                        <button onClick={triggerSignIn} className="w-full py-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white text-[12.5px] font-bold uppercase rounded-xl cursor-pointer">
-                                            Sign In
-                                        </button>
-                                    )}
-                                </div>
-                            </motion.aside>
-                        </>
-                    )}
-                </AnimatePresence>
+                                <span className={`text-[9px] font-bold ${isActive ? "text-[#0a4a83]" : "text-slate-500"}`}>{item.label}</span>
+                            </button>
+                        )
+                    })}
+                </nav>
 
                 <div className="flex flex-1 w-full overflow-hidden items-start">
                     {/* ── CENTER WORKSPACE ── */}
                     <div className="flex-1 min-w-0 h-[calc(100vh-108px)] overflow-y-auto scroll-container-smooth flex flex-col justify-between">
                         {/* Official Bulletin Notice Ticker */}
                         {upcomingDeadlines.length > 0 && activeTab !== "services" && (
-                            <div className="bg-[#fff4ee] text-slate-700 text-[11px] font-semibold py-2 px-6 overflow-hidden flex items-center border-b border-orange-100 shadow-inner relative shrink-0">
-                                <div className="flex items-center gap-1.5 shrink-0 bg-[#fff4ee] z-10 pr-4 mr-4 text-[#f26522] font-black uppercase tracking-wider relative">
+                            <div className="bg-[#fff4ee] text-slate-700 text-[11px] font-semibold py-1.5 md:py-2 px-3 md:px-6 overflow-hidden flex items-center border-b border-orange-100 shadow-inner relative shrink-0">
+                                <div className="flex items-center gap-1.5 shrink-0 bg-[#fff4ee] z-10 pr-2 md:pr-4 mr-2 md:mr-4 text-[#f26522] font-black uppercase tracking-wider relative">
                                     <Clock size={12} className="animate-pulse" /> 
                                     {lang === "EN" ? "URGENT NOTICES" : "आवश्यक सूचना"}
                                     <div className="absolute right-0 top-0 bottom-0 w-3 bg-gradient-to-r from-transparent to-black/5 pointer-events-none translate-x-full" />
@@ -831,7 +791,7 @@ export default function StudentPanel() {
                             </div>
                         )}
                         {/* ── CANVAS MAIN CONTENT ── */}
-                        <main className="max-w-[1140px] w-full mx-auto px-6 md:px-10 py-8 flex-1">
+                        <main className="max-w-[1140px] w-full mx-auto px-3 md:px-10 py-4 md:py-8 flex-1">
                     
                     {loading ? (
                         <div className="flex flex-col items-center justify-center h-[60vh] gap-3">
@@ -863,6 +823,8 @@ export default function StudentPanel() {
                                         setWizardExamName={setWizardExamName}
                                         setIsWizardOpen={setIsWizardOpen}
                                         triggerSignIn={triggerSignIn}
+                                        lang={lang}
+                                        subNotifications={subNotifications}
                                     />
                                 )
                             )}
@@ -878,25 +840,14 @@ export default function StudentPanel() {
                                 />
                             )}
 
-                            {/* ── Tab 2: Services ── */}
                             {activeTab === "services" && (
                                 <ServicesTab 
                                     lang={lang}
-                                    isLoggedIn={isLoggedIn}
                                     services={services}
                                     flatServicesList={flatServicesList}
                                     serviceSearch={serviceSearch}
                                     setServiceSearch={setServiceSearch}
-                                    serviceCatFilter={serviceCatFilter}
-                                    setServiceCatFilter={setServiceCatFilter}
-                                    servicesSubTab={servicesSubTab}
-                                    setServicesSubTab={setServicesSubTab}
-                                    history={history}
-                                    expandedAppId={expandedAppId}
-                                    setExpandedAppId={setExpandedAppId}
-                                    triggerSignIn={triggerSignIn}
                                     handleAutoServiceRequest={handleAutoServiceRequest}
-                                    config={config}
                                 />
                             )}
 
@@ -957,6 +908,27 @@ export default function StudentPanel() {
                                 <AboutUsTab 
                                     lang={lang}
                                     config={config}
+                                />
+                            )}
+
+                            {/* ── New Tabs (Status & Notifications) ── */}
+                            {activeTab === "status" && (
+                                <StatusTab 
+                                    history={history}
+                                    isLoggedIn={isLoggedIn}
+                                    triggerSignIn={triggerSignIn}
+                                    lang={lang}
+                                />
+                            )}
+
+                            {activeTab === "notifications" && (
+                                <NotificationsTab 
+                                    notifications={subNotifications}
+                                    formatMessage={formatTelegramMessage}
+                                    onMarkRead={handleMarkNotificationRead}
+                                    readIds={readNotifications}
+                                    onMarkAllRead={handleMarkAllNotificationsRead}
+                                    lang={lang}
                                 />
                             )}
 

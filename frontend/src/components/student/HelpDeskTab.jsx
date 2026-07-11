@@ -13,9 +13,9 @@ export default function HelpDeskTab({
     handleCallbackQuerySubmit
 }) {
     return (
-        <div className="space-y-8 animate-fadeIn text-left">
+        <div className="space-y-6 md:space-y-8 animate-fadeIn text-left">
             <div className="border-b border-[var(--color-outline-variant)] pb-4">
-                <h2 className="text-xl font-black text-slate-900">
+                <h2 className="text-lg md:text-xl font-black text-slate-900">
                     {lang === 'EN' ? 'Support Desk & Callback Support' : 'सहायता डेस्क और कॉलबैक सहायता'}
                 </h2>
                 <p className="text-[12px] text-slate-400 mt-0.5">
@@ -23,9 +23,9 @@ export default function HelpDeskTab({
                 </p>
             </div>
 
-            <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl shadow-sm p-6 md:p-8 max-w-xl mx-auto space-y-6 border-solid">
+            <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl shadow-sm p-4 md:p-8 max-w-xl mx-auto space-y-4 md:space-y-6 border-solid">
                 {cbSubmitted ? (
-                    <div className="text-center py-6 space-y-5">
+                    <div className="text-center py-4 md:py-6 space-y-4 md:space-y-5">
                         <div className="w-16 h-16 bg-emerald-50 text-emerald-505 flex items-center justify-center rounded-full mx-auto border border-emerald-100 shadow-sm shadow-emerald-500/5">
                             <CheckCircle2 size={36} />
                         </div>
@@ -35,13 +35,13 @@ export default function HelpDeskTab({
                         </p>
                         <button
                             onClick={() => setCbSubmitted(false)}
-                            className="px-4 py-2.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white text-[13px] font-semibold rounded-xl transition-all cursor-pointer border-none shadow-sm"
+                            className="px-4 py-2 md:py-2.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white text-[12px] md:text-[13px] font-semibold rounded-xl transition-all cursor-pointer border-none shadow-sm"
                         >
                             Submit Another Query
                         </button>
                     </div>
                 ) : (
-                    <form onSubmit={handleCallbackQuerySubmit} className="space-y-5">
+                    <form onSubmit={handleCallbackQuerySubmit} className="space-y-4 md:space-y-5">
                         <div>
                             <label className="text-[9.5px] font-extrabold uppercase text-slate-400 tracking-wider block mb-1">Your Full Name *</label>
                             <input 
@@ -49,7 +49,7 @@ export default function HelpDeskTab({
                                 value={cbName}
                                 onChange={e => setCbName(e.target.value)}
                                 placeholder="e.g. Rahul Sharma"
-                                className="w-full p-3.5 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl text-[13px] font-semibold outline-none focus:border-[var(--color-primary)] transition-all shadow-sm placeholder:text-gray-400 border-solid text-[var(--color-on-surface)]"
+                                className="w-full p-2.5 md:p-3.5 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl text-[12px] md:text-[13px] font-semibold outline-none focus:border-[var(--color-primary)] transition-all shadow-sm placeholder:text-gray-400 border-solid text-[var(--color-on-surface)]"
                                 required
                             />
                         </div>
@@ -61,7 +61,7 @@ export default function HelpDeskTab({
                                 value={cbPhone}
                                 onChange={e => setCbPhone(e.target.value)}
                                 placeholder="10-digit number"
-                                className="w-full p-3.5 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl text-[13px] font-semibold outline-none focus:border-[var(--color-primary)] transition-all shadow-sm placeholder:text-gray-400 border-solid text-[var(--color-on-surface)]"
+                                className="w-full p-2.5 md:p-3.5 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl text-[12px] md:text-[13px] font-semibold outline-none focus:border-[var(--color-primary)] transition-all shadow-sm placeholder:text-gray-400 border-solid text-[var(--color-on-surface)]"
                                 required
                             />
                         </div>
@@ -73,14 +73,14 @@ export default function HelpDeskTab({
                                 value={cbQuery}
                                 onChange={e => setCbQuery(e.target.value)}
                                 placeholder="Ask about marksheet uploads, fee payments, document correction, etc."
-                                className="w-full p-3.5 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl text-[13px] font-semibold outline-none resize-none focus:border-[var(--color-primary)] transition-all shadow-sm placeholder:text-gray-400 border-solid text-[var(--color-on-surface)]"
+                                className="w-full p-2.5 md:p-3.5 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] rounded-xl text-[12px] md:text-[13px] font-semibold outline-none resize-none focus:border-[var(--color-primary)] transition-all shadow-sm placeholder:text-gray-400 border-solid text-[var(--color-on-surface)]"
                                 required
                             />
                         </div>
 
                         <button
                             type="submit"
-                            className="w-full py-3.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white text-[12.5px] font-bold uppercase rounded-xl transition-all shadow-sm cursor-pointer border-none"
+                            className="w-full py-2.5 md:py-3.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white text-[12.5px] font-bold uppercase rounded-xl transition-all shadow-sm cursor-pointer border-none"
                         >
                             Submit Callback Request
                         </button>

@@ -113,13 +113,26 @@ if not config.TELEGRAM_BOT_TOKEN:
 _global_loop = None
 _global_bot = None
 
+def _run_event_loop_in_background(loop):
+    import asyncio
+    asyncio.set_event_loop(loop)
+    try:
+        loop.run_forever()
+    except Exception as e:
+        print(f"Background loop crashed: {e}")
+
 def get_bot_and_loop():
     """Lazily initializes the event loop and bot after the WSGI worker has forked."""
     global _global_loop, _global_bot
     if _global_loop is None:
         import asyncio
+        import threading
         _global_loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(_global_loop)
+        
+        # Start the loop in a background thread so it doesn't block WSGI worker
+        t = threading.Thread(target=_run_event_loop_in_background, args=(_global_loop,), daemon=True)
+        t.start()
+        
         if config.TELEGRAM_BOT_TOKEN:
             import os
             from telegram.request import HTTPXRequest
@@ -130,7 +143,8 @@ def get_bot_and_loop():
             else:
                 _global_bot = Bot(token=config.TELEGRAM_BOT_TOKEN)
             try:
-                _global_loop.run_until_complete(asyncio.wait_for(_global_bot.initialize(), timeout=5.0))
+                future = asyncio.run_coroutine_threadsafe(_global_bot.initialize(), _global_loop)
+                future.result(timeout=5.0)
             except Exception as e:
                 print(f"Warning: Failed to initialize bot: {e}")
     return _global_bot, _global_loop
@@ -283,7 +297,7 @@ def webhook():
             elif update.callback_query:
                 await bot_handlers.button_callback_handler(update, None)
 
-        loop.run_until_complete(process())
+        asyncio.run_coroutine_threadsafe(process(), loop)
         return jsonify({"ok": True})
 
     except Exception as e:
