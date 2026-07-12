@@ -42,6 +42,7 @@ export default function SendNotification() {
   const [searchQuery, setSearchQuery] = useState("")
 
   const filteredExams = availableExams.filter(exam => exam.toLowerCase().includes(searchQuery.toLowerCase()))
+  const visibleExams = Array.from(new Set([...selectedExams.filter(e => e !== "ALL"), ...filteredExams]))
 
   // Pre-select exam from URL param e.g. /send?exam=JEE
   useEffect(() => {
@@ -208,7 +209,7 @@ export default function SendNotification() {
                   All Students
                 </button>
 
-                {filteredExams.map(exam => {
+                {visibleExams.map(exam => {
                   const active = selectedExams.includes("ALL") || selectedExams.includes(exam)
                   return (
                     <button
@@ -224,7 +225,7 @@ export default function SendNotification() {
                     </button>
                   )
                 })}
-                {filteredExams.length === 0 && (
+                {visibleExams.length === 0 && (
                   <span className="text-[12px] text-gray-400 py-2 italic">No exams found matching "{searchQuery}"</span>
                 )}
               </div>
