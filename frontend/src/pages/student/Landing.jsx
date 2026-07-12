@@ -320,21 +320,7 @@ export default function Landing() {
                             </button>
                         </div>
 
-                        {/* Stats Counters */}
-                        <div className="grid grid-cols-3 gap-6 pt-8 border-t border-slate-100 max-w-md">
-                            <div>
-                                <span className="block text-2xl font-semibold text-[#1d1d1f] tracking-tight">12,000+</span>
-                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 block">Students served</span>
-                            </div>
-                            <div>
-                                <span className="block text-2xl font-semibold text-[#1d1d1f] tracking-tight">10+</span>
-                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 block">Exams tracked</span>
-                            </div>
-                            <div>
-                                <span className="block text-2xl font-semibold text-[#1d1d1f] tracking-tight">Free</span>
-                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 block">Status alerts</span>
-                            </div>
-                        </div>
+
                     </div>
 
                     {/* Hero Right - Onboarding Card (The 2 Step Wizard) */}
