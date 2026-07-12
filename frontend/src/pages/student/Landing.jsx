@@ -297,7 +297,7 @@ export default function Landing() {
                 >
                     {/* Hero Left */}
                     <div className="lg:col-span-7 space-y-6 text-left">
-                        <h1 className="text-4xl md:text-5xl lg:text-[46px] font-semibold leading-[1.1] tracking-tight text-[#1d1d1f] font-display" style={{ letterSpacing: "-0.5px" }}>
+                        <h1 className="text-4xl md:text-5xl lg:text-[46px] leading-[1.1] text-[#1d1d1f] font-offbit-dot" style={{ letterSpacing: "-0.5px" }}>
                             Track your exam deadlines and govt forms, all in one place
                         </h1>
                         <p className="text-[15px] text-[#7a7a7a] leading-relaxed max-w-2xl font-normal">

@@ -1,0 +1,13 @@
+/* Webfont: OffBitTrial-Cross */@font-face {
+    font-family: 'OffBitTrialCross';
+    src: url('OffBitTrial-Cross.eot'); /* IE9 Compat Modes */
+    src: url('OffBitTrial-Cross.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('OffBitTrial-Cross.woff2') format('woff2'), /* Modern Browsers */
+         url('OffBitTrial-Cross.woff') format('woff'), /* Modern Browsers */
+         url('OffBitTrial-Cross.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('OffBitTrial-Cross.svg#OffBitTrial-Cross') format('svg'); /* Legacy iOS */
+    font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+

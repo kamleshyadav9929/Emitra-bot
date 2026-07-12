@@ -1,6 +1,44 @@
 @import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Mukta:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Offbit';
+  src: url('/fonts/OffBit/OffBitTrial-101.woff2') format('woff2'),
+       url('/fonts/OffBit/OffBitTrial-101.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Offbit-Dot';
+  src: url('/fonts/OffBit/OffBitTrial-Dot.woff2') format('woff2'),
+       url('/fonts/OffBit/OffBitTrial-Dot.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Offbit-Regular';
+  src: url('/fonts/OffBit/OffBitTrial-Regular.woff2') format('woff2'),
+       url('/fonts/OffBit/OffBitTrial-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@utility font-offbit {
+  font-family: 'Offbit', sans-serif;
+}
+@utility font-offbit-dot {
+  font-family: 'Offbit-Dot', sans-serif;
+}
+@utility font-offbit-regular {
+  font-family: 'Offbit-Regular', sans-serif;
+}
+
+
 @theme {
   --color-surface-base:      #f3faff;
   --color-surface-low:       #e6f6ff;

@@ -1,0 +1,13 @@
+/* Webfont: OffBitTrial-Dot */@font-face {
+    font-family: 'OffBitTrialDot';
+    src: url('OffBitTrial-Dot.eot'); /* IE9 Compat Modes */
+    src: url('OffBitTrial-Dot.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('OffBitTrial-Dot.woff2') format('woff2'), /* Modern Browsers */
+         url('OffBitTrial-Dot.woff') format('woff'), /* Modern Browsers */
+         url('OffBitTrial-Dot.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('OffBitTrial-Dot.svg#OffBitTrial-Dot') format('svg'); /* Legacy iOS */
+    font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+

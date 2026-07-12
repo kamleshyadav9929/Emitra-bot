@@ -1,0 +1,13 @@
+/* Webfont: OffBitTrial-TiltBold */@font-face {
+    font-family: 'OffBitTrialTilt';
+    src: url('OffBitTrial-TiltBold.eot'); /* IE9 Compat Modes */
+    src: url('OffBitTrial-TiltBold.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('OffBitTrial-TiltBold.woff2') format('woff2'), /* Modern Browsers */
+         url('OffBitTrial-TiltBold.woff') format('woff'), /* Modern Browsers */
+         url('OffBitTrial-TiltBold.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('OffBitTrial-TiltBold.svg#OffBitTrial-TiltBold') format('svg'); /* Legacy iOS */
+    font-style: normal;
+    font-weight: bold;
+    text-rendering: optimizeLegibility;
+}
+
