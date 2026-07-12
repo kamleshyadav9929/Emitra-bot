@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { Home, Send, Users, ClipboardList, Bot, HelpCircle, LogOut, Wrench, FileText, GraduationCap } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useClerk } from "@clerk/clerk-react"
+import { useClerk } from "@clerk/react"
 import { getServiceRequests } from "../../api"
 import Logo from "../common/Logo"
 
