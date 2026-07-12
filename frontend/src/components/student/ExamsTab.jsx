@@ -14,6 +14,7 @@ export default function ExamsTab({
 }) {
     const [activeFilter, setActiveFilter] = useState("ALL")
     const [tabMode, setTabMode] = useState("upcoming") // 'upcoming' | 'all'
+    const [toast, setToast] = useState(null)
     
     // Derived categories from the filtered list (could be static too)
     const filterChips = ["ALL", "UG", "GOVT JOB", "MEDICAL", "ENGINEERING"]
@@ -67,12 +68,12 @@ export default function ExamsTab({
                 </div>
 
                 {/* Horizontal Filter Chips */}
-                <div className="flex flex-wrap gap-2 pb-2">
+                <div className="flex overflow-x-auto gap-2 pb-2 hide-scrollbar">
                     {filterChips.map(chip => (
                         <button
                             key={chip}
                             onClick={() => setActiveFilter(chip)}
-                            className={`px-4 py-1.5 rounded-full text-[12px] font-bold whitespace-nowrap transition-colors ${
+                            className={`px-4 py-1.5 rounded-full text-[12px] font-bold shrink-0 whitespace-nowrap transition-colors ${
                                 activeFilter === chip 
                                     ? "bg-[#0a4a83] text-white" 
                                     : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -126,7 +127,11 @@ export default function ExamsTab({
                                             <button
                                                 onClick={() => {
                                                     if (!isLoggedIn) triggerSignIn()
-                                                    else handleToggleExamSubscription(ex.name)
+                                                    else {
+                                                        handleToggleExamSubscription(ex.name)
+                                                        setToast(isSubscribed ? `Unsubscribed from ${ex.name}` : `Subscribed to ${ex.name} alerts!`)
+                                                        setTimeout(() => setToast(null), 3000)
+                                                    }
                                                 }}
                                                 className={`flex-1 py-2.5 rounded-lg text-[12px] font-bold text-center transition-colors flex items-center justify-center gap-2 ${
                                                     isSubscribed 
@@ -167,6 +172,14 @@ export default function ExamsTab({
                     </div>
                 )}
             </div>
+
+            {/* Toast Notification */}
+            {toast && (
+                <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 bg-slate-800 text-white px-5 py-2.5 rounded-full text-[12px] font-bold shadow-lg z-[100] animate-fadeIn whitespace-nowrap flex items-center gap-2">
+                    <CheckCircle2 size={14} className="text-emerald-400" />
+                    {toast}
+                </div>
+            )}
         </div>
     )
 }
