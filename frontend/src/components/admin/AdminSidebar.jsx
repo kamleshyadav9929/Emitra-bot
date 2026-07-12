@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { Home, Send, Users, ClipboardList, Bot, HelpCircle, LogOut, Wrench, FileText, GraduationCap } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useClerk } from "@clerk/react"
+import { useAuth } from "../../context/AuthContext"
 import { getServiceRequests } from "../../api"
 import Logo from "../common/Logo"
 
@@ -31,7 +31,7 @@ function usePendingCount() {
 export function AdminSidebar({ isOpen, onClose }) {
   const location = useLocation()
   const navigate = useNavigate()
-  const { signOut } = useClerk()
+  const { logout } = useAuth()
   const pendingCount = usePendingCount()
 
   return (
@@ -104,7 +104,7 @@ export function AdminSidebar({ isOpen, onClose }) {
             </Link>
             <button 
               onClick={async () => {
-                await signOut()
+                await logout()
                 navigate("/")
               }}
               className="flex items-center gap-3 text-gray-500 hover:text-gray-900 transition-colors text-[13px] font-medium w-full text-left bg-transparent border-none cursor-pointer"
