@@ -220,8 +220,8 @@ export default function Landing() {
         <div 
             className="min-h-screen bg-gradient-to-b from-[#f3faff] via-white to-[#f6fbff] text-[#071e27] font-sans overflow-x-hidden selection:bg-[#164FA8]/20"
             style={{
-                '--font-sans': '"Offbit", sans-serif',
-                '--font-display': '"Offbit-Dot", sans-serif'
+                '--font-sans': '"Rockstar", sans-serif',
+                '--font-display': '"Rockstar", sans-serif'
             }}
         >
             {/* ── HEADER ── */}
