@@ -1,6 +1,7 @@
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { Home, Send, Users, ClipboardList, Bot, HelpCircle, LogOut, Wrench, FileText, GraduationCap } from "lucide-react"
 import { useEffect, useState } from "react"
+import { useClerk } from "@clerk/clerk-react"
 import { getServiceRequests } from "../../api"
 import Logo from "../common/Logo"
 
@@ -29,6 +30,8 @@ function usePendingCount() {
 // Main Admin Sidebar Component
 export function AdminSidebar({ isOpen, onClose }) {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { signOut } = useClerk()
   const pendingCount = usePendingCount()
 
   return (
@@ -99,10 +102,16 @@ export function AdminSidebar({ isOpen, onClose }) {
               <HelpCircle size={18} className="text-gray-400" />
               <span>Help Center</span>
             </Link>
-            <Link to="/login" className="flex items-center gap-3 text-gray-500 hover:text-gray-900 transition-colors text-[13px] font-medium">
+            <button 
+              onClick={async () => {
+                await signOut()
+                navigate("/")
+              }}
+              className="flex items-center gap-3 text-gray-500 hover:text-gray-900 transition-colors text-[13px] font-medium w-full text-left bg-transparent border-none cursor-pointer"
+            >
               <LogOut size={18} className="text-gray-400" />
               <span>Logout</span>
-            </Link>
+            </button>
           </div>
         </div>
       </aside>
