@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { getStudents, blockStudent, deleteStudent, addStudent, getExams, updateStudentCategory } from "../../api"
 import ExamBadge from "../../components/common/ExamBadge"
-import { Phone, MessagesSquare, Search, X, Download, ChevronDown, Trash2, Plus, Grid, List } from "lucide-react"
+import { Phone, MessagesSquare, Search, X, Download, ChevronDown, Trash2, Plus, Grid, List, Filter } from "lucide-react"
 import { TableSkeleton } from "../../components/common/Skeleton"
 
 const DEFAULT_FILTERS = ["ALL", "JEE", "NEET", "SSC", "UPSC", "CUET"]
@@ -39,6 +39,41 @@ function DeleteConfirmModal({ student, onClose, onConfirm, isDeleting }) {
   )
 }
 
+function FilterDrawer({ isOpen, onClose, exams, activeFilter, setActiveFilter }) {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end">
+      <div className="absolute inset-0 bg-[#071e27]/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-80 max-w-full bg-[var(--color-surface-lowest)] h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+        <div className="flex items-center justify-between p-6 border-b border-[var(--color-outline-variant)]">
+          <h2 className="text-lg font-bold text-gray-900 tracking-tight font-display">Filter by Category</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 hover:bg-gray-100 rounded-full">
+            <X size={18} />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 space-y-1">
+          {exams.map(exam => {
+            const isSelected = activeFilter === exam;
+            return (
+              <button
+                key={exam}
+                onClick={() => { setActiveFilter(exam); onClose(); }}
+                className={`w-full text-left px-4 py-3 rounded-xl text-[13px] font-semibold transition-all ${
+                  isSelected
+                    ? "bg-[var(--color-primary-fixed)] text-[var(--color-primary)] font-bold shadow-sm"
+                    : "text-gray-600 hover:bg-[var(--color-surface-low)]"
+                }`}
+              >
+                {exam}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Students() {
   const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(true)
@@ -57,6 +92,7 @@ export default function Students() {
   const changeRef = useRef(null)
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false)
   const [newStudent, setNewStudent] = useState({ name: "", phone: "", exam_preference: "NONE" })
   const [addError, setAddError] = useState("")
   const [addSuccess, setAddSuccess] = useState("")
@@ -162,9 +198,7 @@ export default function Students() {
   }
 
   useEffect(() => {
-    const handler = (e) => { if (changeRef.current && !changeRef.current.contains(e.target)) setChangingExam(null) }
-    document.addEventListener("mousedown", handler)
-    return () => document.removeEventListener("mousedown", handler)
+    // cleanup not strictly needed for changingExam anymore but leaving ref handler mostly intact
   }, [])
 
   return (
@@ -229,24 +263,20 @@ export default function Students() {
       {/* Filters & Search Section */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 mb-6">
         {/* Configurator Option Chips style Filter List */}
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-[11px] font-bold text-gray-400 tracking-wider uppercase mr-2">Filter Category:</span>
-          {examList.map(f => {
-            const isSelected = activeFilter === f
-            return (
-              <button
-                key={f}
-                onClick={() => setActiveFilter(f)}
-                className={`px-4 py-1.5 text-[13px] font-medium rounded-lg border transition-all ${
-                  isSelected
-                    ? "bg-[var(--color-surface-low)] border-[var(--color-primary)] text-[var(--color-primary)] font-bold shadow-sm"
-                    : "bg-[var(--color-surface-lowest)] border-[var(--color-outline-variant)] text-gray-500 hover:border-gray-400"
-                }`}
-              >
-                {f}
-              </button>
-            )
-          })}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsFilterDrawerOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-[var(--color-surface-low)] border border-[var(--color-outline-variant)] text-[13px] font-bold text-gray-700 rounded-xl hover:bg-[var(--color-surface-lowest)] transition-all shadow-sm"
+          >
+            <Filter size={15} />
+            Filter
+          </button>
+          {activeFilter !== "ALL" && (
+            <div className="flex items-center gap-2 bg-[var(--color-primary-fixed)] text-[var(--color-primary)] px-3 py-1.5 rounded-lg text-[12px] font-bold shadow-sm">
+              <span>{activeFilter}</span>
+              <button onClick={() => setActiveFilter("ALL")} className="hover:text-blue-800"><X size={12} /></button>
+            </div>
+          )}
         </div>
 
         {/* Search Box */}
@@ -356,42 +386,7 @@ export default function Students() {
                   Joined {new Date(student.joined_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                 </span>
                 <div className="flex items-center gap-1.5">
-                  {/* Category selector */}
-                  <div className="relative" ref={changingExam === student.id ? changeRef : null}>
-                    <button
-                      onClick={() => setChangingExam(changingExam === student.id ? null : student.id)}
-                      className="px-2 py-1 bg-[var(--color-surface-low)] text-gray-600 text-[11px] font-semibold rounded-lg border border-[var(--color-outline-variant)] hover:bg-[var(--color-surface-lowest)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)]/30 transition-all flex items-center gap-1"
-                      title="Change Category"
-                    >
-                      Edit <ChevronDown size={11} />
-                    </button>
-                    {changingExam === student.id && (
-                      <div className="absolute right-0 bottom-full mb-2 z-30 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] shadow-ambient py-1.5 min-w-[145px] rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-200">
-                        <p className="px-3 py-1 text-[9px] font-bold text-gray-400 tracking-wider uppercase border-b border-[var(--color-outline-variant)] mb-1">Change Category</p>
-                        {examList.filter(e => e !== "ALL").map(exam => (
-                          <button
-                            key={exam}
-                            className={`w-full text-left px-3 py-1.5 text-[12px] font-semibold hover:bg-[var(--color-surface-low)] transition-colors flex items-center justify-between ${
-                              student.exam_preference === exam ? "text-[var(--color-primary)] font-bold" : "text-gray-700"
-                            }`}
-                            onClick={() => {
-                              updateStudentCategory(student.id, exam)
-                                .then(() => {
-                                  setStudents(prev => prev.map(s =>
-                                    s.id === student.id ? { ...s, exam_preference: exam } : s
-                                  ))
-                                })
-                                .catch(console.error)
-                              setChangingExam(null)
-                            }}
-                          >
-                            <span>{exam}</span>
-                            {student.exam_preference === exam && <span className="text-[var(--color-primary)]">✓</span>}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  {/* Category selector removed */}
 
                   {/* Block/Delete Capsule buttons */}
                   {student.exam_preference !== "BLOCKED" && (
@@ -455,41 +450,8 @@ export default function Students() {
                       </div>
                     </td>
                     <td className="py-4.5 px-6">
-                      <div className="relative inline-flex items-center gap-2" ref={changingExam === student.id ? changeRef : null}>
+                      <div className="inline-flex items-center">
                         <ExamBadge exam={student.exam_preference} />
-                        <button
-                          onClick={() => setChangingExam(changingExam === student.id ? null : student.id)}
-                          className="p-1 text-gray-400 hover:text-[var(--color-primary)] transition-colors rounded"
-                          title="Update Category"
-                        >
-                          <ChevronDown size={13} />
-                        </button>
-                        {changingExam === student.id && (
-                          <div className="absolute left-0 top-full mt-1.5 z-30 bg-[var(--color-surface-lowest)] border border-[var(--color-outline-variant)] shadow-ambient py-1.5 min-w-[145px] rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-200">
-                            <p className="px-3 py-1 text-[9px] font-bold text-gray-400 tracking-wider uppercase border-b border-[var(--color-outline-variant)] mb-1">Update Category</p>
-                            {examList.filter(e => e !== "ALL").map(exam => (
-                              <button
-                                key={exam}
-                                className={`w-full text-left px-3 py-1.5 text-[12px] font-semibold hover:bg-[var(--color-surface-low)] transition-colors flex items-center justify-between ${
-                                  student.exam_preference === exam ? "text-[var(--color-primary)] font-bold" : "text-gray-700"
-                                }`}
-                                onClick={() => {
-                                  updateStudentCategory(student.id, exam)
-                                    .then(() => {
-                                      setStudents(prev => prev.map(s =>
-                                        s.id === student.id ? { ...s, exam_preference: exam } : s
-                                      ))
-                                    })
-                                    .catch(console.error)
-                                  setChangingExam(null)
-                                }}
-                              >
-                                <span>{exam}</span>
-                                {student.exam_preference === exam && <span className="text-[var(--color-primary)]">✓</span>}
-                              </button>
-                            ))}
-                          </div>
-                        )}
                       </div>
                     </td>
                     <td className="py-4.5 px-6">
@@ -670,6 +632,13 @@ export default function Students() {
         onClose={() => setStudentToDelete(null)}
         onConfirm={handleDeleteConfirm}
         isDeleting={isDeleting}
+      />
+      <FilterDrawer
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        exams={examList}
+        activeFilter={activeFilter}
+        setActiveFilter={setActiveFilter}
       />
     </div>
   )
