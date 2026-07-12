@@ -4,11 +4,13 @@ import {
     X, LogOut, Mail, Clock, CheckCircle2, AlertCircle, Loader2, 
     Layers, Award, ClipboardList, CheckCircle, ChevronRight, Phone, ShieldCheck
 } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
 import { ProfileSkeleton } from "../common/Skeleton"
 
 export default function StudentProfileDrawer({ isOpen, onClose }) {
+    const navigate = useNavigate()
     const { user, logout } = useAuth()
     const [history, setHistory] = useState([])
     const [loading, setLoading] = useState(false)
@@ -51,9 +53,10 @@ export default function StudentProfileDrawer({ isOpen, onClose }) {
         }
     }, [isOpen, user])
 
-    const handleLogout = () => {
-        logout()
+    const handleLogout = async () => {
+        await logout()
         onClose()
+        navigate("/")
     }
 
     // Dynamic stats computation
