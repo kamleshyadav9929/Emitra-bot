@@ -414,7 +414,7 @@ export default function Landing() {
                                         <Globe size={16} /> {lang === 'EN' ? 'Website Portal' : 'वेबसाइट पोर्टल'}
                                     </button>
                                     <a 
-                                        href="https://t.me/krishna_emitra_bot" 
+                                        href={config?.telegram_bot_url || "https://t.me/Kamlesh6377_bot"} 
                                         target="_blank" 
                                         rel="noopener noreferrer"
                                         className="w-full h-11 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-xl text-[13px] font-bold shadow-lg shadow-[#1a73e8]/20 flex items-center justify-center gap-2 transition-all"
