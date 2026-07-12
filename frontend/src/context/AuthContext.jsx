@@ -155,7 +155,7 @@ export function AuthProvider({ children }) {
     const isFullyLoaded = isLoaded && isClerkLoaded && !(isClerkSignedIn && !user && !token && !isAdmin)
 
     return (
-        <AuthContext.Provider value={{ user, isLoggedIn, needsOnboarding, isLoaded: isFullyLoaded, login: handleLogin, logout: handleLogout }}>
+        <AuthContext.Provider value={{ user, isLoggedIn, needsOnboarding, isLoaded: isFullyLoaded, login: handleLogin, logout: handleLogout, isAdmin }}>
             {children}
         </AuthContext.Provider>
     )

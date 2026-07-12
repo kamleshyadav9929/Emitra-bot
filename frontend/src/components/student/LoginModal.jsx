@@ -11,7 +11,7 @@ export default function LoginModal({ isOpen, onClose }) {
     const { login } = useAuth()
     const { lang } = useLanguage()
     const { openSignIn } = useClerk()
-    const { isSignedIn } = useUser()
+    const { isSignedIn, isLoaded: isClerkLoaded } = useUser()
     const navigate = useNavigate()
     const [token, setToken] = useState(null)
     const [botUrl, setBotUrl] = useState("")
@@ -245,7 +245,9 @@ export default function LoginModal({ isOpen, onClose }) {
 
                                 <div>
                                     <button
+                                        disabled={!isClerkLoaded}
                                         onClick={() => {
+                                            if (!isClerkLoaded) return;
                                             onClose()
                                             if (isSignedIn) {
                                                 navigate("/dashboard")
@@ -256,8 +258,9 @@ export default function LoginModal({ isOpen, onClose }) {
                                                 })
                                             }
                                         }}
-                                        className="w-full py-3 border border-slate-200 hover:bg-slate-50 text-slate-700 text-[13px] font-bold rounded-2xl transition-all shadow-sm cursor-pointer bg-white"
+                                        className="w-full py-3 border border-slate-200 hover:bg-slate-50 text-slate-700 text-[13px] font-bold rounded-2xl transition-all shadow-sm cursor-pointer bg-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
+                                        {!isClerkLoaded && <Loader2 size={16} className="animate-spin text-slate-400" />}
                                         {lang === "EN" ? "Sign in with Google / Email" : "गूगल / ईमेल से साइन इन करें"}
                                     </button>
                                 </div>

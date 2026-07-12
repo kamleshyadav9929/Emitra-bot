@@ -35,7 +35,7 @@ export default function StudentPanel() {
     const [showLoginModal, setShowLoginModal] = useState(false)
     const { tab: tabParam, category: catParam } = useParams()
     const { lang, toggleLanguage, t } = useLanguage()
-    const { user, isLoggedIn, needsOnboarding, logout, isLoaded } = useAuth()
+    const { user, isLoggedIn, needsOnboarding, logout, isLoaded, isAdmin } = useAuth()
 
     // Navigation and tab states
     const activeTab = catParam ? "services" : (tabParam || "dashboard")
@@ -792,7 +792,7 @@ export default function StudentPanel() {
                                         <Loader2 size={32} className="animate-spin" />
                                     </div>
                                 ) : !isLoggedIn ? (
-                                    <Navigate to="/" replace />
+                                    isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/" replace />
                                 ) : (
                                     <DashboardTab 
                                         user={user}
