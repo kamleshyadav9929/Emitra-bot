@@ -405,17 +405,22 @@ export default function Landing() {
                                         : 'पोर्टल में साइन इन करें या लाइव अलर्ट प्राप्त करने के लिए हमारे टेलीग्राम बॉट को जोड़ें।'}
                                 </p>
                                 
-                                {/* Mockup Div */}
-                                <div className="absolute bottom-6 left-6 right-6 h-[88px] bg-white rounded-[14px] shadow-sm p-4 border border-slate-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-[#eef4ff] rounded-lg flex items-center justify-center">
-                                            <div className="w-5 h-5 bg-[#1a73e8] rounded-md opacity-80" />
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[13px] font-bold text-slate-800">EmitraBotConnect</span>
-                                            <span className="text-[11px] text-slate-500">Secure • Verified</span>
-                                        </div>
-                                    </div>
+                                {/* Action Links */}
+                                <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-3">
+                                    <button 
+                                        onClick={triggerSignIn}
+                                        className="w-full h-11 bg-white hover:bg-slate-50 text-[#1a73e8] rounded-xl text-[13px] font-bold border border-[#1a73e8]/30 shadow-sm flex items-center justify-center gap-2 transition-all"
+                                    >
+                                        <Globe size={16} /> {lang === 'EN' ? 'Website Portal' : 'वेबसाइट पोर्टल'}
+                                    </button>
+                                    <a 
+                                        href="https://t.me/krishna_emitra_bot" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="w-full h-11 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-xl text-[13px] font-bold shadow-lg shadow-[#1a73e8]/20 flex items-center justify-center gap-2 transition-all"
+                                    >
+                                        <Send size={16} /> {lang === 'EN' ? 'Telegram Bot' : 'टेलीग्राम बॉट'}
+                                    </a>
                                 </div>
                             </div>
 
@@ -433,26 +438,14 @@ export default function Landing() {
                                         : 'अपनी वांछित सेवा चुनें और सुरक्षित रूप से आवश्यक विवरण जमा करें।'}
                                 </p>
                                 
-                                {/* Mockup Div */}
-                                <div className="absolute bottom-6 left-6 right-6 h-auto min-h-[120px] bg-white rounded-[14px] shadow-sm p-5 border border-slate-100 flex flex-col">
-                                    <div className="text-[11px] font-bold text-slate-800 mb-3 flex justify-between items-center">
-                                        <span>Submit request form?</span>
-                                        <X size={12} className="text-slate-400" />
-                                    </div>
-                                    <div className="space-y-1.5 mb-5">
-                                        <div className="text-[9px] text-slate-400 flex gap-1 items-center">
-                                            <span className="w-12 text-right">Service:</span> 
-                                            <span className="text-slate-600">Document verification</span>
-                                        </div>
-                                        <div className="text-[9px] text-slate-400 flex gap-1 items-center">
-                                            <span className="w-12 text-right">To:</span> 
-                                            <span className="text-slate-600">Emitra Admin</span>
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-end gap-2 mt-auto">
-                                        <div className="px-4 py-1.5 rounded border border-slate-200 text-[11px] text-slate-600 font-medium">Cancel</div>
-                                        <div className="px-4 py-1.5 rounded bg-white border border-[#1a73e8] text-[#1a73e8] text-[11px] font-medium">Submit</div>
-                                    </div>
+                                {/* Action Links */}
+                                <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-3">
+                                    <button 
+                                        onClick={() => scrollToSection("services-catalog")}
+                                        className="w-full h-11 bg-[#1e8e3e] hover:bg-[#157a31] text-white rounded-xl text-[13px] font-bold shadow-lg shadow-[#1e8e3e]/20 flex items-center justify-center gap-2 transition-all"
+                                    >
+                                        <Search size={16} /> {lang === 'EN' ? 'Browse All Services' : 'सभी सेवाएँ ब्राउज़ करें'}
+                                    </button>
                                 </div>
                             </div>
 
