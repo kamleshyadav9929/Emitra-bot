@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef, Fragment } from "react"
 import { motion, AnimatePresence } from "motion/react"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, Navigate } from "react-router-dom"
 import {
     User, Mail, Phone, Clock, CheckCircle2, AlertCircle, Loader2,
     Layers, Award, ClipboardList, CheckCircle, ChevronRight, ShieldCheck,
@@ -26,7 +26,6 @@ import ProfileTab from "../../components/student/ProfileTab"
 import HelpDeskTab from "../../components/student/HelpDeskTab"
 import AboutUsTab from "../../components/student/AboutUsTab"
 import OngoingRecruitmentsTab from "../../components/student/OngoingRecruitmentsTab"
-import PublicOverview from "../../components/student/PublicOverview"
 import Logo from "../../components/common/Logo"
 import StatusTab from "../../components/student/StatusTab"
 import NotificationsTab from "../../components/student/NotificationsTab"
@@ -102,8 +101,6 @@ export default function StudentPanel() {
     const [isWizardOpen, setIsWizardOpen] = useState(false)
     const [wizardExamName, setWizardExamName] = useState("")
 
-    // Public Slider Carousel State
-    const [carouselIndex, setCarouselIndex] = useState(0)
 
     // Fetch dashboard resources
     const fetchAllData = async (isSilent = false) => {
@@ -212,15 +209,6 @@ export default function StudentPanel() {
         }
     }, [user, storagePrefix])
 
-    // Automatic Announcement Carousel rotation (every 4s)
-    useEffect(() => {
-        if (announcements.length > 0 && activeTab === "dashboard" && !isLoggedIn) {
-            const timer = setInterval(() => {
-                setCarouselIndex(prev => (prev + 1) % Math.min(announcements.length, 4))
-            }, 4000)
-            return () => clearInterval(timer)
-        }
-    }, [announcements, activeTab, isLoggedIn])
 
     // Save exam preferences
     const handleSaveExamSubscriptions = async (updatedList) => {
@@ -800,13 +788,7 @@ export default function StudentPanel() {
                             {/* ── Tab 1: Overview ── */}
                             {activeTab === "dashboard" && (
                                 !isLoggedIn ? (
-                                    <PublicOverview 
-                                        announcements={announcements}
-                                        carouselIndex={carouselIndex}
-                                        setCarouselIndex={setCarouselIndex}
-                                        upcomingDeadlines={upcomingDeadlines}
-                                        triggerSignIn={triggerSignIn}
-                                    />
+                                    <Navigate to="/" replace />
                                 ) : (
                                     <DashboardTab 
                                         user={user}
