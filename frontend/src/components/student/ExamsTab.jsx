@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Search, CheckCircle2 } from "lucide-react"
+import { Search, CheckCircle2, Calendar, FileText, Bell } from "lucide-react"
 
 export default function ExamsTab({
     subscribedExams,
@@ -13,6 +13,7 @@ export default function ExamsTab({
     isLoggedIn
 }) {
     const [activeFilter, setActiveFilter] = useState("ALL")
+    const [tabMode, setTabMode] = useState("upcoming") // 'upcoming' | 'all'
     
     // Derived categories from the filtered list (could be static too)
     const filterChips = ["ALL", "UG", "GOVT JOB", "MEDICAL", "ENGINEERING"]
@@ -23,6 +24,10 @@ export default function ExamsTab({
         if (activeFilter === "GOVT JOB" && cat.includes("GOVT")) return true
         return cat === activeFilter
     })
+
+    const upcomingExams = displayedExams.filter(ex => ex.end_date && new Date(ex.end_date) >= new Date(new Date().setHours(0,0,0,0)))
+
+    const examsToRender = tabMode === "upcoming" ? upcomingExams : displayedExams
 
     return (
         <div className="animate-fadeIn text-left pb-24">
@@ -39,6 +44,26 @@ export default function ExamsTab({
                             className="w-full bg-white border border-slate-200 text-[13px] md:text-[14px] placeholder:text-slate-400 pl-11 pr-6 py-3 rounded-xl focus:outline-none focus:border-[#0a4a83] shadow-sm font-semibold"
                         />
                     </div>
+                </div>
+
+                {/* Internal Tabs */}
+                <div className="flex gap-2 p-1 bg-slate-100 rounded-xl mb-2">
+                    <button
+                        onClick={() => setTabMode("upcoming")}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[12px] font-bold transition-all ${
+                            tabMode === "upcoming" ? "bg-white text-[#0a4a83] shadow-sm" : "text-slate-500 hover:text-slate-700"
+                        }`}
+                    >
+                        <Calendar size={16} /> Upcoming Exams
+                    </button>
+                    <button
+                        onClick={() => setTabMode("all")}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[12px] font-bold transition-all ${
+                            tabMode === "all" ? "bg-white text-[#0a4a83] shadow-sm" : "text-slate-500 hover:text-slate-700"
+                        }`}
+                    >
+                        <Bell size={16} /> Exam Alerts
+                    </button>
                 </div>
 
                 {/* Horizontal Filter Chips */}
@@ -59,23 +84,23 @@ export default function ExamsTab({
                 </div>
 
                 {/* Exam List */}
-                {displayedExams.length === 0 ? (
-                    <div className="text-center py-12 text-slate-400 text-sm">
-                        No exams found for this category.
+                {examsToRender.length === 0 ? (
+                    <div className="text-center py-12 text-slate-400 text-sm font-semibold">
+                        {tabMode === "upcoming" ? "No upcoming exams found in this category." : "No exams found for this category."}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {displayedExams.map((ex, idx) => {
+                        {examsToRender.map((ex, idx) => {
                             const isSubscribed = subscribedExams.includes(ex.name)
                             return (
-                                <div key={idx} className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm relative overflow-hidden flex flex-col justify-between">
+                                <div key={idx} className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm relative flex flex-col justify-between hover:shadow-md transition-shadow">
                                     <div className="flex justify-between items-start mb-3">
                                         <div className="pr-4">
-                                            <h4 className="text-[14px] font-bold text-slate-800 leading-snug line-clamp-1">{ex.name}</h4>
-                                            <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">{ex.category || "UG"}</span>
+                                            <h4 className="text-[14px] font-bold text-slate-800 leading-snug line-clamp-2">{ex.name}</h4>
+                                            <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase mt-1 inline-block">{ex.category || "UG"}</span>
                                         </div>
-                                        {isSubscribed && (
-                                            <div className="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                                        {tabMode === "all" && isSubscribed && (
+                                            <div className="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shrink-0">
                                                 <CheckCircle2 size={10} /> Subscribed
                                             </div>
                                         )}
@@ -97,31 +122,44 @@ export default function ExamsTab({
                                     </div>
                                     
                                     <div className="flex items-center gap-2 mt-auto">
-                                        <button
-                                            onClick={() => {
-                                                if (!isLoggedIn) triggerSignIn()
-                                                else handleToggleExamSubscription(ex.name)
-                                            }}
-                                            className={`flex-1 py-2 rounded-lg text-[11px] font-bold text-center transition-colors ${
-                                                isSubscribed 
-                                                    ? "bg-slate-100 text-slate-600 hover:bg-slate-200" 
-                                                    : "bg-[#e5effa] text-[#0a4a83] hover:bg-blue-100"
-                                            }`}
-                                        >
-                                            {isSubscribed ? "Unsubscribe" : "Subscribe"}
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                if (!isLoggedIn) triggerSignIn()
-                                                else {
-                                                    setWizardExamName(ex.name)
-                                                    setIsWizardOpen(true)
-                                                }
-                                            }}
-                                            className="flex-1 bg-[#0a4a83] hover:bg-[#164FA8] text-white py-2 rounded-lg text-[11px] font-bold text-center shadow-sm transition-colors"
-                                        >
-                                            Fill Form
-                                        </button>
+                                        {tabMode === "all" ? (
+                                            <button
+                                                onClick={() => {
+                                                    if (!isLoggedIn) triggerSignIn()
+                                                    else handleToggleExamSubscription(ex.name)
+                                                }}
+                                                className={`flex-1 py-2.5 rounded-lg text-[12px] font-bold text-center transition-colors flex items-center justify-center gap-2 ${
+                                                    isSubscribed 
+                                                        ? "bg-slate-100 text-slate-600 hover:bg-slate-200" 
+                                                        : "bg-[#e5effa] text-[#0a4a83] hover:bg-blue-100"
+                                                }`}
+                                            >
+                                                <Bell size={14} /> {isSubscribed ? "Unsubscribe from Alerts" : "Subscribe to Alerts"}
+                                            </button>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    onClick={() => {
+                                                        alert("Details will be available soon!")
+                                                    }}
+                                                    className="flex-1 py-2.5 rounded-lg text-[12px] font-bold text-center transition-colors bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-2"
+                                                >
+                                                    <FileText size={14} /> View Details
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        if (!isLoggedIn) triggerSignIn()
+                                                        else {
+                                                            setWizardExamName(ex.name)
+                                                            setIsWizardOpen(true)
+                                                        }
+                                                    }}
+                                                    className="flex-1 bg-[#0a4a83] hover:bg-[#164FA8] text-white py-2.5 rounded-lg text-[12px] font-bold text-center shadow-sm transition-colors flex items-center justify-center gap-2"
+                                                >
+                                                    <CheckCircle2 size={14} /> Fill Form
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             )
