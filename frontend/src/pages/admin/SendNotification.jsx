@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useLocation } from "react-router-dom"
-import { Send, CheckCircle, Loader2, Bot, Users, MessageSquare, Clock, Calendar, Trash2, ArrowRight, CheckCircle2 } from "lucide-react"
+import { Send, CheckCircle, Loader2, Bot, Users, MessageSquare, Clock, Calendar, Trash2, ArrowRight, CheckCircle2, Search } from "lucide-react"
 import { getStats, sendNotification, getExams, getBroadcastStatus } from "../../api"
 import Stepper, { Step } from "../../components/common/Stepper"
 
@@ -39,6 +39,9 @@ export default function SendNotification() {
   const [currentStep, setCurrentStep] = useState(1)
   const [imageFile, setImageFile] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
+  const [searchQuery, setSearchQuery] = useState("")
+
+  const filteredExams = availableExams.filter(exam => exam.toLowerCase().includes(searchQuery.toLowerCase()))
 
   // Pre-select exam from URL param e.g. /send?exam=JEE
   useEffect(() => {
@@ -182,6 +185,17 @@ export default function SendNotification() {
                 <h2 className="text-[13px] font-bold text-gray-900 tracking-wide uppercase">Target Audience</h2>
               </div>
 
+              <div className="relative w-full max-w-md">
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search to filter exams..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white border border-gray-200 pl-10 pr-4 py-2.5 rounded-[14px] text-[13px] focus:outline-none focus:ring-2 focus:ring-[#164FA8]/20 focus:border-[#164FA8] transition-all shadow-sm"
+                />
+              </div>
+
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={selectAll}
@@ -194,7 +208,7 @@ export default function SendNotification() {
                   All Students
                 </button>
 
-                {availableExams.map(exam => {
+                {filteredExams.map(exam => {
                   const active = selectedExams.includes("ALL") || selectedExams.includes(exam)
                   return (
                     <button
@@ -210,6 +224,9 @@ export default function SendNotification() {
                     </button>
                   )
                 })}
+                {filteredExams.length === 0 && (
+                  <span className="text-[12px] text-gray-400 py-2 italic">No exams found matching "{searchQuery}"</span>
+                )}
               </div>
 
               <div className="flex items-center gap-3 px-5 py-4 bg-[var(--color-primary-fixed)] rounded-[16px] shadow-ambient">
