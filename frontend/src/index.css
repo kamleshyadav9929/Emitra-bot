@@ -9,6 +9,14 @@
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: 'Offbit';
+  src: url('/fonts/OffBit/OffBitTrial-101Bold.woff2') format('woff2'),
+       url('/fonts/OffBit/OffBitTrial-101Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
 
 @font-face {
   font-family: 'Offbit-Dot';
@@ -18,12 +26,28 @@
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: 'Offbit-Dot';
+  src: url('/fonts/OffBit/OffBitTrial-DotBold.woff2') format('woff2'),
+       url('/fonts/OffBit/OffBitTrial-DotBold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
 
 @font-face {
   font-family: 'Offbit-Regular';
   src: url('/fonts/OffBit/OffBitTrial-Regular.woff2') format('woff2'),
        url('/fonts/OffBit/OffBitTrial-Regular.woff') format('woff');
   font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Offbit-Regular';
+  src: url('/fonts/OffBit/OffBitTrial-Bold.woff2') format('woff2'),
+       url('/fonts/OffBit/OffBitTrial-Bold.woff') format('woff');
+  font-weight: bold;
   font-style: normal;
   font-display: swap;
 }

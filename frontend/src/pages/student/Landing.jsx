@@ -217,7 +217,13 @@ export default function Landing() {
     ]
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-[#f3faff] via-white to-[#f6fbff] text-[#071e27] font-sans overflow-x-hidden selection:bg-[#164FA8]/20">
+        <div 
+            className="min-h-screen bg-gradient-to-b from-[#f3faff] via-white to-[#f6fbff] text-[#071e27] font-sans overflow-x-hidden selection:bg-[#164FA8]/20"
+            style={{
+                '--font-sans': '"Offbit", sans-serif',
+                '--font-display': '"Offbit-Dot", sans-serif'
+            }}
+        >
             {/* ── HEADER ── */}
             <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-[#c2c6d4]/20 px-4 sm:px-6 lg:px-12 h-20 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -297,7 +303,7 @@ export default function Landing() {
                 >
                     {/* Hero Left */}
                     <div className="lg:col-span-7 space-y-6 text-left">
-                        <h1 className="text-4xl md:text-5xl lg:text-[46px] leading-[1.1] text-[#1d1d1f] font-offbit-dot" style={{ letterSpacing: "-0.5px" }}>
+                        <h1 className="text-4xl md:text-5xl lg:text-[46px] leading-[1.1] font-bold text-[#1d1d1f] font-display" style={{ letterSpacing: "-0.5px" }}>
                             Track your exam deadlines and govt forms, all in one place
                         </h1>
                         <p className="text-[15px] text-[#7a7a7a] leading-relaxed max-w-2xl font-normal">
