@@ -70,7 +70,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <ErrorBoundary>
       <ClerkProvider
         publishableKey={clerkPubKey}
-        afterSignOutUrl="/login"
+        afterSignOutUrl="/"
         appearance={clerkAppearance}
       >
         <HelmetProvider>

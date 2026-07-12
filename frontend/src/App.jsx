@@ -81,7 +81,7 @@ function AccessDenied() {
                     </p>
                 </div>
                 <button
-                    onClick={() => signOut({ redirectUrl: "/login" })}
+                    onClick={() => signOut({ redirectUrl: "/" })}
                     className="px-6 py-2.5 rounded-xl bg-[#0A1A40] text-white text-[12px] font-black tracking-wide hover:bg-[#164FA8] transition-all"
                 >
                     Sign out &amp; go back
@@ -166,6 +166,7 @@ function App() {
         <Routes>
             {/* ── Public Student Portal ─────────────────────────────────────── */}
             <Route path="/" element={<StudentPortalHome />} />
+            <Route path="/login" element={<Navigate to="/" replace />} />
             <Route path="/:tab" element={<StudentPanel />} />
             <Route path="/services/:category" element={<StudentPanel />} />
 
