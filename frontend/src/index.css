@@ -2,22 +2,29 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: 'Rockstar';
-  src: url('/fonts/Rockstar/Rockstar-ExtraBold.otf') format('opentype');
+  font-family: 'Mersad';
+  src: url('/fonts/Mersad/Mersad Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Mersad';
+  src: url('/fonts/Mersad/Mersad Bold.woff') format('woff');
   font-weight: bold;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: 'Rockstar';
-  src: url('/fonts/Rockstar/Rockstar-ExtraBold.otf') format('opentype');
-  font-weight: normal;
+  font-family: 'Mersad';
+  src: url('/fonts/Mersad/Mersad ExtraBold.woff') format('woff');
+  font-weight: 800;
   font-style: normal;
   font-display: swap;
 }
 
-@utility font-rockstar {
-  font-family: 'Rockstar', sans-serif;
+@utility font-mersad {
+  font-family: 'Mersad', sans-serif;
 }
 
 
