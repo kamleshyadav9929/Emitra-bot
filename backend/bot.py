@@ -6,11 +6,86 @@ from telegram import (
     KeyboardButton,
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
+    Bot,
 )
 from telegram.ext import ContextTypes
 
 import database
 import config
+
+# Monkey patch Bot class to personalize every message
+def escape_markdown(text: str) -> str:
+    for char in ["*", "_", "[", "]", "`"]:
+        text = text.replace(char, f"\\{char}")
+    return text
+
+def personalize_by_chat_id(chat_id, text: str) -> str:
+    if not text:
+        return text
+    text = str(text)
+    
+    name = None
+    try:
+        user = database.get_student_basic(chat_id)
+        if user:
+            name = user.get("name")
+    except Exception as e:
+        print(f"Error fetching user name for personalization in bot: {e}")
+        
+    if not name:
+        name = "Student"
+        
+    name_str = escape_markdown(name.strip())
+    prefix = f"Dear {name_str},\n\n"
+    
+    if text.startswith("Dear ") or f"Dear {name_str}" in text:
+        return text
+    return f"{prefix}{text}"
+
+_orig_send_message = Bot.send_message
+_orig_edit_message_text = Bot.edit_message_text
+
+async def new_send_message(self, *args, **kwargs):
+    chat_id = kwargs.get("chat_id")
+    text = kwargs.get("text")
+    
+    args_list = list(args)
+    if chat_id is None and len(args_list) > 0:
+        chat_id = args_list[0]
+    if text is None and len(args_list) > 1:
+        text = args_list[1]
+        
+    if chat_id and text:
+        text = personalize_by_chat_id(chat_id, text)
+        if "text" in kwargs:
+            kwargs["text"] = text
+        elif len(args_list) > 1:
+            args_list[1] = text
+            
+    return await _orig_send_message(self, *args_list, **kwargs)
+
+async def new_edit_message_text(self, *args, **kwargs):
+    text = kwargs.get("text")
+    chat_id = kwargs.get("chat_id")
+    
+    args_list = list(args)
+    if text is None and len(args_list) > 0:
+        text = args_list[0]
+    if chat_id is None and len(args_list) > 1:
+        chat_id = args_list[1]
+        
+    if chat_id and text:
+        text = personalize_by_chat_id(chat_id, text)
+        if "text" in kwargs:
+            kwargs["text"] = text
+        elif len(args_list) > 0:
+            args_list[0] = text
+            
+    return await _orig_edit_message_text(self, *args_list, **kwargs)
+
+Bot.send_message = new_send_message
+Bot.edit_message_text = new_edit_message_text
+
 
 # ── Services Catalog (loaded from DB, not hardcoded) ─────────────────────────
 

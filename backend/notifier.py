@@ -11,11 +11,35 @@ BROADCAST_DELAY_SECONDS = 0.035   # ~28 messages per second
 MAX_RETRIES = 2
 
 
+def escape_markdown(text: str) -> str:
+    for char in ["*", "_", "[", "]", "`"]:
+        text = text.replace(char, f"\\{char}")
+    return text
+
+
 def send_message_to_user(bot_token, telegram_id, message, parse_mode="Markdown", image_url=None):
     """
     Send a message (text, photo, or photo with caption) to one user via Telegram HTTP API (no asyncio).
     Supports Markdown formatting by default (for admin receipts).
     """
+    if message:
+        import database
+        name = None
+        try:
+            user = database.get_student_basic(telegram_id)
+            if user:
+                name = user.get("name")
+        except Exception as e:
+            print(f"Error looking up student basic in send_message_to_user: {e}")
+
+        if not name:
+            name = "Student"
+
+        name_str = escape_markdown(name.strip())
+        prefix = f"Dear {name_str},\n\n"
+        if not (message.startswith("Dear ") or f"Dear {name_str}" in message):
+            message = f"{prefix}{message}"
+
     if image_url:
         url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
         payload = {
