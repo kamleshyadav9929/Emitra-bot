@@ -78,3 +78,11 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "super-secret-jwt-key-2025")
 
+# Parse Admin Emails
+ADMIN_EMAILS = [
+    email.strip().lower()
+    for email in os.getenv("VITE_ADMIN_EMAILS", "").split(",")
+    if email.strip()
+]
+
+

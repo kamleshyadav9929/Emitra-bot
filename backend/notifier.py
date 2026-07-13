@@ -68,10 +68,20 @@ def broadcast(bot_token, student_list, message, parse_mode="Markdown", image_url
     if not student_list:
         return 0
 
-    success_count = 0
-    total = len(student_list)
+    # Filter out users without valid Telegram IDs to avoid useless API calls and retries
+    valid_students = []
+    for s in student_list:
+        tg_id = s.get("telegram_id")
+        if tg_id and not tg_id.startswith("BOT_TEMP_") and not tg_id.startswith("CLERK_TEMP_"):
+            valid_students.append(s)
 
-    for i, student in enumerate(student_list):
+    if not valid_students:
+        return 0
+
+    success_count = 0
+    total = len(valid_students)
+
+    for i, student in enumerate(valid_students):
         ok = send_message_to_user(bot_token, student["telegram_id"], message, parse_mode, image_url)
         if ok:
             success_count += 1

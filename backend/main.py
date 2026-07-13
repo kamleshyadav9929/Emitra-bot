@@ -12,6 +12,7 @@ from flask import Flask, request, jsonify
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from telegram import Update, Bot
+from werkzeug.utils import secure_filename
 
 import uuid
 import config
@@ -204,6 +205,12 @@ def token_required(f):
         payload = verify_clerk_token(token)
         if not payload:
             return jsonify({"error": "Invalid or expired Clerk token."}), 401
+
+        # Security check: verify admin role in DB using Clerk sub (user id)
+        clerk_user_id = payload.get("sub")
+        user = database.get_user_by_clerk_id(clerk_user_id)
+        if not user or user.get("role") != "admin":
+            return jsonify({"error": "Forbidden: Admin privileges required."}), 403
 
         return f(*args, **kwargs)
     return decorated
@@ -1072,7 +1079,7 @@ def complete_service_request_endpoint(request_id):
                     clean_phone = clean_phone[1:]
                 clean_phone = clean_phone[-10:]
                 
-                student_res = database.supabase.table("students").select("telegram_id").ilike("phone_number", f"%{clean_phone}").execute()
+                student_res = database.supabase.table("users").select("telegram_id").ilike("phone", f"%{clean_phone}").execute()
                 if student_res.data and student_res.data[0].get("telegram_id"):
                     telegram_id = student_res.data[0]["telegram_id"]
                     # Backport telegram_id to this request
@@ -1260,7 +1267,7 @@ def delete_exam(exam_id):
 # ── Exam Form Applications & Detailed Exams API ─────────────────────────────
 import os
 import uuid
-from werkzeug.utils import secure_filename
+
 
 # ── Public APIs ─────────────────────────────────────────────────────────────
 
@@ -1440,8 +1447,7 @@ def admin_update_application(app_id):
             clean_phone = clean_phone[-10:] # last 10 digits
             
             try:
-                # Query student record
-                student_res = database.supabase.table("students").select("telegram_id").ilike("phone_number", f"%{clean_phone}").execute()
+                student_res = database.supabase.table("users").select("telegram_id").ilike("phone", f"%{clean_phone}").execute()
                 if student_res.data and student_res.data[0].get("telegram_id"):
                     telegram_id = student_res.data[0]["telegram_id"]
                     status_text = status.upper()

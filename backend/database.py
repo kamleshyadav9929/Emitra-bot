@@ -162,28 +162,56 @@ def _seed_default_services():
 
 def _seed_default_exams():
     defaults = [
-        ("JEE Main", "Joint Entrance Examination for undergraduate engineering admissions at NITs, IIITs and CFTIs.", "UG", "2026-11-01", "2026-12-15", "2027-01-24", "₹1000", "₹500", "12th Pass with PCM", "https://jeemain.nta.nic.in/"),
-        ("NEET UG", "National Eligibility cum Entrance Test for undergraduate medical programs (MBBS/BDS) admissions.", "UG", "2026-02-09", "2026-03-16", "2026-05-03", "₹1700", "₹1000", "12th Pass with PCB", "https://neet.nta.nic.in/"),
-        ("SSC CGL", "Staff Selection Commission - Combined Graduate Level Exam for various Group B & C government posts.", "Govt Job", "2026-06-15", "2026-07-20", "2026-09-10", "₹100", "Free", "Bachelor's Degree", "https://ssc.nic.in/"),
-        ("UPSC CSE", "Union Public Service Commission Civil Services Exam for IAS, IPS, IFS and other elite civil services.", "Govt Job", "2026-02-01", "2026-03-05", "2026-05-26", "₹100", "Free", "Bachelor's Degree", "https://upsc.gov.in/"),
-        ("CUET UG", "Common University Entrance Test for admission to undergraduate programs in central universities.", "UG", "2026-02-27", "2026-04-05", "2026-05-15", "₹750", "₹350", "12th Pass", "https://cuet.samarth.ac.in/")
+        # (Name, Description, Category Key, Start Date, End Date, Exam Date, Fees Gen/OBC, Fees SC/ST, Eligibility, Official URL)
+        ("JEE Main", "Joint Entrance Examination for undergraduate engineering admissions at NITs, IIITs and CFTIs.", "engineering", "2026-11-01", "2026-12-15", "2027-01-24", "₹1000", "₹500", "12th Pass with PCM", "https://jeemain.nta.nic.in/"),
+        ("NEET UG", "National Eligibility cum Entrance Test for undergraduate medical programs (MBBS/BDS) admissions.", "medical", "2026-02-09", "2026-03-16", "2026-05-03", "₹1700", "₹1000", "12th Pass with PCB", "https://neet.nta.nic.in/"),
+        ("SSC CGL", "Staff Selection Commission - Combined Graduate Level Exam for various Group B & C government posts.", "central_govt", "2026-06-15", "2026-07-20", "2026-09-10", "₹100", "Free", "Bachelor's Degree", "https://ssc.nic.in/"),
+        ("UPSC CSE", "Union Public Service Commission Civil Services Exam for IAS, IPS, IFS and other elite civil services.", "central_govt", "2026-02-01", "2026-03-05", "2026-05-26", "₹100", "Free", "Bachelor's Degree", "https://upsc.gov.in/"),
+        ("CUET UG", "Common University Entrance Test for admission to undergraduate programs in central universities.", "other", "2026-02-27", "2026-04-05", "2026-05-15", "₹750", "₹350", "12th Pass", "https://cuet.samarth.ac.in/")
     ]
-    rows = []
+    
+    # Pre-fetch or verify categories lookup map
+    categories_res = supabase.table("exam_categories").select("*").execute()
+    category_map = {cat["key"]: cat["id"] for cat in categories_res.data}
+    
     for row in defaults:
-        rows.append({
-            "name": row[0],
-            "description": row[1],
-            "category": row[2],
-            "start_date": row[3],
-            "end_date": row[4],
-            "exam_date": row[5],
-            "fees_gen_obc": row[6],
-            "fees_sc_st": row[7],
-            "eligibility": row[8],
-            "official_url": row[9],
-            "enabled": 1
-        })
-    supabase.table("exams").insert(rows).execute()
+        name = row[0]
+        description = row[1]
+        category_key = row[2]
+        start_date = row[3]
+        end_date = row[4]
+        exam_date = row[5]
+        fees_gen_obc = row[6]
+        fees_sc_st = row[7]
+        eligibility = row[8]
+        official_url = row[9]
+        
+        category_id = category_map.get(category_key, category_map.get("other"))
+        
+        # 1. Insert exam
+        exam_res = supabase.table("exams").insert({
+            "name": name,
+            "description": description,
+            "category_id": category_id,
+            "official_url": official_url,
+            "is_active": True
+        }).execute()
+        
+        if exam_res.data:
+            exam_id = exam_res.data[0]["id"]
+            # 2. Insert cycle for year 2026
+            supabase.table("exam_cycles").insert({
+                "exam_id": exam_id,
+                "cycle_year": 2026,
+                "start_date": start_date,
+                "end_date": end_date,
+                "exam_date": exam_date,
+                "fees_gen_obc": fees_gen_obc,
+                "fees_sc_st": fees_sc_st,
+                "eligibility": eligibility,
+                "is_confirmed": True
+            }).execute()
+
 
 
 def _seed_default_settings():
@@ -319,6 +347,51 @@ def update_student_profile(user_id, name, phone, gender=None):
         return False, str(e)
 
 
+def _merge_users_data(old_uid, new_uid):
+    """
+    Safely transfers all related data (subscriptions, requests, documents, 
+    applications, tokens, history) from old_uid to new_uid, and deletes old_uid.
+    Handles unique constraints in subscriptions to avoid database errors.
+    """
+    try:
+        # 1. Safely merge exam subscriptions (handling unique constraints)
+        old_subs = supabase.table("user_exam_subscriptions").select("exam_id").eq("user_id", old_uid).execute().data or []
+        old_exam_ids = {row["exam_id"] for row in old_subs if "exam_id" in row}
+        
+        new_subs = supabase.table("user_exam_subscriptions").select("exam_id").eq("user_id", new_uid).execute().data or []
+        new_exam_ids = {row["exam_id"] for row in new_subs if "exam_id" in row}
+        
+        to_transfer = old_exam_ids - new_exam_ids
+        to_delete = old_exam_ids & new_exam_ids
+        
+        if to_delete:
+            supabase.table("user_exam_subscriptions").delete().eq("user_id", old_uid).in_("exam_id", list(to_delete)).execute()
+        if to_transfer:
+            supabase.table("user_exam_subscriptions").update({"user_id": new_uid}).eq("user_id", old_uid).in_("exam_id", list(to_transfer)).execute()
+            
+        # 2. Transfer service requests
+        supabase.table("service_requests").update({"user_id": new_uid}).eq("user_id", old_uid).execute()
+        
+        # 3. Transfer login tokens
+        supabase.table("login_tokens").update({"user_id": new_uid}).eq("user_id", old_uid).execute()
+        
+        # 4. Transfer user documents
+        supabase.table("user_documents").update({"user_id": new_uid}).eq("user_id", old_uid).execute()
+        
+        # 5. Transfer form applications
+        supabase.table("form_applications").update({"user_id": new_uid}).eq("user_id", old_uid).execute()
+        
+        # 6. Transfer notification history
+        supabase.table("notification_history").update({"user_id": new_uid}).eq("user_id", old_uid).execute()
+        
+        # 7. Delete the old user safely now that all references have been moved
+        supabase.table("users").delete().eq("id", old_uid).execute()
+        return True
+    except Exception as e:
+        print(f"Error merging users data ({old_uid} -> {new_uid}): {e}")
+        return False
+
+
 def update_phone_number(telegram_id, phone_number):
     """Verify & link phone from bot contact button."""
     clean_phone = phone_number.strip().replace(" ", "").replace("-", "")
@@ -335,21 +408,14 @@ def update_phone_number(telegram_id, phone_number):
     if tg_user and phone_user and tg_user["id"] != phone_user["id"]:
         # Merge: Phone user wins, delete temporary Telegram user
         try:
-            # Transfer login tokens to the phone user to prevent cascade deletion
-            supabase.table("login_tokens").update({
-                "user_id": phone_user["id"]
-            }).eq("user_id", tg_user["id"]).execute()
-
-            # Delete temp user
-            supabase.table("users").delete().eq("id", tg_user["id"]).execute()
+            # Safely merge all data from tg_user to phone_user
+            _merge_users_data(tg_user["id"], phone_user["id"])
+            
             # Link phone user to telegram
             supabase.table("users").update({
                 "telegram_id": str(telegram_id),
                 "is_telegram_linked": True
             }).eq("id", phone_user["id"]).execute()
-            
-            # Backport service requests
-            supabase.table("service_requests").update({"user_id": phone_user["id"]}).eq("user_id", tg_user["id"]).execute()
         except Exception as e:
             print(f"Error merging users: {e}")
     elif tg_user:
@@ -360,6 +426,7 @@ def update_phone_number(telegram_id, phone_number):
             }).eq("id", tg_user["id"]).execute()
         except Exception as e:
             print(f"Error updating phone: {e}")
+
 
 
 # ── Exam Subscriptions Helpers ────────────────────────────────────────────────
@@ -1312,12 +1379,8 @@ def link_login_token(token, telegram_id):
         if existing_user_id and existing_user_id != tg_user["id"]:
             # Merge: link telegram_id to the Clerk user record and delete temporary Telegram user
             try:
-                # Transfer subscriptions and requests
-                supabase.table("user_exam_subscriptions").update({"user_id": existing_user_id}).eq("user_id", tg_user["id"]).execute()
-                supabase.table("service_requests").update({"user_id": existing_user_id}).eq("user_id", tg_user["id"]).execute()
-                
-                # Delete temporary Telegram user first to free up the unique telegram_id constraint
-                supabase.table("users").delete().eq("id", tg_user["id"]).execute()
+                # Safely merge data from tg_user to existing_user_id
+                _merge_users_data(tg_user["id"], existing_user_id)
 
                 # Update the Clerk user record with Telegram details
                 supabase.table("users").update({
@@ -1392,12 +1455,23 @@ def sync_clerk_user(clerk_id, email, phone, name):
             if len(clean_phone) > 10 and (clean_phone.startswith("91") or clean_phone.startswith("091")):
                 clean_phone = clean_phone[-10:]
 
+        is_admin = False
+        if email and email.strip().lower() in config.ADMIN_EMAILS:
+            is_admin = True
+        role_val = "admin" if is_admin else "student"
+
         # 1. Check if user already exists by clerk_user_id
         user = get_user_by_clerk_id(clerk_id)
         if user:
             updates = {}
             if name and user.get("name") != name:
                 updates["name"] = name
+            
+            # Sync role
+            if is_admin and user.get("role") != "admin":
+                updates["role"] = "admin"
+            elif not is_admin and user.get("role") == "admin":
+                updates["role"] = "student"
             
             if clean_phone:
                 current_phone = user.get("phone")
@@ -1407,16 +1481,14 @@ def sync_clerk_user(clerk_id, email, phone, name):
                     if phone_user and phone_user["id"] != user["id"]:
                         # Merge: transfer Clerk user ID to existing user and delete temporary Clerk record
                         try:
-                            # Transfer subscriptions, requests, and tokens
-                            supabase.table("user_exam_subscriptions").update({"user_id": phone_user["id"]}).eq("user_id", user["id"]).execute()
-                            supabase.table("service_requests").update({"user_id": phone_user["id"]}).eq("user_id", user["id"]).execute()
-                            supabase.table("login_tokens").update({"user_id": phone_user["id"]}).eq("user_id", user["id"]).execute()
+                            # Safely merge data from temporary Clerk user (user) to existing phone user (phone_user)
+                            _merge_users_data(user["id"], phone_user["id"])
                             
-                            # Link existing user to Clerk
-                            supabase.table("users").update({"clerk_user_id": clerk_id}).eq("id", phone_user["id"]).execute()
-                            
-                            # Delete the temporary Clerk record
-                            supabase.table("users").delete().eq("id", user["id"]).execute()
+                            # Link existing user to Clerk and update role
+                            supabase.table("users").update({
+                                "clerk_user_id": clerk_id,
+                                "role": role_val
+                            }).eq("id", phone_user["id"]).execute()
                             
                             return get_user_by_clerk_id(clerk_id)
                         except Exception as merge_err:
@@ -1433,9 +1505,10 @@ def sync_clerk_user(clerk_id, email, phone, name):
         if clean_phone:
             phone_user = get_user_by_phone(clean_phone)
             if phone_user:
-                # Link Clerk user id to this existing phone user
+                # Link Clerk user id to this existing phone user and update role
                 supabase.table("users").update({
-                    "clerk_user_id": clerk_id
+                    "clerk_user_id": clerk_id,
+                    "role": role_val
                 }).eq("id", phone_user["id"]).execute()
                 return get_user_by_clerk_id(clerk_id)
 
@@ -1444,7 +1517,7 @@ def sync_clerk_user(clerk_id, email, phone, name):
             "clerk_user_id": clerk_id,
             "name": name or "Student",
             "phone": clean_phone or f"CLERK_TEMP_{clerk_id[-10:]}",
-            "role": "student"
+            "role": role_val
         }).execute()
         return res.data[0] if res.data else None
     except Exception as e:
