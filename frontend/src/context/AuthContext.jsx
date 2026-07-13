@@ -51,7 +51,7 @@ export function AuthProvider({ children }) {
     // Monitor Clerk session as a secondary login
     useEffect(() => {
         const syncClerkSession = async () => {
-            if (isClerkSignedIn && clerkUser && !token) {
+            if (isClerkSignedIn && clerkUser) {
                 const email = clerkUser.primaryEmailAddress?.emailAddress?.toLowerCase() || ""
                 const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || "")
                     .split(",")
@@ -59,47 +59,56 @@ export function AuthProvider({ children }) {
                     .filter(Boolean)
                 
                 const isAdmin = adminEmails.includes(email)
+
+                // If they are an admin, clear any student token to prevent session conflicts
+                if (isAdmin && token) {
+                    localStorage.removeItem("student_token")
+                    setToken(null)
+                    return // The token state change will trigger the useEffect again with token = null
+                }
                 
-                try {
-                    const name = clerkUser.fullName || clerkUser.username || "Student"
-                    const phone = clerkUser.primaryPhoneNumber?.phoneNumber || ""
-                    const clerkToken = await getToken()
-                    
-                    // Sync Clerk user with Supabase database
-                    const res = await api.syncClerkStudent(clerkToken, { email, phone, name })
-                    if (res.success && res.user) {
-                        setUser({
-                            name: res.user.name,
-                            phone: res.user.phone_number,
-                            telegram_id: res.user.telegram_id,
-                            email: email,
-                            exam_preference: res.user.exam_preference || "NONE",
-                            exam_preferences: res.user.exam_preferences || []
-                        })
-                    } else {
+                if (!token) {
+                    try {
+                        const name = clerkUser.fullName || clerkUser.username || "Student"
+                        const phone = clerkUser.primaryPhoneNumber?.phoneNumber || ""
+                        const clerkToken = await getToken()
+                        
+                        // Sync Clerk user with Supabase database
+                        const res = await api.syncClerkStudent(clerkToken, { email, phone, name })
+                        if (res.success && res.user) {
+                            setUser({
+                                name: res.user.name,
+                                phone: res.user.phone_number,
+                                telegram_id: res.user.telegram_id,
+                                email: email,
+                                exam_preference: res.user.exam_preference || "NONE",
+                                exam_preferences: res.user.exam_preferences || []
+                            })
+                        } else {
+                            // Fallback to local Clerk details
+                            setUser({
+                                name,
+                                phone,
+                                email,
+                                telegram_id: null,
+                                exam_preference: "NONE",
+                                exam_preferences: []
+                            })
+                        }
+                    } catch (err) {
+                        console.error("Clerk sync failed", err)
                         // Fallback to local Clerk details
                         setUser({
-                            name,
-                            phone,
-                            email,
+                            name: clerkUser.fullName || clerkUser.username || "Student",
+                            phone: clerkUser.primaryPhoneNumber?.phoneNumber || "",
+                            email: email,
                             telegram_id: null,
                             exam_preference: "NONE",
                             exam_preferences: []
                         })
                     }
-                } catch (err) {
-                    console.error("Clerk sync failed", err)
-                    // Fallback to local Clerk details
-                    setUser({
-                        name: clerkUser.fullName || clerkUser.username || "Student",
-                        phone: clerkUser.primaryPhoneNumber?.phoneNumber || "",
-                        email: email,
-                        telegram_id: null,
-                        exam_preference: "NONE",
-                        exam_preferences: []
-                    })
+                    setIsLocalLoggedIn(true)
                 }
-                setIsLocalLoggedIn(true)
             }
             if (!isClerkSignedIn && !token) {
                 setIsLocalLoggedIn(false)
