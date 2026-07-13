@@ -807,6 +807,7 @@ export default function StudentPanel() {
                                         triggerSignIn={triggerSignIn}
                                         lang={lang}
                                         subNotifications={subNotifications}
+                                        history={history}
                                     />
                                 )
                             )}
