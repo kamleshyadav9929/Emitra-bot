@@ -957,6 +957,18 @@ def send_notification():
         message = data.get("message")
         image_url = data.get("image_url")
 
+    # Check if a broadcast is already running to prevent concurrent conflicts
+    from database import supabase
+    try:
+        running_jobs = supabase.table("broadcast_jobs").select("id").eq("status", "running").execute()
+        if running_jobs.data:
+            return jsonify({
+                "success": False,
+                "error": "A broadcast job is already running. Please wait until it completes."
+            }), 409
+    except Exception as e:
+        print(f"Error checking running broadcast jobs: {e}")
+
     if not exam:
         return jsonify({"success": False, "error": "Missing exam"}), 400
 
@@ -1293,9 +1305,14 @@ def public_submit_application():
         if not re.match(r"^[6-9]\d{9}$", phone_number):
             return jsonify({"success": False, "error": "Invalid Indian phone number"}), 400
 
+        try:
+            exam_cycle_id_int = int(exam_cycle_id)
+        except ValueError:
+            return jsonify({"success": False, "error": "Invalid Exam Cycle ID format"}), 400
+
         # 2. Insert form application to get ID
         app_id = database.submit_form_application(
-            student_name, phone_number, email, dob, gender, category, exam_cycle_id, qualification, doc_submission_method
+            student_name, phone_number, email, dob, gender, category, exam_cycle_id_int, qualification, doc_submission_method
         )
 
         # 3. Process files
@@ -1635,9 +1652,10 @@ def check_and_send_scheduled_announcements():
                     # run_at_str is in format: "YYYY-MM-DDTHH:MM" (naive local time)
                     run_dt = datetime.datetime.fromisoformat(run_at_str)
                     
-                    # Compare naive local time of server
-                    now_naive = datetime.datetime.now()
-                    if now_naive >= run_dt:
+                    # Compare naive local time normalized to Indian Standard Time (IST, UTC+5:30)
+                    ist_tz = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
+                    now_ist = datetime.datetime.now(datetime.timezone.utc).astimezone(ist_tz).replace(tzinfo=None)
+                    if now_ist >= run_dt:
                         exam = ann.get("title", "ALL")
                         message = ann.get("content", "")
                         ann_id = ann.get("id")

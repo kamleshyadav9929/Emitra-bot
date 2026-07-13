@@ -1160,7 +1160,7 @@ def submit_form_application(student_name, phone_number, email, dob, gender, cate
             
     res = supabase.table("form_applications").insert({
         "user_id": uid,
-        "exam_cycle_id": int(exam_cycle_id),
+        "exam_cycle_id": exam_cycle_id,
         "email": email,
         "dob": dob or None,
         "gender": gender,
