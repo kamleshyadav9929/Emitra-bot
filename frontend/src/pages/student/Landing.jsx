@@ -6,13 +6,12 @@ import LoginModal from "../../components/student/LoginModal"
 import {
     Send, Clock, Bell, Globe, ExternalLink,
     ChevronDown, Check, LogOut, User, Search,
-    X, Loader2, ArrowRight
+    X, Loader2, ArrowRight, Shield, MessageSquare, ClipboardCheck, Sparkles
 } from "lucide-react"
 import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
 import Logo from "../../components/common/Logo"
-
 
 const formatTelegramMessage = (text) => {
     if (!text) return "";
@@ -21,12 +20,9 @@ const formatTelegramMessage = (text) => {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
 
-    // Bold *text*
     formatted = formatted.replace(/\*(.*?)\*/g, "<strong>$1</strong>");
-    // Underscore _italic_
     formatted = formatted.replace(/_(.*?)_/g, "<em>$1</em>");
-    // Code `code`
-    formatted = formatted.replace(/`(.*?)`/g, "<code class='bg-slate-100 px-1 py-0.5 rounded text-[10.5px] font-mono'>$1</code>");
+    formatted = formatted.replace(/`(.*?)`/g, "<code class='bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded text-[10.5px] font-mono'>$1</code>");
 
     return <span dangerouslySetInnerHTML={{ __html: formatted }} />;
 }
@@ -37,7 +33,6 @@ export default function Landing() {
     const { lang, toggleLanguage } = useLanguage()
     const { user, isLoggedIn, logout } = useAuth()
 
-    // Data from DB
     const [services, setServices] = useState({})
     const [exams, setExams] = useState([])
     const [announcements, setAnnouncements] = useState([])
@@ -53,14 +48,12 @@ export default function Landing() {
         return 3
     })
 
-    // UI state
     const [searchQuery, setSearchQuery] = useState("")
     const [filterCategory, setFilterCategory] = useState("ALL")
     const [serviceSearch, setServiceSearch] = useState("")
     const [serviceCatFilter, setServiceCatFilter] = useState("ALL")
     const [expandedFaq, setExpandedFaq] = useState(null)
 
-    // Service request modal state
     const [showRequestModal, setShowRequestModal] = useState(false)
     const [requestModalSvc, setRequestModalSvc] = useState(null)
     const [requestModalCatKey, setRequestModalCatKey] = useState("")
@@ -69,7 +62,6 @@ export default function Landing() {
     const [customerPhone, setCustomerPhone] = useState("")
     const [isSubmittingRequest, setIsSubmittingRequest] = useState(false)
 
-    // Filtered services presence check
     const hasMatchingServices = useMemo(() => {
         return Object.entries(services).some(([catKey, cat]) => {
             const isVisible = serviceCatFilter === "ALL" || serviceCatFilter === catKey
@@ -81,7 +73,6 @@ export default function Landing() {
         })
     }, [services, serviceSearch, serviceCatFilter])
 
-    // Fetch initial data
     useEffect(() => {
         const fetchLandingData = async () => {
             try {
@@ -104,7 +95,6 @@ export default function Landing() {
         fetchLandingData()
     }, [])
 
-    // Scroll to section helper
     const scrollToSection = (id) => {
         const element = document.getElementById(id)
         if (element) {
@@ -112,7 +102,6 @@ export default function Landing() {
         }
     }
 
-    // Complete Onboarding Steps
     const handleJoinWhatsApp = () => {
         setStep1Done(true)
         localStorage.setItem("emitra_step1_wa", "true")
@@ -121,9 +110,11 @@ export default function Landing() {
         window.open(`https://wa.me/${config.whatsapp_number || "916377964293"}?text=${waMsg}`, "_blank")
     }
 
-    const handleWhatsAppFiling = () => {
-        const waMsg = encodeURIComponent("Hello! I want to submit my documents and complete my service filing request.")
-        window.open(`https://wa.me/${config.whatsapp_number || "916377964293"}?text=${waMsg}`, "_blank")
+    const handleJoinTelegram = () => {
+        setStep2Done(true)
+        localStorage.setItem("emitra_step2_tg", "true")
+        setActiveStep(3)
+        window.open(config.telegram_bot_url || "https://t.me/Kamlesh6377_bot", "_blank")
     }
 
     const handleRequestServiceWhatsApp = (svc, catKey, catLabel) => {
@@ -158,18 +149,10 @@ export default function Landing() {
         }
     }
 
-    const handleJoinTelegram = () => {
-        setStep2Done(true)
-        localStorage.setItem("emitra_step2_tg", "true")
-        setActiveStep(3)
-        window.open(config.telegram_bot_url || "https://t.me/Kamlesh6377_bot", "_blank")
-    }
-
     const triggerSignIn = () => {
         setShowLoginModal(true)
     }
 
-    // Filter Announcements/Notifications
     const filteredAnnouncements = useMemo(() => {
         return announcements.filter(ann => {
             const matchesSearch = (ann.title && ann.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -181,7 +164,6 @@ export default function Landing() {
         })
     }, [announcements, searchQuery, filterCategory])
 
-    // Deadlines ticker content
     const upcomingDeadlines = useMemo(() => {
         return exams
             .filter(ex => ex.end_date && new Date(ex.end_date) >= new Date())
@@ -212,7 +194,7 @@ export default function Landing() {
             q: lang === "EN" ? "Are there fees for form filing services?" : "क्या फॉर्म भरने की सेवाओं के लिए कोई शुल्क है?",
             a: lang === "EN"
                 ? "We only charge the nominal government portal fees plus a minimal service charge for processing and verification. All fees are transparently displayed before form submission."
-                : "हम केवल नाममात्र का सरकारी पोर्टल शुल्क और प्रसंस्करण के लिए न्यूनतम सेवा शुल्क लेते हैं। फॉर्म जमा करने से पहले सभी शुल्क पारदर्शी रूप से दिखाए जाते हैं।"
+                : "हम केवल नाममात्र का सरकारी पोर्टल शुल्क और प्रसंस्करण के लिए न्यूनतम सेवा शुल्क लेते हैं। फॉर्म जमा करने से पहले सभी शुल्क पारदर्शी रूप से दिखाए जाने हैं।"
         }
     ]
 
@@ -281,7 +263,6 @@ export default function Landing() {
                 <div className="bg-[#164FA8] text-white/95 text-[11px] font-semibold py-2 px-6 overflow-hidden flex items-center shadow-inner relative">
                     <div className="flex items-center gap-1.5 shrink-0 bg-[#164FA8] z-10 pr-4 mr-4 text-amber-300 font-bold uppercase tracking-wider relative">
                         <Clock size={12} className="animate-pulse" /> {lang === "EN" ? "Upcoming Deadlines" : "आगामी अंतिम तिथियां"}
-                        {/* Soft visual shadow separator */}
                         <div className="absolute right-0 top-0 bottom-0 w-3 bg-gradient-to-r from-transparent to-black/10 pointer-events-none translate-x-full" />
                     </div>
                     <div className="flex items-center gap-12 whitespace-nowrap marquee-track">
@@ -294,330 +275,358 @@ export default function Landing() {
                 </div>
             )}
 
-            {/* ── HERO & ONBOARDING SECTION ── */}
-            <div 
-                className="w-full bg-white border-b border-[#c2c6d4]/10 bg-hero-responsive bg-cover bg-bottom bg-no-repeat"
-            >
-                <section 
-                    className="relative px-6 lg:px-12 py-12 lg:py-24 max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center"
-                >
-                    {/* Hero Left */}
-                    <div className="lg:col-span-7 space-y-6 text-left">
-                        <h1 className="text-4xl md:text-5xl lg:text-[46px] leading-[1.1] font-bold text-[#1d1d1f] font-display" style={{ letterSpacing: "-0.5px" }}>
-                            Track your exam deadlines and govt forms, all in one place
-                        </h1>
-                        <p className="text-[15px] text-[#7a7a7a] leading-relaxed max-w-2xl font-normal">
-                            SSC, Railway, NEET counselling, and state services — all updates delivered directly to your Telegram, for free.
-                        </p>
+            {/* ── HERO SECTION ── */}
+            <div className="relative bg-[#070b19] overflow-hidden text-white border-b border-white/5 py-16 lg:py-24">
+                {/* Glow circles */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute top-[-20%] left-[-10%] w-[55%] h-[55%] rounded-full bg-blue-600/10 blur-[130px] animate-slow-glow" />
+                    <div className="absolute bottom-[-20%] right-[-10%] w-[55%] h-[55%] rounded-full bg-indigo-600/10 blur-[130px] animate-slow-glow" />
+                </div>
 
-                        {/* Action Buttons */}
-                        <div className="flex flex-wrap items-center gap-4 pt-2">
-                            <button
-                                onClick={handleJoinTelegram}
-                                className="px-6 py-3 bg-[#0066cc] hover:bg-[#0071e3] text-white text-[13px] font-medium rounded-full shadow-sm hover:shadow-md transition-all active:scale-[0.97] cursor-pointer border-none flex items-center gap-2"
-                            >
-                                <Send size={14} /> Join Telegram assistant
-                            </button>
-                            <button
-                                onClick={() => scrollToSection("what-we-do")}
-                                className="px-6 py-3 bg-white hover:bg-slate-50 text-[#0066cc] border border-[#0066cc] text-[13px] font-medium rounded-full shadow-sm transition-all active:scale-[0.97] cursor-pointer"
-                            >
-                                Browse services
-                            </button>
+                <section className="relative px-6 lg:px-12 max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+                    {/* Hero Left */}
+                    <div className="lg:col-span-7 space-y-8 text-left">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-bold text-[#38bdf8] uppercase tracking-wider">
+                            <Sparkles size={12} className="animate-spin" /> {lang === "EN" ? "Krishna Emitra 2.0 Assistant" : "कृष्णा ई-मित्र 2.0 सहायक"}
                         </div>
 
+                        <h1 className="text-4xl md:text-5xl lg:text-[52px] leading-[1.08] font-black tracking-tight font-display bg-gradient-to-r from-white via-blue-100 to-indigo-200 bg-clip-text text-transparent">
+                            {lang === "EN" 
+                                ? "Track exam deadlines. File applications. From home."
+                                : "परीक्षा की तारीखें। सरकारी फॉर्म। अब सीधे घर बैठे।"}
+                        </h1>
 
+                        <p className="text-[15px] text-slate-400 leading-relaxed max-w-2xl font-normal">
+                            {lang === "EN"
+                                ? "SSC, Railways, NEET counselling, and state services — all official updates and seamless form filing delivered straight to your Telegram, completely free."
+                                : "SSC, रेलवे, NEET काउंसलिंग और राज्य सेवाएँ — सभी आधिकारिक अपडेट और आसान फॉर्म फिलिंग सीधे आपके टेलीग्राम पर, पूरी तरह से निःशुल्क।"}
+                        </p>
+
+                        {/* 2-Step Interactive Wizard */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
+                            {/* Step 1: Connect Bot */}
+                            <div className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl space-y-4 flex flex-col justify-between hover:border-blue-500/30 transition-all duration-300">
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-5 h-5 rounded-full bg-[#0088cc] text-[10px] font-bold flex items-center justify-center text-white">1</span>
+                                        <h3 className="text-[13px] font-bold text-white">{lang === "EN" ? "Link Telegram Assistant" : "टेलीग्राम असिस्टेंट जोड़ें"}</h3>
+                                    </div>
+                                    <p className="text-[11.5px] text-slate-400 leading-normal font-normal">
+                                        {lang === "EN" ? "Receive deadlines, alerts & form PDFs." : "परीक्षा की अंतिम तिथि व फॉर्म PDF प्राप्त करें।"}
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={handleJoinTelegram}
+                                    className="w-full py-2.5 bg-[#0088cc] hover:bg-[#0077b3] text-white text-[12px] font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 border-none shadow-sm cursor-pointer"
+                                >
+                                    <Send size={13} /> {lang === "EN" ? "Open Telegram Bot" : "टेलीग्राम बोट खोलें"}
+                                </button>
+                            </div>
+
+                            {/* Step 2: Sign In */}
+                            <div 
+                                onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
+                                className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl space-y-4 flex flex-col justify-between cursor-pointer hover:border-indigo-500/30 hover:bg-white/[0.07] transition-all duration-300"
+                            >
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-5 h-5 rounded-full bg-indigo-600 text-[10px] font-bold flex items-center justify-center text-white">2</span>
+                                        <h3 className="text-[13px] font-bold text-white flex items-center gap-1.5">
+                                            {lang === "EN" ? "Enter Student Panel" : "विद्यार्थी पैनल में जाएँ"}
+                                            {isLoggedIn && <Check size={12} className="text-emerald-400" />}
+                                        </h3>
+                                    </div>
+                                    <p className="text-[11.5px] text-slate-400 leading-normal font-normal">
+                                        {lang === "EN" ? "Secure digital documents & filing history." : "दस्तावेज स्टोर करें व पुराना इतिहास देखें।"}
+                                    </p>
+                                </div>
+                                <div className="w-full py-2.5 bg-white/10 border border-white/10 text-white text-[12px] font-bold rounded-xl flex items-center justify-center gap-1.5 hover:bg-white/20 transition-all">
+                                    <User size={13} /> {isLoggedIn ? (lang === "EN" ? "Open Dashboard" : "डैशबोर्ड खोलें") : (lang === "EN" ? "Sign In Now" : "लॉगिन करें")}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Hero Right - Onboarding Card (The 2 Step Wizard) */}
-                    <div className="lg:col-span-5 relative">
-                        <div className="bg-white border border-slate-200 rounded-3xl p-6 lg:p-8 space-y-6 text-left">
-                            <div>
-                                <h3 className="text-lg font-semibold text-[#1d1d1f] font-display" style={{ letterSpacing: "-0.2px" }}>Get started in 2 steps</h3>
-                                <p className="text-[12.5px] text-gray-400 mt-1">Get your student dashboard ready in two minutes.</p>
-                            </div>
-
-                            <div className="space-y-4">
-                                {/* STEP 1: JOIN TELEGRAM */}
-                                <div className="border border-slate-250 rounded-2xl p-5 bg-white flex flex-col gap-4">
-                                    <div className="flex gap-4">
-                                        <div className="w-8 h-8 rounded-full bg-blue-50 text-[#0066cc] border border-blue-100 flex items-center justify-center text-[12px] font-bold shrink-0">
-                                            1
-                                        </div>
-                                        <div className="space-y-1">
-                                            <h4 className="text-[13px] font-semibold text-[#1d1d1f]">Join Telegram assistant</h4>
-                                            <p className="text-[11.5px] text-gray-400 font-normal leading-normal">Exam dates and form PDFs directly in your chat.</p>
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={handleJoinTelegram}
-                                        className="w-full py-2.5 bg-[#0066cc] hover:bg-[#0071e3] text-white text-[12.5px] font-medium rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm border-none"
-                                    >
-                                        <Send size={13} /> Open Telegram bot
-                                    </button>
-                                </div>
-
-                                {/* STEP 2: SIGN IN TO PANEL */}
-                                <div
-                                    onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
-                                    className="border border-slate-200 rounded-2xl p-5 bg-white flex gap-4 cursor-pointer hover:border-blue-200 hover:bg-slate-50/40 transition-all"
-                                >
-                                    <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-[12px] font-bold shrink-0">
-                                        2
-                                    </div>
-                                    <div className="space-y-1">
-                                        <h4 className="text-[13px] font-semibold text-[#1d1d1f] flex items-center gap-1.5">
-                                            Sign in to student panel {isLoggedIn && <Check size={12} className="text-emerald-500" />}
-                                        </h4>
-                                        <p className="text-[11.5px] text-gray-400 font-normal leading-normal">Full dashboard, service requests and history.</p>
-                                    </div>
-                                </div>
-                            </div>
+                    {/* Hero Right - 3D Dashboard Mockup */}
+                    <div className="lg:col-span-5 relative flex justify-center items-center">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 to-indigo-600/20 rounded-3xl blur-3xl transform scale-95 opacity-50" />
+                        <div className="relative w-full max-w-[420px] animate-float-3d">
+                            <img 
+                                src="/dashboard-mockup.png" 
+                                alt="Student Dashboard Preview"
+                                className="w-full h-auto rounded-[24px] shadow-[0_50px_100px_-15px_rgba(0,0,0,0.6)] border border-white/10 select-none pointer-events-none"
+                            />
                         </div>
                     </div>
                 </section>
             </div>
 
-            {/* ── WHAT WE DO & HOW WE DO IT ── */}
-            <section id="what-we-do" className="bg-[#f8fcff] border-y border-[#c2c6d4]/10 py-20 px-6 lg:px-12">
-                <div className="max-w-[1240px] mx-auto space-y-20">
+            {/* ── BENTO PROCESS GRID ── */}
+            <section id="how-it-works" className="bg-[#f8fcff] border-y border-[#c2c6d4]/10 py-24 px-6 lg:px-12 text-center">
+                <div className="max-w-[1240px] mx-auto space-y-16">
+                    <div className="space-y-3">
+                        <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "Workflow" : "कार्यप्रणाली"}</p>
+                        <h2 className="text-3xl md:text-4xl font-black text-[#0A1A40] font-display">
+                            {lang === "EN" ? "How We Make Filing Effortless" : "हम फॉर्म भरना कैसे आसान बनाते हैं"}
+                        </h2>
+                        <p className="text-[14px] text-gray-500 max-w-xl mx-auto">
+                            {lang === "EN"
+                                ? "No physical queues. No complex portals. Get it done in three visual steps."
+                                : "कियोस्क की लंबी लाइनें नहीं। कोई जटिल सरकारी पोर्टल नहीं। बस इन तीन चरणों में पूरा करें।"}
+                        </p>
+                    </div>
 
-                    {/* How It Works - Process Flow */}
-                    <div id="how-it-works" className="space-y-12 pb-8">
-                        <div className="text-center max-w-xl mx-auto space-y-3">
-                            <h3 className="text-3xl font-normal text-slate-800 font-display">
-                                {lang === "EN" ? "Just a few steps left" : "बस कुछ ही कदम बाकी हैं"}
+                    {/* Bento Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 max-w-[1100px] mx-auto text-left">
+                        {/* Bento Card 1: Connect */}
+                        <div className="md:col-span-5 bg-gradient-to-br from-[#0B0F19] to-slate-900 border border-white/5 rounded-[28px] p-8 relative overflow-hidden h-[400px] text-white bento-glow-card">
+                            <div className="bg-white/10 backdrop-blur-md text-[#38bdf8] border border-white/10 px-3 py-1 rounded-full text-[10px] font-bold w-fit uppercase tracking-wider">
+                                {lang === "EN" ? "Step 1" : "चरण १"}
+                            </div>
+                            <h3 className="text-2xl font-bold font-display text-white mt-6 mb-3">
+                                {lang === "EN" ? "Connect Alerts" : "अलर्ट से जुड़ें"}
                             </h3>
+                            <p className="text-[13px] text-slate-400 leading-relaxed font-normal">
+                                {lang === "EN"
+                                    ? "Add our Telegram bot. Get notifications about exam releases, dates, and PDFs directly in chat."
+                                    : "टेलीग्राम असिस्टेंट से जुड़ें। परीक्षा विज्ञापन, एडमिट कार्ड और अंतिम तिथि के सीधे अलर्ट पाएं।"}
+                            </p>
+
+                            {/* Chat Mockup visual */}
+                            <div className="absolute bottom-6 left-6 right-6 bg-slate-950/70 backdrop-blur border border-white/10 rounded-2xl p-4 space-y-2.5 shadow-2xl">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-5 h-5 rounded-full bg-[#0088cc] flex items-center justify-center text-[10px] text-white">✈</div>
+                                    <span className="text-[10px] font-bold text-white">Krishna Assistant</span>
+                                    <span className="text-[8px] text-slate-500 ml-auto">{lang === "EN" ? "Online" : "सक्रिय"}</span>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[10.5px] text-slate-350 leading-relaxed">
+                                        🔔 <b>{lang === "EN" ? "SSC CGL 2026 Notification Out!" : "SSC CGL 2026 अधिसूचना जारी!"}</b><br />
+                                        {lang === "EN" ? "Filing Deadline:" : "फॉर्म भरने की अंतिम तिथि:"} <b>12th August</b>
+                                    </p>
+                                </div>
+                                <div className="h-7 bg-[#0088cc] text-white text-[9.5px] font-bold rounded-lg flex items-center justify-center shadow-md">
+                                    {lang === "EN" ? "Apply Now" : "आवेदन करें"}
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[1000px] mx-auto">
-                            {/* STEP 1 */}
-                            <div className="flex flex-col bg-[#eef4ff] p-8 rounded-3xl border border-blue-50/50 shadow-sm relative overflow-hidden h-[400px]">
-                                <div className="bg-white text-slate-600 px-3 py-1.5 rounded-full text-[12px] font-medium w-fit shadow-sm">
-                                    Step 1
-                                </div>
-                                <h4 className="text-[26px] font-normal text-[#1a73e8] mt-8 mb-4">
-                                    {lang === 'EN' ? 'Connect' : 'जुड़ें'}
-                                </h4>
-                                <p className="text-[14.5px] text-slate-600 font-normal leading-relaxed">
-                                    {lang === 'EN'
-                                        ? 'Sign in to our portal or add our Telegram bot to start receiving live alerts.'
-                                        : 'पोर्टल में साइन इन करें या लाइव अलर्ट प्राप्त करने के लिए हमारे टेलीग्राम बॉट को जोड़ें।'}
-                                </p>
-                                
-                                {/* Action Links */}
-                                <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-3">
-                                    <button 
-                                        onClick={triggerSignIn}
-                                        className="w-full h-11 bg-white hover:bg-slate-50 text-[#1a73e8] rounded-xl text-[13px] font-bold border border-[#1a73e8]/30 shadow-sm flex items-center justify-center gap-2 transition-all"
-                                    >
-                                        <Globe size={16} /> {lang === 'EN' ? 'Website Portal' : 'वेबसाइट पोर्टल'}
-                                    </button>
-                                    <a 
-                                        href={config?.telegram_bot_url || "https://t.me/Kamlesh6377_bot"} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="w-full h-11 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-xl text-[13px] font-bold shadow-lg shadow-[#1a73e8]/20 flex items-center justify-center gap-2 transition-all"
-                                    >
-                                        <Send size={16} /> {lang === 'EN' ? 'Telegram Bot' : 'टेलीग्राम बॉट'}
-                                    </a>
-                                </div>
+                        {/* Bento Card 2: Request */}
+                        <div className="md:col-span-7 bg-gradient-to-br from-[#051F14] to-slate-900 border border-white/5 rounded-[28px] p-8 relative overflow-hidden h-[400px] text-white bento-glow-card">
+                            <div className="bg-white/10 backdrop-blur-md text-[#34d399] border border-white/10 px-3 py-1 rounded-full text-[10px] font-bold w-fit uppercase tracking-wider">
+                                {lang === "EN" ? "Step 2" : "चरण २"}
                             </div>
+                            <h3 className="text-2xl font-bold font-display text-white mt-6 mb-3">
+                                {lang === "EN" ? "Filing & Tracking" : "फॉर्म व लाइव ट्रैकिंग"}
+                            </h3>
+                            <p className="text-[13px] text-slate-400 leading-relaxed font-normal">
+                                {lang === "EN"
+                                    ? "Select any service. Provide details and upload document copies safely. Our verified operator processes it."
+                                    : "सेवा का चयन करें, आवश्यक दस्तावेज अपलोड करें। हमारे सत्यापित ऑपरेटर द्वारा फॉर्म प्रोसेस किया जाएगा।"}
+                            </p>
 
-                            {/* STEP 2 */}
-                            <div className="flex flex-col bg-[#e6f5ea] p-8 rounded-3xl border border-green-50/50 shadow-sm relative overflow-hidden h-[400px]">
-                                <div className="bg-white text-slate-600 px-3 py-1.5 rounded-full text-[12px] font-medium w-fit shadow-sm">
-                                    Step 2
+                            {/* Tracker Mockup visual */}
+                            <div className="absolute bottom-6 left-6 right-6 bg-slate-950/70 backdrop-blur border border-white/10 rounded-2xl p-4.5 space-y-3.5 shadow-2xl">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-[9px] font-bold text-slate-400">ID: #KE-3829</span>
+                                    <span className="text-[8px] font-bold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 uppercase tracking-wider animate-pulse">
+                                        {lang === "EN" ? "In Progress" : "प्रक्रिया में"}
+                                    </span>
                                 </div>
-                                <h4 className="text-[26px] font-normal text-[#1e8e3e] mt-8 mb-4">
-                                    {lang === 'EN' ? 'Request' : 'अनुरोध'}
-                                </h4>
-                                <p className="text-[14.5px] text-slate-600 font-normal leading-relaxed">
-                                    {lang === 'EN'
-                                        ? 'Choose your desired service and submit the required details securely.'
-                                        : 'अपनी वांछित सेवा चुनें और सुरक्षित रूप से आवश्यक विवरण जमा करें।'}
-                                </p>
-                                
-                                {/* Action Links */}
-                                <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-3">
-                                    <button 
-                                        onClick={() => scrollToSection("services-catalog")}
-                                        className="w-full h-11 bg-[#1e8e3e] hover:bg-[#157a31] text-white rounded-xl text-[13px] font-bold shadow-lg shadow-[#1e8e3e]/20 flex items-center justify-center gap-2 transition-all"
-                                    >
-                                        <Search size={16} /> {lang === 'EN' ? 'Browse All Services' : 'सभी सेवाएँ ब्राउज़ करें'}
-                                    </button>
+                                <div className="space-y-0.5">
+                                    <h5 className="text-[12px] font-bold text-white">{lang === "EN" ? "Domicile Certificate (Mool Niwas)" : "मूल निवास प्रमाण पत्र"}</h5>
+                                    <p className="text-[9.5px] text-slate-500">{lang === "EN" ? "Govt Services Desk" : "सरकारी सेवा विभाग"}</p>
                                 </div>
-                            </div>
-
-                            {/* STEP 3 */}
-                            <div className="flex flex-col bg-[#fff3db] p-8 rounded-3xl border border-orange-50/50 shadow-sm relative overflow-hidden h-[400px]">
-                                <div className="bg-white text-slate-600 px-3 py-1.5 rounded-full text-[12px] font-medium w-fit shadow-sm">
-                                    Step 3
-                                </div>
-                                <h4 className="text-[26px] font-normal text-[#f9ab00] mt-8 mb-4">
-                                    {lang === 'EN' ? 'Complete' : 'पूरा करें'}
-                                </h4>
-                                <p className="text-[14.5px] text-slate-600 font-normal leading-relaxed">
-                                    {lang === 'EN'
-                                        ? 'Wait for processing to finish. You will receive the receipt automatically.'
-                                        : 'प्रसंस्करण समाप्त होने की प्रतीक्षा करें। आपको रसीद स्वचालित रूप से प्राप्त होगी।'}
-                                </p>
-                                
-                                {/* Mockup Div */}
-                                <div className="absolute bottom-6 left-6 right-6 h-[88px] bg-white rounded-[14px] shadow-sm px-6 py-0 border border-slate-100 flex flex-col justify-center items-center gap-3">
-                                    <span className="text-[12px] font-medium text-slate-800">Processing...</span>
-                                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                        <div className="w-[45%] h-full bg-[#1a73e8] rounded-full"></div>
+                                <div className="space-y-1.5">
+                                    <div className="flex justify-between text-[8px] font-bold text-slate-500 uppercase tracking-wider">
+                                        <span>{lang === "EN" ? "Uploaded" : "अपलोड"}</span>
+                                        <span>{lang === "EN" ? "Verify" : "सत्यापन"}</span>
+                                        <span>{lang === "EN" ? "Kiosk Submit" : "सब्मिट"}</span>
+                                    </div>
+                                    <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden flex gap-0.5">
+                                        <div className="h-full bg-emerald-500 w-[35%] rounded-full" />
+                                        <div className="h-full bg-emerald-500 w-[35%] rounded-full animate-pulse" />
+                                        <div className="h-full bg-slate-700 w-[30%] rounded-full" />
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Divider Line */}
-                    <div className="border-t border-[#c2c6d4]/20 pt-8" id="services-catalog" />
+                        {/* Bento Card 3: Secure Locker */}
+                        <div className="md:col-span-12 bg-gradient-to-br from-[#1C1204] to-slate-900 border border-white/5 rounded-[28px] p-8 relative overflow-hidden min-h-[180px] flex flex-col md:flex-row justify-between items-start md:items-center gap-6 text-white bento-glow-card">
+                            <div className="space-y-2">
+                                <div className="bg-white/10 backdrop-blur-md text-[#fbbf24] border border-white/10 px-3 py-1 rounded-full text-[10px] font-bold w-fit uppercase tracking-wider">
+                                    {lang === "EN" ? "Step 3" : "चरण ३"}
+                                </div>
+                                <h3 className="text-2xl font-bold font-display text-white">
+                                    {lang === "EN" ? "Secure Digital Document Locker" : "सुरक्षित डिजिटल लॉकर"}
+                                </h3>
+                                <p className="text-[13px] text-slate-400 leading-relaxed font-normal max-w-xl">
+                                    {lang === "EN"
+                                        ? "Your marksheets, photo, and government IDs are locked safely. Re-use them instantly for any future applications without re-uploading."
+                                        : "मार्कशीट, फोटो और आईडी डिजिटल लॉकर में सुरक्षित स्टोर हो जाते हैं। दोबारा अपलोड किए बिना किसी भी नए फॉर्म में सीधा इस्तेमाल करें।"}
+                                </p>
+                            </div>
 
-                    {/* Available Services Grouped by Category */}
-                    <div className="space-y-12">
-                        <div className="text-center max-w-2xl mx-auto space-y-4">
-                            <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "Our Services" : "हमारी सेवाएँ"}</p>
-                            <h2 className="text-3xl md:text-4xl font-black text-[#0A1A40] font-display">
-                                {lang === "EN" ? "Available Services" : "उपलब्ध सेवाएँ"}
-                            </h2>
-                            <p className="text-[13.5px] text-gray-500 font-normal leading-relaxed">
-                                {lang === "EN"
-                                    ? "Browse and request official government documentation, application filings, and counselling services online."
-                                    : "आधिकारिक सरकारी दस्तावेज़, आवेदन पत्र और काउंसलिंग सेवाओं को ऑनलाइन ब्राउज़ करें और अनुरोध करें।"}
-                            </p>
+                            <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4 w-full md:w-auto shrink-0 shadow-xl">
+                                <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400">
+                                    <Shield size={18} />
+                                </div>
+                                <div>
+                                    <p className="text-[12px] font-bold text-white">{lang === "EN" ? "AES-256 Locker" : "AES-256 सुरक्षित लॉकर"}</p>
+                                    <p className="text-[10px] text-slate-500">{lang === "EN" ? "Fully Encrypted Data" : "पूर्णतः एन्क्रिप्टेड डेटा"}</p>
+                                </div>
+                            </div>
                         </div>
-
-                        {/* Services Search & Filter Controls */}
-                        {!loading && Object.keys(services).length > 0 && (
-                            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white border border-[#c2c6d4]/20 p-4 rounded-2xl shadow-sm animate-fadeIn">
-                                <div className="relative w-full sm:w-80">
-                                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                                    <input
-                                        type="text"
-                                        value={serviceSearch}
-                                        onChange={e => setServiceSearch(e.target.value)}
-                                        placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
-                                        className="w-full bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] placeholder:text-gray-400 pl-11 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all font-medium"
-                                    />
-                                </div>
-
-                                <div className="w-full sm:w-auto">
-                                    <select
-                                        value={serviceCatFilter}
-                                        onChange={e => setServiceCatFilter(e.target.value)}
-                                        className="w-full sm:w-auto px-4 py-2.5 bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all cursor-pointer font-semibold"
-                                    >
-                                        <option value="ALL">{lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां'}</option>
-                                        {Object.entries(services).map(([k, cat]) => (
-                                            <option key={k} value={k}>{cat.label}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Available Services Grouped by Category Grid */}
-                        {loading ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-                                <ServiceCardSkeleton />
-                                <ServiceCardSkeleton />
-                                <ServiceCardSkeleton />
-                            </div>
-                        ) : Object.keys(services).length === 0 ? (
-                            <div className="text-center py-12 text-gray-400">
-                                <p className="text-sm font-semibold">No services available at the moment.</p>
-                            </div>
-                        ) : !hasMatchingServices ? (
-                            <div className="text-center py-16 bg-white border border-dashed border-[#c2c6d4]/30 rounded-2xl text-gray-400">
-                                <Search size={28} className="mx-auto text-gray-300 mb-2" />
-                                <p className="text-sm font-bold">{lang === 'EN' ? 'No services match your search query.' : 'आपकी खोज से मेल खाने वाली कोई सेवा नहीं मिली।'}</p>
-                            </div>
-                        ) : (
-                            <div className="space-y-12 text-left">
-                                {Object.entries(services).map(([catKey, cat]) => {
-                                    const matchingServices = (cat.services || []).filter(s =>
-                                        s.name.toLowerCase().includes(serviceSearch.toLowerCase()) ||
-                                        (s.description && s.description.toLowerCase().includes(serviceSearch.toLowerCase()))
-                                    )
-                                    const isVisible = serviceCatFilter === "ALL" || serviceCatFilter === catKey
-
-                                    if (matchingServices.length === 0 || !isVisible) return null
-
-                                    return (
-                                        <div key={catKey} className="space-y-6 animate-fadeIn">
-                                            {/* Category Section Header */}
-                                            <div className="flex items-center gap-3 border-b border-[#c2c6d4]/20 pb-2">
-                                                <span className="w-1.5 h-6 bg-[#164FA8] rounded-full"></span>
-                                                <h3 className="text-base font-bold text-[#0A1A40] tracking-tight font-display">{cat.label}</h3>
-                                                <span className="text-[10px] text-gray-400 font-bold bg-white px-2 py-0.5 rounded-full border border-slate-200">
-                                                    {matchingServices.length} {matchingServices.length === 1 ? "Service" : "Services"}
-                                                </span>
-                                            </div>
-
-                                            {/* Category Cards Grid */}
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                                {matchingServices.map((svc, idx) => (
-                                                    <div key={idx} className="bg-white border border-[#c2c6d4]/20 p-6 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
-                                                        <div className="space-y-3">
-                                                            <div className="flex items-center justify-between text-[10px] font-bold uppercase text-slate-400 tracking-wider">
-                                                                <span>{cat.label}</span>
-                                                                {svc.price && (
-                                                                    <span className="text-[#164FA8] bg-blue-50/50 px-2.5 py-1 rounded-lg border border-blue-150 font-bold">
-                                                                        Fee: {svc.price}
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                            <h4 className="text-base font-bold text-[#0A1A40] group-hover:text-[#164FA8] transition-colors leading-snug">{svc.name}</h4>
-                                                            <p className="text-[12.5px] text-gray-500 font-normal leading-relaxed">{svc.description || "Official filing and registration services."}</p>
-                                                        </div>
-
-                                                        <button
-                                                            onClick={() => handleRequestServiceWhatsApp(svc, catKey, cat.label)}
-                                                            className="mt-6 w-full py-2.5 bg-[#164FA8] hover:bg-[#0A1A40] text-white text-[12.5px] font-bold rounded-xl transition-all shadow-sm border-none cursor-pointer text-center"
-                                                        >
-                                                            {lang === 'EN' ? 'Request via WhatsApp' : 'व्हाट्सएप से अनुरोध करें'}
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        )}
                     </div>
                 </div>
             </section>
 
-            {/* ── LIVE NOTIFICATIONS BOARD ── */}
-            <section id="notifications" className="py-20 px-6 lg:px-12 max-w-[1240px] mx-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                    {/* Left Panel: Search & Controls */}
-                    <div className="lg:col-span-4 space-y-6">
-                        <div className="space-y-2">
-                            <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">Notice Board</p>
-                            <h2 className="text-3xl font-black text-[#0A1A40] font-display">Live Circulars & Alerts</h2>
-                            <p className="text-[12.5px] text-gray-500 font-normal leading-relaxed">
-                                Get live government exam bulletins, admit cards opening warnings, results announcements, and important notification downloads.
-                            </p>
-                        </div>
+            {/* ── SERVICES CATALOG ── */}
+            <section id="what-we-do" className="py-24 px-6 lg:px-12 max-w-[1240px] mx-auto text-center space-y-16">
+                <div className="space-y-4">
+                    <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "Catalog" : "सूची पत्र"}</p>
+                    <h2 className="text-3xl md:text-4xl font-black text-[#0A1A40] font-display">
+                        {lang === "EN" ? "Explore E-Mitra Services" : "ई-मित्र सेवाओं की सूची"}
+                    </h2>
+                    <p className="text-[13.5px] text-gray-500 font-normal max-w-xl mx-auto">
+                        {lang === "EN"
+                            ? "Browse official application filing desk services. Submit requests and check requirements."
+                            : "आधिकारिक फॉर्म भरने की सेवाओं को ऑनलाइन देखें। अपने आवश्यक दस्तावेजों की जांच करें।"}
+                    </p>
+                </div>
 
-                        {/* Search input */}
-                        <div className="relative">
+                {/* Search & Filter bar */}
+                {!loading && Object.keys(services).length > 0 && (
+                    <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white border border-[#c2c6d4]/20 p-4 rounded-2xl shadow-sm max-w-4xl mx-auto">
+                        <div className="relative w-full sm:w-80">
+                            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Search notifications..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-[13px] outline-none focus:ring-2 focus:ring-[#164FA8]/20 focus:border-[#164FA8] transition-all"
+                                value={serviceSearch}
+                                onChange={e => setServiceSearch(e.target.value)}
+                                placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
+                                className="w-full bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] placeholder:text-gray-400 pl-11 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all font-medium"
                             />
                         </div>
 
-                        {/* Category filter pills */}
+                        <div className="w-full sm:w-auto">
+                            <select
+                                value={serviceCatFilter}
+                                onChange={e => setServiceCatFilter(e.target.value)}
+                                className="w-full sm:w-auto px-4 py-2.5 bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all cursor-pointer font-semibold"
+                            >
+                                <option value="ALL">{lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां'}</option>
+                                {Object.entries(services).map(([k, cat]) => (
+                                    <option key={k} value={k}>{cat.label}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                )}
+
+                {/* Grid Lists */}
+                {loading ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                        <ServiceCardSkeleton />
+                        <ServiceCardSkeleton />
+                        <ServiceCardSkeleton />
+                    </div>
+                ) : Object.keys(services).length === 0 ? (
+                    <div className="text-center py-12 text-gray-400">
+                        <p className="text-sm font-semibold">No services available at the moment.</p>
+                    </div>
+                ) : !hasMatchingServices ? (
+                    <div className="text-center py-16 bg-white border border-dashed border-[#c2c6d4]/30 rounded-2xl text-gray-400 max-w-4xl mx-auto">
+                        <Search size={28} className="mx-auto text-gray-300 mb-2" />
+                        <p className="text-sm font-bold">{lang === 'EN' ? 'No services match your search query.' : 'आपकी खोज से मेल खाने वाली कोई सेवा नहीं मिली।'}</p>
+                    </div>
+                ) : (
+                    <div className="space-y-16 text-left max-w-6xl mx-auto">
+                        {Object.entries(services).map(([catKey, cat]) => {
+                            const matchingServices = (cat.services || []).filter(s =>
+                                s.name.toLowerCase().includes(serviceSearch.toLowerCase()) ||
+                                (s.description && s.description.toLowerCase().includes(serviceSearch.toLowerCase()))
+                            )
+                            const isVisible = serviceCatFilter === "ALL" || serviceCatFilter === catKey
+
+                            if (matchingServices.length === 0 || !isVisible) return null
+
+                            return (
+                                <div key={catKey} className="space-y-6">
+                                    <div className="flex items-center gap-3 border-b border-[#c2c6d4]/20 pb-2">
+                                        <span className="w-1.5 h-6 bg-[#164FA8] rounded-full"></span>
+                                        <h3 className="text-base font-bold text-[#0A1A40] tracking-tight font-display">{cat.label}</h3>
+                                        <span className="text-[10px] text-gray-400 font-bold bg-white px-2 py-0.5 rounded-full border border-slate-200">
+                                            {matchingServices.length} {matchingServices.length === 1 ? "Service" : "Services"}
+                                        </span>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {matchingServices.map((svc, idx) => (
+                                            <div key={idx} className="bg-white border border-[#c2c6d4]/20 p-6 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center justify-between text-[10px] font-bold uppercase text-slate-400 tracking-wider">
+                                                        <span>{cat.label}</span>
+                                                        {svc.price && (
+                                                            <span className="text-[#164FA8] bg-blue-50/50 px-2.5 py-1 rounded-lg border border-blue-150 font-bold">
+                                                                {lang === "EN" ? "Fee" : "शुल्क"}: {svc.price}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <h4 className="text-base font-bold text-[#0A1A40] group-hover:text-[#164FA8] transition-colors leading-snug">{svc.name}</h4>
+                                                    <p className="text-[12.5px] text-gray-500 font-normal leading-relaxed">{svc.description || "Official filing and registration services."}</p>
+                                                </div>
+
+                                                <button
+                                                    onClick={() => handleRequestServiceWhatsApp(svc, catKey, cat.label)}
+                                                    className="mt-6 w-full py-2.5 bg-[#164FA8] hover:bg-[#0A1A40] text-white text-[12.5px] font-bold rounded-xl transition-all shadow-sm border-none cursor-pointer text-center"
+                                                >
+                                                    {lang === 'EN' ? 'Request via WhatsApp' : 'व्हाट्सएप से अनुरोध करें'}
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                )}
+            </section>
+
+            {/* ── LIVE NOTIFICATIONS FEED ── */}
+            <section id="notifications" className="py-24 px-6 lg:px-12 max-w-[1240px] mx-auto border-t border-[#c2c6d4]/20">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    {/* Notice Board Info */}
+                    <div className="lg:col-span-4 space-y-6 text-left">
+                        <div className="space-y-2">
+                            <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "Real-time updates" : "वास्तविक समय अपडेट"}</p>
+                            <h2 className="text-3xl font-black text-[#0A1A40] font-display flex items-center gap-2">
+                                {lang === "EN" ? "Live Notice Board" : "लाइव सूचना बोर्ड"}
+                                <span className="flex h-2.5 w-2.5 relative">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                                </span>
+                            </h2>
+                            <p className="text-[13px] text-gray-500 font-normal leading-relaxed">
+                                {lang === "EN" 
+                                    ? "Official exam circulars, admit card releases, result sheets, and counselling downloads."
+                                    : "आधिकारिक परीक्षा अधिसूचनाएं, एडमिट कार्ड, परीक्षा परिणाम व काउंसलिंग की खबरें।"}
+                            </p>
+                        </div>
+
+                        {/* Search */}
+                        <div className="relative">
+                            <input
+                                type="text"
+                                placeholder={lang === "EN" ? "Search announcements..." : "सूचना खोजें..."}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-[13px] outline-none focus:ring-2 focus:ring-[#164FA8]/25 focus:border-[#164FA8] transition-all font-medium text-[#071e27]"
+                            />
+                        </div>
+
+                        {/* Filter Categories */}
                         <div className="flex flex-wrap gap-2">
                             <button
                                 onClick={() => setFilterCategory("ALL")}
@@ -626,7 +635,7 @@ export default function Landing() {
                                     : "bg-white text-gray-500 border-gray-200 hover:bg-slate-50"
                                     }`}
                             >
-                                All Notices ({announcements.length})
+                                {lang === "EN" ? "All" : "सभी"} ({announcements.length})
                             </button>
                             <button
                                 onClick={() => setFilterCategory("exams")}
@@ -635,7 +644,7 @@ export default function Landing() {
                                     : "bg-white text-gray-500 border-gray-200 hover:bg-slate-50"
                                     }`}
                             >
-                                Exam Bulletins
+                                {lang === "EN" ? "Exam Circulars" : "परीक्षा विज्ञापन"}
                             </button>
                             <button
                                 onClick={() => setFilterCategory("general")}
@@ -644,16 +653,16 @@ export default function Landing() {
                                     : "bg-white text-gray-500 border-gray-200 hover:bg-slate-50"
                                     }`}
                             >
-                                General Info
+                                {lang === "EN" ? "General Alerts" : "सामान्य खबरें"}
                             </button>
                         </div>
                     </div>
 
-                    {/* Right Panel: Scrollable notifications feed */}
-                    <div className="lg:col-span-8 bg-white border border-[#c2c6d4]/20 rounded-2xl shadow-sm p-6 space-y-4 max-h-[550px] overflow-y-auto pr-3">
+                    {/* Announcements Feed Container */}
+                    <div className="lg:col-span-8 bg-white border border-[#c2c6d4]/20 rounded-3xl shadow-sm p-6 space-y-4 max-h-[500px] overflow-y-auto pr-3 text-left">
                         <div className="border-b pb-3 flex justify-between items-center">
-                            <span className="text-[12px] font-black text-[#0A1A40]">Recent Announcements</span>
-                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider">Updates Feed</span>
+                            <span className="text-[12px] font-black text-[#0A1A40] uppercase tracking-wider">{lang === "EN" ? "Recent Circulars" : "हालिया घोषणाएं"}</span>
+                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{lang === "EN" ? "Live Feed" : "लाइव समाचार"}</span>
                         </div>
 
                         {loading ? (
@@ -661,13 +670,12 @@ export default function Landing() {
                         ) : filteredAnnouncements.length === 0 ? (
                             <div className="text-center py-20 text-gray-400">
                                 <Bell className="mx-auto text-gray-300 mb-2" size={24} />
-                                <p className="text-[12px] font-bold">No notifications found matching filter.</p>
+                                <p className="text-[12px] font-bold">{lang === "EN" ? "No matches found" : "कोई सूचना नहीं मिली"}</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
                                 {filteredAnnouncements.map((ann, idx) => (
-                                    <div key={idx} className="border border-slate-100 rounded-xl p-5 bg-slate-50/40 hover:bg-slate-50/95 transition-colors space-y-3 text-left">
-                                        {/* Date and category header */}
+                                    <div key={idx} className="border border-slate-100 rounded-xl p-5 bg-slate-50/40 hover:bg-slate-50/80 transition-colors space-y-3">
                                         <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold border-b border-slate-100 pb-1.5 uppercase tracking-wider">
                                             <span className="px-2 py-0.5 bg-blue-50 text-[#164FA8] rounded uppercase">Govt Alert</span>
                                             <span>{new Date(ann.created_at || Date.now()).toLocaleString("en-IN", {
@@ -678,7 +686,7 @@ export default function Landing() {
                                             })}</span>
                                         </div>
                                         {ann.title && <h4 className="text-[14px] font-bold text-[#0A1A40] leading-snug">{ann.title}</h4>}
-                                        <div className="text-[12px] text-slate-655 font-normal leading-relaxed whitespace-pre-wrap break-words font-sans">
+                                        <div className="text-[12px] text-slate-600 font-normal leading-relaxed whitespace-pre-wrap break-words font-sans">
                                             {formatTelegramMessage(ann.content)}
                                         </div>
 
@@ -689,7 +697,7 @@ export default function Landing() {
                                                 rel="noopener noreferrer"
                                                 className="text-[#164FA8] hover:underline text-[12px] font-bold inline-flex items-center gap-1 mt-1"
                                             >
-                                                Download Official Document <ExternalLink size={13} />
+                                                {lang === "EN" ? "Download Official Circular" : "आधिकारिक अधिसूचना डाउनलोड करें"} <ExternalLink size={13} />
                                             </a>
                                         )}
                                     </div>
@@ -700,18 +708,22 @@ export default function Landing() {
                 </div>
             </section>
 
-            {/* ── IMPORTANT RESOURCES & LINKS ── */}
-            <section id="resources" className="bg-[#f8fcff] border-y border-[#c2c6d4]/10 py-20 px-6 lg:px-12">
+            {/* ── IMPORTANT RESOURCES ── */}
+            <section id="resources" className="bg-[#f8fcff] border-y border-[#c2c6d4]/10 py-24 px-6 lg:px-12 text-center">
                 <div className="max-w-[1240px] mx-auto space-y-12">
-                    <div className="text-center max-w-xl mx-auto space-y-3">
-                        <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">Quick Resources</p>
-                        <h2 className="text-3xl font-black text-[#0A1A40] font-display">Important Govt Portals</h2>
-                        <p className="text-[13px] text-gray-500 font-normal">
-                            Direct, authentic gateways to leading central and state government recruitment portals.
+                    <div className="space-y-3">
+                        <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "Portals" : "प्रमुख वेबसाइट्स"}</p>
+                        <h2 className="text-3xl font-black text-[#0A1A40] font-display">
+                            {lang === "EN" ? "Important Government Gateways" : "महत्वपूर्ण सरकारी लिंक्स"}
+                        </h2>
+                        <p className="text-[13.5px] text-gray-500 max-w-xl mx-auto">
+                            {lang === "EN"
+                                ? "Access central and state quota registration desks directly."
+                                : "केंद्रीय और राज्य कोटा भर्ती बोर्डों के सीधे प्रवेश द्वार।"}
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-5 max-w-5xl mx-auto text-left">
                         <a
                             href="https://sso.rajasthan.gov.in/"
                             target="_blank"
@@ -771,12 +783,14 @@ export default function Landing() {
             </section>
 
             {/* ── FAQ SECTION ── */}
-            <section id="faq" className="py-20 px-6 lg:px-12 max-w-[800px] mx-auto space-y-12">
+            <section id="faq" className="py-24 px-6 lg:px-12 max-w-[800px] mx-auto space-y-12">
                 <div className="text-center space-y-3">
-                    <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">Questions?</p>
-                    <h2 className="text-3xl font-black text-[#0A1A40] font-display">Frequently Asked Questions</h2>
+                    <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "Help" : "सहायता"}</p>
+                    <h2 className="text-3xl font-black text-[#0A1A40] font-display">{lang === "EN" ? "Frequently Asked Questions" : "अक्सर पूछे जाने वाले सवाल"}</h2>
                     <p className="text-[13px] text-gray-500 font-normal">
-                        Got questions about form filings, digital lockers, or notification broadcasts? We have got you covered.
+                        {lang === "EN" 
+                            ? "Everything you need to know about notifications locker and filings."
+                            : "डिजिटल लॉकर, फॉर्म भरने व नोटिफिकेशन से जुड़े आपके सवालों के जवाब।"}
                     </p>
                 </div>
 
@@ -811,29 +825,33 @@ export default function Landing() {
             </section>
 
             {/* ── FINAL CALL TO ACTION ── */}
-            <section className="px-6 lg:px-12 pb-20 max-w-[1240px] mx-auto">
-                <div className="bg-gradient-to-r from-[#164FA8] to-[#0A1A40] rounded-[24px] text-white p-8 lg:p-12 text-center space-y-6 shadow-xl relative overflow-hidden">
+            <section className="px-6 lg:px-12 pb-24 max-w-[1240px] mx-auto">
+                <div className="bg-gradient-to-r from-[#164FA8] to-[#0A1A40] rounded-[32px] text-white p-12 text-center space-y-6 shadow-xl relative overflow-hidden">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.08),transparent)] pointer-events-none" />
 
-                    <h3 className="text-2xl lg:text-3xl font-black font-display tracking-tight">Ready to file forms from home?</h3>
+                    <h3 className="text-2xl lg:text-3xl font-black font-display tracking-tight">
+                        {lang === "EN" ? "Ready to file forms from home?" : "क्या आप घर बैठे फॉर्म भरना चाहते हैं?"}
+                    </h3>
                     <p className="text-[13px] text-white/70 max-w-md mx-auto font-normal leading-relaxed">
-                        Complete your digital setup by connecting your mobile and joining our WhatsApp group. File your exams seamlessly.
+                        {lang === "EN"
+                            ? "Set up your student profile and link your Telegram account to start receiving alerts instantly."
+                            : "अपना स्टूडेंट प्रोफाइल बनाएं और तुरंत परीक्षा अपडेट प्राप्त करने के लिए टेलीग्राम असिस्टेंट से जुड़ें।"}
                     </p>
 
                     <div className="flex justify-center gap-4">
                         {isLoggedIn ? (
                             <button
                                 onClick={() => navigate("/dashboard")}
-                                className="px-6 py-3 bg-white text-[#164FA8] hover:bg-slate-50 text-[12px] font-black uppercase rounded-xl transition-all shadow-md active:scale-95"
+                                className="px-6 py-3 bg-white text-[#164FA8] hover:bg-slate-50 text-[12px] font-black uppercase rounded-xl transition-all shadow-md active:scale-95 border-none cursor-pointer"
                             >
-                                Access Student Panel
+                                {lang === "EN" ? "Access Student Panel" : "विद्यार्थी पैनल खोलें"}
                             </button>
                         ) : (
                             <button
                                 onClick={triggerSignIn}
-                                className="px-6 py-3 bg-white text-[#164FA8] hover:bg-slate-50 text-[12px] font-black uppercase rounded-xl transition-all shadow-md active:scale-95"
+                                className="px-6 py-3 bg-white text-[#164FA8] hover:bg-slate-50 text-[12px] font-black uppercase rounded-xl transition-all shadow-md active:scale-95 border-none cursor-pointer"
                             >
-                                Create Free Student Account
+                                {lang === "EN" ? "Create Free Account" : "निशुल्क अकाउंट बनाएं"}
                             </button>
                         )}
                     </div>
@@ -842,21 +860,23 @@ export default function Landing() {
 
             {/* ── FOOTER ── */}
             <footer className="bg-slate-900 border-t border-slate-800 text-white/50 text-[12px] font-normal py-16 px-6 lg:px-12">
-                <div className="max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
+                <div className="max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 text-left">
                     <div className="space-y-3">
                         <div className="flex items-center gap-2.5">
                             <div className="w-8 h-8 rounded-lg bg-[#164FA8] text-white flex items-center justify-center font-extrabold text-sm">
-                                e
+                                K
                             </div>
-                            <span className="font-bold text-white tracking-tight">Krishna Emitra Digital Portal</span>
+                            <span className="font-bold text-white tracking-tight">Krishna Emitra Digital</span>
                         </div>
                         <p className="text-[11.5px] leading-relaxed">
-                            A secure, prompt, and convenient platform designed to file and track recruitment forms and counselling.
+                            {lang === "EN"
+                                ? "A secure, prompt, and convenient platform designed to file and track recruitment forms and counselling."
+                                : "सरकारी नौकरी फॉर्म एवं कॉलेज काउंसलिंग आवेदन भरने व लाइव अपडेट पाने का सुरक्षित पोर्टल।"}
                         </p>
                     </div>
 
                     <div className="space-y-3">
-                        <h4 className="font-bold text-white text-[12.5px]">Our Center Address</h4>
+                        <h4 className="font-bold text-white text-[12.5px]">{lang === "EN" ? "Our Center Address" : "हमारा केंद्र पता"}</h4>
                         <p className="text-[11.5px] leading-relaxed">
                             📍 Shop No. 12, Main Market,<br />
                             Jodhpur, Rajasthan, India
@@ -864,7 +884,7 @@ export default function Landing() {
                     </div>
 
                     <div className="space-y-3">
-                        <h4 className="font-bold text-white text-[12.5px]">Operator Contact</h4>
+                        <h4 className="font-bold text-white text-[12.5px]">{lang === "EN" ? "Operator Contact" : "ऑपरेटर संपर्क"}</h4>
                         <p className="text-[11.5px]">
                             📞 Phone: +91 {config.whatsapp_number || "916377964293"}<br />
                             ✉️ Email: support@krishnaemitra.com
@@ -872,8 +892,8 @@ export default function Landing() {
                     </div>
 
                     <div className="space-y-3">
-                        <h4 className="font-bold text-white text-[12.5px]">Automated Bots</h4>
-                        <a href={config.telegram_bot_url || "https://t.me/Kamlesh6377_bot"} target="_blank" rel="noreferrer" className="block text-[#2997ff] hover:underline">Telegram Assistant Bot</a>
+                        <h4 className="font-bold text-white text-[12.5px]">{lang === "EN" ? "Automated Desks" : "सहायक सेवाएं"}</h4>
+                        <a href={config.telegram_bot_url || "https://t.me/Kamlesh6377_bot"} target="_blank" rel="noreferrer" className="block text-[#38bdf8] hover:underline">Telegram Assistant Bot</a>
                         <a href={`https://wa.me/${config.whatsapp_number || "916377964293"}`} target="_blank" rel="noreferrer" className="block text-[#25D366] hover:underline">WhatsApp Operator Desk</a>
                     </div>
                 </div>
@@ -891,15 +911,12 @@ export default function Landing() {
             {/* ── SERVICE REQUEST MODAL ── */}
             {showRequestModal && requestModalSvc && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    {/* Backdrop */}
                     <div
                         className="absolute inset-0 bg-[#0A1A40]/40 backdrop-blur-sm transition-opacity"
                         onClick={() => setShowRequestModal(false)}
                     />
 
-                    {/* Modal Content */}
-                    <div className="relative bg-white border border-[#c2c6d4]/30 rounded-3xl shadow-2xl p-6 md:p-8 max-w-md w-full z-10">
-                        {/* Close button */}
+                    <div className="relative bg-white border border-[#c2c6d4]/30 rounded-3xl shadow-2xl p-6 md:p-8 max-w-md w-full z-10 text-left">
                         <button
                             onClick={() => setShowRequestModal(false)}
                             className="absolute top-4 right-4 text-gray-400 hover:text-[#0A1A40] transition-colors p-1 bg-transparent border-none cursor-pointer"
