@@ -226,10 +226,10 @@ export const publicRegister = (data) =>
     body: JSON.stringify(data)
   })
 
-export const publicCheckStatus = (phone) =>
+export const publicCheckStatus = async (phone) =>
   requestJson(`/api/public/check-status`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: await getAuthHeaders(),
     body: JSON.stringify({ phone })
   })
 
@@ -255,8 +255,8 @@ export const submitFormApplication = async (formData) => {
   return data
 }
 
-export const getFormApplicationStatus = (phone) =>
-  requestJson(`/api/public/applications/${phone}`)
+export const getFormApplicationStatus = async (phone) =>
+  requestJson(`/api/public/applications/${phone}`, { headers: await getAuthHeaders() })
 
 export const getAdminExams = async () =>
   requestJson(`/api/admin/exams`, { headers: await getAuthHeaders() })
@@ -411,6 +411,5 @@ export const syncClerkStudent = async (clerkToken, profileData) =>
     },
     body: JSON.stringify(profileData)
   })
-
 
 

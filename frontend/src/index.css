@@ -89,12 +89,6 @@
   box-shadow: rgba(0, 0, 0, 0.22) 3px 5px 30px 0px;
 }
 
-@utility bg-hero-responsive {
-  background-image: url('/Hero-sm.png');
-  @media (min-width: 1024px) {
-    background-image: url('/Hero-bg.png');
-  }
-}
 
 
 @media (max-width: 640px) {
@@ -264,6 +258,51 @@ body {
   &:hover {
     box-shadow: 0 25px 50px -12px rgba(37, 99, 235, 0.12);
   }
+}
+
+@utility bg-grid-pattern {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+@utility glow-blue {
+  box-shadow: 0 0 50px -10px rgba(37, 99, 235, 0.12);
+}
+
+@utility glow-indigo {
+  box-shadow: 0 0 50px -10px rgba(99, 102, 241, 0.12);
+}
+
+@utility glow-emerald {
+  box-shadow: 0 0 50px -10px rgba(16, 185, 129, 0.12);
+}
+
+@utility glow-amber {
+  box-shadow: 0 0 50px -10px rgba(245, 158, 11, 0.12);
+}
+
+@utility text-gradient-primary {
+  background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@utility text-gradient-blue {
+  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@utility text-gradient-emerald {
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@utility text-gradient-amber {
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Hide Google Translate UI Elements */

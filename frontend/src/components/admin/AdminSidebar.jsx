@@ -52,7 +52,7 @@ export function AdminSidebar({ isOpen, onClose }) {
         {/* Logo Area */}
         <div className="px-8 py-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Logo className="w-8 h-8 rounded-lg shrink-0" />
+            <Logo className="w-8 h-8 rounded-full shrink-0" />
             <div>
               <h1 className="text-[18px] font-bold tracking-tight text-[var(--color-primary)] font-display">Krishna Emitra</h1>
               <p className="text-[11px] font-medium text-gray-500 mt-0.5">Bot Administration</p>

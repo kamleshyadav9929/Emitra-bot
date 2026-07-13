@@ -6,4 +6,5 @@ __pycache__/
 emitra.db
 frontend/node_modules/
 frontend/dist/
+backend/uploads/
 .DS_Store

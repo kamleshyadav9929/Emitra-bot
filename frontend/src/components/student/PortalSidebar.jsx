@@ -89,7 +89,7 @@ function SidebarLogo({ open }) {
     return (
         <div className="flex items-center gap-2.5 px-3 py-2 overflow-hidden">
             {/* Always-visible icon block */}
-            <Logo className="w-7 h-7 rounded-lg shrink-0" />
+            <Logo className="w-7 h-7 rounded-full shrink-0" />
 
             {/* Text fades in */}
             <motion.div

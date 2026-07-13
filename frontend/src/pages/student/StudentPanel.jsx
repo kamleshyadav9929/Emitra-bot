@@ -602,7 +602,7 @@ export default function StudentPanel() {
                 {/* SSO / e-Mitra Kiosk Header */}
                 <div className="h-16 flex items-center px-5 border-b border-slate-200 bg-[#f8fafc]">
                     <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab("dashboard")}>
-                        <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-lg object-contain shadow-sm bg-white" />
+                        <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-full object-cover shadow-sm bg-white border border-slate-100" />
                         <div className="leading-tight">
                             <span className="text-slate-800 font-extrabold text-[14px] tracking-tight block">Krishna Emitra</span>
                             <span className="text-[9px] text-[#f26522] font-black tracking-widest uppercase block">कृष्णा ई-मित्र</span>

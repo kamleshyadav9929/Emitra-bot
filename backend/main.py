@@ -3,6 +3,7 @@
 import asyncio
 import re
 import threading
+import os
 from functools import wraps
 from datetime import datetime, timedelta, timezone
 from collections import defaultdict
@@ -36,6 +37,13 @@ if HAS_CRYPTO and config.CLERK_JWKS_URL and not config.CLERK_JWT_PUBLIC_KEY:
         print(f"JWKS Client initialization failed: {e}")
 
 app = Flask(__name__)
+IS_PRODUCTION = os.environ.get("FLASK_ENV", "").lower() == "production"
+MAX_UPLOAD_BYTES = 8 * 1024 * 1024
+ALLOWED_DOCUMENT_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png"}
+ALLOWED_DOCUMENT_TYPES = {"application/pdf", "image/jpeg", "image/png"}
+ALLOWED_BROADCAST_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+ALLOWED_BROADCAST_TYPES = {"image/jpeg", "image/png", "image/webp"}
+app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_BYTES
 
 # ── Manual CORS – bulletproof for PythonAnywhere ─────────────────────────────
 # Using @after_request ensures every response (200, 401, 500, OPTIONS …)
@@ -84,9 +92,17 @@ def handle_exception(e):
     import traceback
     trace = traceback.format_exc()
     print("Unhandled Exception:", trace)
-    response = jsonify({"error": str(e), "trace": trace})
+    if IS_PRODUCTION:
+        response = jsonify({"error": "Internal server error"})
+    else:
+        response = jsonify({"error": str(e), "trace": trace})
     response.status_code = 500
     return response
+
+
+@app.errorhandler(ValueError)
+def handle_bad_request(e):
+    return jsonify({"success": False, "error": str(e)}), 400
 
 # ── Rate Limiter Setup ────────────────────────────────────────────────────────
 limiter = Limiter(
@@ -154,9 +170,95 @@ def get_bot_and_loop():
 
 # ── Authentication ─────────────────────────────────────────────────────────────
 
+def _extract_bearer_token():
+    auth_header = request.headers.get("Authorization", "")
+    if auth_header.startswith("Bearer "):
+        return auth_header.split(" ", 1)[1].strip()
+    return None
+
+
+def _decode_local_student_token(token):
+    try:
+        payload = jwt.decode(token, config.JWT_SECRET_KEY, algorithms=["HS256"])
+        if payload.get("role") == "student":
+            return payload
+    except Exception:
+        return None
+    return None
+
+
+def _normalize_phone(phone):
+    phone = (phone or "").strip().replace(" ", "").replace("-", "")
+    if phone.startswith("+"):
+        phone = phone[1:]
+    return phone[-10:] if len(phone) >= 10 else phone
+
+
+def _phones_match(a, b):
+    return _normalize_phone(a) == _normalize_phone(b)
+
+
+def _claim_first(payload, *keys):
+    for key in keys:
+        value = payload.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return ""
+
+
+def _validate_upload(file, allowed_exts, allowed_content_types, label):
+    if not file or not file.filename:
+        return None, None, None
+
+    safe_name = secure_filename(file.filename)
+    ext = os.path.splitext(safe_name)[1].lower()
+    content_type = (file.content_type or "").split(";", 1)[0].lower()
+
+    if ext not in allowed_exts or content_type not in allowed_content_types:
+        raise ValueError(f"Invalid {label} file type.")
+
+    file_bytes = file.read(MAX_UPLOAD_BYTES + 1)
+    if len(file_bytes) > MAX_UPLOAD_BYTES:
+        raise ValueError(f"{label.capitalize()} file is too large.")
+
+    return safe_name, file_bytes, content_type
+
+
+def _authorized_for_phone(phone):
+    token = _extract_bearer_token()
+    if not token:
+        return False, jsonify({"success": False, "error": "Authentication required."}), 401
+
+    local_payload = _decode_local_student_token(token)
+    if local_payload:
+        if _phones_match(local_payload.get("phone_number"), phone):
+            return True, local_payload, 200
+        return False, jsonify({"success": False, "error": "Forbidden."}), 403
+
+    clerk_payload = verify_clerk_token(token)
+    if not clerk_payload:
+        return False, jsonify({"success": False, "error": "Invalid or expired token."}), 401
+
+    user = database.get_user_by_clerk_id(clerk_payload.get("sub"))
+    if user and user.get("role") == "admin":
+        return True, user, 200
+    if user and _phones_match(user.get("phone"), phone):
+        return True, user, 200
+    return False, jsonify({"success": False, "error": "Forbidden."}), 403
+
+
 def verify_clerk_token(token):
     if not HAS_CRYPTO:
         return None
+    decode_kwargs = {}
+    if config.CLERK_ISSUER:
+        decode_kwargs["issuer"] = config.CLERK_ISSUER
+    if config.CLERK_AUDIENCE:
+        decode_kwargs["audience"] = config.CLERK_AUDIENCE
+        decode_options = {"verify_aud": True}
+    else:
+        decode_options = {"verify_aud": False}
+
     # Priority 1: High-Performance Offline Verification (No network calls)
     if config.CLERK_JWT_PUBLIC_KEY:
         try:
@@ -164,7 +266,8 @@ def verify_clerk_token(token):
                 token,
                 config.CLERK_JWT_PUBLIC_KEY,
                 algorithms=["RS256"],
-                options={"verify_aud": False}
+                options=decode_options,
+                **decode_kwargs
             )
             return payload
         except Exception as e:
@@ -178,7 +281,8 @@ def verify_clerk_token(token):
                 token,
                 signing_key.key,
                 algorithms=["RS256"],
-                options={"verify_aud": False}
+                options=decode_options,
+                **decode_kwargs
             )
             return payload
         except Exception as e:
@@ -193,11 +297,7 @@ def token_required(f):
         if request.method == "OPTIONS":
             return jsonify({"ok": True}), 200
             
-        token = None
-        if "Authorization" in request.headers:
-            auth_header = request.headers["Authorization"]
-            if auth_header.startswith("Bearer "):
-                token = auth_header.split(" ")[1]
+        token = _extract_bearer_token()
 
         if not token:
             return jsonify({"error": "Token is missing. Please log in again."}), 401
@@ -222,23 +322,16 @@ def student_token_required(f):
         if request.method == "OPTIONS":
             return jsonify({"ok": True}), 200
             
-        token = None
-        if "Authorization" in request.headers:
-            auth_header = request.headers["Authorization"]
-            if auth_header.startswith("Bearer "):
-                token = auth_header.split(" ")[1]
+        token = _extract_bearer_token()
 
         if not token:
             return jsonify({"error": "Token is missing. Please log in."}), 401
 
         # 1. Try local student token (HS256)
-        try:
-            payload = jwt.decode(token, config.JWT_SECRET_KEY, algorithms=["HS256"])
-            if payload.get("role") == "student":
-                request.student_payload = payload
-                return f(*args, **kwargs)
-        except Exception:
-            pass
+        payload = _decode_local_student_token(token)
+        if payload:
+            request.student_payload = payload
+            return f(*args, **kwargs)
 
         # 2. Try Clerk token (RS256)
         clerk_payload = verify_clerk_token(token)
@@ -336,12 +429,14 @@ def deploy():
     import hmac, hashlib, subprocess, os
 
     secret = os.environ.get("DEPLOY_SECRET", "")
-    if secret:
-        sig = request.headers.get("X-Hub-Signature-256", "")
-        body = request.get_data()
-        expected = "sha256=" + hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
-        if not hmac.compare_digest(sig, expected):
-            return jsonify({"error": "Unauthorized"}), 403
+    if not secret:
+        return jsonify({"error": "Deploy webhook is not configured."}), 503
+
+    sig = request.headers.get("X-Hub-Signature-256", "")
+    body = request.get_data()
+    expected = "sha256=" + hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(sig, expected):
+        return jsonify({"error": "Unauthorized"}), 403
 
     try:
         result = subprocess.check_output(
@@ -359,6 +454,8 @@ def deploy():
 
 @app.route("/debug-env", methods=["GET"])
 def debug_env():
+    if IS_PRODUCTION:
+        return jsonify({"error": "Not found"}), 404
     import os
     import sys
     
@@ -408,6 +505,8 @@ def debug_env():
 @app.route("/debug-key", methods=["GET"])
 def debug_key():
     """Temporary endpoint to diagnose PEM key parsing on PythonAnywhere."""
+    if IS_PRODUCTION:
+        return jsonify({"error": "Not found"}), 404
     import os
     raw = os.getenv("CLERK_JWT_PUBLIC_KEY", "")
     normalized = config.CLERK_JWT_PUBLIC_KEY
@@ -635,11 +734,11 @@ def public_sync_clerk_student():
 
     clerk_id = payload.get("sub")
     data = request.json or {}
-    email = data.get("email", "").strip()
-    phone = data.get("phone", "").strip()
-    name = data.get("name", "").strip()
+    email = _claim_first(payload, "email", "primary_email_address", "email_address")
+    phone = _claim_first(payload, "phone_number", "primary_phone_number")
+    name = _claim_first(payload, "name", "full_name", "first_name") or data.get("name", "").strip()
 
-    user = database.sync_clerk_user(clerk_id, email, phone, name)
+    user = database.sync_clerk_user(clerk_id, email, phone, name, verified_phone=bool(phone))
     if not user:
         return jsonify({"success": False, "error": "Failed to sync user profile."}), 500
 
@@ -702,7 +801,7 @@ def student_onboard():
         user = database.get_user_by_clerk_id(clerk_user_id)
         if not user:
             # Sync / Create the user since they don't exist yet!
-            user = database.sync_clerk_user(clerk_user_id, "", phone, name)
+            user = database.sync_clerk_user(clerk_user_id, "", "", name)
     else:
         telegram_id = request.student_payload.get("sub")
         user = database.get_user_by_telegram_id(telegram_id)
@@ -775,6 +874,10 @@ def public_check_status():
     phone = data.get("phone", "").strip()
     if not phone:
         return jsonify({"success": False, "error": "Phone number required"}), 400
+
+    allowed, payload_or_response, status_code = _authorized_for_phone(phone)
+    if not allowed:
+        return payload_or_response, status_code
 
     history = database.get_student_history(phone)
     return jsonify({"success": True, "history": history})
@@ -936,16 +1039,20 @@ def send_notification():
         if "image" in request.files:
             file = request.files["image"]
             if file and file.filename != "":
-                orig_filename = secure_filename(file.filename)
+                orig_filename, file_bytes, content_type = _validate_upload(
+                    file,
+                    ALLOWED_BROADCAST_EXTENSIONS,
+                    ALLOWED_BROADCAST_TYPES,
+                    "broadcast image"
+                )
                 unique_name = f"broadcast_{uuid.uuid4().hex[:8]}_{orig_filename}"
                 
                 # Upload to Supabase public bucket
-                file_bytes = file.read()
                 from database import supabase
                 supabase.storage.from_("broadcast_images").upload(
                     file=file_bytes,
                     path=unique_name,
-                    file_options={"content-type": file.content_type}
+                    file_options={"content-type": content_type}
                 )
                 
                 # Get public URL directly from Supabase
@@ -1319,17 +1426,21 @@ def public_submit_application():
         for doc_key in request.files:
             file = request.files[doc_key]
             if file and file.filename != "":
-                orig_filename = secure_filename(file.filename)
+                orig_filename, file_bytes, content_type = _validate_upload(
+                    file,
+                    ALLOWED_DOCUMENT_EXTENSIONS,
+                    ALLOWED_DOCUMENT_TYPES,
+                    "document"
+                )
                 # Generate unique name: appid_uuid_origfilename
                 unique_name = f"{app_id}_{uuid.uuid4().hex[:8]}_{orig_filename}"
                 
                 # Upload to Supabase private bucket
-                file_bytes = file.read()
                 from database import supabase
                 supabase.storage.from_("student_documents").upload(
                     file=file_bytes,
                     path=unique_name,
-                    file_options={"content-type": file.content_type}
+                    file_options={"content-type": content_type}
                 )
                 
                 # Log file in database using doc_key (which is the document label like '10th Marksheet') as file_type
@@ -1345,6 +1456,10 @@ def public_submit_application():
 @limiter.limit("20 per minute")
 def public_get_applications_status(phone):
     """Students call this to see status of all their form filings by phone number."""
+    allowed, payload_or_response, status_code = _authorized_for_phone(phone)
+    if not allowed:
+        return payload_or_response, status_code
+
     apps = database.get_student_applications_by_phone(phone)
     return jsonify({"success": True, "applications": apps})
 
@@ -1700,4 +1815,4 @@ if os.environ.get("WERKZEUG_RUN_MAIN") == "true" or not app.debug:
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=config.FLASK_PORT, debug=True)
+    app.run(host="0.0.0.0", port=config.FLASK_PORT, debug=not IS_PRODUCTION)

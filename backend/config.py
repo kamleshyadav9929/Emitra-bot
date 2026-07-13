@@ -16,7 +16,7 @@ else:
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 
 # ── Clerk Configuration ───────────────────────────────────────────────────────
-CLERK_PUBLISHABLE_KEY = os.getenv("CLERK_PUBLISHABLE_KEY", "pk_test_cGlja2VkLWJveGVyLTk2LmNsZXJrLmFjY291bnRzLmRldiQ")
+CLERK_PUBLISHABLE_KEY = os.getenv("CLERK_PUBLISHABLE_KEY") or os.getenv("VITE_CLERK_PUBLISHABLE_KEY", "")
 try:
     import base64
     _key_part = CLERK_PUBLISHABLE_KEY.split("_")[2]
@@ -26,6 +26,10 @@ try:
 except Exception as e:
     print(f"WARNING: Invalid CLERK_PUBLISHABLE_KEY format ({e}). Clerk JWTs cannot be verified.")
     CLERK_JWKS_URL = ""
+    CLERK_DOMAIN = ""
+
+CLERK_ISSUER = os.getenv("CLERK_ISSUER", f"https://{CLERK_DOMAIN}" if CLERK_DOMAIN else "")
+CLERK_AUDIENCE = os.getenv("CLERK_AUDIENCE", "")
 
 def _normalize_pem_key(raw):
     """Convert any .env format of a PEM key into a valid multi-line PEM string.
@@ -76,7 +80,11 @@ FLASK_PORT = int(os.getenv("PORT", os.getenv("FLASK_PORT", 5000)))
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
 
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "super-secret-jwt-key-2025")
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "")
+if not JWT_SECRET_KEY:
+    raise RuntimeError("JWT_SECRET_KEY must be set to a long random secret.")
+if len(JWT_SECRET_KEY) < 32:
+    raise RuntimeError("JWT_SECRET_KEY must be at least 32 characters long.")
 
 # Parse Admin Emails
 ADMIN_EMAILS = [

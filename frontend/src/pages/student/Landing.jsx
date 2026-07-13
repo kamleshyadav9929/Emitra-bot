@@ -6,7 +6,7 @@ import LoginModal from "../../components/student/LoginModal"
 import {
     Send, Clock, Bell, Globe, ExternalLink,
     ChevronDown, Check, LogOut, User, Search,
-    X, Loader2, ArrowRight, Shield, MessageSquare, ClipboardCheck, Sparkles
+    X, Loader2, ArrowRight, Shield, MessageSquare, ClipboardCheck, Sparkles, Files, HelpCircle
 } from "lucide-react"
 import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
@@ -22,7 +22,7 @@ const formatTelegramMessage = (text) => {
 
     formatted = formatted.replace(/\*(.*?)\*/g, "<strong>$1</strong>");
     formatted = formatted.replace(/_(.*?)_/g, "<em>$1</em>");
-    formatted = formatted.replace(/`(.*?)`/g, "<code class='bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded text-[10.5px] font-mono'>$1</code>");
+    formatted = formatted.replace(/`(.*?)`/g, "<code class='bg-zinc-800 text-cyan-400 px-1.5 py-0.5 rounded text-[10px] font-mono border border-white/5'>$1</code>");
 
     return <span dangerouslySetInnerHTML={{ __html: formatted }} />;
 }
@@ -194,65 +194,66 @@ export default function Landing() {
             q: lang === "EN" ? "Are there fees for form filing services?" : "क्या फॉर्म भरने की सेवाओं के लिए कोई शुल्क है?",
             a: lang === "EN"
                 ? "We only charge the nominal government portal fees plus a minimal service charge for processing and verification. All fees are transparently displayed before form submission."
-                : "हम केवल नाममात्र का सरकारी पोर्टल शुल्क और प्रसंस्करण के लिए न्यूनतम सेवा शुल्क लेते हैं। फॉर्म जमा करने से पहले सभी शुल्क पारदर्शी रूप से दिखाए जाने हैं।"
+                : "हम केवल नाममात्र का सरकारी पोर्टल शुल्क और प्रसंस्करण के लिए न्यूनतम सेवा शुल्क लेते हैं। फॉर्म जमा करने से पहले सभी शुल्क पारदर्शी रूप से दिखाए जाते हैं।"
         }
     ]
 
     return (
-        <div 
-            className="min-h-screen bg-gradient-to-b from-[#f3faff] via-white to-[#f6fbff] text-[#071e27] font-sans overflow-x-hidden selection:bg-[#164FA8]/20"
-            style={{
-                '--font-sans': '"Mersad", sans-serif',
-                '--font-display': '"Mersad", sans-serif'
-            }}
-        >
+        <div className="min-h-screen bg-[#050508] bg-grid-pattern text-slate-100 font-sans overflow-x-hidden relative">
+            {/* Ambient Background Glow Circles */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[55%] h-[55%] rounded-full bg-blue-600/5 blur-[120px] animate-slow-glow" />
+                <div className="absolute top-[40%] right-[-10%] w-[45%] h-[45%] rounded-full bg-indigo-600/5 blur-[130px] animate-slow-glow" />
+                <div className="absolute bottom-[10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-emerald-600/3 blur-[120px] animate-slow-glow" />
+            </div>
+
             {/* ── HEADER ── */}
-            <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-[#c2c6d4]/20 px-4 sm:px-6 lg:px-12 h-20 flex items-center justify-between">
+            <header className="sticky top-0 z-40 bg-[#050508]/65 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 lg:px-12 h-20 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <Logo className="w-10 h-10 rounded-xl" />
-                    <div className="leading-none hidden sm:block">
-                        <span className="text-lg font-black tracking-tight text-[#0A1A40] font-display">Krishna Emitra Digital</span>
-                        <span className="text-[9px] text-gray-400 font-bold tracking-widest uppercase block mt-0.5">Kiosk & Alerts</span>
+                    <Logo className="w-9 h-9 rounded-full border border-white/10" />
+                    <div className="leading-none hidden sm:block text-left">
+                        <span className="text-base font-black tracking-tight text-white font-display">Krishna Emitra</span>
+                        <span className="text-[8.5px] text-slate-500 font-bold tracking-widest uppercase block mt-0.5">Digital Administration</span>
                     </div>
                 </div>
 
-                <nav className="hidden md:flex items-center gap-8 text-[13px] font-bold text-gray-500">
-                    <button onClick={() => scrollToSection("what-we-do")} className="hover:text-[#164FA8] transition-colors">What We Do</button>
-                    <button onClick={() => scrollToSection("how-it-works")} className="hover:text-[#164FA8] transition-colors">How It Works</button>
-                    <button onClick={() => scrollToSection("notifications")} className="hover:text-[#164FA8] transition-colors">Live Circulars</button>
-                    <button onClick={() => scrollToSection("resources")} className="hover:text-[#164FA8] transition-colors">Resources</button>
-                    <button onClick={() => scrollToSection("faq")} className="hover:text-[#164FA8] transition-colors">FAQs</button>
+                <nav className="hidden md:flex items-center gap-8 text-[12.5px] font-bold text-slate-400">
+                    <button onClick={() => scrollToSection("what-we-do")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">What We Do</button>
+                    <button onClick={() => scrollToSection("how-it-works")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">How It Works</button>
+                    <button onClick={() => scrollToSection("notifications")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">Live Circulars</button>
+                    <button onClick={() => scrollToSection("resources")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">Resources</button>
+                    <button onClick={() => scrollToSection("faq")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">FAQs</button>
                 </nav>
 
-                <div className="flex items-center gap-2 sm:gap-4">
-                    <button onClick={toggleLanguage} className="text-slate-600 hover:text-slate-900 transition-colors text-[11px] font-black flex items-center gap-1.5 bg-slate-50 px-2 py-1.5 sm:px-3 rounded-lg border border-slate-200 uppercase">
-                        <Globe size={13} className="text-slate-400" /> {lang === 'EN' ? 'हिंदी' : 'English'}
+                <div className="flex items-center gap-3">
+                    <button onClick={toggleLanguage} className="text-slate-300 hover:text-white transition-colors text-[10.5px] font-bold flex items-center gap-1.5 bg-white/5 px-2.5 py-1.5 rounded-lg border border-white/10 uppercase cursor-pointer">
+                        <Globe size={12} className="text-slate-400" /> {lang === 'EN' ? 'हिंदी' : 'English'}
                     </button>
 
-                    <div className="h-6 w-px bg-slate-200" />
+                    <div className="h-5 w-px bg-white/10" />
 
                     {isLoggedIn ? (
-                        <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="flex items-center gap-2">
                             <button
                                 onClick={() => navigate("/dashboard")}
-                                className="p-2.5 sm:px-5 sm:py-2.5 rounded-xl bg-[#164FA8] hover:bg-[#0A1A40] text-white text-[12px] font-bold shadow-lg shadow-[#164FA8]/15 flex items-center justify-center gap-2 transform active:scale-95 transition-all"
+                                className="px-4 py-2 rounded-xl bg-gradient-to-br from-[#1a73e8] to-[#1557b0] hover:shadow-lg hover:shadow-blue-500/10 text-white text-[12px] font-bold flex items-center justify-center gap-2 transform active:scale-95 transition-all border-none cursor-pointer"
                                 title="Dashboard"
                             >
-                                <User size={16} />
-                                <span className="hidden sm:inline">Dashboard</span>
+                                <User size={14} />
+                                <span>Dashboard</span>
                             </button>
-                            <button onClick={logout} className="p-2.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors shrink-0" title="Log Out">
-                                <LogOut size={16} />
+                            <button onClick={logout} className="p-2 rounded-lg hover:bg-white/5 text-slate-400 hover:text-red-400 transition-colors bg-transparent border-none cursor-pointer" title="Log Out">
+                                <LogOut size={14} />
                             </button>
                         </div>
                     ) : (
                         <button
                             onClick={triggerSignIn}
-                            className="p-2.5 sm:px-5 sm:py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-[12px] font-bold shadow-sm flex items-center justify-center gap-1.5 transform active:scale-95 transition-all"
+                            className="px-4 py-2 rounded-xl bg-white text-slate-950 hover:bg-slate-100 text-[12px] font-bold flex items-center justify-center gap-1.5 transform active:scale-95 transition-all border-none cursor-pointer shadow-md"
                             title="Sign In Portal"
                         >
-                            <User size={16} />
-                            <span className="hidden sm:inline">Sign In Portal</span>
+                            <User size={14} />
+                            <span>Sign In</span>
                         </button>
                     )}
                 </div>
@@ -260,15 +261,14 @@ export default function Landing() {
 
             {/* ── DEADLINES TICKER ── */}
             {upcomingDeadlines.length > 0 && (
-                <div className="bg-[#164FA8] text-white/95 text-[11px] font-semibold py-2 px-6 overflow-hidden flex items-center shadow-inner relative">
-                    <div className="flex items-center gap-1.5 shrink-0 bg-[#164FA8] z-10 pr-4 mr-4 text-amber-300 font-bold uppercase tracking-wider relative">
-                        <Clock size={12} className="animate-pulse" /> {lang === "EN" ? "Upcoming Deadlines" : "आगामी अंतिम तिथियां"}
-                        <div className="absolute right-0 top-0 bottom-0 w-3 bg-gradient-to-r from-transparent to-black/10 pointer-events-none translate-x-full" />
+                <div className="bg-slate-950/80 border-y border-white/5 text-slate-350 text-[10.5px] font-semibold py-2 px-6 overflow-hidden flex items-center relative z-10">
+                    <div className="flex items-center gap-1.5 shrink-0 bg-slate-950 z-10 pr-4 mr-4 text-amber-400 font-bold uppercase tracking-wider relative font-display">
+                        <Clock size={11} className="animate-pulse" /> {lang === "EN" ? "Upcoming Deadlines" : "आगामी अंतिम तिथियां"}
                     </div>
                     <div className="flex items-center gap-12 whitespace-nowrap marquee-track">
                         {upcomingDeadlines.map((ex, idx) => (
-                            <span key={idx} className="inline-flex items-center gap-1 text-[11.5px]">
-                                ⚡ <span className="font-extrabold text-white">{ex.name}</span>: {lang === "EN" ? "Closes on" : "अंतिम तिथि"} <span className="text-amber-300 font-bold">{new Date(ex.end_date).toLocaleDateString()}</span>
+                            <span key={idx} className="inline-flex items-center gap-1.5 text-[11px]">
+                                ⚡ <span className="font-extrabold text-white">{ex.name}</span>: <span className="text-slate-400">{lang === "EN" ? "Closes on" : "अंतिम तिथि"}</span> <span className="text-amber-400 font-bold">{new Date(ex.end_date).toLocaleDateString()}</span>
                             </span>
                         ))}
                     </div>
@@ -276,205 +276,136 @@ export default function Landing() {
             )}
 
             {/* ── HERO SECTION ── */}
-            <div className="relative bg-[#070b19] overflow-hidden text-white border-b border-white/5 py-16 lg:py-24">
-                {/* Glow circles */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div className="absolute top-[-20%] left-[-10%] w-[55%] h-[55%] rounded-full bg-blue-600/10 blur-[130px] animate-slow-glow" />
-                    <div className="absolute bottom-[-20%] right-[-10%] w-[55%] h-[55%] rounded-full bg-indigo-600/10 blur-[130px] animate-slow-glow" />
-                </div>
-
-                <section className="relative px-6 lg:px-12 max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-                    {/* Hero Left */}
-                    <div className="lg:col-span-7 space-y-8 text-left">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-bold text-[#38bdf8] uppercase tracking-wider">
-                            <Sparkles size={12} className="animate-spin" /> {lang === "EN" ? "Krishna Emitra 2.0 Assistant" : "कृष्णा ई-मित्र 2.0 सहायक"}
-                        </div>
-
-                        <h1 className="text-4xl md:text-5xl lg:text-[52px] leading-[1.08] font-black tracking-tight font-display bg-gradient-to-r from-white via-blue-100 to-indigo-200 bg-clip-text text-transparent">
+            <div className="relative py-20 lg:py-28 z-10 text-center">
+                <section className="relative px-6 lg:px-12 max-w-[1000px] mx-auto space-y-12">
+                    {/* Hero Header Content */}
+                    <div className="space-y-6 max-w-4xl mx-auto">
+                        <h1 className="text-4xl sm:text-6xl lg:text-[68px] leading-[1.03] font-black tracking-tighter font-display text-gradient-primary">
                             {lang === "EN" 
-                                ? "Track exam deadlines. File applications. From home."
-                                : "परीक्षा की तारीखें। सरकारी फॉर्म। अब सीधे घर बैठे।"}
+                                ? "Your government applications, automated."
+                                : "आपकी सरकारी नौकरी आवेदन, अब स्वचालित।"}
                         </h1>
 
-                        <p className="text-[15px] text-slate-400 leading-relaxed max-w-2xl font-normal">
+                        <p className="text-[15px] sm:text-[17px] text-slate-400 leading-relaxed max-w-2xl mx-auto font-normal">
                             {lang === "EN"
-                                ? "SSC, Railways, NEET counselling, and state services — all official updates and seamless form filing delivered straight to your Telegram, completely free."
-                                : "SSC, रेलवे, NEET काउंसलिंग और राज्य सेवाएँ — सभी आधिकारिक अपडेट और आसान फॉर्म फिलिंग सीधे आपके टेलीग्राम पर, पूरी तरह से निःशुल्क।"}
+                                ? "SSC, Railways, NEET counselling, and state services. Track deadlines, store files, and submit application requests straight to our digital operator desk via Telegram."
+                                : "SSC, रेलवे, NEET काउंसलिंग और राज्य सेवाएँ। परीक्षा अंतिम तिथि ट्रैक करें, दस्तावेज स्टोर करें और सीधे टेलीग्राम द्वारा हमारे ऑपरेटर को आवेदन भेजें।"}
                         </p>
-
-                        {/* 2-Step Interactive Wizard */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
-                            {/* Step 1: Connect Bot */}
-                            <div className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl space-y-4 flex flex-col justify-between hover:border-blue-500/30 transition-all duration-300">
-                                <div className="space-y-1">
-                                    <div className="flex items-center gap-2">
-                                        <span className="w-5 h-5 rounded-full bg-[#0088cc] text-[10px] font-bold flex items-center justify-center text-white">1</span>
-                                        <h3 className="text-[13px] font-bold text-white">{lang === "EN" ? "Link Telegram Assistant" : "टेलीग्राम असिस्टेंट जोड़ें"}</h3>
-                                    </div>
-                                    <p className="text-[11.5px] text-slate-400 leading-normal font-normal">
-                                        {lang === "EN" ? "Receive deadlines, alerts & form PDFs." : "परीक्षा की अंतिम तिथि व फॉर्म PDF प्राप्त करें।"}
-                                    </p>
-                                </div>
-                                <button
-                                    onClick={handleJoinTelegram}
-                                    className="w-full py-2.5 bg-[#0088cc] hover:bg-[#0077b3] text-white text-[12px] font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 border-none shadow-sm cursor-pointer"
-                                >
-                                    <Send size={13} /> {lang === "EN" ? "Open Telegram Bot" : "टेलीग्राम बोट खोलें"}
-                                </button>
-                            </div>
-
-                            {/* Step 2: Sign In */}
-                            <div 
-                                onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
-                                className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl space-y-4 flex flex-col justify-between cursor-pointer hover:border-indigo-500/30 hover:bg-white/[0.07] transition-all duration-300"
-                            >
-                                <div className="space-y-1">
-                                    <div className="flex items-center gap-2">
-                                        <span className="w-5 h-5 rounded-full bg-indigo-600 text-[10px] font-bold flex items-center justify-center text-white">2</span>
-                                        <h3 className="text-[13px] font-bold text-white flex items-center gap-1.5">
-                                            {lang === "EN" ? "Enter Student Panel" : "विद्यार्थी पैनल में जाएँ"}
-                                            {isLoggedIn && <Check size={12} className="text-emerald-400" />}
-                                        </h3>
-                                    </div>
-                                    <p className="text-[11.5px] text-slate-400 leading-normal font-normal">
-                                        {lang === "EN" ? "Secure digital documents & filing history." : "दस्तावेज स्टोर करें व पुराना इतिहास देखें।"}
-                                    </p>
-                                </div>
-                                <div className="w-full py-2.5 bg-white/10 border border-white/10 text-white text-[12px] font-bold rounded-xl flex items-center justify-center gap-1.5 hover:bg-white/20 transition-all">
-                                    <User size={13} /> {isLoggedIn ? (lang === "EN" ? "Open Dashboard" : "डैशबोर्ड खोलें") : (lang === "EN" ? "Sign In Now" : "लॉगिन करें")}
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
-                    {/* Hero Right - 3D Dashboard Mockup */}
-                    <div className="lg:col-span-5 relative flex justify-center items-center">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 to-indigo-600/20 rounded-3xl blur-3xl transform scale-95 opacity-50" />
-                        <div className="relative w-full max-w-[420px] animate-float-3d">
-                            <img 
-                                src="/dashboard-mockup.png" 
-                                alt="Student Dashboard Preview"
-                                className="w-full h-auto rounded-[24px] shadow-[0_50px_100px_-15px_rgba(0,0,0,0.6)] border border-white/10 select-none pointer-events-none"
-                            />
-                        </div>
+                    {/* Integrated 2-Step Action Row */}
+                    <div className="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-xl mx-auto">
+                        <button
+                            onClick={handleJoinTelegram}
+                            className="w-full sm:w-auto px-6 py-3 bg-[#0088cc] hover:bg-[#0077b3] text-white text-[13px] font-bold rounded-full transition-all flex items-center justify-center gap-2 border-none shadow-lg shadow-[#0088cc]/10 cursor-pointer"
+                        >
+                            <Send size={14} /> {lang === "EN" ? "Join Telegram assistant" : "टेलीग्राम असिस्टेंट से जुड़ें"}
+                        </button>
+
+                        <button
+                            onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
+                            className="w-full sm:w-auto px-6 py-3 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[13px] font-bold rounded-full transition-all flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                            <User size={14} />
+                            {isLoggedIn ? (lang === "EN" ? "Enter Student Dashboard" : "पैनल में प्रवेश करें") : (lang === "EN" ? "Sign In student portal" : "स्टूडेंट पोर्टल में लॉगिन")}
+                            {isLoggedIn && <Check size={12} className="text-emerald-400" />}
+                        </button>
                     </div>
+
                 </section>
             </div>
 
-            {/* ── BENTO PROCESS GRID ── */}
-            <section id="how-it-works" className="bg-[#f8fcff] border-y border-[#c2c6d4]/10 py-24 px-6 lg:px-12 text-center">
-                <div className="max-w-[1240px] mx-auto space-y-16">
+            {/* ── HOW IT WORKS SECTION ── */}
+            <section id="how-it-works" className="border-t border-white/5 py-24 px-6 lg:px-12 text-center relative z-10">
+                <div className="max-w-[1000px] mx-auto space-y-16">
                     <div className="space-y-3">
-                        <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "Workflow" : "कार्यप्रणाली"}</p>
-                        <h2 className="text-3xl md:text-4xl font-black text-[#0A1A40] font-display">
-                            {lang === "EN" ? "How We Make Filing Effortless" : "हम फॉर्म भरना कैसे आसान बनाते हैं"}
+                        <p className="text-[11px] font-black text-[#6366f1] uppercase tracking-[0.2em]">{lang === "EN" ? "Workflow" : "कार्यप्रणाली"}</p>
+                        <h2 className="text-3xl md:text-4xl font-black text-white font-display tracking-tight">
+                            {lang === "EN" ? "Just a few steps left" : "बस कुछ ही कदम बाकी हैं"}
                         </h2>
-                        <p className="text-[14px] text-gray-500 max-w-xl mx-auto">
-                            {lang === "EN"
-                                ? "No physical queues. No complex portals. Get it done in three visual steps."
-                                : "कियोस्क की लंबी लाइनें नहीं। कोई जटिल सरकारी पोर्टल नहीं। बस इन तीन चरणों में पूरा करें।"}
-                        </p>
                     </div>
 
-                    {/* Bento Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 max-w-[1100px] mx-auto text-left">
-                        {/* Bento Card 1: Connect */}
-                        <div className="md:col-span-5 bg-gradient-to-br from-[#0B0F19] to-slate-900 border border-white/5 rounded-[28px] p-8 relative overflow-hidden h-[400px] text-white bento-glow-card">
-                            <div className="bg-white/10 backdrop-blur-md text-[#38bdf8] border border-white/10 px-3 py-1 rounded-full text-[10px] font-bold w-fit uppercase tracking-wider">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                        {/* STEP 1 */}
+                        <div className="flex flex-col bg-zinc-900/35 backdrop-blur-xl border border-white/5 p-8 rounded-[24px] relative overflow-hidden h-[400px] bento-glow-card">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 blur-2xl rounded-full" />
+                            <div className="bg-white/5 text-slate-350 border border-white/10 px-3 py-1 rounded-full text-[9px] font-bold w-fit uppercase tracking-widest font-mono">
                                 {lang === "EN" ? "Step 1" : "चरण १"}
                             </div>
-                            <h3 className="text-2xl font-bold font-display text-white mt-6 mb-3">
-                                {lang === "EN" ? "Connect Alerts" : "अलर्ट से जुड़ें"}
-                            </h3>
-                            <p className="text-[13px] text-slate-400 leading-relaxed font-normal">
-                                {lang === "EN"
-                                    ? "Add our Telegram bot. Get notifications about exam releases, dates, and PDFs directly in chat."
-                                    : "टेलीग्राम असिस्टेंट से जुड़ें। परीक्षा विज्ञापन, एडमिट कार्ड और अंतिम तिथि के सीधे अलर्ट पाएं।"}
+                            <h4 className="text-[24px] font-bold text-[#38bdf8] font-display mt-8 mb-4">
+                                {lang === 'EN' ? 'Connect' : 'जुड़ें'}
+                            </h4>
+                            <p className="text-[13px] text-slate-400 font-normal leading-relaxed">
+                                {lang === 'EN'
+                                    ? 'Sign in to our portal or add our Telegram bot to start receiving live alerts.'
+                                    : 'पोर्टल में साइन इन करें या लाइव अलर्ट प्राप्त करने के लिए हमारे टेलीग्राम बॉट को जोड़ें।'}
                             </p>
-
-                            {/* Chat Mockup visual */}
-                            <div className="absolute bottom-6 left-6 right-6 bg-slate-950/70 backdrop-blur border border-white/10 rounded-2xl p-4 space-y-2.5 shadow-2xl">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-5 h-5 rounded-full bg-[#0088cc] flex items-center justify-center text-[10px] text-white">✈</div>
-                                    <span className="text-[10px] font-bold text-white">Krishna Assistant</span>
-                                    <span className="text-[8px] text-slate-500 ml-auto">{lang === "EN" ? "Online" : "सक्रिय"}</span>
-                                </div>
-                                <div className="space-y-1">
-                                    <p className="text-[10.5px] text-slate-350 leading-relaxed">
-                                        🔔 <b>{lang === "EN" ? "SSC CGL 2026 Notification Out!" : "SSC CGL 2026 अधिसूचना जारी!"}</b><br />
-                                        {lang === "EN" ? "Filing Deadline:" : "फॉर्म भरने की अंतिम तिथि:"} <b>12th August</b>
-                                    </p>
-                                </div>
-                                <div className="h-7 bg-[#0088cc] text-white text-[9.5px] font-bold rounded-lg flex items-center justify-center shadow-md">
-                                    {lang === "EN" ? "Apply Now" : "आवेदन करें"}
-                                </div>
+                            
+                            {/* Action Links */}
+                            <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-3">
+                                <button 
+                                    onClick={triggerSignIn}
+                                    className="w-full h-11 bg-white hover:bg-slate-100 text-slate-950 rounded-xl text-[12.5px] font-bold border-none shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+                                >
+                                    <Globe size={14} /> {lang === 'EN' ? 'Website Portal' : 'वेबसाइट पोर्टल'}
+                                </button>
+                                <a 
+                                    href={config?.telegram_bot_url || "https://t.me/Kamlesh6377_bot"} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="w-full h-11 bg-[#0088cc] hover:bg-[#0077b3] text-white rounded-xl text-[12.5px] font-bold shadow-lg shadow-[#0088cc]/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                                >
+                                    <Send size={14} /> {lang === 'EN' ? 'Telegram Bot' : 'टेलीग्राम बॉट'}
+                                </a>
                             </div>
                         </div>
 
-                        {/* Bento Card 2: Request */}
-                        <div className="md:col-span-7 bg-gradient-to-br from-[#051F14] to-slate-900 border border-white/5 rounded-[28px] p-8 relative overflow-hidden h-[400px] text-white bento-glow-card">
-                            <div className="bg-white/10 backdrop-blur-md text-[#34d399] border border-white/10 px-3 py-1 rounded-full text-[10px] font-bold w-fit uppercase tracking-wider">
+                        {/* STEP 2 */}
+                        <div className="flex flex-col bg-zinc-900/35 backdrop-blur-xl border border-white/5 p-8 rounded-[24px] relative overflow-hidden h-[400px] bento-glow-card">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-600/5 blur-2xl rounded-full" />
+                            <div className="bg-white/5 text-slate-350 border border-white/10 px-3 py-1 rounded-full text-[9px] font-bold w-fit uppercase tracking-widest font-mono">
                                 {lang === "EN" ? "Step 2" : "चरण २"}
                             </div>
-                            <h3 className="text-2xl font-bold font-display text-white mt-6 mb-3">
-                                {lang === "EN" ? "Filing & Tracking" : "फॉर्म व लाइव ट्रैकिंग"}
-                            </h3>
-                            <p className="text-[13px] text-slate-400 leading-relaxed font-normal">
-                                {lang === "EN"
-                                    ? "Select any service. Provide details and upload document copies safely. Our verified operator processes it."
-                                    : "सेवा का चयन करें, आवश्यक दस्तावेज अपलोड करें। हमारे सत्यापित ऑपरेटर द्वारा फॉर्म प्रोसेस किया जाएगा।"}
+                            <h4 className="text-[24px] font-bold text-[#34d399] font-display mt-8 mb-4">
+                                {lang === 'EN' ? 'Request' : 'अनुरोध'}
+                            </h4>
+                            <p className="text-[13px] text-slate-400 font-normal leading-relaxed">
+                                {lang === 'EN'
+                                    ? 'Choose your desired service and submit the required details securely.'
+                                    : 'अपनी वांछित सेवा चुनें और सुरक्षित रूप से आवश्यक विवरण जमा करें।'}
                             </p>
-
-                            {/* Tracker Mockup visual */}
-                            <div className="absolute bottom-6 left-6 right-6 bg-slate-950/70 backdrop-blur border border-white/10 rounded-2xl p-4.5 space-y-3.5 shadow-2xl">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-[9px] font-bold text-slate-400">ID: #KE-3829</span>
-                                    <span className="text-[8px] font-bold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 uppercase tracking-wider animate-pulse">
-                                        {lang === "EN" ? "In Progress" : "प्रक्रिया में"}
-                                    </span>
-                                </div>
-                                <div className="space-y-0.5">
-                                    <h5 className="text-[12px] font-bold text-white">{lang === "EN" ? "Domicile Certificate (Mool Niwas)" : "मूल निवास प्रमाण पत्र"}</h5>
-                                    <p className="text-[9.5px] text-slate-500">{lang === "EN" ? "Govt Services Desk" : "सरकारी सेवा विभाग"}</p>
-                                </div>
-                                <div className="space-y-1.5">
-                                    <div className="flex justify-between text-[8px] font-bold text-slate-500 uppercase tracking-wider">
-                                        <span>{lang === "EN" ? "Uploaded" : "अपलोड"}</span>
-                                        <span>{lang === "EN" ? "Verify" : "सत्यापन"}</span>
-                                        <span>{lang === "EN" ? "Kiosk Submit" : "सब्मिट"}</span>
-                                    </div>
-                                    <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden flex gap-0.5">
-                                        <div className="h-full bg-emerald-500 w-[35%] rounded-full" />
-                                        <div className="h-full bg-emerald-500 w-[35%] rounded-full animate-pulse" />
-                                        <div className="h-full bg-slate-700 w-[30%] rounded-full" />
-                                    </div>
-                                </div>
+                            
+                            {/* Action Links */}
+                            <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-3">
+                                <button 
+                                    onClick={() => scrollToSection("what-we-do")}
+                                    className="w-full h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl text-[12.5px] font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
+                                >
+                                    <Search size={14} /> {lang === 'EN' ? 'Browse All Services' : 'सभी सेवाएँ ब्राउज़ करें'}
+                                </button>
                             </div>
                         </div>
 
-                        {/* Bento Card 3: Secure Locker */}
-                        <div className="md:col-span-12 bg-gradient-to-br from-[#1C1204] to-slate-900 border border-white/5 rounded-[28px] p-8 relative overflow-hidden min-h-[180px] flex flex-col md:flex-row justify-between items-start md:items-center gap-6 text-white bento-glow-card">
-                            <div className="space-y-2">
-                                <div className="bg-white/10 backdrop-blur-md text-[#fbbf24] border border-white/10 px-3 py-1 rounded-full text-[10px] font-bold w-fit uppercase tracking-wider">
-                                    {lang === "EN" ? "Step 3" : "चरण ३"}
-                                </div>
-                                <h3 className="text-2xl font-bold font-display text-white">
-                                    {lang === "EN" ? "Secure Digital Document Locker" : "सुरक्षित डिजिटल लॉकर"}
-                                </h3>
-                                <p className="text-[13px] text-slate-400 leading-relaxed font-normal max-w-xl">
-                                    {lang === "EN"
-                                        ? "Your marksheets, photo, and government IDs are locked safely. Re-use them instantly for any future applications without re-uploading."
-                                        : "मार्कशीट, फोटो और आईडी डिजिटल लॉकर में सुरक्षित स्टोर हो जाते हैं। दोबारा अपलोड किए बिना किसी भी नए फॉर्म में सीधा इस्तेमाल करें।"}
-                                </p>
+                        {/* STEP 3 */}
+                        <div className="flex flex-col bg-zinc-900/35 backdrop-blur-xl border border-white/5 p-8 rounded-[24px] relative overflow-hidden h-[400px] bento-glow-card">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-600/5 blur-2xl rounded-full" />
+                            <div className="bg-white/5 text-slate-350 border border-white/10 px-3 py-1 rounded-full text-[9px] font-bold w-fit uppercase tracking-widest font-mono">
+                                {lang === "EN" ? "Step 3" : "चरण ३"}
                             </div>
-
-                            <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4 w-full md:w-auto shrink-0 shadow-xl">
-                                <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400">
-                                    <Shield size={18} />
-                                </div>
-                                <div>
-                                    <p className="text-[12px] font-bold text-white">{lang === "EN" ? "AES-256 Locker" : "AES-256 सुरक्षित लॉकर"}</p>
-                                    <p className="text-[10px] text-slate-500">{lang === "EN" ? "Fully Encrypted Data" : "पूर्णतः एन्क्रिप्टेड डेटा"}</p>
+                            <h4 className="text-[24px] font-bold text-[#fbbf24] font-display mt-8 mb-4">
+                                {lang === 'EN' ? 'Complete' : 'पूरा करें'}
+                            </h4>
+                            <p className="text-[13px] text-slate-400 font-normal leading-relaxed">
+                                {lang === 'EN'
+                                    ? 'Wait for processing to finish. You will receive the receipt automatically.'
+                                    : 'प्रसंस्करण समाप्त होने की प्रतीक्षा करें। आपको रसीद स्वचालित रूप से प्राप्त होगी।'}
+                            </p>
+                            
+                            {/* Mockup Progress Loader */}
+                            <div className="absolute bottom-6 left-6 right-6 h-[88px] bg-black/45 backdrop-blur-xl border border-white/5 rounded-2xl px-5 py-0 shadow-lg flex flex-col justify-center gap-2">
+                                <span className="text-[11px] font-bold text-slate-300">{lang === "EN" ? "Filing in progress..." : "प्रक्रिया जारी है..."}</span>
+                                <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                    <div className="w-[45%] h-full bg-[#38bdf8] rounded-full animate-pulse"></div>
                                 </div>
                             </div>
                         </div>
@@ -483,30 +414,30 @@ export default function Landing() {
             </section>
 
             {/* ── SERVICES CATALOG ── */}
-            <section id="what-we-do" className="py-24 px-6 lg:px-12 max-w-[1240px] mx-auto text-center space-y-16">
+            <section id="what-we-do" className="border-t border-white/5 py-24 px-6 lg:px-12 max-w-[1240px] mx-auto text-center space-y-16 relative z-10">
                 <div className="space-y-4">
-                    <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "Catalog" : "सूची पत्र"}</p>
-                    <h2 className="text-3xl md:text-4xl font-black text-[#0A1A40] font-display">
+                    <p className="text-[11px] font-black text-[#6366f1] uppercase tracking-[0.2em]">{lang === "EN" ? "Catalog" : "सूची पत्र"}</p>
+                    <h2 className="text-3xl md:text-4xl font-black text-white font-display tracking-tight">
                         {lang === "EN" ? "Explore E-Mitra Services" : "ई-मित्र सेवाओं की सूची"}
                     </h2>
-                    <p className="text-[13.5px] text-gray-500 font-normal max-w-xl mx-auto">
+                    <p className="text-[13.5px] text-slate-400 max-w-xl mx-auto font-normal">
                         {lang === "EN"
                             ? "Browse official application filing desk services. Submit requests and check requirements."
                             : "आधिकारिक फॉर्म भरने की सेवाओं को ऑनलाइन देखें। अपने आवश्यक दस्तावेजों की जांच करें।"}
                     </p>
                 </div>
 
-                {/* Search & Filter bar */}
+                {/* Command-Palette style Search & Filter bar */}
                 {!loading && Object.keys(services).length > 0 && (
-                    <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white border border-[#c2c6d4]/20 p-4 rounded-2xl shadow-sm max-w-4xl mx-auto">
+                    <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-zinc-900/40 backdrop-blur-xl border border-white/5 p-4 rounded-2xl shadow-2xl max-w-4xl mx-auto">
                         <div className="relative w-full sm:w-80">
-                            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                             <input
                                 type="text"
                                 value={serviceSearch}
                                 onChange={e => setServiceSearch(e.target.value)}
                                 placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
-                                className="w-full bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] placeholder:text-gray-400 pl-11 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all font-medium"
+                                className="w-full bg-black/30 border border-white/5 text-[13px] text-slate-100 placeholder:text-slate-500 pl-11 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-medium"
                             />
                         </div>
 
@@ -514,11 +445,11 @@ export default function Landing() {
                             <select
                                 value={serviceCatFilter}
                                 onChange={e => setServiceCatFilter(e.target.value)}
-                                className="w-full sm:w-auto px-4 py-2.5 bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all cursor-pointer font-semibold"
+                                className="w-full sm:w-auto px-4 py-2.5 bg-black/30 border border-white/5 text-[13px] text-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all cursor-pointer font-bold"
                             >
-                                <option value="ALL">{lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां'}</option>
+                                <option value="ALL" className="bg-[#050508]">{lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां'}</option>
                                 {Object.entries(services).map(([k, cat]) => (
-                                    <option key={k} value={k}>{cat.label}</option>
+                                    <option key={k} value={k} className="bg-[#050508]">{cat.label}</option>
                                 ))}
                             </select>
                         </div>
@@ -533,12 +464,12 @@ export default function Landing() {
                         <ServiceCardSkeleton />
                     </div>
                 ) : Object.keys(services).length === 0 ? (
-                    <div className="text-center py-12 text-gray-400">
+                    <div className="text-center py-12 text-slate-500">
                         <p className="text-sm font-semibold">No services available at the moment.</p>
                     </div>
                 ) : !hasMatchingServices ? (
-                    <div className="text-center py-16 bg-white border border-dashed border-[#c2c6d4]/30 rounded-2xl text-gray-400 max-w-4xl mx-auto">
-                        <Search size={28} className="mx-auto text-gray-300 mb-2" />
+                    <div className="text-center py-16 bg-zinc-900/20 border border-white/5 rounded-2xl text-slate-500 max-w-4xl mx-auto">
+                        <Search size={28} className="mx-auto text-slate-600 mb-2" />
                         <p className="text-sm font-bold">{lang === 'EN' ? 'No services match your search query.' : 'आपकी खोज से मेल खाने वाली कोई सेवा नहीं मिली।'}</p>
                     </div>
                 ) : (
@@ -554,33 +485,33 @@ export default function Landing() {
 
                             return (
                                 <div key={catKey} className="space-y-6">
-                                    <div className="flex items-center gap-3 border-b border-[#c2c6d4]/20 pb-2">
-                                        <span className="w-1.5 h-6 bg-[#164FA8] rounded-full"></span>
-                                        <h3 className="text-base font-bold text-[#0A1A40] tracking-tight font-display">{cat.label}</h3>
-                                        <span className="text-[10px] text-gray-400 font-bold bg-white px-2 py-0.5 rounded-full border border-slate-200">
+                                    <div className="flex items-center gap-3 border-b border-white/5 pb-2">
+                                        <span className="w-1.5 h-6 bg-blue-500 rounded-full"></span>
+                                        <h3 className="text-base font-bold text-white tracking-tight font-display">{cat.label}</h3>
+                                        <span className="text-[10px] text-slate-400 font-bold bg-white/5 px-2 py-0.5 rounded-full border border-white/5">
                                             {matchingServices.length} {matchingServices.length === 1 ? "Service" : "Services"}
                                         </span>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {matchingServices.map((svc, idx) => (
-                                            <div key={idx} className="bg-white border border-[#c2c6d4]/20 p-6 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                                            <div key={idx} className="bg-zinc-900/35 backdrop-blur-xl border border-white/5 p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
                                                 <div className="space-y-3">
                                                     <div className="flex items-center justify-between text-[10px] font-bold uppercase text-slate-400 tracking-wider">
                                                         <span>{cat.label}</span>
                                                         {svc.price && (
-                                                            <span className="text-[#164FA8] bg-blue-50/50 px-2.5 py-1 rounded-lg border border-blue-150 font-bold">
+                                                            <span className="text-blue-400 bg-blue-500/5 px-2.5 py-1 rounded-lg border border-blue-500/10 font-bold font-mono">
                                                                 {lang === "EN" ? "Fee" : "शुल्क"}: {svc.price}
                                                             </span>
                                                         )}
                                                     </div>
-                                                    <h4 className="text-base font-bold text-[#0A1A40] group-hover:text-[#164FA8] transition-colors leading-snug">{svc.name}</h4>
-                                                    <p className="text-[12.5px] text-gray-500 font-normal leading-relaxed">{svc.description || "Official filing and registration services."}</p>
+                                                    <h4 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors leading-snug">{svc.name}</h4>
+                                                    <p className="text-[12.5px] text-slate-400 font-normal leading-relaxed">{svc.description || "Official filing and registration services."}</p>
                                                 </div>
 
                                                 <button
                                                     onClick={() => handleRequestServiceWhatsApp(svc, catKey, cat.label)}
-                                                    className="mt-6 w-full py-2.5 bg-[#164FA8] hover:bg-[#0A1A40] text-white text-[12.5px] font-bold rounded-xl transition-all shadow-sm border-none cursor-pointer text-center"
+                                                    className="mt-6 w-full py-3 bg-white text-slate-950 hover:bg-slate-100 text-[12px] font-black uppercase rounded-xl transition-all border-none cursor-pointer text-center"
                                                 >
                                                     {lang === 'EN' ? 'Request via WhatsApp' : 'व्हाट्सएप से अनुरोध करें'}
                                                 </button>
@@ -595,20 +526,20 @@ export default function Landing() {
             </section>
 
             {/* ── LIVE NOTIFICATIONS FEED ── */}
-            <section id="notifications" className="py-24 px-6 lg:px-12 max-w-[1240px] mx-auto border-t border-[#c2c6d4]/20">
+            <section id="notifications" className="py-24 px-6 lg:px-12 max-w-[1240px] mx-auto border-t border-white/5 relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                     {/* Notice Board Info */}
                     <div className="lg:col-span-4 space-y-6 text-left">
                         <div className="space-y-2">
-                            <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "Real-time updates" : "वास्तविक समय अपडेट"}</p>
-                            <h2 className="text-3xl font-black text-[#0A1A40] font-display flex items-center gap-2">
+                            <p className="text-[11px] font-black text-[#6366f1] uppercase tracking-[0.2em]">{lang === "EN" ? "Real-time updates" : "वास्तविक समय अपडेट"}</p>
+                            <h2 className="text-3xl font-black text-white font-display tracking-tight flex items-center gap-2">
                                 {lang === "EN" ? "Live Notice Board" : "लाइव सूचना बोर्ड"}
-                                <span className="flex h-2.5 w-2.5 relative">
+                                <span className="flex h-2 w-2 relative">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                                 </span>
                             </h2>
-                            <p className="text-[13px] text-gray-500 font-normal leading-relaxed">
+                            <p className="text-[13px] text-slate-400 font-normal leading-relaxed">
                                 {lang === "EN" 
                                     ? "Official exam circulars, admit card releases, result sheets, and counselling downloads."
                                     : "आधिकारिक परीक्षा अधिसूचनाएं, एडमिट कार्ड, परीक्षा परिणाम व काउंसलिंग की खबरें।"}
@@ -622,7 +553,7 @@ export default function Landing() {
                                 placeholder={lang === "EN" ? "Search announcements..." : "सूचना खोजें..."}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-[13px] outline-none focus:ring-2 focus:ring-[#164FA8]/25 focus:border-[#164FA8] transition-all font-medium text-[#071e27]"
+                                className="w-full bg-zinc-900/35 border border-white/5 px-4 py-3 rounded-xl text-[13px] outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-white placeholder:text-slate-500"
                             />
                         </div>
 
@@ -631,8 +562,8 @@ export default function Landing() {
                             <button
                                 onClick={() => setFilterCategory("ALL")}
                                 className={`px-4 py-2 text-[11px] font-bold rounded-lg border transition-all ${filterCategory === "ALL"
-                                    ? "bg-slate-900 text-white border-slate-900"
-                                    : "bg-white text-gray-500 border-gray-200 hover:bg-slate-50"
+                                    ? "bg-white text-slate-950 border-white"
+                                    : "bg-white/5 text-slate-450 border-white/5 hover:bg-white/10"
                                     }`}
                             >
                                 {lang === "EN" ? "All" : "सभी"} ({announcements.length})
@@ -640,8 +571,8 @@ export default function Landing() {
                             <button
                                 onClick={() => setFilterCategory("exams")}
                                 className={`px-4 py-2 text-[11px] font-bold rounded-lg border transition-all ${filterCategory === "exams"
-                                    ? "bg-slate-900 text-white border-slate-900"
-                                    : "bg-white text-gray-500 border-gray-200 hover:bg-slate-50"
+                                    ? "bg-white text-slate-950 border-white"
+                                    : "bg-white/5 text-slate-450 border-white/5 hover:bg-white/10"
                                     }`}
                             >
                                 {lang === "EN" ? "Exam Circulars" : "परीक्षा विज्ञापन"}
@@ -649,8 +580,8 @@ export default function Landing() {
                             <button
                                 onClick={() => setFilterCategory("general")}
                                 className={`px-4 py-2 text-[11px] font-bold rounded-lg border transition-all ${filterCategory === "general"
-                                    ? "bg-slate-900 text-white border-slate-900"
-                                    : "bg-white text-gray-500 border-gray-200 hover:bg-slate-50"
+                                    ? "bg-white text-slate-950 border-white"
+                                    : "bg-white/5 text-slate-450 border-white/5 hover:bg-white/10"
                                     }`}
                             >
                                 {lang === "EN" ? "General Alerts" : "सामान्य खबरें"}
@@ -659,25 +590,25 @@ export default function Landing() {
                     </div>
 
                     {/* Announcements Feed Container */}
-                    <div className="lg:col-span-8 bg-white border border-[#c2c6d4]/20 rounded-3xl shadow-sm p-6 space-y-4 max-h-[500px] overflow-y-auto pr-3 text-left">
-                        <div className="border-b pb-3 flex justify-between items-center">
-                            <span className="text-[12px] font-black text-[#0A1A40] uppercase tracking-wider">{lang === "EN" ? "Recent Circulars" : "हालिया घोषणाएं"}</span>
-                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{lang === "EN" ? "Live Feed" : "लाइव समाचार"}</span>
+                    <div className="lg:col-span-8 bg-zinc-900/35 backdrop-blur-xl border border-white/5 rounded-3xl p-6 space-y-4 max-h-[500px] overflow-y-auto pr-3 text-left">
+                        <div className="border-b border-white/5 pb-3 flex justify-between items-center">
+                            <span className="text-[12px] font-black text-white uppercase tracking-wider">{lang === "EN" ? "Recent Circulars" : "हालिया घोषणाएं"}</span>
+                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{lang === "EN" ? "Live Feed" : "लाइव समाचार"}</span>
                         </div>
 
                         {loading ? (
                             <AnnouncementSkeleton count={3} />
                         ) : filteredAnnouncements.length === 0 ? (
-                            <div className="text-center py-20 text-gray-400">
-                                <Bell className="mx-auto text-gray-300 mb-2" size={24} />
+                            <div className="text-center py-20 text-slate-500">
+                                <Bell className="mx-auto text-slate-655 mb-2" size={24} />
                                 <p className="text-[12px] font-bold">{lang === "EN" ? "No matches found" : "कोई सूचना नहीं मिली"}</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
                                 {filteredAnnouncements.map((ann, idx) => (
-                                    <div key={idx} className="border border-slate-100 rounded-xl p-5 bg-slate-50/40 hover:bg-slate-50/80 transition-colors space-y-3">
-                                        <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold border-b border-slate-100 pb-1.5 uppercase tracking-wider">
-                                            <span className="px-2 py-0.5 bg-blue-50 text-[#164FA8] rounded uppercase">Govt Alert</span>
+                                    <div key={idx} className="border border-white/5 rounded-xl p-5 bg-black/20 hover:bg-black/45 transition-colors space-y-3">
+                                        <div className="flex items-center justify-between text-[9.5px] text-slate-500 font-bold border-b border-white/5 pb-1.5 uppercase tracking-wider font-mono">
+                                            <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded">Govt Alert</span>
                                             <span>{new Date(ann.created_at || Date.now()).toLocaleString("en-IN", {
                                                 day: "numeric",
                                                 month: "short",
@@ -685,8 +616,8 @@ export default function Landing() {
                                                 minute: "2-digit"
                                             })}</span>
                                         </div>
-                                        {ann.title && <h4 className="text-[14px] font-bold text-[#0A1A40] leading-snug">{ann.title}</h4>}
-                                        <div className="text-[12px] text-slate-600 font-normal leading-relaxed whitespace-pre-wrap break-words font-sans">
+                                        {ann.title && <h4 className="text-[13.5px] font-bold text-white leading-snug">{ann.title}</h4>}
+                                        <div className="text-[12px] text-slate-350 font-normal leading-relaxed whitespace-pre-wrap break-words font-sans">
                                             {formatTelegramMessage(ann.content)}
                                         </div>
 
@@ -695,9 +626,9 @@ export default function Landing() {
                                                 href={ann.links}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-[#164FA8] hover:underline text-[12px] font-bold inline-flex items-center gap-1 mt-1"
+                                                className="text-blue-400 hover:text-blue-300 text-[11.5px] font-bold inline-flex items-center gap-1 mt-1"
                                             >
-                                                {lang === "EN" ? "Download Official Circular" : "आधिकारिक अधिसूचना डाउनलोड करें"} <ExternalLink size={13} />
+                                                {lang === "EN" ? "Download Official Circular" : "आधिकारिक अधिसूचना डाउनलोड करें"} <ExternalLink size={12} />
                                             </a>
                                         )}
                                     </div>
@@ -709,14 +640,14 @@ export default function Landing() {
             </section>
 
             {/* ── IMPORTANT RESOURCES ── */}
-            <section id="resources" className="bg-[#f8fcff] border-y border-[#c2c6d4]/10 py-24 px-6 lg:px-12 text-center">
+            <section id="resources" className="border-t border-white/5 py-24 px-6 lg:px-12 text-center relative z-10">
                 <div className="max-w-[1240px] mx-auto space-y-12">
                     <div className="space-y-3">
-                        <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "Portals" : "प्रमुख वेबसाइट्स"}</p>
-                        <h2 className="text-3xl font-black text-[#0A1A40] font-display">
+                        <p className="text-[11px] font-black text-[#6366f1] uppercase tracking-[0.2em]">{lang === "EN" ? "Portals" : "प्रमुख वेबसाइट्स"}</p>
+                        <h2 className="text-3xl font-black text-white font-display tracking-tight">
                             {lang === "EN" ? "Important Government Gateways" : "महत्वपूर्ण सरकारी लिंक्स"}
                         </h2>
-                        <p className="text-[13.5px] text-gray-500 max-w-xl mx-auto">
+                        <p className="text-[13.5px] text-slate-400 max-w-xl mx-auto font-normal">
                             {lang === "EN"
                                 ? "Access central and state quota registration desks directly."
                                 : "केंद्रीय और राज्य कोटा भर्ती बोर्डों के सीधे प्रवेश द्वार।"}
@@ -728,66 +659,66 @@ export default function Landing() {
                             href="https://sso.rajasthan.gov.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-white border border-[#c2c6d4]/20 p-5 rounded-2xl hover:border-[#164FA8] transition-all flex flex-col justify-between h-[130px] group shadow-sm"
+                            className="bg-zinc-900/35 border border-white/5 p-5 rounded-2xl hover:border-blue-500/40 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
                         >
-                            <span className="text-[10px] font-bold text-gray-400 uppercase">State Quota</span>
-                            <span className="font-bold text-[13.5px] text-[#0A1A40] group-hover:text-[#164FA8]">Rajasthan SSO</span>
-                            <span className="text-[10px] text-slate-400 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
+                            <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">State Quota</span>
+                            <span className="font-bold text-[13.5px] text-white group-hover:text-blue-400">Rajasthan SSO</span>
+                            <span className="text-[10px] text-slate-500 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
                         </a>
 
                         <a
                             href="https://ssc.gov.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-white border border-[#c2c6d4]/20 p-5 rounded-2xl hover:border-[#164FA8] transition-all flex flex-col justify-between h-[130px] group shadow-sm"
+                            className="bg-zinc-900/35 border border-white/5 p-5 rounded-2xl hover:border-blue-500/40 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
                         >
-                            <span className="text-[10px] font-bold text-gray-400 uppercase">Govt Jobs</span>
-                            <span className="font-bold text-[13.5px] text-[#0A1A40] group-hover:text-[#164FA8]">SSC Portal</span>
-                            <span className="text-[10px] text-slate-400 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
+                            <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Govt Jobs</span>
+                            <span className="font-bold text-[13.5px] text-white group-hover:text-blue-400">SSC Portal</span>
+                            <span className="text-[10px] text-slate-500 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
                         </a>
 
                         <a
                             href="https://neet.nta.nic.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-white border border-[#c2c6d4]/20 p-5 rounded-2xl hover:border-[#164FA8] transition-all flex flex-col justify-between h-[130px] group shadow-sm"
+                            className="bg-zinc-900/35 border border-white/5 p-5 rounded-2xl hover:border-blue-500/40 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
                         >
-                            <span className="text-[10px] font-bold text-gray-400 uppercase">Medical Exams</span>
-                            <span className="font-bold text-[13.5px] text-[#0A1A40] group-hover:text-[#164FA8]">NEET UG (NTA)</span>
-                            <span className="text-[10px] text-slate-400 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
+                            <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Medical Exams</span>
+                            <span className="font-bold text-[13.5px] text-white group-hover:text-blue-400">NEET UG (NTA)</span>
+                            <span className="text-[10px] text-slate-500 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
                         </a>
 
                         <a
                             href="https://www.rrcb.gov.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-white border border-[#c2c6d4]/20 p-5 rounded-2xl hover:border-[#164FA8] transition-all flex flex-col justify-between h-[130px] group shadow-sm"
+                            className="bg-zinc-900/35 border border-white/5 p-5 rounded-2xl hover:border-blue-500/40 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
                         >
-                            <span className="text-[10px] font-bold text-gray-400 uppercase">Railways</span>
-                            <span className="font-bold text-[13.5px] text-[#0A1A40] group-hover:text-[#164FA8]">RRB Recruitment</span>
-                            <span className="text-[10px] text-slate-400 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
+                            <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Railways</span>
+                            <span className="font-bold text-[13.5px] text-white group-hover:text-blue-400">RRB Recruitment</span>
+                            <span className="text-[10px] text-slate-500 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
                         </a>
 
                         <a
                             href="https://www.ibps.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-white border border-[#c2c6d4]/20 p-5 rounded-2xl hover:border-[#164FA8] transition-all flex flex-col justify-between h-[130px] group shadow-sm"
+                            className="bg-zinc-900/35 border border-white/5 p-5 rounded-2xl hover:border-blue-500/40 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
                         >
-                            <span className="text-[10px] font-bold text-gray-400 uppercase">Banking</span>
-                            <span className="font-bold text-[13.5px] text-[#0A1A40] group-hover:text-[#164FA8]">IBPS Exams</span>
-                            <span className="text-[10px] text-slate-400 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
+                            <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Banking</span>
+                            <span className="font-bold text-[13.5px] text-white group-hover:text-blue-400">IBPS Exams</span>
+                            <span className="text-[10px] text-slate-500 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
                         </a>
                     </div>
                 </div>
             </section>
 
             {/* ── FAQ SECTION ── */}
-            <section id="faq" className="py-24 px-6 lg:px-12 max-w-[800px] mx-auto space-y-12">
+            <section id="faq" className="py-24 px-6 lg:px-12 max-w-[800px] mx-auto space-y-12 relative z-10">
                 <div className="text-center space-y-3">
-                    <p className="text-[11px] font-black text-[#164FA8] uppercase tracking-[0.2em]">{lang === "EN" ? "Help" : "सहायता"}</p>
-                    <h2 className="text-3xl font-black text-[#0A1A40] font-display">{lang === "EN" ? "Frequently Asked Questions" : "अक्सर पूछे जाने वाले सवाल"}</h2>
-                    <p className="text-[13px] text-gray-500 font-normal">
+                    <p className="text-[11px] font-black text-[#6366f1] uppercase tracking-[0.2em]">{lang === "EN" ? "Help" : "सहायता"}</p>
+                    <h2 className="text-3xl font-black text-white font-display tracking-tight">{lang === "EN" ? "Frequently Asked Questions" : "अक्सर पूछे जाने वाले सवाल"}</h2>
+                    <p className="text-[13px] text-slate-400 font-normal">
                         {lang === "EN" 
                             ? "Everything you need to know about notifications locker and filings."
                             : "डिजिटल लॉकर, फॉर्म भरने व नोटिफिकेशन से जुड़े आपके सवालों के जवाब।"}
@@ -796,13 +727,13 @@ export default function Landing() {
 
                 <div className="space-y-4">
                     {faqs.map((faq, idx) => (
-                        <div key={idx} className="border border-gray-200 rounded-xl bg-white overflow-hidden transition-all duration-300">
+                        <div key={idx} className="border border-white/5 rounded-2xl bg-zinc-900/25 overflow-hidden transition-all duration-300">
                             <button
                                 onClick={() => setExpandedFaq(expandedFaq === idx ? null : idx)}
-                                className="w-full p-5 flex items-center justify-between text-left font-bold text-[13.5px] text-[#0A1A40] hover:bg-slate-50/50"
+                                className="w-full p-5 flex items-center justify-between text-left font-bold text-[13px] text-white hover:bg-white/5 bg-transparent border-none cursor-pointer"
                             >
                                 <span>{faq.q}</span>
-                                <ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${expandedFaq === idx ? "rotate-180" : ""}`} />
+                                <ChevronDown size={14} className={`text-slate-500 transition-transform duration-300 ${expandedFaq === idx ? "rotate-180" : ""}`} />
                             </button>
 
                             <AnimatePresence>
@@ -811,9 +742,9 @@ export default function Landing() {
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: "auto", opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}
-                                        className="border-t border-gray-100"
+                                        className="border-t border-white/5"
                                     >
-                                        <div className="p-5 text-[12.5px] text-gray-500 font-normal leading-relaxed bg-slate-50/20">
+                                        <div className="p-5 text-[12px] text-slate-400 font-normal leading-relaxed bg-black/20">
                                             {faq.a}
                                         </div>
                                     </motion.div>
@@ -825,14 +756,14 @@ export default function Landing() {
             </section>
 
             {/* ── FINAL CALL TO ACTION ── */}
-            <section className="px-6 lg:px-12 pb-24 max-w-[1240px] mx-auto">
-                <div className="bg-gradient-to-r from-[#164FA8] to-[#0A1A40] rounded-[32px] text-white p-12 text-center space-y-6 shadow-xl relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.08),transparent)] pointer-events-none" />
+            <section className="px-6 lg:px-12 pb-24 max-w-[1240px] mx-auto relative z-10">
+                <div className="bg-gradient-to-r from-blue-900/40 via-indigo-900/30 to-black/80 border border-white/5 rounded-[32px] text-white p-12 text-center space-y-6 shadow-2xl relative overflow-hidden">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.04),transparent)] pointer-events-none" />
 
                     <h3 className="text-2xl lg:text-3xl font-black font-display tracking-tight">
                         {lang === "EN" ? "Ready to file forms from home?" : "क्या आप घर बैठे फॉर्म भरना चाहते हैं?"}
                     </h3>
-                    <p className="text-[13px] text-white/70 max-w-md mx-auto font-normal leading-relaxed">
+                    <p className="text-[13px] text-slate-400 max-w-md mx-auto font-normal leading-relaxed">
                         {lang === "EN"
                             ? "Set up your student profile and link your Telegram account to start receiving alerts instantly."
                             : "अपना स्टूडेंट प्रोफाइल बनाएं और तुरंत परीक्षा अपडेट प्राप्त करने के लिए टेलीग्राम असिस्टेंट से जुड़ें।"}
@@ -842,14 +773,14 @@ export default function Landing() {
                         {isLoggedIn ? (
                             <button
                                 onClick={() => navigate("/dashboard")}
-                                className="px-6 py-3 bg-white text-[#164FA8] hover:bg-slate-50 text-[12px] font-black uppercase rounded-xl transition-all shadow-md active:scale-95 border-none cursor-pointer"
+                                className="px-6 py-3 bg-white text-slate-950 hover:bg-slate-100 text-[12px] font-black uppercase rounded-xl transition-all shadow-md active:scale-95 border-none cursor-pointer"
                             >
                                 {lang === "EN" ? "Access Student Panel" : "विद्यार्थी पैनल खोलें"}
                             </button>
                         ) : (
                             <button
                                 onClick={triggerSignIn}
-                                className="px-6 py-3 bg-white text-[#164FA8] hover:bg-slate-50 text-[12px] font-black uppercase rounded-xl transition-all shadow-md active:scale-95 border-none cursor-pointer"
+                                className="px-6 py-3 bg-white text-slate-950 hover:bg-slate-100 text-[12px] font-black uppercase rounded-xl transition-all shadow-md active:scale-95 border-none cursor-pointer"
                             >
                                 {lang === "EN" ? "Create Free Account" : "निशुल्क अकाउंट बनाएं"}
                             </button>
@@ -859,16 +790,16 @@ export default function Landing() {
             </section>
 
             {/* ── FOOTER ── */}
-            <footer className="bg-slate-900 border-t border-slate-800 text-white/50 text-[12px] font-normal py-16 px-6 lg:px-12">
+            <footer className="bg-black/80 border-t border-white/5 text-slate-500 text-[12px] font-normal py-16 px-6 lg:px-12 relative z-10">
                 <div className="max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 text-left">
                     <div className="space-y-3">
                         <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-[#164FA8] text-white flex items-center justify-center font-extrabold text-sm">
+                            <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-sm">
                                 K
                             </div>
                             <span className="font-bold text-white tracking-tight">Krishna Emitra Digital</span>
                         </div>
-                        <p className="text-[11.5px] leading-relaxed">
+                        <p className="text-[11px] leading-relaxed text-slate-400">
                             {lang === "EN"
                                 ? "A secure, prompt, and convenient platform designed to file and track recruitment forms and counselling."
                                 : "सरकारी नौकरी फॉर्म एवं कॉलेज काउंसलिंग आवेदन भरने व लाइव अपडेट पाने का सुरक्षित पोर्टल।"}
@@ -877,7 +808,7 @@ export default function Landing() {
 
                     <div className="space-y-3">
                         <h4 className="font-bold text-white text-[12.5px]">{lang === "EN" ? "Our Center Address" : "हमारा केंद्र पता"}</h4>
-                        <p className="text-[11.5px] leading-relaxed">
+                        <p className="text-[11.5px] leading-relaxed text-slate-450">
                             📍 Shop No. 12, Main Market,<br />
                             Jodhpur, Rajasthan, India
                         </p>
@@ -885,7 +816,7 @@ export default function Landing() {
 
                     <div className="space-y-3">
                         <h4 className="font-bold text-white text-[12.5px]">{lang === "EN" ? "Operator Contact" : "ऑपरेटर संपर्क"}</h4>
-                        <p className="text-[11.5px]">
+                        <p className="text-[11.5px] text-slate-450">
                             📞 Phone: +91 {config.whatsapp_number || "916377964293"}<br />
                             ✉️ Email: support@krishnaemitra.com
                         </p>
@@ -893,12 +824,12 @@ export default function Landing() {
 
                     <div className="space-y-3">
                         <h4 className="font-bold text-white text-[12.5px]">{lang === "EN" ? "Automated Desks" : "सहायक सेवाएं"}</h4>
-                        <a href={config.telegram_bot_url || "https://t.me/Kamlesh6377_bot"} target="_blank" rel="noreferrer" className="block text-[#38bdf8] hover:underline">Telegram Assistant Bot</a>
+                        <a href={config.telegram_bot_url || "https://t.me/Kamlesh6377_bot"} target="_blank" rel="noreferrer" className="block text-cyan-400 hover:underline">Telegram Assistant Bot</a>
                         <a href={`https://wa.me/${config.whatsapp_number || "916377964293"}`} target="_blank" rel="noreferrer" className="block text-[#25D366] hover:underline">WhatsApp Operator Desk</a>
                     </div>
                 </div>
 
-                <div className="max-w-[1240px] mx-auto mt-12 pt-6 border-t border-slate-800 flex flex-col sm:flex-row justify-between gap-4 text-[10.5px]">
+                <div className="max-w-[1240px] mx-auto mt-12 pt-6 border-t border-white/5 flex flex-col sm:flex-row justify-between gap-4 text-[10.5px]">
                     <p>© {new Date().getFullYear()} Krishna Emitra Digital Administration. All rights reserved.</p>
                     <div className="flex gap-4">
                         <span className="cursor-pointer hover:text-white">Privacy Policy</span>
@@ -912,27 +843,27 @@ export default function Landing() {
             {showRequestModal && requestModalSvc && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div
-                        className="absolute inset-0 bg-[#0A1A40]/40 backdrop-blur-sm transition-opacity"
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
                         onClick={() => setShowRequestModal(false)}
                     />
 
-                    <div className="relative bg-white border border-[#c2c6d4]/30 rounded-3xl shadow-2xl p-6 md:p-8 max-w-md w-full z-10 text-left">
+                    <div className="relative bg-[#0b0f19] border border-white/10 rounded-3xl shadow-2xl p-6 md:p-8 max-w-md w-full z-10 text-left text-white">
                         <button
                             onClick={() => setShowRequestModal(false)}
-                            className="absolute top-4 right-4 text-gray-400 hover:text-[#0A1A40] transition-colors p-1 bg-transparent border-none cursor-pointer"
+                            className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors p-1 bg-transparent border-none cursor-pointer"
                         >
                             <X size={18} />
                         </button>
 
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <span className="text-[10px] font-bold text-[#164FA8] bg-blue-50 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+                                <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider border border-blue-500/20">
                                     {requestModalCatLabel}
                                 </span>
-                                <h3 className="text-xl font-black text-[#0A1A40] font-display">
+                                <h3 className="text-xl font-black text-white font-display">
                                     {lang === 'EN' ? 'Confirm Request' : 'अनुरोध की पुष्टि करें'}
                                 </h3>
-                                <p className="text-[12px] text-gray-500 font-medium">
+                                <p className="text-[12px] text-slate-400 font-medium leading-relaxed">
                                     {lang === 'EN'
                                         ? `You are requesting: "${requestModalSvc.name}". Enter your name and phone number to automatically send this request to our admin desk.`
                                         : `आप "${requestModalSvc.name}" का अनुरोध कर रहे हैं। इस अनुरोध को हमारे एडमिन डेस्क पर भेजने के लिए अपना नाम और फोन नंबर दर्ज करें।`}
@@ -941,7 +872,7 @@ export default function Landing() {
 
                             <form onSubmit={handleModalSubmit} className="space-y-4">
                                 <div className="space-y-1 text-left">
-                                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">
                                         {lang === 'EN' ? 'Full Name' : 'पूरा नाम'}
                                     </label>
                                     <input
@@ -950,16 +881,16 @@ export default function Landing() {
                                         value={customerName}
                                         onChange={e => setCustomerName(e.target.value)}
                                         placeholder={lang === 'EN' ? 'Enter your name' : 'अपना नाम दर्ज करें'}
-                                        className="w-full bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] placeholder:text-gray-400 px-4 py-2.5 rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all font-medium"
+                                        className="w-full bg-black/40 border border-white/5 text-[13px] text-white placeholder:text-slate-600 px-4 py-2.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-medium"
                                     />
                                 </div>
 
                                 <div className="space-y-1 text-left">
-                                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">
                                         {lang === 'EN' ? 'Phone Number (WhatsApp)' : 'फ़ोन नंबर (व्हाट्सएप)'}
                                     </label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[13px] text-gray-400 font-bold">+91</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[13px] text-slate-500 font-bold font-mono">+91</span>
                                         <input
                                             type="tel"
                                             required
@@ -967,7 +898,7 @@ export default function Landing() {
                                             value={customerPhone}
                                             onChange={e => setCustomerPhone(e.target.value)}
                                             placeholder={lang === 'EN' ? '10-digit number' : '10-अंकीय नंबर'}
-                                            className="w-full bg-slate-50 border border-slate-200 text-[13px] text-[#071e27] placeholder:text-gray-400 pl-14 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-[#164FA8] focus:ring-2 focus:ring-[#164FA8]/10 transition-all font-mono font-medium"
+                                            className="w-full bg-black/40 border border-white/5 text-[13px] text-white placeholder:text-slate-600 pl-14 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-mono font-medium"
                                         />
                                     </div>
                                 </div>
@@ -975,7 +906,7 @@ export default function Landing() {
                                 <button
                                     type="submit"
                                     disabled={isSubmittingRequest}
-                                    className="w-full mt-2 py-3 bg-[#164FA8] hover:bg-[#0A1A40] text-white text-[13px] font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-none disabled:opacity-50"
+                                    className="w-full mt-2 py-3 bg-white hover:bg-slate-100 text-slate-950 text-[13px] font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-none disabled:opacity-50"
                                 >
                                     {isSubmittingRequest ? (
                                         <>

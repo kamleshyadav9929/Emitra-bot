@@ -1445,10 +1445,10 @@ def get_user_by_clerk_id(clerk_id):
         return None
 
 
-def sync_clerk_user(clerk_id, email, phone, name):
+def sync_clerk_user(clerk_id, email, phone, name, verified_phone=False):
     try:
         clean_phone = None
-        if phone:
+        if verified_phone and phone:
             clean_phone = phone.strip().replace(" ", "").replace("-", "")
             if clean_phone.startswith("+"):
                 clean_phone = clean_phone[1:]
