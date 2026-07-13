@@ -22,7 +22,7 @@ const getAuthHeaders = async () => {
   let token = null;
   if (window.Clerk && window.Clerk.session) {
     try {
-      token = await window.Clerk.session.getToken();
+      token = await window.Clerk.session.getToken({ template: "AdminSignIn" });
     } catch (e) {
       console.error("Error getting Clerk token", e);
     }

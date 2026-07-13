@@ -71,7 +71,7 @@ export function AuthProvider({ children }) {
                     try {
                         const name = clerkUser.fullName || clerkUser.username || "Student"
                         const phone = clerkUser.primaryPhoneNumber?.phoneNumber || ""
-                        const clerkToken = await getToken()
+                        const clerkToken = await getToken({ template: "AdminSignIn" })
                         
                         // Sync Clerk user with Supabase database
                         const res = await api.syncClerkStudent(clerkToken, { email, phone, name })
