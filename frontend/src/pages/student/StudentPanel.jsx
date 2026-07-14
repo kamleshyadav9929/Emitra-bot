@@ -284,7 +284,6 @@ export default function StudentPanel() {
         localStorage.setItem(`${storagePrefix}_readNotifications`, JSON.stringify(allIds))
     }
 
-    // Render notifications panel for 3-column split layout
     const formatTelegramMessage = (text) => {
         if (!text) return "";
         let formatted = text
@@ -293,23 +292,23 @@ export default function StudentPanel() {
             .replace(/>/g, "&gt;");
         
         // Handle images: ![alt](url)
-        formatted = formatted.replace(/!\[(.*?)\]\((.*?)\)/g, "<div class='mt-2 mb-2 w-full max-w-sm'><img src='$2' alt='$1' class='w-full rounded-[8px] border border-slate-200 object-cover shadow-sm' /></div>");
+        formatted = formatted.replace(/!\[(.*?)\]\((.*?)\)/g, "<div class='mt-2 mb-2 w-full max-w-sm'><img src='$2' alt='$1' class='w-full rounded-[8px] border border-white/10 object-cover shadow-sm' /></div>");
         
         // Handle [Image](url) format
-        formatted = formatted.replace(/\[Image\]\((.*?)\)/gi, "<div class='mt-2 mb-2 w-full max-w-sm'><img src='$1' alt='Notification Image' class='w-full rounded-[8px] border border-slate-200 object-cover shadow-sm' /></div>");
+        formatted = formatted.replace(/\[Image\]\((.*?)\)/gi, "<div class='mt-2 mb-2 w-full max-w-sm'><img src='$1' alt='Notification Image' class='w-full rounded-[8px] border border-white/10 object-cover shadow-sm' /></div>");
 
         // Handle [Image] url format
-        formatted = formatted.replace(/\[Image\]\s*(https?:\/\/[^\s<]+)/gi, "<div class='mt-2 mb-2 w-full max-w-sm'><img src='$1' alt='Notification Image' class='w-full rounded-[8px] border border-slate-200 object-cover shadow-sm' /></div>");
+        formatted = formatted.replace(/\[Image\]\s*(https?:\/\/[^\s<]+)/gi, "<div class='mt-2 mb-2 w-full max-w-sm'><img src='$1' alt='Notification Image' class='w-full rounded-[8px] border border-white/10 object-cover shadow-sm' /></div>");
 
         // Markdown links [text](url)
-        formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, "<a href='$2' target='_blank' rel='noopener noreferrer' class='text-[#0a66c2] hover:underline font-semibold'>$1</a>");
+        formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, "<a href='$2' target='_blank' rel='noopener noreferrer' class='text-blue-400 hover:text-blue-300 hover:underline font-semibold'>$1</a>");
         
         // Raw URLs (basic) - split by HTML tags to avoid replacing URLs inside href/src attributes
         const parts = formatted.split(/(<[^>]+>)/g);
         for (let i = 0; i < parts.length; i++) {
             if (i % 2 === 0) {
                 // It's a text node
-                parts[i] = parts[i].replace(/(https?:\/\/[^\s<]+)/g, "<a href='$1' target='_blank' rel='noopener noreferrer' class='text-[#0a66c2] hover:underline font-semibold'>$1</a>");
+                parts[i] = parts[i].replace(/(https?:\/\/[^\s<]+)/g, "<a href='$1' target='_blank' rel='noopener noreferrer' class='text-blue-400 hover:text-blue-300 hover:underline font-semibold'>$1</a>");
             }
         }
         formatted = parts.join("");
@@ -319,7 +318,7 @@ export default function StudentPanel() {
         // Underscore _italic_
         formatted = formatted.replace(/_(.*?)_/g, "<em>$1</em>");
         // Code `code`
-        formatted = formatted.replace(/`(.*?)`/g, "<code class='bg-slate-100 px-1 py-0.5 rounded text-[10.5px] font-mono'>$1</code>");
+        formatted = formatted.replace(/`(.*?)`/g, "<code class='bg-white/10 text-cyan-400 px-1.5 py-0.5 rounded text-[10.5px] font-mono border border-white/5'>$1</code>");
         
         return <span dangerouslySetInnerHTML={{ __html: formatted }} />;
     }
@@ -328,12 +327,12 @@ export default function StudentPanel() {
         const visibleNotifications = subNotifications.slice(0, visibleCount);
 
         return (
-            <div className={`flex flex-col h-full bg-white ${isSticky ? "rounded-none w-full" : "border border-slate-200 rounded-[12px] shadow-sm"}`}>
-                <div className="border-b border-slate-200 px-5 py-5 flex items-center gap-3">
-                    <h3 className="text-[20px] font-medium text-slate-900 tracking-tight font-sans">
-                        Notification
+            <div className={`flex flex-col h-full bg-transparent ${isSticky ? "rounded-none w-full" : "bg-zinc-950/50 border border-white/10 rounded-[12px] shadow-sm"}`}>
+                <div className="border-b border-white/5 px-5 py-5 flex items-center gap-3">
+                    <h3 className="text-[20px] font-bold text-white tracking-tight font-sans">
+                        Notifications
                     </h3>
-                    <span className="bg-[#4863d4] text-white text-[12px] font-medium px-2.5 py-0.5 rounded-full">
+                    <span className="bg-blue-600 text-white text-[12px] font-bold px-2.5 py-0.5 rounded-full">
                         {subNotifications.length}
                     </span>
                 </div>
@@ -341,10 +340,10 @@ export default function StudentPanel() {
                 {subNotifications.length === 0 ? (
                     <div className="py-8 px-4 text-center space-y-4 flex flex-col items-center justify-center my-auto">
                         <div className="space-y-2">
-                            <h4 className="text-[14px] font-medium text-slate-900">
+                            <h4 className="text-[14px] font-bold text-white">
                                 {lang === 'EN' ? 'No Notifications' : 'कोई सूचना नहीं'}
                             </h4>
-                            <p className="text-[13px] text-slate-500">
+                            <p className="text-[13px] text-slate-400">
                                 {lang === 'EN' ? 'You are all caught up.' : 'आप सभी अपडेट हैं।'}
                             </p>
                         </div>
@@ -356,18 +355,18 @@ export default function StudentPanel() {
                                 <div 
                                     key={ann.id || idx} 
                                     onClick={() => handleMarkNotificationRead(ann.id)}
-                                    className="flex items-start gap-4 group text-left"
+                                    className="flex items-start gap-4 group text-left cursor-pointer"
                                 >
                                     <div className="text-[#ef4444] mt-0.5 flex-shrink-0 text-[18px]">
                                         📌
                                     </div>
-                                    <div className="text-[15px] font-bold text-slate-800 leading-relaxed font-sans w-full announcement-content tracking-tight break-words whitespace-pre-wrap overflow-hidden">
+                                    <div className="text-[15px] font-bold text-slate-200 leading-relaxed font-sans w-full announcement-content tracking-tight break-words whitespace-pre-wrap overflow-hidden">
                                         {formatTelegramMessage(ann.content)}
                                         {ann.links && (
                                             <div className="mt-1.5">
                                                 <a 
                                                     href={ann.links} target="_blank" rel="noopener noreferrer"
-                                                    className="text-[#0a66c2] hover:underline inline-flex items-center gap-1 font-semibold"
+                                                    className="text-blue-400 hover:text-blue-300 hover:underline inline-flex items-center gap-1 font-semibold"
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
                                                     View Document
@@ -383,7 +382,7 @@ export default function StudentPanel() {
                             <div className="pt-2 pb-4 flex justify-center">
                                 <button 
                                     onClick={() => setVisibleCount(prev => prev + 30)}
-                                    className="px-5 py-2 rounded-full border border-slate-200 text-[#0a66c2] text-[13px] font-bold hover:bg-slate-50 transition-colors"
+                                    className="px-5 py-2 rounded-full border border-white/10 text-blue-400 text-[13px] font-bold hover:bg-white/5 transition-colors"
                                 >
                                     {lang === 'EN' ? 'Load More' : 'और लोड करें'}
                                 </button>
@@ -590,21 +589,28 @@ export default function StudentPanel() {
     ]
 
     return (
-        <div className="min-h-screen flex text-slate-800 font-sans antialiased relative bg-[var(--color-surface-base)] w-full pb-16 lg:pb-0">
+        <div className="min-h-screen flex text-slate-200 font-sans antialiased relative bg-[#050508] bg-grid-pattern w-full pb-16 lg:pb-0 overflow-x-hidden">
+            {/* Ambient Background Glow Circles */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-blue-600/10 blur-[130px] animate-slow-glow" />
+                <div className="absolute top-[30%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 blur-[140px] animate-slow-glow" />
+                <div className="absolute bottom-[20%] left-[-5%] w-[45%] h-[45%] rounded-full bg-emerald-500/5 blur-[120px] animate-slow-glow" />
+            </div>
+
             <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
             <OnboardingModal isOpen={needsOnboarding} exams={exams} />
             
             {/* ── DESKTOP SIDEBAR ── */}
-            <aside className="w-[280px] glass-sidebar hidden lg:flex flex-col sticky top-0 h-screen shrink-0 z-20">
+            <aside className="w-[280px] bg-zinc-950/80 backdrop-blur-xl border-r border-white/5 hidden lg:flex flex-col sticky top-0 h-screen shrink-0 z-20">
                 {/* Tricolor Saffron/Green Top Line */}
                 <div className="h-1 bg-gradient-to-r from-[#FF6B00] via-white to-[#10b981]" />
 
                 {/* SSO / e-Mitra Kiosk Header */}
-                <div className="h-16 flex items-center px-5 border-b border-slate-100 bg-transparent">
+                <div className="h-16 flex items-center px-5 border-b border-white/5 bg-transparent">
                     <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab("dashboard")}>
-                        <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-full object-cover shadow-sm bg-white border border-slate-100" />
+                        <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-full object-cover shadow-sm bg-white border border-white/10" />
                         <div className="leading-tight text-left">
-                            <span className="text-slate-800 font-extrabold text-[14px] tracking-tight block font-display">Krishna Emitra</span>
+                            <span className="text-white font-extrabold text-[14px] tracking-tight block font-display">Krishna Emitra</span>
                             <span className="text-[9px] text-[#FF6B00] font-black tracking-widest uppercase block mt-0.5">कृष्णा ई-मित्र</span>
                         </div>
                     </div>
@@ -612,18 +618,18 @@ export default function StudentPanel() {
 
                 {/* REDESIGNED CITIZEN SSOID CARD */}
                 {isLoggedIn && (
-                    <div className="px-4 py-4 border-b border-slate-100/60 bg-transparent">
-                        <div className="bg-white/40 backdrop-blur-md border border-white/60 rounded-2xl p-4 text-center relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="w-12 h-12 mx-auto mb-2 rounded-full border-2 border-[#0a4a83]/20 bg-slate-50 flex items-center justify-center text-[#0a4a83] text-base font-black shadow-inner overflow-hidden ring-2 ring-white">
+                    <div className="px-4 py-4 border-b border-white/5 bg-transparent">
+                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 text-center relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+                            <div className="w-12 h-12 mx-auto mb-2 rounded-full border-2 border-blue-500/20 bg-zinc-900 flex items-center justify-center text-white text-base font-black shadow-inner overflow-hidden ring-2 ring-white/10">
                                 {user?.imageUrl ? (
                                     <img src={user.imageUrl} alt={user.name} className="w-full h-full object-cover" />
                                 ) : (
                                     <span>{user?.name?.charAt(0).toUpperCase()}</span>
                                 )}
                             </div>
-                            <h4 className="text-[12.5px] font-bold text-slate-850 tracking-tight leading-tight mb-0.5">{user?.name}</h4>
-                            <p className="text-[10px] font-mono text-slate-500 select-all">
-                                ID: <span className="font-extrabold text-slate-700">{user?.telegram_id || 'N/A'}</span>
+                            <h4 className="text-[12.5px] font-bold text-white tracking-tight leading-tight mb-0.5">{user?.name}</h4>
+                            <p className="text-[10px] font-mono text-slate-400 select-all">
+                                ID: <span className="font-extrabold text-slate-200">{user?.telegram_id || 'N/A'}</span>
                             </p>
                         </div>
                     </div>
@@ -646,11 +652,11 @@ export default function StudentPanel() {
                                 }}
                                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12.5px] font-semibold transition-all duration-200 cursor-pointer group ${
                                     isActive
-                                        ? "glass-nav-pill-active text-[#0a4a83] font-bold"
-                                        : "text-slate-600 hover:text-[#0a4a83] hover:bg-white/50"
+                                        ? "bg-white/5 text-white font-bold border-l-2 border-blue-500"
+                                        : "text-slate-400 hover:text-white hover:bg-white/5"
                                 }`}
                             >
-                                <Icon size={15} strokeWidth={isActive ? 2.5 : 2.0} className={`${isActive ? "text-[#0a4a83]" : "text-slate-400 group-hover:text-[#0a4a83] transition-colors"}`} />
+                                <Icon size={15} strokeWidth={isActive ? 2.5 : 2.0} className={`${isActive ? "text-blue-400" : "text-slate-400 group-hover:text-white transition-colors"}`} />
                                 <span className="flex-1 text-left">
                                     {lang === "EN" ? item.label : item.labelHi}
                                 </span>
@@ -663,18 +669,18 @@ export default function StudentPanel() {
                 </nav>
 
                 {/* Desktop Account block at bottom */}
-                <div className="p-4 border-t border-slate-100 bg-transparent">
+                <div className="p-4 border-t border-white/5 bg-transparent">
                     {isLoggedIn ? (
                         <button
                             onClick={handleLogout}
-                            className="w-full flex items-center justify-center gap-1.5 py-2.5 border border-red-200 hover:bg-red-50/50 text-red-600 hover:text-red-700 text-[11px] font-bold uppercase rounded-lg transition-all cursor-pointer"
+                            className="w-full flex items-center justify-center gap-1.5 py-2.5 border border-red-500/20 hover:bg-red-500/10 text-red-400 hover:text-red-300 text-[11px] font-bold uppercase rounded-lg transition-all cursor-pointer"
                         >
                             <LogOut size={13} /> Close SSO Session
                         </button>
                     ) : (
                         <button
                             onClick={triggerSignIn}
-                            className="w-full py-2.5 bg-gradient-to-r from-[#0a4a83] to-[#185adb] hover:shadow-md hover:shadow-blue-500/10 text-white text-[11.5px] font-bold uppercase rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:-translate-y-0.5 duration-200 border-none"
+                            className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-md hover:shadow-blue-500/10 text-white text-[11.5px] font-bold uppercase rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:-translate-y-0.5 duration-200 border-none"
                         >
                             <User size={13} /> SSO Portal Login
                         </button>
@@ -683,18 +689,18 @@ export default function StudentPanel() {
             </aside>
 
             {/* ── MAIN PORTAL CANVAS ── */}
-            <div className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden relative">
+            <div className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden relative z-10">
                 
                 {/* ── SINGLE CLEAN HEADER ── */}
                 <div className="flex flex-col sticky top-0 z-30 shrink-0 shadow-sm">
-                    <header className="h-14 md:h-16 glass-header flex items-center justify-between px-3 md:px-10">
+                    <header className="h-14 md:h-16 bg-[#050508]/85 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-3 md:px-10">
                         {/* Left Side: Navigation / Tab Title */}
                         <div className="flex items-center gap-3">
-                            <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 -ml-2 text-slate-600 hover:text-slate-850 hover:bg-slate-100/50 rounded-lg cursor-pointer transition-colors">
+                            <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 -ml-2 text-slate-450 hover:text-white hover:bg-white/5 rounded-lg cursor-pointer transition-colors">
                                 <Menu size={20} />
                             </button>
                             <div className="flex items-center gap-2.5 text-left">
-                                <h2 className="text-[16px] font-bold text-[#0a4a83] tracking-tight font-display">
+                                <h2 className="text-[16px] font-extrabold text-white tracking-tight font-display">
                                     {lang === "EN" ? navigationItems.find(i => i.id === activeTab)?.label : navigationItems.find(i => i.id === activeTab)?.labelHi}
                                 </h2>
                             </div>
@@ -705,23 +711,23 @@ export default function StudentPanel() {
                             {isLoggedIn && (
                                 <button 
                                     onClick={() => setActiveTab("dashboard")} 
-                                    className="p-2 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-800 transition-all relative cursor-pointer"
+                                    className="p-2 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition-all relative cursor-pointer"
                                     title="Inbox Notifications"
                                 >
                                     <Bell size={16} />
                                     {unreadCount > 0 && (
-                                        <span className="absolute top-1 right-1 w-4 h-4 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-full text-[8px] font-bold flex items-center justify-center ring-2 ring-white">
+                                        <span className="absolute top-1 right-1 w-4 h-4 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-full text-[8px] font-bold flex items-center justify-center ring-2 ring-[#050508]">
                                             {unreadCount}
                                         </span>
                                     )}
                                 </button>
                             )}
 
-                            <button onClick={() => fetchAllData(true)} disabled={refreshing} className="p-2 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-800 transition-all cursor-pointer">
-                                <RefreshCw size={15} className={refreshing ? "animate-spin text-[#0a4a83]" : ""} />
+                            <button onClick={() => fetchAllData(true)} disabled={refreshing} className="p-2 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition-all cursor-pointer">
+                                <RefreshCw size={15} className={refreshing ? "animate-spin text-blue-400" : ""} />
                             </button>
 
-                            <button onClick={toggleLanguage} className="text-slate-700 hover:text-slate-900 transition-all text-[11px] font-bold flex items-center gap-1.5 bg-white/60 hover:bg-white px-3.5 py-1.8 rounded-xl border border-slate-200/80 shadow-sm cursor-pointer backdrop-blur-sm">
+                            <button onClick={toggleLanguage} className="text-slate-300 hover:text-white transition-all text-[11px] font-bold flex items-center gap-1.5 bg-white/5 hover:bg-white/10 px-3.5 py-1.8 rounded-xl border border-white/10 shadow-sm cursor-pointer backdrop-blur-sm">
                                 <Globe size={13} className="text-slate-400" /> {lang === 'EN' ? 'हिन्दी' : 'English'}
                             </button>
                         </div>
@@ -729,7 +735,7 @@ export default function StudentPanel() {
                 </div>
 
                 {/* ── MOBILE BOTTOM NAV (Replaces Drawer) ── */}
-                <nav className="lg:hidden fixed bottom-3 left-4 right-4 bg-white/80 backdrop-blur-lg border border-white/60 z-50 flex items-center justify-around px-2 py-1 shadow-lg rounded-2xl">
+                <nav className="lg:hidden fixed bottom-3 left-4 right-4 bg-zinc-950/80 backdrop-blur-lg border border-white/10 z-50 flex items-center justify-around px-2 py-1 shadow-lg rounded-2xl">
                     {[
                         { id: "dashboard", icon: LayoutDashboard, label: "Home" },
                         { id: "services", icon: ClipboardList, label: "Services" },
@@ -746,24 +752,24 @@ export default function StudentPanel() {
                                     setActiveTab(item.id)
                                     setActiveExamForTimeline(null)
                                 }}
-                                className={`flex flex-col items-center justify-center w-16 py-1 shrink-0 transition-colors ${isActive ? "text-[#0a4a83]" : "text-slate-400 hover:text-slate-600"}`}
+                                className={`flex flex-col items-center justify-center w-16 py-1 shrink-0 transition-colors ${isActive ? "text-blue-400" : "text-slate-400 hover:text-slate-200"}`}
                             >
-                                <div className={`p-1.5 rounded-xl mb-0.5 transition-colors ${isActive ? "bg-[#e5effa]" : "bg-transparent"}`}>
+                                <div className={`p-1.5 rounded-xl mb-0.5 transition-colors ${isActive ? "bg-white/5" : "bg-transparent"}`}>
                                     <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
                                 </div>
-                                <span className={`text-[9px] font-bold ${isActive ? "text-[#0a4a83]" : "text-slate-500"}`}>{item.label}</span>
+                                <span className={`text-[9px] font-bold ${isActive ? "text-white" : "text-slate-400"}`}>{item.label}</span>
                             </button>
                         )
                     })}
                 </nav>
 
-                <div className="flex flex-1 w-full overflow-hidden items-start">
+                <div className="flex flex-1 w-full overflow-hidden items-start relative z-10">
                     {/* ── CENTER WORKSPACE ── */}
                     <div className="flex-1 min-w-0 h-[calc(100vh-108px)] overflow-y-auto scroll-container-smooth flex flex-col justify-between">
                         {/* Official Bulletin Notice Ticker */}
                         {upcomingDeadlines.length > 0 && activeTab !== "services" && (
-                            <div className="bg-[#fff4ee] text-slate-700 text-[11px] font-semibold py-1.5 md:py-2 px-3 md:px-6 overflow-hidden flex items-center border-b border-orange-100 shadow-inner relative shrink-0">
-                                <div className="flex items-center gap-1.5 shrink-0 bg-[#fff4ee] z-10 pr-2 md:pr-4 mr-2 md:mr-4 text-[#f26522] font-black uppercase tracking-wider relative">
+                            <div className="bg-orange-500/10 text-orange-200 text-[11px] font-semibold py-1.5 md:py-2 px-3 md:px-6 overflow-hidden flex items-center border-b border-orange-500/20 shadow-inner relative shrink-0">
+                                <div className="flex items-center gap-1.5 shrink-0 bg-[#050508] z-10 pr-2 md:pr-4 mr-2 md:mr-4 text-orange-400 font-black uppercase tracking-wider relative">
                                     <Clock size={12} className="animate-pulse" /> 
                                     {lang === "EN" ? "URGENT NOTICES" : "आवश्यक सूचना"}
                                     <div className="absolute right-0 top-0 bottom-0 w-3 bg-gradient-to-r from-transparent to-black/5 pointer-events-none translate-x-full" />
@@ -771,7 +777,7 @@ export default function StudentPanel() {
                                 <div className="flex items-center gap-12 whitespace-nowrap marquee-track">
                                     {upcomingDeadlines.map((ex, idx) => (
                                         <span key={idx} className="inline-flex items-center gap-1 text-[11.5px]">
-                                            📢 <span className="font-extrabold text-slate-800">{ex.name}</span>: {lang === "EN" ? "Submission closes on" : "आवेदन की अंतिम तिथि"} <span className="text-[#f26522] font-bold">{new Date(ex.end_date).toLocaleDateString("en-IN")}</span>
+                                            📢 <span className="font-extrabold text-white">{ex.name}</span>: {lang === "EN" ? "Submission closes on" : "आवेदन की अंतिम तिथि"} <span className="text-orange-400 font-bold">{new Date(ex.end_date).toLocaleDateString("en-IN")}</span>
                                         </span>
                                     ))}
                                 </div>
@@ -923,8 +929,8 @@ export default function StudentPanel() {
                 </main>
 
                         {/* Footer */}
-                        <footer className="border-t border-[var(--color-outline-variant)] py-8 bg-white/50 backdrop-blur-sm mt-auto">
-                            <div className="max-w-[1140px] w-full mx-auto px-6 md:px-10 flex flex-col md:flex-row justify-between items-center gap-4 text-[12px] text-slate-400 font-bold tracking-tight">
+                        <footer className="border-t border-white/5 py-8 bg-[#050508]/40 backdrop-blur-md mt-auto">
+                            <div className="max-w-[1140px] w-full mx-auto px-6 md:px-10 flex flex-col md:flex-row justify-between items-center gap-4 text-[12px] text-slate-550 font-bold tracking-tight">
                                 <p>© {new Date().getFullYear()} Krishna Emitra Digital Seva. All rights reserved.</p>
                                 <div className="flex gap-4">
                                     <span>support@krishnaemitra.com</span>
@@ -937,7 +943,7 @@ export default function StudentPanel() {
 
                     {/* ── RIGHT PREMIUM NOTIFICATION PANEL ── */}
                     {!loading && (
-                        <aside className="hidden xl:flex w-[340px] border-l border-slate-200 h-[calc(100vh-108px)] shrink-0 flex-col overflow-y-auto scroll-container-smooth bg-white relative">
+                        <aside className="hidden xl:flex w-[340px] border-l border-white/5 h-[calc(100vh-108px)] shrink-0 flex-col overflow-y-auto scroll-container-smooth bg-zinc-950/80 backdrop-blur-xl relative z-10">
                             {renderNotificationsPanel(true)}
                         </aside>
                     )}

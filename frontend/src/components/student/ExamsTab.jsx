@@ -31,10 +31,10 @@ export default function ExamsTab({
     const examsToRender = tabMode === "upcoming" ? upcomingExams : displayedExams
 
     return (
-        <div className="animate-fadeIn text-left pb-24">
+        <div className="animate-fadeIn text-left pb-24 relative z-10">
             <div className="space-y-4">
                 {/* Search Bar */}
-                <div className="sticky top-0 z-20 bg-[var(--color-surface-base)] pb-3 pt-2">
+                <div className="sticky top-0 z-20 bg-[#050508]/80 backdrop-blur-md pb-3 pt-2">
                     <div className="relative w-full">
                         <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input 
@@ -42,25 +42,25 @@ export default function ExamsTab({
                             value={examSearch}
                             onChange={e => setExamSearch(e.target.value)}
                             placeholder="Search exams..."
-                            className="w-full bg-white border border-slate-200 text-[13px] md:text-[14px] placeholder:text-slate-400 pl-11 pr-6 py-3 rounded-xl focus:outline-none focus:border-[#0a4a83] shadow-sm font-semibold"
+                            className="w-full bg-white/5 border border-white/10 text-white text-[13px] md:text-[14px] placeholder:text-slate-500 pl-11 pr-6 py-3 rounded-xl focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 shadow-sm font-semibold"
                         />
                     </div>
                 </div>
 
                 {/* Internal Tabs */}
-                <div className="flex gap-2 p-1 bg-slate-100 rounded-xl mb-2">
+                <div className="flex gap-2 p-1 bg-white/5 border border-white/10 rounded-xl mb-2">
                     <button
                         onClick={() => setTabMode("upcoming")}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[12px] font-bold transition-all ${
-                            tabMode === "upcoming" ? "bg-white text-[#0a4a83] shadow-sm" : "text-slate-500 hover:text-slate-700"
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[12px] font-bold transition-all cursor-pointer ${
+                            tabMode === "upcoming" ? "bg-white/10 text-white shadow-sm" : "text-slate-400 hover:text-white"
                         }`}
                     >
                         <Calendar size={16} /> Upcoming Exams
                     </button>
                     <button
                         onClick={() => setTabMode("all")}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[12px] font-bold transition-all ${
-                            tabMode === "all" ? "bg-white text-[#0a4a83] shadow-sm" : "text-slate-500 hover:text-slate-700"
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[12px] font-bold transition-all cursor-pointer ${
+                            tabMode === "all" ? "bg-white/10 text-white shadow-sm" : "text-slate-400 hover:text-white"
                         }`}
                     >
                         <Bell size={16} /> Exam Alerts
@@ -73,10 +73,10 @@ export default function ExamsTab({
                         <button
                             key={chip}
                             onClick={() => setActiveFilter(chip)}
-                            className={`px-4 py-1.5 rounded-full text-[12px] font-bold shrink-0 whitespace-nowrap transition-colors ${
+                            className={`px-4 py-1.5 rounded-full text-[12px] font-bold shrink-0 whitespace-nowrap transition-colors cursor-pointer ${
                                 activeFilter === chip 
-                                    ? "bg-[#0a4a83] text-white" 
-                                    : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+                                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white" 
+                                    : "bg-white/5 border border-white/5 text-slate-400 hover:bg-white/10 hover:text-white"
                             }`}
                         >
                             {chip}
@@ -94,14 +94,14 @@ export default function ExamsTab({
                         {examsToRender.map((ex, idx) => {
                             const isSubscribed = subscribedExams.includes(ex.name)
                             return (
-                                <div key={idx} className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm relative flex flex-col justify-between hover:shadow-md transition-shadow">
+                                <div key={idx} className="bg-zinc-950/50 border border-white/5 p-4 rounded-xl shadow-sm relative flex flex-col justify-between hover:border-white/15 hover:shadow-md transition-all duration-300">
                                     <div className="flex justify-between items-start mb-3">
                                         <div className="pr-4">
-                                            <h4 className="text-[14px] font-bold text-slate-800 leading-snug line-clamp-2">{ex.name}</h4>
-                                            <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase mt-1 inline-block">{ex.category || "UG"}</span>
+                                            <h4 className="text-[14px] font-bold text-slate-200 leading-snug line-clamp-2">{ex.name}</h4>
+                                            <span className="text-[10px] font-black tracking-widest text-slate-450 uppercase mt-1 inline-block">{ex.category || "UG"}</span>
                                         </div>
                                         {tabMode === "all" && isSubscribed && (
-                                            <div className="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shrink-0">
+                                            <div className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shrink-0">
                                                 <CheckCircle2 size={10} /> Subscribed
                                             </div>
                                         )}
@@ -111,13 +111,13 @@ export default function ExamsTab({
                                         {ex.exam_date && (
                                             <div>
                                                 <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-0.5">Exam Date</p>
-                                                <p className="text-xs font-bold text-slate-800">{new Date(ex.exam_date).toLocaleDateString("en-IN")}</p>
+                                                <p className="text-xs font-bold text-slate-350">{new Date(ex.exam_date).toLocaleDateString("en-IN")}</p>
                                             </div>
                                         )}
                                         {ex.end_date && (
                                             <div>
                                                 <p className="text-[10px] text-red-400 uppercase tracking-widest font-bold mb-0.5">Last Date</p>
-                                                <p className="text-xs font-bold text-red-600">{new Date(ex.end_date).toLocaleDateString("en-IN")}</p>
+                                                <p className="text-xs font-bold text-red-400">{new Date(ex.end_date).toLocaleDateString("en-IN")}</p>
                                             </div>
                                         )}
                                     </div>
@@ -133,13 +133,13 @@ export default function ExamsTab({
                                                         setTimeout(() => setToast(null), 3000)
                                                     }
                                                 }}
-                                                className={`flex-1 py-2.5 rounded-lg text-[12px] font-bold text-center transition-colors flex items-center justify-center gap-2 ${
+                                                className={`flex-1 py-2.5 rounded-lg text-[12px] font-bold text-center transition-all cursor-pointer flex items-center justify-center gap-2 border-none ${
                                                     isSubscribed 
-                                                        ? "bg-slate-100 text-slate-600 hover:bg-slate-200" 
-                                                        : "bg-[#e5effa] text-[#0a4a83] hover:bg-blue-100"
+                                                        ? "bg-white/5 text-slate-400 hover:bg-white/10" 
+                                                        : "bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20"
                                                 }`}
                                             >
-                                                <Bell size={14} /> {isSubscribed ? "Unsubscribe from Alerts" : "Subscribe to Alerts"}
+                                                <Bell size={14} /> {isSubscribed ? "Unsubscribe" : "Subscribe to Alerts"}
                                             </button>
                                         ) : (
                                             <>
@@ -147,7 +147,7 @@ export default function ExamsTab({
                                                     onClick={() => {
                                                         alert("Details will be available soon!")
                                                     }}
-                                                    className="flex-1 py-2.5 rounded-lg text-[12px] font-bold text-center transition-colors bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-2"
+                                                    className="flex-1 py-2.5 rounded-lg text-[12px] font-bold text-center transition-colors bg-white/5 text-slate-300 hover:bg-white/10 border-none cursor-pointer flex items-center justify-center gap-2"
                                                 >
                                                     <FileText size={14} /> View Details
                                                 </button>
@@ -159,7 +159,7 @@ export default function ExamsTab({
                                                             setIsWizardOpen(true)
                                                         }
                                                     }}
-                                                    className="flex-1 bg-[#0a4a83] hover:bg-[#164FA8] text-white py-2.5 rounded-lg text-[12px] font-bold text-center shadow-sm transition-colors flex items-center justify-center gap-2"
+                                                    className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white py-2.5 rounded-lg text-[12px] font-bold text-center shadow-sm border-none cursor-pointer transition-all flex items-center justify-center gap-2"
                                                 >
                                                     <CheckCircle2 size={14} /> Fill Form
                                                 </button>
@@ -175,7 +175,7 @@ export default function ExamsTab({
 
             {/* Toast Notification */}
             {toast && (
-                <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 bg-slate-800 text-white px-5 py-2.5 rounded-full text-[12px] font-bold shadow-lg z-[100] animate-fadeIn whitespace-nowrap flex items-center gap-2">
+                <div className="fixed bottom-[80px] left-1/2 -translate-x-1/2 bg-zinc-900 border border-white/10 text-white px-5 py-2.5 rounded-full text-[12px] font-bold shadow-lg z-[100] animate-fadeIn whitespace-nowrap flex items-center gap-2">
                     <CheckCircle2 size={14} className="text-emerald-400" />
                     {toast}
                 </div>

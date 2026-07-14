@@ -12,15 +12,15 @@ export default function NotificationsTab({ notifications, formatMessage, onMarkR
     })
 
     return (
-        <div className="space-y-4 pb-20">
+        <div className="space-y-4 pb-20 relative z-10 text-left">
             <div className="flex items-center justify-between mb-2">
                 <div>
-                    <h3 className="text-lg font-bold text-slate-800">Notifications</h3>
-                    <p className="text-xs text-slate-500">Updates and alerts</p>
+                    <h3 className="text-lg font-bold text-white">Notifications</h3>
+                    <p className="text-xs text-slate-400">Updates and alerts</p>
                 </div>
                 <button 
                     onClick={onMarkAllRead}
-                    className="text-xs font-bold text-[#0a4a83] hover:underline flex items-center gap-1"
+                    className="text-xs font-bold text-blue-400 hover:text-blue-350 hover:underline flex items-center gap-1 cursor-pointer bg-transparent border-none"
                 >
                     <CheckCircle2 size={14} /> Mark all read
                 </button>
@@ -31,10 +31,10 @@ export default function NotificationsTab({ notifications, formatMessage, onMarkR
                     <button
                         key={f}
                         onClick={() => setFilter(f)}
-                        className={`px-4 py-1.5 rounded-full text-[12px] font-bold capitalize whitespace-nowrap transition-colors ${
+                        className={`px-4 py-1.5 rounded-full text-[12px] font-bold capitalize whitespace-nowrap transition-colors cursor-pointer ${
                             filter === f 
-                                ? "bg-[#0a4a83] text-white" 
-                                : "bg-white border border-slate-200 text-slate-600"
+                                ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white" 
+                                : "bg-white/5 border border-white/5 text-slate-400 hover:bg-white/10 hover:text-white"
                         }`}
                     >
                         {f}
@@ -44,8 +44,8 @@ export default function NotificationsTab({ notifications, formatMessage, onMarkR
 
             {filtered.length === 0 ? (
                 <div className="text-center py-16">
-                    <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <Bell size={20} className="text-slate-300" />
+                    <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Bell size={20} className="text-slate-500" />
                     </div>
                     <p className="text-slate-500 text-sm">No notifications found.</p>
                 </div>
@@ -57,26 +57,30 @@ export default function NotificationsTab({ notifications, formatMessage, onMarkR
                             <div 
                                 key={ann.id}
                                 onClick={() => onMarkRead(ann.id)}
-                                className={`bg-white rounded-xl p-4 shadow-sm border cursor-pointer transition-colors ${isRead ? 'border-slate-100 opacity-75' : 'border-[#4162EE]/30'}`}
+                                className={`rounded-xl p-4 shadow-sm border cursor-pointer transition-all duration-300 ${
+                                    isRead 
+                                        ? 'bg-zinc-950/30 border-white/5 opacity-70 hover:opacity-90 hover:border-white/10' 
+                                        : 'bg-zinc-950/60 border-[#4162EE]/40 hover:border-[#4162EE]/60'
+                                }`}
                             >
                                 <div className="flex gap-3">
                                     <div className="mt-0.5 relative shrink-0">
-                                        <Bell size={16} className={isRead ? "text-slate-400" : "text-[#4162EE]"} />
-                                        {!isRead && <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>}
+                                        <Bell size={16} className={isRead ? "text-slate-500" : "text-blue-400"} />
+                                        {!isRead && <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border border-zinc-900"></span>}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-[13px] text-slate-800 leading-relaxed announcement-content text-left">
+                                        <div className="text-[13px] text-slate-200 leading-relaxed announcement-content text-left">
                                             {formatMessage(ann.content)}
                                         </div>
                                         <div className="mt-3 flex items-center justify-between">
-                                            <span className="text-[10px] text-slate-400 font-bold uppercase">
+                                            <span className="text-[10px] text-slate-550 font-bold uppercase">
                                                 {new Date(ann.created_at || ann.sent_at).toLocaleDateString('en-IN', {day:'numeric', month:'short'})}
                                             </span>
                                             {ann.links && (
                                                 <a 
                                                     href={ann.links} target="_blank" rel="noopener noreferrer"
                                                     onClick={(e) => e.stopPropagation()}
-                                                    className="text-[11px] font-bold text-[#0a4a83] hover:underline"
+                                                    className="text-[11px] font-bold text-blue-400 hover:text-blue-300 hover:underline"
                                                 >
                                                     View Link
                                                 </a>
