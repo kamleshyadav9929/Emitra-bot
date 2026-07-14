@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Mukta:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Mukta:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @font-face {
@@ -29,23 +29,23 @@
 
 
 @theme {
-  --color-surface-base:      #f3faff;
-  --color-surface-low:       #e6f6ff;
+  --color-surface-base:      #f5f8fc;
+  --color-surface-low:       #ebf2fa;
   --color-surface-lowest:    #ffffff;
-  --color-surface-highest:   #cfe6f2;
+  --color-surface-highest:   #e1ecf7;
   
-  --color-primary:           #003f87;
-  --color-primary-container: #0056b3;
-  --color-primary-fixed:     #d7e2ff;
-  --color-on-surface:        #071e27;
+  --color-primary:           #0a4a83;
+  --color-primary-container: #185adb;
+  --color-primary-fixed:     #e5effa;
+  --color-on-surface:        #0f172a;
   
-  --color-secondary-fixed:   #dee0ff;
-  --color-surface-bright:    #f8fbff;
+  --color-secondary-fixed:   #e2e8f0;
+  --color-surface-bright:    #f8fafc;
   
-  --color-outline-variant:   #c2c6d426;
+  --color-outline-variant:   #e2e8f0;
   
-  --color-tertiary:          #623700;
-  --color-tertiary-fixed:    #ffdcbe;
+  --color-tertiary:          #f26522;
+  --color-tertiary-fixed:    #fff4ee;
 
   --color-exam-jee:  #D4450C;
   --color-exam-neet: #0A7A6B;
@@ -54,11 +54,11 @@
   --color-exam-cuet: #A37A0A;
   --color-exam-all:  #071e27;
 
-  --color-success:   #2E7D32;
-  --color-danger:    #C62828;
+  --color-success:   #10B981;
+  --color-danger:    #EF4444;
 
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-display: 'Public Sans', sans-serif;
+  --font-sans: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  --font-display: 'Outfit', 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'DM Mono', 'Courier New', monospace;
   
   --radius-sm: 0.375rem;
@@ -79,9 +79,9 @@
 }
 
 @utility apple-active-scale {
-  transition: transform 0.1s ease;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   &:active {
-    transform: scale(0.95);
+    transform: scale(0.97);
   }
 }
 

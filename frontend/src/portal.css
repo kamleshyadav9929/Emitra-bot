@@ -1,97 +1,172 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   Rajasthan Government SSO Design System Styles
-───────────────────────────────────────────────────────────────────────────── */
+   Rajasthan Government SSO Design System Styles - Dribbble & Awwwards Refinement
+   ───────────────────────────────────────────────────────────────────────────── */
 
 :root {
   --sso-blue:          #0a4a83;   /* Official SSO Primary Blue */
   --sso-blue-dark:     #07355e;   /* Darker Navy variant */
-  --sso-blue-light:    #e5effa;   /* Highlight/active background */
-  --sso-orange:        #f26522;   /* Tricolor Saffron */
-  --sso-orange-light:  #fff4ee;   /* Soft saffron background */
-  --sso-green:         #138808;   /* Tricolor Green */
-  --sso-green-light:   #e7f6e7;   /* Soft green background */
+  --sso-blue-light:    rgba(10, 74, 131, 0.05);   /* Highlight/active background */
+  --sso-orange:        #FF6B00;   /* Vibrant digital saffron */
+  --sso-orange-light:  #fff7f2;   /* Soft saffron background */
+  --sso-green:         #10b981;   /* Modern digital emerald */
+  --sso-green-light:   #ecfdf5;   /* Soft green background */
   
-  --surface:           #f0f4f8;   /* Government portal backdrop */
-  --card:              #ffffff;   /* Pure white container cards */
-  --border:            #cbd5e1;   /* Slate outline */
-  --text:              #1e293b;   /* Slate text */
+  --surface:           #f5f8fc;   /* Government portal backdrop */
+  --card:              rgba(255, 255, 255, 0.85); /* Semi-transparent container card */
+  --border:            rgba(226, 232, 240, 0.8);   /* Slate outline */
+  --text:              #0f172a;   /* Slate text */
   --muted:             #64748b;   /* Muted label text */
   
   --sidebar-w:         280px;
   --header-h:          80px;
+  
+  --glass-bg:          rgba(255, 255, 255, 0.7);
+  --glass-border:      rgba(255, 255, 255, 0.4);
+  --glass-shadow:      0 8px 32px 0 rgba(15, 23, 42, 0.04);
 }
 
-/* Tricolor Banner Line */
+/* Tricolor Banner Line - Refined to feel subtle and premium */
 .sso-tricolor-line {
   height: 4px;
-  background: linear-gradient(to right, #f26522 33%, #ffffff 33%, #ffffff 66%, #138808 66%);
+  background: linear-gradient(to right, #FF6B00 33%, #ffffff 33%, #ffffff 66%, #10b981 66%);
   width: 100%;
 }
 
-/* Government notice card style */
+/* Government notice card style - Redesigned with glow and gradient border */
 .sso-notice-card {
   border-left: 4px solid var(--sso-orange);
   background-color: var(--sso-orange-light);
+  box-shadow: 0 4px 20px -2px rgba(255, 107, 0, 0.04);
+  border-radius: 12px;
 }
 
 /* Verified citizen pill */
 .sso-badge-verified {
   background-color: var(--sso-green-light);
   color: var(--sso-green);
-  border: 1px solid rgba(19, 136, 8, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  font-weight: 700;
+  letter-spacing: 0.025em;
 }
 
-/* Official widget styling */
+/* Official widget styling - Dribbble inspired floating container */
 .sso-widget {
   background: var(--card);
   border: 1px solid var(--border);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--glass-shadow);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .sso-widget-hover:hover {
-  border-color: var(--sso-blue);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  border-color: rgba(10, 74, 131, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -10px rgba(10, 74, 131, 0.08);
 }
 
-/* SSO-style Square Grid Application Buttons */
+/* SSO-style Square Grid Application Buttons - Dribbble-style Bento Cells */
 .sso-app-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 24px;
   text-align: center;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
-  height: 140px;
+  height: 150px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+}
+
+.sso-app-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 1.5px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 50%, rgba(10, 74, 131, 0.05) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .sso-app-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--sso-blue);
-  box-shadow: 0 10px 15px -3px rgba(10, 74, 131, 0.1), 0 4px 6px -4px rgba(10, 74, 131, 0.1);
+  transform: translateY(-4px) scale(1.01);
+  border-color: rgba(10, 74, 131, 0.25);
+  box-shadow: 0 20px 30px -10px rgba(10, 74, 131, 0.08);
 }
 
 .sso-app-icon-wrapper {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 12px;
-  transition: all 0.2s ease-in-out;
+  margin-bottom: 14px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+.sso-app-card:hover .sso-app-icon-wrapper {
+  transform: scale(1.08) rotate(3deg);
+}
+
+/* Glassmorphic elements */
+.glass-sidebar {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-right: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.glass-nav-pill-active {
+  background: linear-gradient(135deg, rgba(10, 74, 131, 0.06) 0%, rgba(10, 74, 131, 0.02) 100%);
+  border-left: 3px solid var(--sso-blue);
+}
+
+.glass-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.glass-card-dark {
+  background: rgba(24, 24, 27, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card-dark-hover:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+}
+
+/* Custom indicator timelines */
+.timeline-dot-active {
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+}
+
+.timeline-dot-pending {
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+}
+
+/* Scrollbar customization */
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+::-webkit-scrollbar-thumb { background: rgba(203, 213, 225, 0.6); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.8); }
 
 /* Ticker animation */
 @keyframes marquee {
@@ -104,26 +179,26 @@
 /* Pulse animation */
 @keyframes live-ping {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.4; transform: scale(1.4); }
+  50%       { opacity: 0.4; transform: scale(1.3); }
 }
 .live-dot { animation: live-ping 1.5s ease-in-out infinite; }
 
-/* Fade transitions */
+/* Premium layout fade in */
 @keyframes premiumFadeIn {
-  from { opacity: 0; transform: translateY(4px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fadeIn {
-  animation: premiumFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: premiumFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-.scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
+.scrollbar-thin::-webkit-scrollbar { width: 3px; height: 3px; }
 .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
-.scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 99px; }
-.scrollbar-thin::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.6); }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 99px; }
+.scrollbar-thin::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); }
 
 .scroll-container-smooth {
   scroll-behavior: smooth;

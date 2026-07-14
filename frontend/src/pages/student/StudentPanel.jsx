@@ -595,33 +595,33 @@ export default function StudentPanel() {
             <OnboardingModal isOpen={needsOnboarding} exams={exams} />
             
             {/* ── DESKTOP SIDEBAR ── */}
-            <aside className="w-[280px] bg-white border-r border-slate-200 hidden lg:flex flex-col sticky top-0 h-screen shrink-0 z-20">
+            <aside className="w-[280px] glass-sidebar hidden lg:flex flex-col sticky top-0 h-screen shrink-0 z-20">
                 {/* Tricolor Saffron/Green Top Line */}
-                <div className="h-1 bg-gradient-to-r from-[#f26522] via-white to-[#138808]" />
+                <div className="h-1 bg-gradient-to-r from-[#FF6B00] via-white to-[#10b981]" />
 
                 {/* SSO / e-Mitra Kiosk Header */}
-                <div className="h-16 flex items-center px-5 border-b border-slate-200 bg-[#f8fafc]">
+                <div className="h-16 flex items-center px-5 border-b border-slate-100 bg-transparent">
                     <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab("dashboard")}>
                         <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-full object-cover shadow-sm bg-white border border-slate-100" />
-                        <div className="leading-tight">
-                            <span className="text-slate-800 font-extrabold text-[14px] tracking-tight block">Krishna Emitra</span>
-                            <span className="text-[9px] text-[#f26522] font-black tracking-widest uppercase block">कृष्णा ई-मित्र</span>
+                        <div className="leading-tight text-left">
+                            <span className="text-slate-800 font-extrabold text-[14px] tracking-tight block font-display">Krishna Emitra</span>
+                            <span className="text-[9px] text-[#FF6B00] font-black tracking-widest uppercase block mt-0.5">कृष्णा ई-मित्र</span>
                         </div>
                     </div>
                 </div>
 
                 {/* REDESIGNED CITIZEN SSOID CARD */}
                 {isLoggedIn && (
-                    <div className="px-4 py-4 border-b border-slate-100 bg-[#f8fafc]/50">
-                        <div className="bg-white border border-slate-200 rounded-xl p-4 text-center relative overflow-hidden shadow-sm">
-                            <div className="w-12 h-12 mx-auto mb-2 rounded-full border-2 border-[#0a4a83]/20 bg-slate-50 flex items-center justify-center text-[#0a4a83] text-base font-black shadow-inner overflow-hidden">
+                    <div className="px-4 py-4 border-b border-slate-100/60 bg-transparent">
+                        <div className="bg-white/40 backdrop-blur-md border border-white/60 rounded-2xl p-4 text-center relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+                            <div className="w-12 h-12 mx-auto mb-2 rounded-full border-2 border-[#0a4a83]/20 bg-slate-50 flex items-center justify-center text-[#0a4a83] text-base font-black shadow-inner overflow-hidden ring-2 ring-white">
                                 {user?.imageUrl ? (
                                     <img src={user.imageUrl} alt={user.name} className="w-full h-full object-cover" />
                                 ) : (
                                     <span>{user?.name?.charAt(0).toUpperCase()}</span>
                                 )}
                             </div>
-                            <h4 className="text-[12.5px] font-bold text-slate-800 tracking-tight leading-tight mb-0.5">{user?.name}</h4>
+                            <h4 className="text-[12.5px] font-bold text-slate-850 tracking-tight leading-tight mb-0.5">{user?.name}</h4>
                             <p className="text-[10px] font-mono text-slate-500 select-all">
                                 ID: <span className="font-extrabold text-slate-700">{user?.telegram_id || 'N/A'}</span>
                             </p>
@@ -644,10 +644,10 @@ export default function StudentPanel() {
                                     setActiveTab(item.id)
                                     setActiveExamForTimeline(null)
                                 }}
-                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12.5px] font-semibold transition-all duration-155 cursor-pointer group ${
+                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12.5px] font-semibold transition-all duration-200 cursor-pointer group ${
                                     isActive
-                                        ? "bg-[#e5effa] text-[#0a4a83] font-bold"
-                                        : "text-slate-655 hover:text-[#0a4a83] hover:bg-slate-50"
+                                        ? "glass-nav-pill-active text-[#0a4a83] font-bold"
+                                        : "text-slate-600 hover:text-[#0a4a83] hover:bg-white/50"
                                 }`}
                             >
                                 <Icon size={15} strokeWidth={isActive ? 2.5 : 2.0} className={`${isActive ? "text-[#0a4a83]" : "text-slate-400 group-hover:text-[#0a4a83] transition-colors"}`} />
@@ -663,18 +663,18 @@ export default function StudentPanel() {
                 </nav>
 
                 {/* Desktop Account block at bottom */}
-                <div className="p-4 border-t border-slate-100 bg-[#f8fafc]">
+                <div className="p-4 border-t border-slate-100 bg-transparent">
                     {isLoggedIn ? (
                         <button
                             onClick={handleLogout}
-                            className="w-full flex items-center justify-center gap-1.5 py-2.5 border border-red-200 hover:bg-red-50 text-red-655 hover:text-red-700 text-[11px] font-bold uppercase rounded-lg transition-all cursor-pointer"
+                            className="w-full flex items-center justify-center gap-1.5 py-2.5 border border-red-200 hover:bg-red-50/50 text-red-600 hover:text-red-700 text-[11px] font-bold uppercase rounded-lg transition-all cursor-pointer"
                         >
                             <LogOut size={13} /> Close SSO Session
                         </button>
                     ) : (
                         <button
                             onClick={triggerSignIn}
-                            className="w-full py-2.5 bg-[#0a4a83] hover:bg-[#07355e] text-white text-[11.5px] font-bold uppercase rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-md shadow-[#0a4a83]/10 cursor-pointer hover:-translate-y-0.5 duration-200"
+                            className="w-full py-2.5 bg-gradient-to-r from-[#0a4a83] to-[#185adb] hover:shadow-md hover:shadow-blue-500/10 text-white text-[11.5px] font-bold uppercase rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:-translate-y-0.5 duration-200 border-none"
                         >
                             <User size={13} /> SSO Portal Login
                         </button>
@@ -687,14 +687,14 @@ export default function StudentPanel() {
                 
                 {/* ── SINGLE CLEAN HEADER ── */}
                 <div className="flex flex-col sticky top-0 z-30 shrink-0 shadow-sm">
-                    <header className="h-14 md:h-16 bg-white flex items-center justify-between px-3 md:px-10 border-b border-slate-200">
+                    <header className="h-14 md:h-16 glass-header flex items-center justify-between px-3 md:px-10">
                         {/* Left Side: Navigation / Tab Title */}
                         <div className="flex items-center gap-3">
-                            <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 -ml-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors">
+                            <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 -ml-2 text-slate-600 hover:text-slate-850 hover:bg-slate-100/50 rounded-lg cursor-pointer transition-colors">
                                 <Menu size={20} />
                             </button>
-                            <div className="flex items-center gap-2.5">
-                                <h2 className="text-[16px] font-bold text-[#0a4a83] tracking-tight">
+                            <div className="flex items-center gap-2.5 text-left">
+                                <h2 className="text-[16px] font-bold text-[#0a4a83] tracking-tight font-display">
                                     {lang === "EN" ? navigationItems.find(i => i.id === activeTab)?.label : navigationItems.find(i => i.id === activeTab)?.labelHi}
                                 </h2>
                             </div>
@@ -705,23 +705,23 @@ export default function StudentPanel() {
                             {isLoggedIn && (
                                 <button 
                                     onClick={() => setActiveTab("dashboard")} 
-                                    className="p-2 rounded-xl hover:bg-slate-100 text-slate-455 hover:text-slate-700 transition-all relative cursor-pointer"
+                                    className="p-2 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-800 transition-all relative cursor-pointer"
                                     title="Inbox Notifications"
                                 >
                                     <Bell size={16} />
                                     {unreadCount > 0 && (
-                                        <span className="absolute top-1 right-1 w-4.5 h-4.5 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-full text-[8px] font-bold flex items-center justify-center ring-2 ring-white">
+                                        <span className="absolute top-1 right-1 w-4 h-4 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-full text-[8px] font-bold flex items-center justify-center ring-2 ring-white">
                                             {unreadCount}
                                         </span>
                                     )}
                                 </button>
                             )}
 
-                            <button onClick={() => fetchAllData(true)} disabled={refreshing} className="p-2 rounded-xl hover:bg-slate-100 text-slate-455 hover:text-slate-700 transition-all cursor-pointer">
+                            <button onClick={() => fetchAllData(true)} disabled={refreshing} className="p-2 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-800 transition-all cursor-pointer">
                                 <RefreshCw size={15} className={refreshing ? "animate-spin text-[#0a4a83]" : ""} />
                             </button>
 
-                            <button onClick={toggleLanguage} className="text-slate-700 hover:text-slate-900 transition-all text-[11px] font-bold flex items-center gap-1.5 bg-white hover:bg-slate-50 px-3.5 py-1.8 rounded-xl border border-slate-200 shadow-sm cursor-pointer">
+                            <button onClick={toggleLanguage} className="text-slate-700 hover:text-slate-900 transition-all text-[11px] font-bold flex items-center gap-1.5 bg-white/60 hover:bg-white px-3.5 py-1.8 rounded-xl border border-slate-200/80 shadow-sm cursor-pointer backdrop-blur-sm">
                                 <Globe size={13} className="text-slate-400" /> {lang === 'EN' ? 'हिन्दी' : 'English'}
                             </button>
                         </div>
@@ -729,7 +729,7 @@ export default function StudentPanel() {
                 </div>
 
                 {/* ── MOBILE BOTTOM NAV (Replaces Drawer) ── */}
-                <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 flex items-center justify-around px-1 pb-safe pt-1 shadow-[0_-4px_10px_rgba(0,0,0,0.03)] overflow-x-auto scrollbar-hide">
+                <nav className="lg:hidden fixed bottom-3 left-4 right-4 bg-white/80 backdrop-blur-lg border border-white/60 z-50 flex items-center justify-around px-2 py-1 shadow-lg rounded-2xl">
                     {[
                         { id: "dashboard", icon: LayoutDashboard, label: "Home" },
                         { id: "services", icon: ClipboardList, label: "Services" },
@@ -746,9 +746,9 @@ export default function StudentPanel() {
                                     setActiveTab(item.id)
                                     setActiveExamForTimeline(null)
                                 }}
-                                className={`flex flex-col items-center justify-center w-16 py-1.5 shrink-0 transition-colors ${isActive ? "text-[#0a4a83]" : "text-slate-400 hover:text-slate-600"}`}
+                                className={`flex flex-col items-center justify-center w-16 py-1 shrink-0 transition-colors ${isActive ? "text-[#0a4a83]" : "text-slate-400 hover:text-slate-600"}`}
                             >
-                                <div className={`p-1 rounded-xl mb-0.5 transition-colors ${isActive ? "bg-[#e5effa]" : "bg-transparent"}`}>
+                                <div className={`p-1.5 rounded-xl mb-0.5 transition-colors ${isActive ? "bg-[#e5effa]" : "bg-transparent"}`}>
                                     <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
                                 </div>
                                 <span className={`text-[9px] font-bold ${isActive ? "text-[#0a4a83]" : "text-slate-500"}`}>{item.label}</span>

@@ -179,7 +179,7 @@ export default function Landing() {
                 : "कियोस्क की लंबी लाइनों में खड़े होने के बजाय, आप हमारे सुरक्षित पोर्टल या टेलीग्राम बॉट के माध्यम से अपने विवरण और दस्तावेज जमा कर सकते हैं। हमारा सत्यापित ई-मित्र संचालक आपकी ओर से आधिकारिक फॉर्म भरेगा और आपको रसीद भेज देगा।"
         },
         {
-            q: lang === "EN" ? "Is my personal data and document safe in the locker?" : "क्या मेरा व्यक्तिगत डेटा और दस्तावेज लॉकर में सुरक्षित हैं?",
+            q: lang === "EN" ? "Is my personal data and document safe in the locker?" : "क्या मेरा व्यक्तिगत दस्तावेज लॉकर में सुरक्षित हैं?",
             a: lang === "EN"
                 ? "Absolutely. All uploaded marksheets, photos, and ID cards are stored securely with strict accessibility controls. They are only accessed by the operator when filing government forms requested by you."
                 : "बिल्कुल। सभी अपलोड की गई मार्कशीट, फोटो और आईडी कार्ड सुरक्षित रूप से संग्रहीत किए जाते हैं। वे केवल तभी एक्सेस किए जाते हैं जब आप फॉर्म भरने का अनुरोध करते हैं।"
@@ -199,16 +199,16 @@ export default function Landing() {
     ]
 
     return (
-        <div className="min-h-screen bg-[#050508] bg-grid-pattern text-slate-100 font-sans overflow-x-hidden relative">
+        <div className="min-h-screen bg-[#050508] bg-grid-pattern text-slate-200 font-sans overflow-x-hidden relative">
             {/* Ambient Background Glow Circles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[55%] h-[55%] rounded-full bg-blue-600/5 blur-[120px] animate-slow-glow" />
-                <div className="absolute top-[40%] right-[-10%] w-[45%] h-[45%] rounded-full bg-indigo-600/5 blur-[130px] animate-slow-glow" />
-                <div className="absolute bottom-[10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-emerald-600/3 blur-[120px] animate-slow-glow" />
+                <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-blue-600/10 blur-[130px] animate-slow-glow" />
+                <div className="absolute top-[30%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 blur-[140px] animate-slow-glow" />
+                <div className="absolute bottom-[20%] left-[-5%] w-[45%] h-[45%] rounded-full bg-emerald-500/5 blur-[120px] animate-slow-glow" />
             </div>
 
             {/* ── HEADER ── */}
-            <header className="sticky top-0 z-40 bg-[#050508]/65 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 lg:px-12 h-20 flex items-center justify-between">
+            <header className="sticky top-0 z-40 bg-[#050508]/75 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 lg:px-12 h-20 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <Logo className="w-9 h-9 rounded-full border border-white/10" />
                     <div className="leading-none hidden sm:block text-left">
@@ -263,7 +263,7 @@ export default function Landing() {
             {upcomingDeadlines.length > 0 && (
                 <div className="bg-slate-950/80 border-y border-white/5 text-slate-350 text-[10.5px] font-semibold py-2 px-6 overflow-hidden flex items-center relative z-10">
                     <div className="flex items-center gap-1.5 shrink-0 bg-slate-950 z-10 pr-4 mr-4 text-amber-400 font-bold uppercase tracking-wider relative font-display">
-                        <Clock size={11} className="animate-pulse" /> {lang === "EN" ? "Upcoming Deadlines" : "आगामी अंतिम तिथियां"}
+                        <Clock size={11} className="animate-pulse text-amber-400" /> {lang === "EN" ? "Upcoming Deadlines" : "आगामी अंतिम तिथियां"}
                     </div>
                     <div className="flex items-center gap-12 whitespace-nowrap marquee-track">
                         {upcomingDeadlines.map((ex, idx) => (
@@ -276,17 +276,17 @@ export default function Landing() {
             )}
 
             {/* ── HERO SECTION ── */}
-            <div className="relative py-20 lg:py-28 z-10 text-center">
+            <div className="relative py-24 lg:py-36 z-10 text-center">
                 <section className="relative px-6 lg:px-12 max-w-[1000px] mx-auto space-y-12">
                     {/* Hero Header Content */}
                     <div className="space-y-6 max-w-4xl mx-auto">
-                        <h1 className="text-4xl sm:text-6xl lg:text-[68px] leading-[1.03] font-black tracking-tighter font-display text-gradient-primary">
+                        <h1 className="text-4xl sm:text-7xl lg:text-[84px] leading-[0.95] font-black tracking-tight font-display text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-400">
                             {lang === "EN" 
                                 ? "Your government applications, automated."
                                 : "आपकी सरकारी नौकरी आवेदन, अब स्वचालित।"}
                         </h1>
 
-                        <p className="text-[15px] sm:text-[17px] text-slate-400 leading-relaxed max-w-2xl mx-auto font-normal">
+                        <p className="text-[15px] sm:text-[17px] text-slate-400 leading-relaxed max-w-2xl mx-auto font-normal pt-2">
                             {lang === "EN"
                                 ? "SSC, Railways, NEET counselling, and state services. Track deadlines, store files, and submit application requests straight to our digital operator desk via Telegram."
                                 : "SSC, रेलवे, NEET काउंसलिंग और राज्य सेवाएँ। परीक्षा अंतिम तिथि ट्रैक करें, दस्तावेज स्टोर करें और सीधे टेलीग्राम द्वारा हमारे ऑपरेटर को आवेदन भेजें।"}
@@ -294,17 +294,17 @@ export default function Landing() {
                     </div>
 
                     {/* Integrated 2-Step Action Row */}
-                    <div className="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-xl mx-auto">
+                    <div className="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-xl mx-auto pt-4">
                         <button
                             onClick={handleJoinTelegram}
-                            className="w-full sm:w-auto px-6 py-3 bg-[#0088cc] hover:bg-[#0077b3] text-white text-[13px] font-bold rounded-full transition-all flex items-center justify-center gap-2 border-none shadow-lg shadow-[#0088cc]/10 cursor-pointer"
+                            className="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-[13px] font-bold rounded-full transition-all flex items-center justify-center gap-2 border-none shadow-lg shadow-cyan-500/20 active:scale-95 cursor-pointer"
                         >
                             <Send size={14} /> {lang === "EN" ? "Join Telegram assistant" : "टेलीग्राम असिस्टेंट से जुड़ें"}
                         </button>
 
                         <button
                             onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
-                            className="w-full sm:w-auto px-6 py-3 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[13px] font-bold rounded-full transition-all flex items-center justify-center gap-2 cursor-pointer"
+                            className="w-full sm:w-auto px-7 py-3.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[13px] font-bold rounded-full transition-all flex items-center justify-center gap-2 backdrop-blur-sm active:scale-95 cursor-pointer"
                         >
                             <User size={14} />
                             {isLoggedIn ? (lang === "EN" ? "Enter Student Dashboard" : "पैनल में प्रवेश करें") : (lang === "EN" ? "Sign In student portal" : "स्टूडेंट पोर्टल में लॉगिन")}
@@ -327,9 +327,9 @@ export default function Landing() {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
                         {/* STEP 1 */}
-                        <div className="flex flex-col bg-zinc-900/35 backdrop-blur-xl border border-white/5 p-8 rounded-[24px] relative overflow-hidden h-[400px] bento-glow-card">
+                        <div className="flex flex-col bg-zinc-950/50 backdrop-blur-xl border border-white/10 p-8 rounded-[24px] relative overflow-hidden h-[400px] bento-glow-card transition-all duration-300 hover:-translate-y-1.5">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 blur-2xl rounded-full" />
-                            <div className="bg-white/5 text-slate-350 border border-white/10 px-3 py-1 rounded-full text-[9px] font-bold w-fit uppercase tracking-widest font-mono">
+                            <div className="bg-white/5 text-slate-300 border border-white/10 px-3 py-1 rounded-full text-[9px] font-bold w-fit uppercase tracking-widest font-mono">
                                 {lang === "EN" ? "Step 1" : "चरण १"}
                             </div>
                             <h4 className="text-[24px] font-bold text-[#38bdf8] font-display mt-8 mb-4">
@@ -353,7 +353,7 @@ export default function Landing() {
                                     href={config?.telegram_bot_url || "https://t.me/Kamlesh6377_bot"} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className="w-full h-11 bg-[#0088cc] hover:bg-[#0077b3] text-white rounded-xl text-[12.5px] font-bold shadow-lg shadow-[#0088cc]/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                                    className="w-full h-11 bg-[#0088cc] hover:bg-[#0077b3] text-white rounded-xl text-[12.5px] font-bold shadow-lg shadow-[#0088cc]/20 flex items-center justify-center gap-2 transition-all cursor-pointer text-center"
                                 >
                                     <Send size={14} /> {lang === 'EN' ? 'Telegram Bot' : 'टेलीग्राम बॉट'}
                                 </a>
@@ -361,12 +361,12 @@ export default function Landing() {
                         </div>
 
                         {/* STEP 2 */}
-                        <div className="flex flex-col bg-zinc-900/35 backdrop-blur-xl border border-white/5 p-8 rounded-[24px] relative overflow-hidden h-[400px] bento-glow-card">
+                        <div className="flex flex-col bg-zinc-950/50 backdrop-blur-xl border border-white/10 p-8 rounded-[24px] relative overflow-hidden h-[400px] bento-glow-card transition-all duration-300 hover:-translate-y-1.5">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-600/5 blur-2xl rounded-full" />
-                            <div className="bg-white/5 text-slate-350 border border-white/10 px-3 py-1 rounded-full text-[9px] font-bold w-fit uppercase tracking-widest font-mono">
+                            <div className="bg-white/5 text-slate-300 border border-white/10 px-3 py-1 rounded-full text-[9px] font-bold w-fit uppercase tracking-widest font-mono">
                                 {lang === "EN" ? "Step 2" : "चरण २"}
                             </div>
-                            <h4 className="text-[24px] font-bold text-[#34d399] font-display mt-8 mb-4">
+                            <h4 className="text-[24px] font-bold text-[#10b981] font-display mt-8 mb-4">
                                 {lang === 'EN' ? 'Request' : 'अनुरोध'}
                             </h4>
                             <p className="text-[13px] text-slate-400 font-normal leading-relaxed">
@@ -387,9 +387,9 @@ export default function Landing() {
                         </div>
 
                         {/* STEP 3 */}
-                        <div className="flex flex-col bg-zinc-900/35 backdrop-blur-xl border border-white/5 p-8 rounded-[24px] relative overflow-hidden h-[400px] bento-glow-card">
+                        <div className="flex flex-col bg-zinc-950/50 backdrop-blur-xl border border-white/10 p-8 rounded-[24px] relative overflow-hidden h-[400px] bento-glow-card transition-all duration-300 hover:-translate-y-1.5">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-600/5 blur-2xl rounded-full" />
-                            <div className="bg-white/5 text-slate-350 border border-white/10 px-3 py-1 rounded-full text-[9px] font-bold w-fit uppercase tracking-widest font-mono">
+                            <div className="bg-white/5 text-slate-300 border border-white/10 px-3 py-1 rounded-full text-[9px] font-bold w-fit uppercase tracking-widest font-mono">
                                 {lang === "EN" ? "Step 3" : "चरण ३"}
                             </div>
                             <h4 className="text-[24px] font-bold text-[#fbbf24] font-display mt-8 mb-4">
@@ -402,10 +402,10 @@ export default function Landing() {
                             </p>
                             
                             {/* Mockup Progress Loader */}
-                            <div className="absolute bottom-6 left-6 right-6 h-[88px] bg-black/45 backdrop-blur-xl border border-white/5 rounded-2xl px-5 py-0 shadow-lg flex flex-col justify-center gap-2">
+                            <div className="absolute bottom-6 left-6 right-6 h-[88px] bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-0 shadow-xl flex flex-col justify-center gap-2">
                                 <span className="text-[11px] font-bold text-slate-300">{lang === "EN" ? "Filing in progress..." : "प्रक्रिया जारी है..."}</span>
                                 <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                                    <div className="w-[45%] h-full bg-[#38bdf8] rounded-full animate-pulse"></div>
+                                    <div className="w-[45%] h-full bg-[#10b981] rounded-full animate-pulse"></div>
                                 </div>
                             </div>
                         </div>
@@ -429,7 +429,7 @@ export default function Landing() {
 
                 {/* Command-Palette style Search & Filter bar */}
                 {!loading && Object.keys(services).length > 0 && (
-                    <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-zinc-900/40 backdrop-blur-xl border border-white/5 p-4 rounded-2xl shadow-2xl max-w-4xl mx-auto">
+                    <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-zinc-950/60 backdrop-blur-xl border border-white/10 p-4 rounded-2xl shadow-2xl max-w-4xl mx-auto">
                         <div className="relative w-full sm:w-80">
                             <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                             <input
@@ -468,8 +468,8 @@ export default function Landing() {
                         <p className="text-sm font-semibold">No services available at the moment.</p>
                     </div>
                 ) : !hasMatchingServices ? (
-                    <div className="text-center py-16 bg-zinc-900/20 border border-white/5 rounded-2xl text-slate-500 max-w-4xl mx-auto">
-                        <Search size={28} className="mx-auto text-slate-600 mb-2" />
+                    <div className="text-center py-16 bg-zinc-950/20 border border-white/5 rounded-2xl text-slate-500 max-w-4xl mx-auto">
+                        <Search size={28} className="mx-auto text-slate-650 mb-2" />
                         <p className="text-sm font-bold">{lang === 'EN' ? 'No services match your search query.' : 'आपकी खोज से मेल खाने वाली कोई सेवा नहीं मिली।'}</p>
                     </div>
                 ) : (
@@ -486,7 +486,7 @@ export default function Landing() {
                             return (
                                 <div key={catKey} className="space-y-6">
                                     <div className="flex items-center gap-3 border-b border-white/5 pb-2">
-                                        <span className="w-1.5 h-6 bg-blue-500 rounded-full"></span>
+                                        <span className="w-1.5 h-6 bg-[#0a4a83] rounded-full"></span>
                                         <h3 className="text-base font-bold text-white tracking-tight font-display">{cat.label}</h3>
                                         <span className="text-[10px] text-slate-400 font-bold bg-white/5 px-2 py-0.5 rounded-full border border-white/5">
                                             {matchingServices.length} {matchingServices.length === 1 ? "Service" : "Services"}
@@ -495,12 +495,12 @@ export default function Landing() {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {matchingServices.map((svc, idx) => (
-                                            <div key={idx} className="bg-zinc-900/35 backdrop-blur-xl border border-white/5 p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                                            <div key={idx} className="bg-zinc-950/40 backdrop-blur-md border border-white/5 p-6 rounded-[22px] hover:border-blue-500/20 hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-1.5 active:scale-[0.99] transition-all duration-300 flex flex-col justify-between group">
                                                 <div className="space-y-3">
                                                     <div className="flex items-center justify-between text-[10px] font-bold uppercase text-slate-400 tracking-wider">
                                                         <span>{cat.label}</span>
                                                         {svc.price && (
-                                                            <span className="text-blue-400 bg-blue-500/5 px-2.5 py-1 rounded-lg border border-blue-500/10 font-bold font-mono">
+                                                            <span className="text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20 font-bold font-mono">
                                                                 {lang === "EN" ? "Fee" : "शुल्क"}: {svc.price}
                                                             </span>
                                                         )}
@@ -511,7 +511,7 @@ export default function Landing() {
 
                                                 <button
                                                     onClick={() => handleRequestServiceWhatsApp(svc, catKey, cat.label)}
-                                                    className="mt-6 w-full py-3 bg-white text-slate-950 hover:bg-slate-100 text-[12px] font-black uppercase rounded-xl transition-all border-none cursor-pointer text-center"
+                                                    className="mt-6 w-full py-3 bg-white/5 hover:bg-white text-white hover:text-slate-950 text-[12px] font-bold uppercase rounded-xl transition-all border border-white/10 cursor-pointer text-center"
                                                 >
                                                     {lang === 'EN' ? 'Request via WhatsApp' : 'व्हाट्सएप से अनुरोध करें'}
                                                 </button>
@@ -590,7 +590,7 @@ export default function Landing() {
                     </div>
 
                     {/* Announcements Feed Container */}
-                    <div className="lg:col-span-8 bg-zinc-900/35 backdrop-blur-xl border border-white/5 rounded-3xl p-6 space-y-4 max-h-[500px] overflow-y-auto pr-3 text-left">
+                    <div className="lg:col-span-8 bg-zinc-950/50 backdrop-blur-md border border-white/10 rounded-[28px] p-6 space-y-4 max-h-[500px] overflow-y-auto pr-3 text-left">
                         <div className="border-b border-white/5 pb-3 flex justify-between items-center">
                             <span className="text-[12px] font-black text-white uppercase tracking-wider">{lang === "EN" ? "Recent Circulars" : "हालिया घोषणाएं"}</span>
                             <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{lang === "EN" ? "Live Feed" : "लाइव समाचार"}</span>
@@ -606,7 +606,7 @@ export default function Landing() {
                         ) : (
                             <div className="space-y-4">
                                 {filteredAnnouncements.map((ann, idx) => (
-                                    <div key={idx} className="border border-white/5 rounded-xl p-5 bg-black/20 hover:bg-black/45 transition-colors space-y-3">
+                                    <div key={idx} className="border border-white/5 rounded-xl p-5 bg-zinc-950/30 hover:bg-zinc-950/60 hover:border-white/10 transition-colors space-y-3">
                                         <div className="flex items-center justify-between text-[9.5px] text-slate-500 font-bold border-b border-white/5 pb-1.5 uppercase tracking-wider font-mono">
                                             <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded">Govt Alert</span>
                                             <span>{new Date(ann.created_at || Date.now()).toLocaleString("en-IN", {
@@ -659,10 +659,10 @@ export default function Landing() {
                             href="https://sso.rajasthan.gov.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-zinc-900/35 border border-white/5 p-5 rounded-2xl hover:border-blue-500/40 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
+                            className="bg-zinc-950/50 border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">State Quota</span>
-                            <span className="font-bold text-[13.5px] text-white group-hover:text-blue-400">Rajasthan SSO</span>
+                            <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">Rajasthan SSO</span>
                             <span className="text-[10px] text-slate-500 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
                         </a>
 
@@ -670,10 +670,10 @@ export default function Landing() {
                             href="https://ssc.gov.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-zinc-900/35 border border-white/5 p-5 rounded-2xl hover:border-blue-500/40 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
+                            className="bg-zinc-950/50 border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Govt Jobs</span>
-                            <span className="font-bold text-[13.5px] text-white group-hover:text-blue-400">SSC Portal</span>
+                            <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">SSC Portal</span>
                             <span className="text-[10px] text-slate-500 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
                         </a>
 
@@ -681,10 +681,10 @@ export default function Landing() {
                             href="https://neet.nta.nic.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-zinc-900/35 border border-white/5 p-5 rounded-2xl hover:border-blue-500/40 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
+                            className="bg-zinc-950/50 border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Medical Exams</span>
-                            <span className="font-bold text-[13.5px] text-white group-hover:text-blue-400">NEET UG (NTA)</span>
+                            <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">NEET UG (NTA)</span>
                             <span className="text-[10px] text-slate-500 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
                         </a>
 
@@ -692,10 +692,10 @@ export default function Landing() {
                             href="https://www.rrcb.gov.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-zinc-900/35 border border-white/5 p-5 rounded-2xl hover:border-blue-500/40 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
+                            className="bg-zinc-950/50 border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Railways</span>
-                            <span className="font-bold text-[13.5px] text-white group-hover:text-blue-400">RRB Recruitment</span>
+                            <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">RRB Recruitment</span>
                             <span className="text-[10px] text-slate-500 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
                         </a>
 
@@ -703,10 +703,10 @@ export default function Landing() {
                             href="https://www.ibps.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-zinc-900/35 border border-white/5 p-5 rounded-2xl hover:border-blue-500/40 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
+                            className="bg-zinc-950/50 border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Banking</span>
-                            <span className="font-bold text-[13.5px] text-white group-hover:text-blue-400">IBPS Exams</span>
+                            <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">IBPS Exams</span>
                             <span className="text-[10px] text-slate-500 inline-flex items-center gap-0.5 group-hover:underline">Open Portal <ExternalLink size={10} /></span>
                         </a>
                     </div>
@@ -727,7 +727,7 @@ export default function Landing() {
 
                 <div className="space-y-4">
                     {faqs.map((faq, idx) => (
-                        <div key={idx} className="border border-white/5 rounded-2xl bg-zinc-900/25 overflow-hidden transition-all duration-300">
+                        <div key={idx} className="border border-white/5 rounded-2xl bg-zinc-950/30 overflow-hidden transition-all duration-300">
                             <button
                                 onClick={() => setExpandedFaq(expandedFaq === idx ? null : idx)}
                                 className="w-full p-5 flex items-center justify-between text-left font-bold text-[13px] text-white hover:bg-white/5 bg-transparent border-none cursor-pointer"
@@ -744,7 +744,7 @@ export default function Landing() {
                                         exit={{ height: 0, opacity: 0 }}
                                         className="border-t border-white/5"
                                     >
-                                        <div className="p-5 text-[12px] text-slate-400 font-normal leading-relaxed bg-black/20">
+                                        <div className="p-5 text-[12.5px] text-slate-400 font-normal leading-relaxed bg-zinc-950/10">
                                             {faq.a}
                                         </div>
                                     </motion.div>
@@ -757,7 +757,7 @@ export default function Landing() {
 
             {/* ── FINAL CALL TO ACTION ── */}
             <section className="px-6 lg:px-12 pb-24 max-w-[1240px] mx-auto relative z-10">
-                <div className="bg-gradient-to-r from-blue-900/40 via-indigo-900/30 to-black/80 border border-white/5 rounded-[32px] text-white p-12 text-center space-y-6 shadow-2xl relative overflow-hidden">
+                <div className="bg-gradient-to-br from-zinc-900 via-indigo-950/40 to-zinc-950 border border-white/10 rounded-[32px] text-white p-12 text-center space-y-6 shadow-2xl relative overflow-hidden">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.04),transparent)] pointer-events-none" />
 
                     <h3 className="text-2xl lg:text-3xl font-black font-display tracking-tight">
@@ -773,14 +773,14 @@ export default function Landing() {
                         {isLoggedIn ? (
                             <button
                                 onClick={() => navigate("/dashboard")}
-                                className="px-6 py-3 bg-white text-slate-950 hover:bg-slate-100 text-[12px] font-black uppercase rounded-xl transition-all shadow-md active:scale-95 border-none cursor-pointer"
+                                className="px-7 py-3.5 bg-white text-slate-950 hover:bg-slate-100 text-[13px] font-bold rounded-xl transition-all shadow-md active:scale-95 border-none cursor-pointer"
                             >
                                 {lang === "EN" ? "Access Student Panel" : "विद्यार्थी पैनल खोलें"}
                             </button>
                         ) : (
                             <button
                                 onClick={triggerSignIn}
-                                className="px-6 py-3 bg-white text-slate-950 hover:bg-slate-100 text-[12px] font-black uppercase rounded-xl transition-all shadow-md active:scale-95 border-none cursor-pointer"
+                                className="px-7 py-3.5 bg-white text-slate-950 hover:bg-slate-100 text-[13px] font-bold rounded-xl transition-all shadow-md active:scale-95 border-none cursor-pointer"
                             >
                                 {lang === "EN" ? "Create Free Account" : "निशुल्क अकाउंट बनाएं"}
                             </button>
@@ -808,7 +808,7 @@ export default function Landing() {
 
                     <div className="space-y-3">
                         <h4 className="font-bold text-white text-[12.5px]">{lang === "EN" ? "Our Center Address" : "हमारा केंद्र पता"}</h4>
-                        <p className="text-[11.5px] leading-relaxed text-slate-450">
+                        <p className="text-[11.5px] leading-relaxed text-slate-400">
                             📍 Shop No. 12, Main Market,<br />
                             Jodhpur, Rajasthan, India
                         </p>
@@ -816,7 +816,7 @@ export default function Landing() {
 
                     <div className="space-y-3">
                         <h4 className="font-bold text-white text-[12.5px]">{lang === "EN" ? "Operator Contact" : "ऑपरेटर संपर्क"}</h4>
-                        <p className="text-[11.5px] text-slate-450">
+                        <p className="text-[11.5px] text-slate-400">
                             📞 Phone: +91 {config.whatsapp_number || "916377964293"}<br />
                             ✉️ Email: support@krishnaemitra.com
                         </p>
@@ -843,11 +843,11 @@ export default function Landing() {
             {showRequestModal && requestModalSvc && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div
-                        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+                        className="absolute inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
                         onClick={() => setShowRequestModal(false)}
                     />
 
-                    <div className="relative bg-[#0b0f19] border border-white/10 rounded-3xl shadow-2xl p-6 md:p-8 max-w-md w-full z-10 text-left text-white">
+                    <div className="relative bg-[#0b0f19]/95 border border-white/15 rounded-3xl shadow-2xl p-6 md:p-8 max-w-md w-full z-10 text-left text-white backdrop-blur-xl">
                         <button
                             onClick={() => setShowRequestModal(false)}
                             className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors p-1 bg-transparent border-none cursor-pointer"
@@ -857,7 +857,7 @@ export default function Landing() {
 
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider border border-blue-500/20">
+                                <span className="text-[10px] font-bold text-blue-450 bg-blue-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider border border-blue-500/20">
                                     {requestModalCatLabel}
                                 </span>
                                 <h3 className="text-xl font-black text-white font-display">
@@ -881,7 +881,7 @@ export default function Landing() {
                                         value={customerName}
                                         onChange={e => setCustomerName(e.target.value)}
                                         placeholder={lang === 'EN' ? 'Enter your name' : 'अपना नाम दर्ज करें'}
-                                        className="w-full bg-black/40 border border-white/5 text-[13px] text-white placeholder:text-slate-600 px-4 py-2.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-medium"
+                                        className="w-full bg-black/50 border border-white/10 text-[13px] text-white placeholder:text-slate-650 px-4 py-2.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-medium"
                                     />
                                 </div>
 
@@ -898,7 +898,7 @@ export default function Landing() {
                                             value={customerPhone}
                                             onChange={e => setCustomerPhone(e.target.value)}
                                             placeholder={lang === 'EN' ? '10-digit number' : '10-अंकीय नंबर'}
-                                            className="w-full bg-black/40 border border-white/5 text-[13px] text-white placeholder:text-slate-600 pl-14 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-mono font-medium"
+                                            className="w-full bg-black/50 border border-white/10 text-[13px] text-white placeholder:text-slate-650 pl-14 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-mono font-medium"
                                         />
                                     </div>
                                 </div>
