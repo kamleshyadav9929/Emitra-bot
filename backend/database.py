@@ -1158,12 +1158,19 @@ def submit_form_application(student_name, phone_number, email, dob, gender, cate
         if user.get("name") == "Web Guest":
             supabase.table("users").update({"name": student_name}).eq("id", uid).execute()
             
+    # Normalize gender to match database constraint CHECK (gender IN ('male','female','other'))
+    db_gender = None
+    if gender:
+        gender_lower = gender.strip().lower()
+        if gender_lower in ['male', 'female', 'other']:
+            db_gender = gender_lower
+
     res = supabase.table("form_applications").insert({
         "user_id": uid,
         "exam_cycle_id": exam_cycle_id,
         "email": email,
         "dob": dob or None,
-        "gender": gender,
+        "gender": db_gender,
         "category": category,
         "academic_qualification": academic_qualification,
         "status": "pending",
@@ -1262,17 +1269,18 @@ def update_application_status(app_id, status, remarks=None):
 def get_student_applications_by_phone(identifier):
     user = None
     if "@" in identifier:
-        res = supabase.table("form_applications").select("*, users(*), exams(*)").ilike("email", f"%{identifier}%").order("submitted_at", desc=True).execute()
+        res = supabase.table("form_applications").select("*, users(*), exam_cycles(*, exams(*))").ilike("email", f"%{identifier}%").order("submitted_at", desc=True).execute()
     else:
         user = get_user_by_phone(identifier)
         if not user:
             return []
-        res = supabase.table("form_applications").select("*, users(*), exams(*)").eq("user_id", user["id"]).order("submitted_at", desc=True).execute()
+        res = supabase.table("form_applications").select("*, users(*), exam_cycles(*, exams(*))").eq("user_id", user["id"]).order("submitted_at", desc=True).execute()
     
     apps = []
     for row in (res.data or []):
         usr = row.get("users") or {}
-        ex = row.get("exams") or {}
+        cycle = row.get("exam_cycles") or {}
+        ex = cycle.get("exams") or {}
         
         app_id = row["id"]
         docs_res = supabase.table("application_documents").select("*").eq("application_id", app_id).execute()
