@@ -1,5 +1,6 @@
-import { useState } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import { Search, CheckCircle2, Calendar, FileText, Bell } from "lucide-react"
+import Fuse from "fuse.js"
 
 export default function ExamsTab({
     subscribedExams,
@@ -15,18 +16,54 @@ export default function ExamsTab({
     const [activeFilter, setActiveFilter] = useState("ALL")
     const [tabMode, setTabMode] = useState("upcoming") // 'upcoming' | 'all'
     const [toast, setToast] = useState(null)
+    const inputRef = useRef(null)
     
     // Derived categories from the filtered list (could be static too)
     const filterChips = ["ALL", "UG", "GOVT JOB", "MEDICAL", "ENGINEERING"]
 
-    const displayedExams = filteredExamsList.filter(ex => {
-        const cat = (ex.category || "UG").toUpperCase()
-        if (activeFilter === "ALL") return true
-        if (activeFilter === "GOVT JOB" && cat.includes("GOVT")) return true
-        return cat === activeFilter
-    })
+    // Keyboard shortcut / listener to focus search input
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === "/" && document.activeElement !== inputRef.current) {
+                const activeTag = document.activeElement?.tagName
+                if (!["INPUT", "TEXTAREA", "SELECT"].includes(activeTag)) {
+                    e.preventDefault()
+                    inputRef.current?.focus()
+                }
+            }
+        }
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [])
 
-    const upcomingExams = displayedExams.filter(ex => ex.end_date && new Date(ex.end_date) >= new Date(new Date().setHours(0,0,0,0)))
+    // Memoized Fuse instance
+    const fuse = useMemo(() => {
+        return new Fuse(filteredExamsList, {
+            keys: ["name", "category"],
+            threshold: 0.35,
+        })
+    }, [filteredExamsList])
+
+    // Memoized displayed exams
+    const displayedExams = useMemo(() => {
+        let list = filteredExamsList
+
+        if (examSearch.trim()) {
+            list = fuse.search(examSearch).map(res => res.item)
+        }
+
+        return list.filter(ex => {
+            const cat = (ex.category || "UG").toUpperCase()
+            if (activeFilter === "ALL") return true
+            if (activeFilter === "GOVT JOB" && cat.includes("GOVT")) return true
+            return cat === activeFilter
+        })
+    }, [filteredExamsList, examSearch, activeFilter, fuse])
+
+    const upcomingExams = useMemo(() => {
+        const today = new Date().setHours(0, 0, 0, 0)
+        return displayedExams.filter(ex => ex.end_date && new Date(ex.end_date) >= new Date(today))
+    }, [displayedExams])
 
     const examsToRender = tabMode === "upcoming" ? upcomingExams : displayedExams
 
@@ -38,12 +75,16 @@ export default function ExamsTab({
                     <div className="relative w-full">
                         <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input 
+                            ref={inputRef}
                             type="text"
                             value={examSearch}
                             onChange={e => setExamSearch(e.target.value)}
                             placeholder="Search exams..."
-                            className="w-full bg-white/5 border border-white/10 text-white text-[13px] md:text-[14px] placeholder:text-slate-500 pl-11 pr-6 py-3 rounded-xl focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 shadow-sm font-semibold"
+                            className="w-full bg-white/5 border border-white/10 text-white text-[13px] md:text-[14px] placeholder:text-slate-500 pl-11 pr-16 py-3 rounded-xl focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 shadow-sm font-semibold"
                         />
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1 pointer-events-none select-none">
+                            <kbd className="bg-white/5 text-slate-500 border border-white/10 px-1.5 py-0.5 rounded text-[10px] font-mono">[ / ]</kbd>
+                        </div>
                     </div>
                 </div>
 

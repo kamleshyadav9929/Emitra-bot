@@ -1,5 +1,6 @@
-import { useState } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import { Search } from "lucide-react"
+import Fuse from "fuse.js"
 
 export default function ServicesTab({
     lang,
@@ -10,14 +11,58 @@ export default function ServicesTab({
     handleAutoServiceRequest,
 }) {
     const [activeCategory, setActiveCategory] = useState("ALL")
+    const [priceFilter, setPriceFilter] = useState("ALL")
+    const inputRef = useRef(null)
 
     const categories = ["ALL", ...Object.keys(services)]
 
-    const filteredServices = flatServicesList.filter(s => {
-        const matchSearch = s.name.toLowerCase().includes(serviceSearch.toLowerCase())
-        const matchCat = activeCategory === "ALL" || s.categoryKey === activeCategory
-        return matchSearch && matchCat
-    })
+    // Keyboard shortcut / listener to focus search input
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === "/" && document.activeElement !== inputRef.current) {
+                const activeTag = document.activeElement?.tagName
+                if (!["INPUT", "TEXTAREA", "SELECT"].includes(activeTag)) {
+                    e.preventDefault()
+                    inputRef.current?.focus()
+                }
+            }
+        }
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [])
+
+    // Memoized Fuse instance
+    const fuse = useMemo(() => {
+        return new Fuse(flatServicesList, {
+            keys: ["name", "categoryLabel"],
+            threshold: 0.35,
+        })
+    }, [flatServicesList])
+
+    // Memoized filtered services catalog combining fuzzy search, category matching, and price filtering
+    const filteredServices = useMemo(() => {
+        let list = flatServicesList
+
+        if (serviceSearch.trim()) {
+            list = fuse.search(serviceSearch).map(res => res.item)
+        }
+
+        return list.filter(s => {
+            const matchCat = activeCategory === "ALL" || s.categoryKey === activeCategory
+            
+            const price = parseFloat(s.price || 50)
+            let matchPrice = true
+            if (priceFilter === "UNDER_100") {
+                matchPrice = price < 100
+            } else if (priceFilter === "100_500") {
+                matchPrice = price >= 100 && price <= 500
+            } else if (priceFilter === "OVER_500") {
+                matchPrice = price > 505
+            }
+
+            return matchCat && matchPrice
+        })
+    }, [flatServicesList, serviceSearch, activeCategory, priceFilter, fuse])
 
     return (
         <div className="animate-fadeIn text-left pb-24 relative z-10">
@@ -27,17 +72,21 @@ export default function ServicesTab({
                     <div className="relative w-full">
                         <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input 
+                            ref={inputRef}
                             type="text"
                             value={serviceSearch}
                             onChange={e => setServiceSearch(e.target.value)}
                             placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
-                            className="w-full bg-white/5 border border-white/10 text-white text-[13px] md:text-[14px] placeholder:text-slate-500 pl-11 pr-6 py-3 rounded-xl focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 shadow-sm font-semibold"
+                            className="w-full bg-white/5 border border-white/10 text-white text-[13px] md:text-[14px] placeholder:text-slate-500 pl-11 pr-16 py-3 rounded-xl focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 shadow-sm font-semibold"
                         />
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1 pointer-events-none select-none">
+                            <kbd className="bg-white/5 text-slate-500 border border-white/10 px-1.5 py-0.5 rounded text-[10px] font-mono">[ / ]</kbd>
+                        </div>
                     </div>
                 </div>
 
                 {/* Horizontal Category Chips */}
-                <div className="flex flex-wrap gap-2 pb-2">
+                <div className="flex flex-wrap gap-2 pb-1">
                     {categories.map((catKey) => {
                         const label = catKey === "ALL" ? "All Services" : (services[catKey]?.label || catKey)
                         const isActive = activeCategory === catKey
@@ -47,7 +96,7 @@ export default function ServicesTab({
                                 onClick={() => setActiveCategory(catKey)}
                                 className={`px-4 py-1.5 rounded-full text-[12px] font-bold whitespace-nowrap transition-colors cursor-pointer ${
                                     isActive 
-                                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white" 
+                                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm shadow-blue-500/10" 
                                         : "bg-white/5 border border-white/5 text-slate-400 hover:bg-white/10 hover:text-white"
                                 }`}
                             >
@@ -57,9 +106,35 @@ export default function ServicesTab({
                     })}
                 </div>
 
+                {/* Horizontal Price Filters */}
+                <div className="flex flex-wrap gap-2 items-center pb-2">
+                    <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider mr-1.5 select-none">Price Range:</span>
+                    {[
+                        { id: "ALL", label: lang === 'EN' ? "All Prices" : "सभी दरें" },
+                        { id: "UNDER_100", label: "Under ₹100" },
+                        { id: "100_500", label: "₹100 - ₹500" },
+                        { id: "OVER_500", label: "₹500+" }
+                    ].map(p => {
+                        const isActive = priceFilter === p.id
+                        return (
+                            <button
+                                key={p.id}
+                                onClick={() => setPriceFilter(p.id)}
+                                className={`px-3 py-1 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer border ${
+                                    isActive
+                                        ? "bg-blue-500/15 text-blue-450 border-blue-500/25"
+                                        : "bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-white"
+                                }`}
+                            >
+                                {p.label}
+                            </button>
+                        )
+                    })}
+                </div>
+
                 {/* Service List */}
                 {filteredServices.length === 0 ? (
-                    <div className="text-center py-12 text-slate-400 text-sm">
+                    <div className="text-center py-12 text-slate-450 text-sm font-semibold bg-zinc-950/30 border border-white/5 border-dashed rounded-2xl">
                         No service records matching selections.
                     </div>
                 ) : (
