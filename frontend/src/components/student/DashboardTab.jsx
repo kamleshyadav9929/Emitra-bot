@@ -76,38 +76,56 @@ export default function DashboardTab({
             {/* Upcoming Deadlines (Compact) */}
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-wide">Upcoming Deadlines</h3>
-                    <button onClick={() => setActiveTab("exams")} className="text-[11px] font-bold text-[#0a4a83] hover:underline">View All</button>
+                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-wide">
+                        {lang === 'EN' ? 'Upcoming Deadlines' : 'आगामी समय सीमा'}
+                    </h3>
+                    <button onClick={() => setActiveTab("exams")} className="text-[11px] font-bold text-[#0a4a83] hover:underline">
+                        {lang === 'EN' ? 'View All' : 'सभी देखें'}
+                    </button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {exams.filter(ex => ex.end_date && new Date(ex.end_date) >= new Date()).slice(0, 2).map((ex, idx) => (
-                        <div key={idx} className="bg-white border border-slate-200 rounded-xl p-3.5 flex items-center justify-between shadow-sm">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
-                                    <Calendar size={18} />
+                {exams && exams.filter(ex => ex.end_date && new Date(ex.end_date) >= new Date()).length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {exams.filter(ex => ex.end_date && new Date(ex.end_date) >= new Date()).slice(0, 2).map((ex, idx) => (
+                            <div key={idx} className="bg-white border border-slate-200 rounded-xl p-3.5 flex items-center justify-between shadow-sm">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                                        <Calendar size={18} />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-[13px] font-bold text-slate-800 line-clamp-1 pr-2">{ex.name}</h4>
+                                        <p className="text-[11px] text-red-500 font-bold mt-0.5">
+                                            Closes: {new Date(ex.end_date).toLocaleDateString("en-IN", {day:'numeric', month:'short'})}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 className="text-[13px] font-bold text-slate-800 line-clamp-1 pr-2">{ex.name}</h4>
-                                    <p className="text-[11px] text-red-500 font-bold mt-0.5">
-                                        Closes: {new Date(ex.end_date).toLocaleDateString("en-IN", {day:'numeric', month:'short'})}
-                                    </p>
-                                </div>
+                                <button
+                                    onClick={() => {
+                                        if (!user) triggerSignIn()
+                                        else {
+                                            setWizardExamName(ex.name)
+                                            setIsWizardOpen(true)
+                                        }
+                                    }}
+                                    className="bg-[#4162EE] text-white px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-[#3451D4]"
+                                >
+                                    Apply
+                                </button>
                             </div>
-                            <button
-                                onClick={() => {
-                                    if (!user) triggerSignIn()
-                                    else {
-                                        setWizardExamName(ex.name)
-                                        setIsWizardOpen(true)
-                                    }
-                                }}
-                                className="bg-[#4162EE] text-white px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-[#3451D4]"
-                            >
-                                Apply
-                            </button>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-6 bg-slate-50 border border-slate-200 border-dashed rounded-xl flex flex-col items-center justify-center gap-2">
+                        <p className="text-slate-500 text-xs font-semibold">
+                            {lang === 'EN' ? 'No upcoming exam deadlines' : 'कोई आगामी परीक्षा समय सीमा नहीं है'}
+                        </p>
+                        <button 
+                            onClick={() => setActiveTab("exams")}
+                            className="bg-[#4162EE] text-white px-3 py-1 rounded-lg text-[10px] font-bold hover:bg-[#3451D4] cursor-pointer"
+                        >
+                            {lang === 'EN' ? 'View Exam Catalog' : 'परीक्षा सूची देखें'}
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Recent Applications */}
