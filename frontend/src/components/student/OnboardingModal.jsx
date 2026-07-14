@@ -100,11 +100,10 @@ export default function OnboardingModal({ isOpen, exams }) {
         submitOnboarding()
     }
 
-    if (!isOpen) return null
-
     return (
         <AnimatePresence>
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -361,6 +360,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                     </div>
                 </motion.div>
             </div>
+            )}
         </AnimatePresence>
     )
 }

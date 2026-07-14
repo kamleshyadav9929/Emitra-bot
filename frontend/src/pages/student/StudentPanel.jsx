@@ -783,7 +783,15 @@ export default function StudentPanel() {
                     {loading ? (
                         <StudentPortalSkeleton />
                     ) : (
-                        <div className="space-y-8 animate-fadeIn">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activeTab}
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -12 }}
+                                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                                className="space-y-8"
+                            >
                             
                             {/* ── Tab 1: Overview ── */}
                             {activeTab === "dashboard" && (
@@ -909,7 +917,8 @@ export default function StudentPanel() {
                                 />
                             )}
 
-                        </div>
+                            </motion.div>
+                        </AnimatePresence>
                     )}
                 </main>
 
@@ -948,13 +957,25 @@ export default function StudentPanel() {
             />
 
             {/* ── SERVICE REQUEST SUBMISSION MODAL ── */}
-            {activeServiceForForm && (
-                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <motion.div 
-                        initial={{ opacity: 0, scale: 0.95, y: 15 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        className="bg-white rounded-3xl border border-[var(--color-outline-variant)] max-w-md w-full shadow-ambient p-6 space-y-5"
-                    >
+            <AnimatePresence>
+                {activeServiceForForm && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+                            onClick={() => setActiveServiceForForm(null)}
+                        />
+
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                            className="bg-white rounded-3xl border border-[var(--color-outline-variant)] max-w-md w-full shadow-ambient p-6 space-y-5 z-10"
+                        >
                         <div className="flex justify-between items-start border-b border-slate-100 pb-3">
                             <div>
                                 <h3 className="text-[14.5px] font-extrabold text-slate-900 text-left font-display">Filing Request Registered</h3>
@@ -1033,6 +1054,7 @@ export default function StudentPanel() {
                     </motion.div>
                 </div>
             )}
+        </AnimatePresence>
 
         </div>
     )

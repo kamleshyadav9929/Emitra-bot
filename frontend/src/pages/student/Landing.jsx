@@ -266,7 +266,7 @@ export default function Landing() {
                         <Clock size={11} className="animate-pulse text-amber-400" /> {lang === "EN" ? "Upcoming Deadlines" : "आगामी अंतिम तिथियां"}
                     </div>
                     <div className="flex items-center gap-12 whitespace-nowrap marquee-track">
-                        {upcomingDeadlines.map((ex, idx) => (
+                        {[...upcomingDeadlines, ...upcomingDeadlines].map((ex, idx) => (
                             <span key={idx} className="inline-flex items-center gap-1.5 text-[11px]">
                                 ⚡ <span className="font-extrabold text-white">{ex.name}</span>: <span className="text-slate-400">{lang === "EN" ? "Closes on" : "अंतिम तिथि"}</span> <span className="text-amber-400 font-bold">{new Date(ex.end_date).toLocaleDateString()}</span>
                             </span>
@@ -840,91 +840,103 @@ export default function Landing() {
             </footer>
 
             {/* ── SERVICE REQUEST MODAL ── */}
-            {showRequestModal && requestModalSvc && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div
-                        className="absolute inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
-                        onClick={() => setShowRequestModal(false)}
-                    />
-
-                    <div className="relative bg-[#0b0f19]/95 border border-white/15 rounded-3xl shadow-2xl p-6 md:p-8 max-w-md w-full z-10 text-left text-white backdrop-blur-xl">
-                        <button
+            <AnimatePresence>
+                {showRequestModal && requestModalSvc && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute inset-0 bg-black/75 backdrop-blur-sm"
                             onClick={() => setShowRequestModal(false)}
-                            className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors p-1 bg-transparent border-none cursor-pointer"
+                        />
+
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                            className="relative bg-[#0b0f19]/95 border border-white/15 rounded-3xl shadow-2xl p-6 md:p-8 max-w-md w-full z-10 text-left text-white backdrop-blur-xl"
                         >
-                            <X size={18} />
-                        </button>
+                            <button
+                                onClick={() => setShowRequestModal(false)}
+                                className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors p-1 bg-transparent border-none cursor-pointer"
+                            >
+                                <X size={18} />
+                            </button>
 
-                        <div className="space-y-6">
-                            <div className="space-y-2">
-                                <span className="text-[10px] font-bold text-blue-450 bg-blue-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider border border-blue-500/20">
-                                    {requestModalCatLabel}
-                                </span>
-                                <h3 className="text-xl font-black text-white font-display">
-                                    {lang === 'EN' ? 'Confirm Request' : 'अनुरोध की पुष्टि करें'}
-                                </h3>
-                                <p className="text-[12px] text-slate-400 font-medium leading-relaxed">
-                                    {lang === 'EN'
-                                        ? `You are requesting: "${requestModalSvc.name}". Enter your name and phone number to automatically send this request to our admin desk.`
-                                        : `आप "${requestModalSvc.name}" का अनुरोध कर रहे हैं। इस अनुरोध को हमारे एडमिन डेस्क पर भेजने के लिए अपना नाम और फोन नंबर दर्ज करें।`}
-                                </p>
-                            </div>
-
-                            <form onSubmit={handleModalSubmit} className="space-y-4">
-                                <div className="space-y-1 text-left">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">
-                                        {lang === 'EN' ? 'Full Name' : 'पूरा नाम'}
-                                    </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={customerName}
-                                        onChange={e => setCustomerName(e.target.value)}
-                                        placeholder={lang === 'EN' ? 'Enter your name' : 'अपना नाम दर्ज करें'}
-                                        className="w-full bg-black/50 border border-white/10 text-[13px] text-white placeholder:text-slate-650 px-4 py-2.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-medium"
-                                    />
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <span className="text-[10px] font-bold text-blue-450 bg-blue-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider border border-blue-500/20">
+                                        {requestModalCatLabel}
+                                    </span>
+                                    <h3 className="text-xl font-black text-white font-display">
+                                        {lang === 'EN' ? 'Confirm Request' : 'अनुरोध की पुष्टि करें'}
+                                    </h3>
+                                    <p className="text-[12px] text-slate-400 font-medium leading-relaxed">
+                                        {lang === 'EN'
+                                            ? `You are requesting: "${requestModalSvc.name}". Enter your name and phone number to automatically send this request to our admin desk.`
+                                            : `आप "${requestModalSvc.name}" का अनुरोध कर रहे हैं। इस अनुरोध को हमारे एडमिन डेस्क पर भेजने के लिए अपना नाम और फोन नंबर दर्ज करें।`}
+                                    </p>
                                 </div>
 
-                                <div className="space-y-1 text-left">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">
-                                        {lang === 'EN' ? 'Phone Number (WhatsApp)' : 'फ़ोन नंबर (व्हाट्सएप)'}
-                                    </label>
-                                    <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[13px] text-slate-500 font-bold font-mono">+91</span>
+                                <form onSubmit={handleModalSubmit} className="space-y-4">
+                                    <div className="space-y-1 text-left">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">
+                                            {lang === 'EN' ? 'Full Name' : 'पूरा नाम'}
+                                        </label>
                                         <input
-                                            type="tel"
+                                            type="text"
                                             required
-                                            pattern="[6-9][0-9]{9}"
-                                            value={customerPhone}
-                                            onChange={e => setCustomerPhone(e.target.value)}
-                                            placeholder={lang === 'EN' ? '10-digit number' : '10-अंकीय नंबर'}
-                                            className="w-full bg-black/50 border border-white/10 text-[13px] text-white placeholder:text-slate-650 pl-14 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-mono font-medium"
+                                            value={customerName}
+                                            onChange={e => setCustomerName(e.target.value)}
+                                            placeholder={lang === 'EN' ? 'Enter your name' : 'अपना नाम दर्ज करें'}
+                                            className="w-full bg-black/50 border border-white/10 text-[13px] text-white placeholder:text-slate-650 px-4 py-2.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-medium"
                                         />
                                     </div>
-                                </div>
 
-                                <button
-                                    type="submit"
-                                    disabled={isSubmittingRequest}
-                                    className="w-full mt-2 py-3 bg-white hover:bg-slate-100 text-slate-950 text-[13px] font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-none disabled:opacity-50"
-                                >
-                                    {isSubmittingRequest ? (
-                                        <>
-                                            <Loader2 className="animate-spin" size={16} />
-                                            <span>{lang === 'EN' ? 'Processing...' : 'प्रक्रिया जारी है...'}</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <span>{lang === 'EN' ? 'Continue to WhatsApp' : 'व्हाट्सएप पर आगे बढ़ें'}</span>
-                                            <ArrowRight size={16} />
-                                        </>
-                                    )}
-                                </button>
-                            </form>
-                        </div>
+                                    <div className="space-y-1 text-left">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">
+                                            {lang === 'EN' ? 'Phone Number (WhatsApp)' : 'फ़ोन नंबर (व्हाट्सएप)'}
+                                        </label>
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[13px] text-slate-500 font-bold font-mono">+91</span>
+                                            <input
+                                                type="tel"
+                                                required
+                                                pattern="[6-9][0-9]{9}"
+                                                value={customerPhone}
+                                                onChange={e => setCustomerPhone(e.target.value)}
+                                                placeholder={lang === 'EN' ? '10-digit number' : '10-अंकीय नंबर'}
+                                                className="w-full bg-black/50 border border-white/10 text-[13px] text-white placeholder:text-slate-650 pl-14 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-mono font-medium"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmittingRequest}
+                                        className="w-full mt-2 py-3 bg-white hover:bg-slate-100 text-slate-950 text-[13px] font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-none disabled:opacity-50"
+                                    >
+                                        {isSubmittingRequest ? (
+                                            <>
+                                                <Loader2 className="animate-spin" size={16} />
+                                                <span>{lang === 'EN' ? 'Processing...' : 'प्रक्रिया जारी है...'}</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span>{lang === 'EN' ? 'Continue to WhatsApp' : 'व्हाट्सएप पर आगे बढ़ें'}</span>
+                                                <ArrowRight size={16} />
+                                            </>
+                                        )}
+                                    </button>
+                                </form>
+                            </div>
+                        </motion.div>
                     </div>
-                </div>
-            )}
+                )}
+            </AnimatePresence>
 
             <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
         </div>
