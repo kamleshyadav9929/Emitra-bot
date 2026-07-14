@@ -1529,7 +1529,7 @@ def admin_update_exam(exam_id):
     if success:
         return jsonify({"success": True})
     else:
-        return jsonify({"success": False, "error": "Failed to update exam"}), 400
+        return jsonify({"success": False, "error": result}), 400
 
 
 @app.route("/api/admin/applications", methods=["GET"])

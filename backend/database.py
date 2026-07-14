@@ -1131,7 +1131,7 @@ def update_exam_details(exam_id, name, description, category_id, official_url, e
                 supabase.table("exam_cycles").insert(cycle_data).execute()
 
         _cache_invalidate("all_exams")
-        return True
+        return True, exam_id
     except Exception as e:
         return False, f"Error: {str(e)}"
 
