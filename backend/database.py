@@ -85,6 +85,23 @@ def init_db():
         if res_set.count == 0:
             _seed_default_settings()
             print("Successfully seeded default bot settings to Supabase.")
+
+        # Clean up any stale/interrupted broadcast jobs at startup
+        try:
+            stuck_res = supabase.table("broadcast_jobs").select("id").in_("status", ["running", "queued"]).execute()
+            if stuck_res.data:
+                now_str = datetime.utcnow().isoformat()
+                for job in stuck_res.data:
+                    supabase.table("broadcast_jobs").update({
+                        "status": "failed",
+                        "error_msg": "Interrupted by server restart",
+                        "finished_at": now_str,
+                        "updated_at": now_str
+                    }).eq("id", job["id"]).execute()
+                print(f"[Startup Cleanup] Cleaned up {len(stuck_res.data)} stuck broadcast jobs.")
+        except Exception as cleanup_err:
+            print(f"Error cleaning up stuck broadcast jobs at startup: {cleanup_err}")
+
     except Exception as e:
         print(f"Database initialization warning: {e}. Please ensure you ran supabase_schema.sql on your Supabase dashboard.")
 
@@ -645,7 +662,13 @@ def create_broadcast_job(job_id, target_exam, total_count):
 
 def update_broadcast_status(job_id, status, sent_count=None, error_msg=None):
     now_str = datetime.utcnow().isoformat()
-    updates = {"status": status, "updated_at": now_str}
+    db_status = status
+    if status == "done":
+        db_status = "completed"
+    elif status == "error":
+        db_status = "failed"
+        
+    updates = {"status": db_status, "updated_at": now_str}
     if sent_count is not None:
         updates["sent_count"] = sent_count
     if error_msg is not None:
@@ -664,9 +687,16 @@ def get_broadcast_status(job_id):
     if not res.data:
         return None
     row = res.data[0]
+    
+    status = row["status"]
+    if status == "completed":
+        status = "done"
+    elif status == "failed":
+        status = "error"
+        
     return {
         "id": row["id"],
-        "status": row["status"],
+        "status": status,
         "sent": row["sent_count"],
         "total": row["total_count"],
         "exam": row["exams"]["name"] if row.get("exams") else "ALL",

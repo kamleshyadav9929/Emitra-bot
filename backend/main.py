@@ -1067,12 +1067,43 @@ def send_notification():
     # Check if a broadcast is already running to prevent concurrent conflicts
     from database import supabase
     try:
-        running_jobs = supabase.table("broadcast_jobs").select("id").eq("status", "running").execute()
+        running_jobs = supabase.table("broadcast_jobs").select("id, started_at, created_at").eq("status", "running").execute()
         if running_jobs.data:
-            return jsonify({
-                "success": False,
-                "error": "A broadcast job is already running. Please wait until it completes."
-            }), 409
+            has_active_job = False
+            for job in running_jobs.data:
+                ts_str = job.get("started_at") or job.get("created_at")
+                if ts_str:
+                    try:
+                        if ts_str.endswith("Z"):
+                            ts_str = ts_str[:-1] + "+00:00"
+                        job_time = datetime.fromisoformat(ts_str)
+                        if job_time.tzinfo is None:
+                            job_time = job_time.replace(tzinfo=timezone.utc)
+                        
+                        age_seconds = (datetime.now(timezone.utc) - job_time).total_seconds()
+                        if age_seconds > 900:  # 15 minutes
+                            # Automatically mark stale job as failed
+                            now_str = datetime.utcnow().isoformat()
+                            supabase.table("broadcast_jobs").update({
+                                "status": "failed",
+                                "error_msg": "Job timed out / crashed",
+                                "finished_at": now_str,
+                                "updated_at": now_str
+                            }).eq("id", job["id"]).execute()
+                            print(f"[Auto-cleanup] Marked stale job {job['id']} as failed.")
+                        else:
+                            has_active_job = True
+                    except Exception as parse_err:
+                        print(f"Error parsing job timestamp: {parse_err}")
+                        has_active_job = True
+                else:
+                    has_active_job = True
+            
+            if has_active_job:
+                return jsonify({
+                    "success": False,
+                    "error": "A broadcast job is already running. Please wait until it completes."
+                }), 409
     except Exception as e:
         print(f"Error checking running broadcast jobs: {e}")
 
