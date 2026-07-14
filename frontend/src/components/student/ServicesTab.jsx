@@ -134,13 +134,13 @@ export default function ServicesTab({
 
                 {/* Service List */}
                 {filteredServices.length === 0 ? (
-                    <div className="text-center py-12 text-slate-450 text-sm font-semibold bg-zinc-950/30 border border-white/5 border-dashed rounded-2xl">
+                    <div className="text-center py-12 text-slate-400 text-sm font-semibold bg-zinc-900/40 border border-white/15 border-dashed rounded-2xl">
                         No service records matching selections.
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {filteredServices.map((svc, idx) => (
-                            <div key={idx} className="bg-zinc-950/50 border border-white/5 p-4 rounded-xl flex items-center justify-between shadow-sm hover:border-white/15 hover:shadow-md transition-all duration-300">
+                            <div key={idx} className="bg-zinc-900/70 border border-white/10 p-4 rounded-xl flex items-center justify-between shadow-sm hover:border-white/20 hover:shadow-md transition-all duration-300">
                                 <div className="flex-1 pr-4">
                                     <h4 className="text-sm font-bold text-slate-200 line-clamp-2 leading-snug">{svc.name}</h4>
                                     <div className="flex items-center gap-2 mt-1.5">

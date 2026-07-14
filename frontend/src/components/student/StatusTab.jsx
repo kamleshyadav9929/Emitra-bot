@@ -42,15 +42,15 @@ export default function StatusTab({
         <div className="space-y-6 pb-20 animate-fadeIn relative z-10">
             {/* Activity Summary (Moved from Dashboard) */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <div className="bg-zinc-950/50 p-4 border border-white/5 rounded-xl shadow-sm text-center">
+                <div className="bg-zinc-900/70 p-4 border border-white/10 rounded-xl shadow-sm text-center">
                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Active</p>
                     <p className="text-2xl font-black text-blue-400">{statsProgress?.active || 0}</p>
                 </div>
-                <div className="bg-zinc-950/50 p-4 border border-white/5 rounded-xl shadow-sm text-center">
+                <div className="bg-zinc-900/70 p-4 border border-white/10 rounded-xl shadow-sm text-center">
                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Completed</p>
                     <p className="text-2xl font-black text-emerald-400">{statsProgress?.completed || 0}</p>
                 </div>
-                <div className="bg-zinc-950/50 p-4 border border-white/5 rounded-xl shadow-sm text-center col-span-2 md:col-span-1 cursor-pointer hover:border-white/15 hover:bg-zinc-900/50 transition-all" onClick={() => setActiveTab("exams")}>
+                <div className="bg-zinc-900/70 p-4 border border-white/10 rounded-xl shadow-sm text-center col-span-2 md:col-span-1 cursor-pointer hover:border-white/20 hover:bg-zinc-800/50 transition-all" onClick={() => setActiveTab("exams")}>
                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Saved Exams</p>
                     <p className="text-2xl font-black text-indigo-400">{subscribedExams?.length || 0}</p>
                 </div>
@@ -62,7 +62,7 @@ export default function StatusTab({
             </div>
 
             {history.length === 0 ? (
-                <div className="text-center py-12 border border-dashed border-white/10 rounded-2xl bg-zinc-950/30">
+                <div className="text-center py-12 border border-dashed border-white/15 rounded-2xl bg-zinc-900/40">
                     <p className="text-slate-500 text-sm">No applications found.</p>
                 </div>
             ) : (
@@ -73,7 +73,7 @@ export default function StatusTab({
                         const isExpanded = expandedItemId === item.id
 
                         return (
-                            <div key={idx} className="bg-zinc-950/50 border border-white/5 rounded-[24px] p-4 shadow-sm hover:border-white/15 transition-all duration-300">
+                            <div key={idx} className="bg-zinc-900/70 border border-white/10 rounded-[24px] p-4 shadow-sm hover:border-white/20 transition-all duration-300">
                                 <div className="flex justify-between items-start mb-3">
                                     <div className="text-left">
                                         <span className="text-[10px] font-black tracking-widest uppercase text-slate-500 block mb-1">

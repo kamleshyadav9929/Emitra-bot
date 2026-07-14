@@ -135,7 +135,7 @@ export default function ExamsTab({
                         {examsToRender.map((ex, idx) => {
                             const isSubscribed = subscribedExams.includes(ex.name)
                             return (
-                                <div key={idx} className="bg-zinc-950/50 border border-white/5 p-4 rounded-xl shadow-sm relative flex flex-col justify-between hover:border-white/15 hover:shadow-md transition-all duration-300">
+                                <div key={idx} className="bg-zinc-900/70 border border-white/10 p-4 rounded-xl shadow-sm relative flex flex-col justify-between hover:border-white/20 hover:shadow-md transition-all duration-300">
                                     <div className="flex justify-between items-start mb-3">
                                         <div className="pr-4">
                                             <h4 className="text-[14px] font-bold text-slate-200 leading-snug line-clamp-2">{ex.name}</h4>

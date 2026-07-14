@@ -21,7 +21,7 @@ export default function ProfileTab({
                 </p>
             </div>
 
-            <div className="bg-zinc-950/50 backdrop-blur-xl border border-white/10 rounded-[24px] shadow-lg p-4 md:p-8 max-w-xl mx-auto space-y-4 md:space-y-6">
+            <div className="bg-zinc-900/70 backdrop-blur-xl border border-white/10 rounded-[24px] shadow-lg p-4 md:p-8 max-w-xl mx-auto space-y-4 md:space-y-6">
                 {profileSavedMessage && (
                     <div className="p-3.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl text-[12px] font-semibold">
                         {profileSavedMessage}

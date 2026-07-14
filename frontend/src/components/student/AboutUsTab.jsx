@@ -17,7 +17,7 @@ export default function AboutUsTab({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                 {/* Center Location */}
-                <div className="bg-zinc-950/50 backdrop-blur-xl border border-white/5 rounded-[24px] p-4 md:p-6 shadow-sm hover:border-white/15 hover:shadow-lg transition-all duration-300 space-y-3 md:space-y-4 text-left">
+                <div className="bg-zinc-900/70 backdrop-blur-xl border border-white/10 rounded-[24px] p-4 md:p-6 shadow-sm hover:border-white/20 hover:shadow-lg transition-all duration-300 space-y-3 md:space-y-4 text-left">
                     <h4 className="text-[13.5px] font-extrabold text-blue-400 uppercase tracking-wider font-display">
                         {lang === 'EN' ? 'Center Location' : 'केंद्र का स्थान'}
                     </h4>
@@ -35,7 +35,7 @@ export default function AboutUsTab({
                 </div>
 
                 {/* Our Commitment */}
-                <div className="bg-zinc-950/50 backdrop-blur-xl border border-white/5 rounded-[24px] p-4 md:p-6 shadow-sm hover:border-white/15 hover:shadow-lg transition-all duration-300 space-y-3 md:space-y-4 text-left">
+                <div className="bg-zinc-900/70 backdrop-blur-xl border border-white/10 rounded-[24px] p-4 md:p-6 shadow-sm hover:border-white/20 hover:shadow-lg transition-all duration-300 space-y-3 md:space-y-4 text-left">
                     <h4 className="text-[13.5px] font-extrabold text-blue-400 uppercase tracking-wider font-display">
                         {lang === 'EN' ? 'Our Commitment' : 'हमारी प्रतिबद्धता'}
                     </h4>
@@ -51,7 +51,7 @@ export default function AboutUsTab({
                 </div>
 
                 {/* WhatsApp Desk */}
-                <div className="bg-zinc-950/50 backdrop-blur-xl border border-white/5 rounded-[24px] p-4 md:p-6 shadow-sm hover:border-white/15 hover:shadow-lg transition-all duration-300 space-y-3 md:space-y-4 text-left">
+                <div className="bg-zinc-900/70 backdrop-blur-xl border border-white/10 rounded-[24px] p-4 md:p-6 shadow-sm hover:border-white/20 hover:shadow-lg transition-all duration-300 space-y-3 md:space-y-4 text-left">
                     <h4 className="text-[13.5px] font-extrabold text-blue-400 uppercase tracking-wider font-display">
                         {lang === 'EN' ? 'Direct WhatsApp Desk' : 'सीधा व्हाट्सएप डेस्क'}
                     </h4>

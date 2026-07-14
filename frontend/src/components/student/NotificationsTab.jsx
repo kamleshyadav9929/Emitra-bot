@@ -59,8 +59,8 @@ export default function NotificationsTab({ notifications, formatMessage, onMarkR
                                 onClick={() => onMarkRead(ann.id)}
                                 className={`rounded-xl p-4 shadow-sm border cursor-pointer transition-all duration-300 ${
                                     isRead 
-                                        ? 'bg-zinc-950/30 border-white/5 opacity-70 hover:opacity-90 hover:border-white/10' 
-                                        : 'bg-zinc-950/60 border-[#4162EE]/40 hover:border-[#4162EE]/60'
+                                        ? 'bg-zinc-900/40 border-white/10 opacity-70 hover:opacity-90 hover:border-white/15' 
+                                        : 'bg-zinc-900/80 border-[#4162EE]/50 hover:border-[#4162EE]/70 shadow-md shadow-[#4162EE]/5'
                                 }`}
                             >
                                 <div className="flex gap-3">

@@ -768,7 +768,7 @@ export default function StudentPanel() {
                     <div className="flex-1 min-w-0 h-[calc(100vh-108px)] overflow-y-auto scroll-container-smooth flex flex-col justify-between">
                         {/* Official Bulletin Notice Ticker */}
                         {upcomingDeadlines.length > 0 && activeTab !== "services" && (
-                            <div className="bg-orange-500/10 text-orange-200 text-[11px] font-semibold py-1.5 md:py-2 px-3 md:px-6 overflow-hidden flex items-center border-b border-orange-500/20 shadow-inner relative shrink-0">
+                            <div className="hidden md:flex bg-orange-500/10 text-orange-200 text-[11px] font-semibold py-1.5 md:py-2 px-3 md:px-6 overflow-hidden items-center border-b border-orange-500/20 shadow-inner relative shrink-0">
                                 <div className="flex items-center gap-1.5 shrink-0 bg-[#050508] z-10 pr-2 md:pr-4 mr-2 md:mr-4 text-orange-400 font-black uppercase tracking-wider relative">
                                     <Clock size={12} className="animate-pulse" /> 
                                     {lang === "EN" ? "URGENT NOTICES" : "आवश्यक सूचना"}

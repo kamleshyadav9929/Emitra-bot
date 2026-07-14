@@ -86,7 +86,7 @@ export default function DashboardTab({
                         <button 
                             key={nav.id}
                             onClick={() => setActiveTab(nav.id)}
-                            className="bg-zinc-950/50 backdrop-blur-md p-5 rounded-2xl border border-white/5 shadow-sm flex flex-col items-center justify-center gap-3.5 hover:border-white/15 hover:bg-zinc-900/50 hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer group active:scale-97"
+                            className="bg-zinc-900/70 backdrop-blur-md p-5 rounded-2xl border border-white/10 shadow-sm flex flex-col items-center justify-center gap-3.5 hover:border-white/20 hover:bg-zinc-800/50 hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer group active:scale-97"
                         >
                             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${nav.color} border transition-all duration-300 group-hover:scale-105`}>
                                 <Icon size={20} />
@@ -110,7 +110,7 @@ export default function DashboardTab({
                 {exams && exams.filter(ex => ex.end_date && new Date(ex.end_date) >= new Date()).length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {exams.filter(ex => ex.end_date && new Date(ex.end_date) >= new Date()).slice(0, 2).map((ex, idx) => (
-                            <div key={idx} className="bg-zinc-950/50 backdrop-blur-sm border border-white/5 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:border-white/15 hover:shadow-md hover:-translate-y-0.5 transition-all duration-350">
+                            <div key={idx} className="bg-zinc-900/70 backdrop-blur-sm border border-white/10 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:border-white/20 hover:shadow-md hover:-translate-y-0.5 transition-all duration-350">
                                 <div className="flex items-center gap-3.5 min-w-0">
                                     <div className="w-11 h-11 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0">
                                         <Calendar size={18} />
@@ -139,7 +139,7 @@ export default function DashboardTab({
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-8 bg-zinc-950/30 backdrop-blur-sm border border-white/10 border-dashed rounded-2xl flex flex-col items-center justify-center gap-2">
+                    <div className="text-center py-8 bg-zinc-900/40 backdrop-blur-sm border border-white/15 border-dashed rounded-2xl flex flex-col items-center justify-center gap-2">
                         <p className="text-slate-500 text-xs font-semibold">
                             {lang === 'EN' ? 'No upcoming exam deadlines' : 'कोई आगामी परीक्षा समय सीमा नहीं है'}
                         </p>
@@ -178,7 +178,7 @@ export default function DashboardTab({
                                 <div 
                                     key={idx}
                                     onClick={() => setActiveTab("status")}
-                                    className="bg-zinc-950/50 backdrop-blur-sm border border-white/5 rounded-2xl p-4.5 flex flex-col justify-between shadow-sm hover:border-white/15 hover:shadow-md transition-all duration-300 cursor-pointer"
+                                    className="bg-zinc-900/70 backdrop-blur-sm border border-white/10 rounded-2xl p-4.5 flex flex-col justify-between shadow-sm hover:border-white/20 hover:shadow-md transition-all duration-300 cursor-pointer"
                                 >
                                     <div className="flex items-start justify-between gap-2">
                                         <div className="flex items-center gap-3.5 min-w-0">
@@ -219,7 +219,7 @@ export default function DashboardTab({
                         })}
                     </div>
                 ) : (
-                    <div className="text-center py-8 bg-zinc-950/30 backdrop-blur-sm border border-white/10 border-dashed rounded-2xl flex flex-col items-center justify-center gap-3">
+                    <div className="text-center py-8 bg-zinc-900/40 backdrop-blur-sm border border-white/15 border-dashed rounded-2xl flex flex-col items-center justify-center gap-3">
                         <p className="text-slate-500 text-xs font-semibold">
                             {lang === 'EN' ? 'No recent applications found' : 'कोई हालिया आवेदन नहीं मिला'}
                         </p>

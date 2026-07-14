@@ -261,7 +261,7 @@ export default function Landing() {
 
             {/* ── DEADLINES TICKER ── */}
             {upcomingDeadlines.length > 0 && (
-                <div className="bg-slate-950/80 border-y border-white/5 text-slate-350 text-[10.5px] font-semibold py-2 px-6 overflow-hidden flex items-center relative z-10">
+                <div className="hidden md:flex bg-slate-950/80 border-y border-white/5 text-slate-350 text-[10.5px] font-semibold py-2 px-6 overflow-hidden items-center relative z-10">
                     <div className="flex items-center gap-1.5 shrink-0 bg-slate-950 z-10 pr-4 mr-4 text-amber-400 font-bold uppercase tracking-wider relative font-display">
                         <Clock size={11} className="animate-pulse text-amber-400" /> {lang === "EN" ? "Upcoming Deadlines" : "आगामी अंतिम तिथियां"}
                     </div>
