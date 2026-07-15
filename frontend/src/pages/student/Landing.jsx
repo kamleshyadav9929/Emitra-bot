@@ -209,7 +209,7 @@ export default function Landing() {
             </div>
 
             {/* ── HEADER ── */}
-            <header className="sticky top-0 z-40 bg-[#050508]/75 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 lg:px-12 h-20 flex items-center justify-between">
+            <header className="sticky top-0 z-40 bg-[#050508]/75 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <Logo className="w-9 h-9 rounded-full border border-white/10" />
                     <div className="leading-none hidden sm:block text-left">
