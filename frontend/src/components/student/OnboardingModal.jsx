@@ -208,7 +208,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                     transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                     className="relative w-full max-w-md bg-white border border-slate-100 rounded-3xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[90vh]"
                 >
-                    <div className="px-6 py-5 border-b border-slate-100 bg-slate-50 shrink-0 text-center relative">
+                    <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-slate-100 bg-slate-50 shrink-0 text-center relative">
                         {step > 1 && status === "idle" && (
                             <button onClick={() => setStep(step - 1)} className="absolute left-4 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors">
                                 <ArrowLeft size={20} />
@@ -234,7 +234,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                         )}
                     </div>
 
-                    <div className="p-6 overflow-y-auto flex-1 scroll-container-smooth">
+                    <div className="p-4 sm:p-6 overflow-y-auto flex-1 flex flex-col scroll-container-smooth">
                         {status === "loading" || status === "success" ? (
                             <div className="flex flex-col items-center justify-center py-12 space-y-5">
                                 {status === "loading" ? (
@@ -270,7 +270,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                                 )}
                             </div>
                         ) : (
-                            <div className="space-y-5">
+                            <div className="flex flex-col flex-1 min-h-0 space-y-5">
                                 {errorMsg && (
                                     <div className="bg-rose-50 text-rose-600 p-3 rounded-xl text-[12px] font-semibold flex items-center gap-2">
                                         <AlertCircle size={16} />
@@ -347,19 +347,19 @@ export default function OnboardingModal({ isOpen, exams }) {
 
                                 {/* STEP 2 */}
                                 {step === 2 && (
-                                    <div className="space-y-4">
-                                        <div className="relative">
+                                    <div className="flex flex-col flex-1 min-h-0 space-y-4">
+                                        <div className="relative shrink-0">
                                             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                                             <input
                                                 type="text"
                                                 value={examSearch}
                                                 onChange={(e) => setExamSearch(e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[13.5px] rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-[var(--color-primary)] focus:bg-white transition-colors sticky top-0"
+                                                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[13.5px] rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-[var(--color-primary)] focus:bg-white transition-colors"
                                                 placeholder={lang === "EN" ? "Search exams..." : "परीक्षाएं खोजें..."}
                                             />
                                         </div>
 
-                                        <div className="grid grid-cols-1 gap-2 max-h-56 overflow-y-auto pr-1 custom-scrollbar">
+                                        <div className="grid grid-cols-1 gap-2 overflow-y-auto flex-1 max-h-[190px] sm:max-h-56 pr-1 custom-scrollbar min-h-0">
                                             {filteredExams.length > 0 ? (
                                                 filteredExams.map(exam => (
                                                     <div 
@@ -393,7 +393,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                                             )}
                                         </div>
 
-                                        <div className="pt-4">
+                                        <div className="pt-2 shrink-0">
                                             <button
                                                 onClick={handleNextStep2}
                                                 className="w-full py-3.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white font-bold text-[13px] rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-none"
