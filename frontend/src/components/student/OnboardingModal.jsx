@@ -234,7 +234,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                         )}
                     </div>
 
-                    <div className="p-3 sm:p-6 flex-1 flex flex-col min-h-0 scroll-container-smooth">
+                    <div className="p-4 sm:p-6 overflow-y-auto flex-1">
                         {status === "loading" || status === "success" ? (
                             <div className="flex flex-col items-center justify-center py-12 space-y-5">
                                 {status === "loading" ? (
@@ -270,7 +270,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                                 )}
                             </div>
                         ) : (
-                            <div className="flex flex-col flex-1 min-h-0 space-y-5">
+                            <div className="space-y-5">
                                 {errorMsg && (
                                     <div className="bg-rose-50 text-rose-600 p-3 rounded-xl text-[12px] font-semibold flex items-center gap-2">
                                         <AlertCircle size={16} />
@@ -280,7 +280,7 @@ export default function OnboardingModal({ isOpen, exams }) {
 
                                 {/* STEP 1 */}
                                 {step === 1 && (
-                                    <div className="space-y-4 overflow-y-auto flex-1 pr-1 custom-scrollbar min-h-0 pb-1">
+                                    <div className="space-y-4">
                                         <div className="space-y-1.5">
                                             <label className="text-[12px] font-bold text-slate-700 ml-1">
                                                 {lang === "EN" ? "Your Name" : "आपका नाम"} <span className="text-rose-500">*</span>
@@ -347,8 +347,9 @@ export default function OnboardingModal({ isOpen, exams }) {
 
                                 {/* STEP 2 */}
                                 {step === 2 && (
-                                    <div className="flex flex-col flex-1 min-h-0 space-y-4">
-                                        <div className="relative shrink-0">
+                                    <div>
+                                        {/* Search - pinned at top */}
+                                        <div className="relative" style={{ marginBottom: '12px' }}>
                                             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                                             <input
                                                 type="text"
@@ -359,41 +360,48 @@ export default function OnboardingModal({ isOpen, exams }) {
                                             />
                                         </div>
 
-                                        <div className="grid grid-cols-1 gap-2 overflow-y-auto flex-1 max-h-36 sm:max-h-72 pr-1 custom-scrollbar min-h-0">
-                                            {filteredExams.length > 0 ? (
-                                                filteredExams.map(exam => (
-                                                    <div 
-                                                        key={exam.id}
-                                                        onClick={() => toggleExam(exam.name)}
-                                                        className={`border rounded-xl p-3 flex flex-col gap-1 cursor-pointer transition-all ${
-                                                            selectedExams.includes(exam.name) 
-                                                                ? "border-[var(--color-primary)] bg-[var(--color-primary)]/5" 
-                                                                : "border-slate-200 bg-white hover:border-slate-300"
-                                                        }`}
-                                                    >
-                                                        <div className="flex items-center justify-between">
-                                                            <span className="text-[12.5px] font-bold text-slate-800 leading-tight pr-4">
-                                                                {exam.name}
-                                                            </span>
-                                                            <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                                                                selectedExams.includes(exam.name)
-                                                                    ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-white"
-                                                                    : "border-slate-300"
-                                                            }`}>
-                                                                {selectedExams.includes(exam.name) && <CheckCircle2 size={10} />}
+                                        {/* Scrollable exam list - inline styles guarantee this works */}
+                                        <div 
+                                            style={{ maxHeight: '45vh', overflowY: 'auto', paddingRight: '4px' }}
+                                            className="custom-scrollbar"
+                                        >
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                {filteredExams.length > 0 ? (
+                                                    filteredExams.map(exam => (
+                                                        <div 
+                                                            key={exam.id}
+                                                            onClick={() => toggleExam(exam.name)}
+                                                            className={`border rounded-xl p-3 flex flex-col gap-1 cursor-pointer transition-all ${
+                                                                selectedExams.includes(exam.name) 
+                                                                    ? "border-[var(--color-primary)] bg-[var(--color-primary)]/5" 
+                                                                    : "border-slate-200 bg-white hover:border-slate-300"
+                                                            }`}
+                                                        >
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-[12.5px] font-bold text-slate-800 leading-tight pr-4">
+                                                                    {exam.name}
+                                                                </span>
+                                                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                                                                    selectedExams.includes(exam.name)
+                                                                        ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-white"
+                                                                        : "border-slate-300"
+                                                                }`}>
+                                                                    {selectedExams.includes(exam.name) && <CheckCircle2 size={10} />}
+                                                                </div>
                                                             </div>
+                                                            <span className="text-[10px] text-slate-500 font-semibold">{exam.category}</span>
                                                         </div>
-                                                        <span className="text-[10px] text-slate-500 font-semibold">{exam.category}</span>
+                                                    ))
+                                                ) : (
+                                                    <div className="text-[12px] text-slate-400 text-center py-4">
+                                                        {lang === "EN" ? "No exams found." : "कोई परीक्षा नहीं मिली।"}
                                                     </div>
-                                                ))
-                                            ) : (
-                                                <div className="text-[12px] text-slate-400 text-center py-4">
-                                                    {lang === "EN" ? "No exams found." : "कोई परीक्षा नहीं मिली।"}
-                                                </div>
-                                            )}
+                                                )}
+                                            </div>
                                         </div>
 
-                                        <div className="pt-2 shrink-0">
+                                        {/* Continue button - pinned at bottom */}
+                                        <div style={{ marginTop: '12px' }}>
                                             <button
                                                 onClick={handleNextStep2}
                                                 className="w-full py-3.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white font-bold text-[13px] rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-none"
@@ -406,7 +414,7 @@ export default function OnboardingModal({ isOpen, exams }) {
 
                                 {/* STEP 3 */}
                                 {step === 3 && (
-                                    <div className="space-y-5 text-center overflow-y-auto flex-1 pr-1 custom-scrollbar min-h-0 pb-1">
+                                    <div className="space-y-5 text-center">
                                         {/* Connected State */}
                                         {telegramStatus === "connected" ? (
                                             <div className="flex flex-col items-center justify-center py-6 space-y-4">
