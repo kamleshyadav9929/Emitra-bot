@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "motion/react"
-import { Loader2, CheckCircle2, User, Phone, BookOpen, AlertCircle, Search, ArrowRight, ArrowLeft } from "lucide-react"
+import { Loader2, CheckCircle2, User, Phone, BookOpen, AlertCircle, Search, ArrowRight, ArrowLeft, ExternalLink } from "lucide-react"
 import { useAuth } from "../../context/AuthContext"
 import { useLanguage } from "../../context/LanguageContext"
 import * as api from "../../api"
@@ -24,6 +24,12 @@ export default function OnboardingModal({ isOpen, exams }) {
     // Step 2 state
     const [selectedExams, setSelectedExams] = useState([])
     const [examSearch, setExamSearch] = useState("")
+
+    // Step 3 Telegram linking state
+    const [telegramStatus, setTelegramStatus] = useState("idle") // idle, generating, waiting, connected
+    const [botUrl, setBotUrl] = useState("")
+    const [linkToken, setLinkToken] = useState(null)
+    const pollRef = useRef(null)
 
     const toggleExam = (examName) => {
         if (selectedExams.includes(examName)) {
@@ -65,6 +71,90 @@ export default function OnboardingModal({ isOpen, exams }) {
             setStep(3)
         }
     }
+
+    // Generate deep-link login token when Step 3 is entered
+    useEffect(() => {
+        if (step !== 3 || telegramStatus !== "idle") return
+        let cancelled = false
+
+        const generateToken = async () => {
+            setTelegramStatus("generating")
+            try {
+                const res = await api.createLoginToken()
+                if (!cancelled && res.success && res.token) {
+                    setLinkToken(res.token)
+                    setBotUrl(res.bot_url)
+                    setTelegramStatus("waiting")
+                } else if (!cancelled) {
+                    // Fallback to static link if token generation fails
+                    setBotUrl("https://t.me/Kamlesh6377_bot")
+                    setTelegramStatus("waiting")
+                }
+            } catch (err) {
+                console.error("Failed to generate telegram link token", err)
+                if (!cancelled) {
+                    setBotUrl("https://t.me/Kamlesh6377_bot")
+                    setTelegramStatus("waiting")
+                }
+            }
+        }
+        generateToken()
+
+        return () => { cancelled = true }
+    }, [step, telegramStatus])
+
+    // Poll login status to detect telegram connection
+    useEffect(() => {
+        if (step !== 3 || !linkToken || telegramStatus !== "waiting") return
+
+        let failedAttempts = 0
+        if (pollRef.current) clearInterval(pollRef.current)
+
+        pollRef.current = setInterval(async () => {
+            try {
+                const res = await api.checkLoginStatus(linkToken)
+                failedAttempts = 0
+                if (res.success) {
+                    if (res.status === "success" || res.status === "awaiting_onboarding") {
+                        // Telegram is now linked!
+                        clearInterval(pollRef.current)
+                        pollRef.current = null
+                        setTelegramStatus("connected")
+
+                        // Auto-submit onboarding after showing success briefly
+                        setTimeout(() => {
+                            submitOnboarding()
+                        }, 1800)
+                    }
+                    // "pending" means still waiting — keep polling
+                }
+            } catch (err) {
+                failedAttempts++
+                if (failedAttempts >= 8) {
+                    clearInterval(pollRef.current)
+                    pollRef.current = null
+                    // Don't block the user — they can still finish manually
+                }
+            }
+        }, 2000)
+
+        return () => {
+            if (pollRef.current) {
+                clearInterval(pollRef.current)
+                pollRef.current = null
+            }
+        }
+    }, [step, linkToken, telegramStatus])
+
+    // Cleanup polling on unmount
+    useEffect(() => {
+        return () => {
+            if (pollRef.current) {
+                clearInterval(pollRef.current)
+                pollRef.current = null
+            }
+        }
+    }, [])
 
     const submitOnboarding = async () => {
         const cleanPhone = phone.replace(/\D/g, '').slice(-10)
@@ -317,42 +407,93 @@ export default function OnboardingModal({ isOpen, exams }) {
                                 {/* STEP 3 */}
                                 {step === 3 && (
                                     <div className="space-y-5 text-center">
-                                        <div className="bg-[#E3F2FD] w-16 h-16 rounded-full flex items-center justify-center mx-auto text-[#2AABEE]">
-                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.98 1.25-5.59 3.69-.53.35-1.01.52-1.44.51-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.41-1.43-.87.03-.24.37-.49 1.02-.75 4-1.74 6.67-2.89 8.01-3.45 3.82-1.6 4.61-1.87 5.12-1.88.11 0 .36.03.49.14.11.09.14.22.15.34.02.1-.01.27-.02.32z"/>
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg font-bold text-slate-800">
-                                                {lang === "EN" ? "Connect Telegram Bot" : "टेलीग्राम बॉट से जुड़ें"}
-                                            </h3>
-                                            <p className="text-[13px] text-slate-500 mt-1 px-4 leading-relaxed">
-                                                {lang === "EN" 
-                                                    ? "To receive instant notifications and download admit cards directly on your phone, connect with our official Telegram bot."
-                                                    : "त्वरित सूचनाएं प्राप्त करने और सीधे अपने फोन पर एडमिट कार्ड डाउनलोड करने के लिए हमारे टेलीग्राम बॉट से जुड़ें।"}
-                                            </p>
-                                        </div>
-                                        
-                                        <div className="space-y-3 pt-2">
-                                            <a 
-                                                href="https://t.me/Kamlesh6377_bot" 
-                                                target="_blank" 
-                                                rel="noopener noreferrer"
-                                                onClick={() => {
-                                                    // Mark as clicked
-                                                }}
-                                                className="w-full py-3 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-bold text-[13.5px] rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
-                                            >
-                                                {lang === "EN" ? "Open Telegram Bot" : "टेलीग्राम बॉट खोलें"}
-                                            </a>
-                                            
-                                            <button
-                                                onClick={handleFinish}
-                                                className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[13px] rounded-xl transition-all border-none cursor-pointer"
-                                            >
-                                                {lang === "EN" ? "Finish Onboarding" : "समाप्त करें"}
-                                            </button>
-                                        </div>
+                                        {/* Connected State */}
+                                        {telegramStatus === "connected" ? (
+                                            <div className="flex flex-col items-center justify-center py-6 space-y-4">
+                                                <motion.div
+                                                    initial={{ scale: 0 }}
+                                                    animate={{ scale: 1 }}
+                                                    transition={{ type: "spring", stiffness: 200, damping: 12 }}
+                                                    className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600"
+                                                >
+                                                    <CheckCircle2 size={32} />
+                                                </motion.div>
+                                                <div className="text-center space-y-1">
+                                                    <h3 className="text-lg font-bold text-emerald-600">
+                                                        {lang === "EN" ? "Telegram Connected!" : "टेलीग्राम जुड़ गया!"}
+                                                    </h3>
+                                                    <p className="text-[13px] font-medium text-slate-500">
+                                                        {lang === "EN"
+                                                            ? "You'll now receive instant notifications on Telegram."
+                                                            : "अब आपको टेलीग्राम पर त्वरित सूचनाएं प्राप्त होंगी।"}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-400 pt-1">
+                                                    <Loader2 size={12} className="animate-spin" />
+                                                    {lang === "EN" ? "Setting up your dashboard..." : "आपका डैशबोर्ड सेट हो रहा है..."}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                {/* Icon */}
+                                                <div className="bg-[#E3F2FD] w-16 h-16 rounded-full flex items-center justify-center mx-auto text-[#2AABEE]">
+                                                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.98 1.25-5.59 3.69-.53.35-1.01.52-1.44.51-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.41-1.43-.87.03-.24.37-.49 1.02-.75 4-1.74 6.67-2.89 8.01-3.45 3.82-1.6 4.61-1.87 5.12-1.88.11 0 .36.03.49.14.11.09.14.22.15.34.02.1-.01.27-.02.32z"/>
+                                                    </svg>
+                                                </div>
+
+                                                {/* Title & Description */}
+                                                <div>
+                                                    <h3 className="text-lg font-bold text-slate-800">
+                                                        {lang === "EN" ? "Connect Telegram Bot" : "टेलीग्राम बॉट से जुड़ें"}
+                                                    </h3>
+                                                    <p className="text-[13px] text-slate-500 mt-1 px-4 leading-relaxed">
+                                                        {lang === "EN" 
+                                                            ? "To receive instant notifications and download admit cards directly on your phone, connect with our official Telegram bot."
+                                                            : "त्वरित सूचनाएं प्राप्त करने और सीधे अपने फोन पर एडमिट कार्ड डाउनलोड करने के लिए हमारे टेलीग्राम बॉट से जुड़ें।"}
+                                                    </p>
+                                                </div>
+                                                
+                                                <div className="space-y-3 pt-2">
+                                                    {/* Dynamic deep-link button */}
+                                                    {telegramStatus === "generating" ? (
+                                                        <div className="w-full py-3 bg-[#2AABEE]/70 text-white font-bold text-[13.5px] rounded-xl flex items-center justify-center gap-2">
+                                                            <Loader2 size={16} className="animate-spin" />
+                                                            {lang === "EN" ? "Preparing secure link..." : "सुरक्षित लिंक तैयार हो रहा है..."}
+                                                        </div>
+                                                    ) : (
+                                                        <a 
+                                                            href={botUrl || "https://t.me/Kamlesh6377_bot"}
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer"
+                                                            className="w-full py-3 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-bold text-[13.5px] rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
+                                                        >
+                                                            {lang === "EN" ? "Open Telegram Bot" : "टेलीग्राम बॉट खोलें"}
+                                                            <ExternalLink size={14} />
+                                                        </a>
+                                                    )}
+
+                                                    {/* Polling indicator — show when we have a token and are waiting */}
+                                                    {telegramStatus === "waiting" && linkToken && (
+                                                        <div className="p-3 bg-sky-50 border border-sky-100 rounded-xl flex items-center justify-center gap-2.5">
+                                                            <Loader2 className="w-3.5 h-3.5 text-sky-500 animate-spin flex-shrink-0" />
+                                                            <p className="text-[11.5px] font-semibold text-slate-500 leading-normal">
+                                                                {lang === "EN"
+                                                                    ? "Waiting for you to press 'Start' in the bot..."
+                                                                    : "बॉट में 'Start' दबाने का इंतज़ार कर रहे हैं..."}
+                                                            </p>
+                                                        </div>
+                                                    )}
+                                                    
+                                                    <button
+                                                        onClick={handleFinish}
+                                                        className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[13px] rounded-xl transition-all border-none cursor-pointer"
+                                                    >
+                                                        {lang === "EN" ? "Skip for now" : "अभी छोड़ें"}
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 )}
                             </div>

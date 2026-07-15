@@ -12,6 +12,7 @@ import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
 import Logo from "../../components/common/Logo"
+import InteractiveHeroBackground from "../../components/student/InteractiveHeroBackground"
 
 const formatTelegramMessage = (text) => {
     if (!text) return "";
@@ -276,8 +277,9 @@ export default function Landing() {
             )}
 
             {/* ── HERO SECTION ── */}
-            <div className="relative py-24 lg:py-36 z-10 text-center">
-                <section className="relative px-6 lg:px-12 max-w-[1000px] mx-auto space-y-12">
+            <div className="relative py-24 lg:py-36 z-10 text-center overflow-hidden">
+                <InteractiveHeroBackground />
+                <section className="relative z-10 px-6 lg:px-12 max-w-[1000px] mx-auto space-y-12">
                     {/* Hero Header Content */}
                     <div className="space-y-6 max-w-4xl mx-auto">
                         <h1 className="text-4xl sm:text-7xl lg:text-[84px] leading-[0.95] font-black tracking-tight font-display text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-400">
