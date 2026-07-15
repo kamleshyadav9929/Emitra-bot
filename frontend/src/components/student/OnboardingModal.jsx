@@ -208,7 +208,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                     transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                     className="relative w-full max-w-md bg-white border border-slate-100 rounded-3xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[90vh]"
                 >
-                    <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-slate-100 bg-slate-50 shrink-0 text-center relative">
+                    <div className="px-3 py-3.5 sm:px-6 sm:py-5 border-b border-slate-100 bg-slate-50 shrink-0 text-center relative">
                         {step > 1 && status === "idle" && (
                             <button onClick={() => setStep(step - 1)} className="absolute left-4 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors">
                                 <ArrowLeft size={20} />
@@ -234,7 +234,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                         )}
                     </div>
 
-                    <div className="p-4 sm:p-6 flex-1 flex flex-col min-h-0 scroll-container-smooth">
+                    <div className="p-3 sm:p-6 flex-1 flex flex-col min-h-0 scroll-container-smooth">
                         {status === "loading" || status === "success" ? (
                             <div className="flex flex-col items-center justify-center py-12 space-y-5">
                                 {status === "loading" ? (
@@ -359,7 +359,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                                             />
                                         </div>
 
-                                        <div className="grid grid-cols-1 gap-2 overflow-y-auto flex-1 max-h-[220px] sm:max-h-[320px] pr-1 custom-scrollbar min-h-0">
+                                        <div className="grid grid-cols-1 gap-2 overflow-y-auto flex-1 max-h-36 sm:max-h-72 pr-1 custom-scrollbar min-h-0">
                                             {filteredExams.length > 0 ? (
                                                 filteredExams.map(exam => (
                                                     <div 
