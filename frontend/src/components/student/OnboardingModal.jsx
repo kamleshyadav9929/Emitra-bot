@@ -234,7 +234,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                         )}
                     </div>
 
-                    <div className="p-4 sm:p-6 overflow-y-auto flex-1 flex flex-col scroll-container-smooth">
+                    <div className="p-4 sm:p-6 flex-1 flex flex-col min-h-0 scroll-container-smooth">
                         {status === "loading" || status === "success" ? (
                             <div className="flex flex-col items-center justify-center py-12 space-y-5">
                                 {status === "loading" ? (
@@ -280,7 +280,7 @@ export default function OnboardingModal({ isOpen, exams }) {
 
                                 {/* STEP 1 */}
                                 {step === 1 && (
-                                    <div className="space-y-4">
+                                    <div className="space-y-4 overflow-y-auto flex-1 pr-1 custom-scrollbar min-h-0 pb-1">
                                         <div className="space-y-1.5">
                                             <label className="text-[12px] font-bold text-slate-700 ml-1">
                                                 {lang === "EN" ? "Your Name" : "आपका नाम"} <span className="text-rose-500">*</span>
@@ -359,7 +359,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                                             />
                                         </div>
 
-                                        <div className="grid grid-cols-1 gap-2 overflow-y-auto flex-1 max-h-[190px] sm:max-h-56 pr-1 custom-scrollbar min-h-0">
+                                        <div className="grid grid-cols-1 gap-2 overflow-y-auto flex-1 pr-1 custom-scrollbar min-h-0">
                                             {filteredExams.length > 0 ? (
                                                 filteredExams.map(exam => (
                                                     <div 
@@ -406,7 +406,7 @@ export default function OnboardingModal({ isOpen, exams }) {
 
                                 {/* STEP 3 */}
                                 {step === 3 && (
-                                    <div className="space-y-5 text-center">
+                                    <div className="space-y-5 text-center overflow-y-auto flex-1 pr-1 custom-scrollbar min-h-0 pb-1">
                                         {/* Connected State */}
                                         {telegramStatus === "connected" ? (
                                             <div className="flex flex-col items-center justify-center py-6 space-y-4">
