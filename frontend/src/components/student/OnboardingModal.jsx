@@ -80,7 +80,13 @@ export default function OnboardingModal({ isOpen, exams }) {
         const generateToken = async () => {
             setTelegramStatus("generating")
             try {
-                const res = await api.createLoginToken()
+                // Add a 6-second timeout so the UI doesn't get stuck on "Preparing secure link..."
+                const controller = new AbortController()
+                const timeoutId = setTimeout(() => controller.abort(), 6000)
+                
+                const res = await api.createLoginToken(controller.signal)
+                clearTimeout(timeoutId)
+                
                 if (!cancelled && res.success && res.token) {
                     setLinkToken(res.token)
                     setBotUrl(res.bot_url)
