@@ -359,7 +359,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                                             />
                                         </div>
 
-                                        <div className="grid grid-cols-1 gap-2 overflow-y-auto flex-1 pr-1 custom-scrollbar min-h-0">
+                                        <div className="grid grid-cols-1 gap-2 overflow-y-auto flex-1 max-h-[220px] sm:max-h-[320px] pr-1 custom-scrollbar min-h-0">
                                             {filteredExams.length > 0 ? (
                                                 filteredExams.map(exam => (
                                                     <div 
