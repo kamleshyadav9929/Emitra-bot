@@ -1114,11 +1114,17 @@ def send_notification():
         return jsonify({"success": False, "error": "Must provide either message text or an image"}), 400
 
     students = database.get_students_by_exam(exam)
-    if not students:
-        return jsonify({"success": True, "sent_to": 0, "exam": exam, "queued": False,
-                        "message": "No eligible students found"})
+    eligible_students = [
+        s for s in students 
+        if s.get("telegram_id") and not s.get("telegram_id").startswith("BOT_TEMP_")
+    ]
+    if not eligible_students:
+        return jsonify({
+            "success": False,
+            "error": "No students in the selected group have linked their Telegram accounts."
+        }), 400
 
-    total = len(students)
+    total = len(eligible_students)
 
     # FIX: Run in background thread so the HTTP request returns immediately.
     # Without this, 4000 students × 50ms = 200s → guaranteed timeout on PythonAnywhere.
@@ -1127,7 +1133,7 @@ def send_notification():
 
     t = threading.Thread(
         target=_run_broadcast_in_background,
-        args=(job_id, exam, message, students, config.TELEGRAM_BOT_TOKEN),
+        args=(job_id, exam, message, eligible_students, config.TELEGRAM_BOT_TOKEN),
         kwargs={"image_url": image_url},
         daemon=True,
     )

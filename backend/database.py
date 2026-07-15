@@ -565,28 +565,48 @@ def delete_student(student_id):
 
 
 def get_stats():
-    total_res = supabase.table("users").select("id", count="exact").neq("role", "admin").execute()
-    total = total_res.count if total_res.count is not None else 0
+    users_res = supabase.table("users").select("id, telegram_id").neq("role", "admin").execute()
+    users_data = users_res.data or []
+    
+    total = len(users_data)
+    linked_total = sum(1 for u in users_data if u.get("telegram_id") and not u["telegram_id"].startswith("BOT_TEMP_"))
     
     by_exam = {}
+    linked_by_exam = {}
     try:
         exams_res = supabase.table("exams").select("name").execute()
         for e in exams_res.data:
             by_exam[e["name"]] = 0
+            linked_by_exam[e["name"]] = 0
     except Exception:
         pass
         
-    by_exam["ALL"] = 0
+    by_exam["ALL"] = total
     by_exam["NONE"] = 0
     by_exam["BLOCKED"] = 0
     
-    res = supabase.table("user_exam_subscriptions").select("exams(name)").execute()
+    linked_by_exam["ALL"] = linked_total
+    linked_by_exam["NONE"] = 0
+    linked_by_exam["BLOCKED"] = 0
+    
+    res = supabase.table("user_exam_subscriptions").select("exams(name), users(telegram_id)").execute()
     for row in (res.data or []):
-        if row.get("exams"):
+        if row.get("exams") and row.get("users"):
             name = row["exams"]["name"]
+            tg_id = row["users"].get("telegram_id")
+            is_linked = tg_id and not tg_id.startswith("BOT_TEMP_")
+            
             by_exam[name] = by_exam.get(name, 0) + 1
+            if is_linked:
+                linked_by_exam[name] = linked_by_exam.get(name, 0) + 1
 
-    return {"total_students": total, "by_exam": by_exam}
+    return {
+        "total_students": total,
+        "total_linked_students": linked_total,
+        "by_exam": by_exam,
+        "linked_by_exam": linked_by_exam
+    }
+
 
 
 def get_public_stats():

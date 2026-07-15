@@ -111,6 +111,12 @@ export default function SendNotification() {
       : selectedExams.reduce((acc, exam) => acc + (stats.by_exam?.[exam] || 0), 0)
     : 0
 
+  const linkedCount = stats
+    ? selectedExams.includes("ALL")
+      ? stats.total_linked_students || 0
+      : selectedExams.reduce((acc, exam) => acc + (stats.linked_by_exam?.[exam] || 0), 0)
+    : 0
+
   const handleImageChange = (e) => {
     const file = e.target.files[0]
     if (file) {
@@ -129,7 +135,7 @@ export default function SendNotification() {
   }
 
   const handleSend = async () => {
-    if ((!message.trim() && !imageFile) || targetCount === 0 || status === "sending" || status === "polling") return
+    if ((!message.trim() && !imageFile) || linkedCount === 0 || status === "sending" || status === "polling") return
     setStatus("sending")
     setErrorMsg("")
     try {
@@ -230,11 +236,23 @@ export default function SendNotification() {
                 )}
               </div>
 
-              <div className="flex items-center gap-3 px-5 py-4 bg-[var(--color-primary-fixed)] rounded-[16px] shadow-ambient">
-                <div className="w-2 h-2 bg-[#164FA8] rounded-full" />
-                <span className="text-[13px] font-medium text-[#164FA8]">
-                  <span className="font-bold text-gray-900 text-[14px]">{targetCount}</span> students will receive this
-                </span>
+              <div className={`flex items-start gap-3.5 px-5 py-4 rounded-[16px] shadow-ambient ${
+                linkedCount === 0
+                  ? "bg-red-50 text-red-700 border border-red-200"
+                  : "bg-[var(--color-primary-fixed)] text-[#164FA8]"
+              }`}>
+                <div className={`w-2.5 h-2.5 rounded-full mt-1 shrink-0 ${linkedCount === 0 ? "bg-red-500 animate-pulse" : "bg-[#164FA8]"}`} />
+                <div className="text-[13px] font-medium leading-relaxed">
+                  {linkedCount === 0 ? (
+                    <span>
+                      ⚠️ <span className="font-bold text-red-700 text-[14px]">0 out of {targetCount}</span> students have linked their Telegram. Please ask students to click the Telegram Assistant button on the landing page first.
+                    </span>
+                  ) : (
+                    <span>
+                      📱 <span className="font-bold text-gray-900 text-[14px]">{linkedCount}</span> out of <span className="font-bold text-gray-900 text-[14px]">{targetCount}</span> students have linked Telegram and will receive this message.
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -246,12 +264,18 @@ export default function SendNotification() {
             {/* Left Column: Form Inputs & Send Controls */}
             <div className="lg:col-span-7 space-y-6">
               {/* Audience Summary Banner */}
-              <div className="flex items-center justify-between px-5 py-4 bg-[var(--color-primary-fixed)] rounded-[16px] shadow-ambient text-[13px] font-medium text-[#164FA8]">
+              <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 rounded-[16px] shadow-ambient text-[13px] font-medium ${
+                linkedCount === 0
+                  ? "bg-red-50 text-red-700 border border-red-150"
+                  : "bg-[var(--color-primary-fixed)] text-[#164FA8]"
+              }`}>
                 <span className="flex items-center gap-2">
                   <Users size={14} /> To: <span className="font-bold text-gray-900">{selectedExams.includes("ALL") ? "All Students" : selectedExams.join(", ") || "None"}</span>
                 </span>
-                <span className="bg-[#EBF1FA] text-[#164FA8] font-bold px-3 py-1 rounded-full text-[11px]">
-                  {targetCount} Recipients
+                <span className={`font-bold px-3 py-1 rounded-full text-[11px] w-fit ${
+                  linkedCount === 0 ? "bg-red-200 text-red-800" : "bg-[#EBF1FA] text-[#164FA8]"
+                }`}>
+                  {linkedCount} of {targetCount} Active Recipients
                 </span>
               </div>
 
@@ -343,9 +367,9 @@ export default function SendNotification() {
               <button
                 type="button"
                 onClick={handleSend}
-                disabled={(!message.trim() && !imageFile) || targetCount === 0 || status === "sending" || status === "polling"}
+                disabled={(!message.trim() && !imageFile) || linkedCount === 0 || status === "sending" || status === "polling"}
                 className={`w-full py-4 font-bold text-[14px] flex items-center justify-center gap-2 transition-all rounded-[16px] shadow-sm ${
-                  (!message.trim() && !imageFile) || targetCount === 0
+                  (!message.trim() && !imageFile) || linkedCount === 0
                     ? "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200"
                     : status === "success"
                       ? "bg-[#10B981] text-white shadow-md"
@@ -359,7 +383,7 @@ export default function SendNotification() {
                 {(status === "idle" || status === "error") && (
                   <>
                     <Send size={15} />
-                    {`Send to {targetCount} Students`.replace("{targetCount}", targetCount)}
+                    {`Send to {linkedCount} Students`.replace("{linkedCount}", linkedCount)}
                   </>
                 )}
               </button>
