@@ -168,7 +168,7 @@ export default function InteractiveHeroBackground() {
 
       {/* Subtle Grid Pattern specifically styled for the Hero */}
       <div 
-        className="absolute inset-0 opacity-[0.07] pointer-events-none"
+        className="absolute inset-0 opacity-[0.16] pointer-events-none"
         style={{
           backgroundImage: `
             linear-gradient(to right, rgba(255, 255, 255, 0.4) 1px, transparent 1px),
