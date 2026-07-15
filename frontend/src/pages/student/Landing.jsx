@@ -200,7 +200,7 @@ export default function Landing() {
     ]
 
     return (
-        <div className="min-h-screen bg-[#050508] bg-grid-pattern text-slate-200 font-sans overflow-x-hidden relative">
+        <div className="min-h-screen bg-[#050508] bg-grid-pattern text-slate-200 font-sans overflow-x-clip relative">
             {/* Ambient Background Glow Circles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-blue-600/10 blur-[130px] animate-slow-glow" />
