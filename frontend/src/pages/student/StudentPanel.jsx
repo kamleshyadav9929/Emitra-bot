@@ -11,7 +11,7 @@ import {
 } from "lucide-react"
 
 import "../../portal.css"
-import { StudentPortalSkeleton } from "../../components/common/Skeleton"
+import { StudentPortalSkeleton, DashboardSkeleton, ServicesSkeleton, ExamsSkeleton, StatusSkeleton, NotificationsSkeleton, ProfileSkeleton, AboutSkeleton } from "../../components/common/Skeleton"
 import LoginModal from "../../components/student/LoginModal"
 import OnboardingModal from "../../components/student/OnboardingModal"
 import { useLanguage } from "../../context/LanguageContext"
@@ -787,7 +787,13 @@ export default function StudentPanel() {
                         <main className="max-w-[1140px] w-full mx-auto px-3 md:px-10 py-4 md:py-8 flex-1">
                     
                     {loading ? (
-                        <StudentPortalSkeleton />
+                        activeTab === "services" ? <ServicesSkeleton /> :
+                        activeTab === "exams" ? <ExamsSkeleton /> :
+                        activeTab === "status" ? <StatusSkeleton /> :
+                        activeTab === "notifications" ? <NotificationsSkeleton /> :
+                        activeTab === "profile" ? <ProfileSkeleton /> :
+                        activeTab === "about" ? <AboutSkeleton /> :
+                        <DashboardSkeleton />
                     ) : (
                         <AnimatePresence mode="wait">
                             <motion.div
