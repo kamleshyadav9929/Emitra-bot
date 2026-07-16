@@ -659,11 +659,11 @@ export default function StudentPanel() {
                                 }}
                                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12.5px] font-semibold transition-all duration-200 cursor-pointer group ${
                                     isActive
-                                        ? "bg-white/5 text-white font-bold border-l-2 border-blue-500"
+                                        ? "bg-white/10 text-white font-bold"
                                         : "text-slate-400 hover:text-white hover:bg-white/5"
                                 }`}
                             >
-                                <Icon size={15} strokeWidth={isActive ? 2.5 : 2.0} className={`${isActive ? "text-blue-400" : "text-slate-400 group-hover:text-white transition-colors"}`} />
+                                <Icon size={15} strokeWidth={isActive ? 2.5 : 2.0} className={`${isActive ? "text-white" : "text-slate-400 group-hover:text-white transition-colors"}`} />
                                 <span className="flex-1 text-left">
                                     {lang === "EN" ? item.label : item.labelHi}
                                 </span>
