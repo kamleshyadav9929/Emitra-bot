@@ -26,8 +26,8 @@ export default function OnboardingModal({ isOpen, exams }) {
     const [examSearch, setExamSearch] = useState("")
 
     // Step 3 Telegram linking state
-    const [telegramStatus, setTelegramStatus] = useState("idle") // idle, generating, waiting, connected
-    const [botUrl, setBotUrl] = useState("")
+    const [telegramStatus, setTelegramStatus] = useState("idle") // idle, waiting, connected
+    const [botUrl, setBotUrl] = useState("https://t.me/Kamlesh6377_bot")
     const [linkToken, setLinkToken] = useState(null)
     const pollRef = useRef(null)
 
@@ -73,14 +73,17 @@ export default function OnboardingModal({ isOpen, exams }) {
     }
 
     // Generate deep-link login token when Step 3 is entered
+    // The button is shown immediately with the static fallback URL.
+    // This effect silently tries to upgrade it to a dynamic deep-link.
     useEffect(() => {
         if (step !== 3 || telegramStatus !== "idle") return
         let cancelled = false
 
+        // Show the button immediately — don't block with a loading state
+        setTelegramStatus("waiting")
+
         const generateToken = async () => {
-            setTelegramStatus("generating")
             try {
-                // Add a 6-second timeout so the UI doesn't get stuck on "Preparing secure link..."
                 const controller = new AbortController()
                 const timeoutId = setTimeout(() => controller.abort(), 6000)
                 
@@ -90,18 +93,9 @@ export default function OnboardingModal({ isOpen, exams }) {
                 if (!cancelled && res.success && res.token) {
                     setLinkToken(res.token)
                     setBotUrl(res.bot_url)
-                    setTelegramStatus("waiting")
-                } else if (!cancelled) {
-                    // Fallback to static link if token generation fails
-                    setBotUrl("https://t.me/Kamlesh6377_bot")
-                    setTelegramStatus("waiting")
                 }
             } catch (err) {
-                console.error("Failed to generate telegram link token", err)
-                if (!cancelled) {
-                    setBotUrl("https://t.me/Kamlesh6377_bot")
-                    setTelegramStatus("waiting")
-                }
+                console.error("Failed to generate telegram link token (using fallback)", err)
             }
         }
         generateToken()
@@ -469,23 +463,16 @@ export default function OnboardingModal({ isOpen, exams }) {
                                                 </div>
                                                 
                                                 <div className="space-y-3 pt-2">
-                                                    {/* Dynamic deep-link button */}
-                                                    {telegramStatus === "generating" ? (
-                                                        <div className="w-full py-3 bg-[#2AABEE]/70 text-white font-bold text-[13.5px] rounded-xl flex items-center justify-center gap-2">
-                                                            <Loader2 size={16} className="animate-spin" />
-                                                            {lang === "EN" ? "Preparing secure link..." : "सुरक्षित लिंक तैयार हो रहा है..."}
-                                                        </div>
-                                                    ) : (
-                                                        <a 
-                                                            href={botUrl || "https://t.me/Kamlesh6377_bot"}
-                                                            target="_blank" 
-                                                            rel="noopener noreferrer"
-                                                            className="w-full py-3 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-bold text-[13.5px] rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
-                                                        >
-                                                            {lang === "EN" ? "Open Telegram Bot" : "टेलीग्राम बॉट खोलें"}
-                                                            <ExternalLink size={14} />
-                                                        </a>
-                                                    )}
+                                                    {/* Telegram bot link — always visible, never blocked */}
+                                                    <a 
+                                                        href={botUrl}
+                                                        target="_blank" 
+                                                        rel="noopener noreferrer"
+                                                        className="w-full py-3 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-bold text-[13.5px] rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
+                                                    >
+                                                        {lang === "EN" ? "Open Telegram Bot" : "टेलीग्राम बॉट खोलें"}
+                                                        <ExternalLink size={14} />
+                                                    </a>
 
                                                     {/* Polling indicator — show when we have a token and are waiting */}
                                                     {telegramStatus === "waiting" && linkToken && (
