@@ -227,7 +227,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 15 }}
                     transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative w-full max-w-md bg-[#0b0f19]/95 border border-white/15 rounded-3xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[90vh] backdrop-blur-xl"
+                    className="relative w-full max-w-md bg-[#0b0f19]/95 border border-white/15 rounded-3xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[85vh] sm:max-h-[90vh] min-h-0 backdrop-blur-xl"
                 >
                     <div className="px-3 py-3.5 sm:px-6 sm:py-5 border-b border-white/10 bg-white/5 shrink-0 text-center relative">
                         {step > 1 && status === "idle" && (
@@ -255,7 +255,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                         )}
                     </div>
 
-                    <div className="p-4 sm:p-6 overflow-y-auto flex-1 text-left">
+                    <div className="p-4 sm:p-6 flex-1 min-h-0 overflow-y-auto text-left">
                         {status === "loading" || status === "success" ? (
                             <div className="flex flex-col items-center justify-center py-12 space-y-5 text-center w-full">
                                 {status === "loading" ? (
