@@ -198,7 +198,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="absolute inset-0 bg-[var(--color-surface-base)]"
+                    className="absolute inset-0 bg-black/60 backdrop-blur-md"
                 />
 
                 <motion.div
@@ -206,18 +206,18 @@ export default function OnboardingModal({ isOpen, exams }) {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 15 }}
                     transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative w-full max-w-md bg-white border border-slate-100 rounded-3xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[90vh]"
+                    className="relative w-full max-w-md bg-[#0b0f19]/95 border border-white/15 rounded-3xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[90vh] backdrop-blur-xl"
                 >
-                    <div className="px-3 py-3.5 sm:px-6 sm:py-5 border-b border-slate-100 bg-slate-50 shrink-0 text-center relative">
+                    <div className="px-3 py-3.5 sm:px-6 sm:py-5 border-b border-white/10 bg-white/5 shrink-0 text-center relative">
                         {step > 1 && status === "idle" && (
-                            <button onClick={() => setStep(step - 1)} className="absolute left-4 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors">
+                            <button onClick={() => setStep(step - 1)} className="absolute left-4 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-white rounded-full hover:bg-white/5 transition-colors cursor-pointer border-none bg-transparent">
                                 <ArrowLeft size={20} />
                             </button>
                         )}
-                        <h2 className="text-xl font-black text-slate-800 tracking-tight font-display">
+                        <h2 className="text-xl font-black text-white tracking-tight font-display">
                             {lang === "EN" ? "Welcome to e-Mitra!" : "ई-मित्र में आपका स्वागत है!"}
                         </h2>
-                        <p className="text-[12px] text-slate-500 mt-1">
+                        <p className="text-[12px] text-slate-400 mt-1">
                             {lang === "EN" 
                                 ? (step === 1 ? "Step 1: Basic Information" : step === 2 ? "Step 2: Select Exams" : "Step 3: Stay Updated")
                                 : (step === 1 ? "चरण 1: बुनियादी जानकारी" : step === 2 ? "चरण 2: परीक्षा चुनें" : "चरण 3: अपडेट रहें")}
@@ -225,26 +225,26 @@ export default function OnboardingModal({ isOpen, exams }) {
                         
                         {/* Progress Bar */}
                         {status === "idle" && (
-                            <div className="w-full bg-slate-200 h-1.5 mt-4 rounded-full overflow-hidden">
+                            <div className="w-full bg-white/10 h-1.5 mt-4 rounded-full overflow-hidden">
                                 <div 
-                                    className="h-full bg-[var(--color-primary)] transition-all duration-300"
+                                    className="h-full bg-blue-600 transition-all duration-300"
                                     style={{ width: `${(step / (user?.is_telegram_linked ? 2 : 3)) * 100}%` }}
                                 />
                             </div>
                         )}
                     </div>
 
-                    <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+                    <div className="p-4 sm:p-6 overflow-y-auto flex-1 text-left">
                         {status === "loading" || status === "success" ? (
-                            <div className="flex flex-col items-center justify-center py-12 space-y-5">
+                            <div className="flex flex-col items-center justify-center py-12 space-y-5 text-center w-full">
                                 {status === "loading" ? (
                                     <>
-                                        <Loader2 className="w-12 h-12 text-[var(--color-primary)] animate-spin" />
+                                        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
                                         <div className="text-center space-y-1">
-                                            <h3 className="text-lg font-bold text-slate-800">
+                                            <h3 className="text-lg font-bold text-white">
                                                 {lang === "EN" ? "Just a moment..." : "बस एक पल..."}
                                             </h3>
-                                            <p className="text-[13px] font-medium text-slate-500">
+                                            <p className="text-[13px] font-medium text-slate-400">
                                                 {lang === "EN" ? "We are customizing your dashboard" : "हम आपका डैशबोर्ड अनुकूलित कर रहे हैं"}
                                             </p>
                                         </div>
@@ -254,15 +254,15 @@ export default function OnboardingModal({ isOpen, exams }) {
                                         <motion.div
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
-                                            className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600"
+                                            className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400 mx-auto"
                                         >
                                             <CheckCircle2 size={32} />
                                         </motion.div>
                                         <div className="text-center space-y-1">
-                                            <h3 className="text-lg font-bold text-emerald-600">
+                                            <h3 className="text-lg font-bold text-emerald-400">
                                                 {lang === "EN" ? "All Set!" : "सब तैयार है!"}
                                             </h3>
-                                            <p className="text-[13px] font-medium text-slate-500">
+                                            <p className="text-[13px] font-medium text-slate-400">
                                                 {lang === "EN" ? "Enjoy your personalized dashboard." : "अपने व्यक्तिगत डैशबोर्ड का आनंद लें।"}
                                             </p>
                                         </div>
@@ -272,7 +272,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                         ) : (
                             <div className="space-y-5">
                                 {errorMsg && (
-                                    <div className="bg-rose-50 text-rose-600 p-3 rounded-xl text-[12px] font-semibold flex items-center gap-2">
+                                    <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-3 rounded-xl text-[12px] font-semibold flex items-center gap-2">
                                         <AlertCircle size={16} />
                                         {errorMsg}
                                     </div>
@@ -282,16 +282,16 @@ export default function OnboardingModal({ isOpen, exams }) {
                                 {step === 1 && (
                                     <div className="space-y-4">
                                         <div className="space-y-1.5">
-                                            <label className="text-[12px] font-bold text-slate-700 ml-1">
+                                            <label className="text-[12px] font-bold text-slate-300 ml-1">
                                                 {lang === "EN" ? "Your Name" : "आपका नाम"} <span className="text-rose-500">*</span>
                                             </label>
                                             <div className="relative">
-                                                <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                                                <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                                                 <input
                                                     type="text"
                                                     value={name}
                                                     onChange={(e) => setName(e.target.value)}
-                                                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[13.5px] rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-[var(--color-primary)] focus:bg-white transition-colors"
+                                                    className="w-full bg-white/5 border border-white/10 text-white text-[13.5px] rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-blue-500 focus:bg-white/10 transition-colors"
                                                     placeholder={lang === "EN" ? "Enter your full name" : "अपना पूरा नाम दर्ज करें"}
                                                     required
                                                 />
@@ -299,24 +299,24 @@ export default function OnboardingModal({ isOpen, exams }) {
                                         </div>
 
                                         <div className="space-y-1.5">
-                                            <label className="text-[12px] font-bold text-slate-700 ml-1 flex justify-between">
+                                            <label className="text-[12px] font-bold text-slate-300 ml-1 flex justify-between">
                                                 <span>{lang === "EN" ? "Phone Number" : "फ़ोन नंबर"}</span>
                                                 <span className="text-rose-500">*</span>
                                             </label>
                                             <div className="relative">
-                                                <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                                                <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                                                 <input
                                                     type="tel"
                                                     value={phone}
                                                     onChange={(e) => setPhone(e.target.value)}
-                                                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[13.5px] rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-[var(--color-primary)] focus:bg-white transition-colors"
+                                                    className="w-full bg-white/5 border border-white/10 text-white text-[13.5px] rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-blue-500 focus:bg-white/10 transition-colors"
                                                     placeholder={lang === "EN" ? "10-digit mobile number" : "10 अंकों का मोबाइल नंबर"}
                                                 />
                                             </div>
                                         </div>
 
                                         <div className="space-y-1.5">
-                                            <label className="text-[12px] font-bold text-slate-700 ml-1">
+                                            <label className="text-[12px] font-bold text-slate-300 ml-1">
                                                 {lang === "EN" ? "Gender" : "लिंग"} <span className="text-rose-500">*</span>
                                             </label>
                                             <div className="grid grid-cols-3 gap-2">
@@ -325,7 +325,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                                                         key={g} 
                                                         onClick={() => setGender(g)}
                                                         className={`text-center py-2.5 rounded-xl cursor-pointer text-[13px] font-bold transition-all border ${
-                                                            gender === g ? 'bg-[var(--color-primary)] text-white border-[var(--color-primary)] shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                                                            gender === g ? 'bg-blue-600 text-white border-blue-500 shadow-sm' : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
                                                         }`}
                                                     >
                                                         {lang === "EN" ? g : (g === "Male" ? "पुरुष" : g === "Female" ? "महिला" : "अन्य")}
@@ -337,7 +337,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                                         <div className="pt-4">
                                             <button
                                                 onClick={handleNextStep1}
-                                                className="w-full py-3.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white font-bold text-[13px] rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-none"
+                                                className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[13px] rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-none"
                                             >
                                                 {lang === "EN" ? "Next Step" : "अगला चरण"} <ArrowRight size={16} />
                                             </button>
@@ -350,12 +350,12 @@ export default function OnboardingModal({ isOpen, exams }) {
                                     <div>
                                         {/* Search - pinned at top */}
                                         <div className="relative" style={{ marginBottom: '12px' }}>
-                                            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                                            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                                             <input
                                                 type="text"
                                                 value={examSearch}
                                                 onChange={(e) => setExamSearch(e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[13.5px] rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-[var(--color-primary)] focus:bg-white transition-colors"
+                                                className="w-full bg-white/5 border border-white/10 text-white text-[13.5px] rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-blue-500 focus:bg-white/10 transition-colors"
                                                 placeholder={lang === "EN" ? "Search exams..." : "परीक्षाएं खोजें..."}
                                             />
                                         </div>
@@ -373,18 +373,18 @@ export default function OnboardingModal({ isOpen, exams }) {
                                                             onClick={() => toggleExam(exam.name)}
                                                             className={`border rounded-xl p-3 flex flex-col gap-1 cursor-pointer transition-all ${
                                                                 selectedExams.includes(exam.name) 
-                                                                    ? "border-[var(--color-primary)] bg-[var(--color-primary)]/5" 
-                                                                    : "border-slate-200 bg-white hover:border-slate-300"
+                                                                    ? "border-blue-500 bg-blue-500/10" 
+                                                                    : "border-white/10 bg-white/5 hover:border-white/20"
                                                             }`}
                                                         >
                                                             <div className="flex items-center justify-between">
-                                                                <span className="text-[12.5px] font-bold text-slate-800 leading-tight pr-4">
+                                                                <span className="text-[12.5px] font-bold text-slate-200 leading-tight pr-4">
                                                                     {exam.name}
                                                                 </span>
                                                                 <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
                                                                     selectedExams.includes(exam.name)
-                                                                        ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-white"
-                                                                        : "border-slate-300"
+                                                                        ? "bg-blue-600 border-blue-600 text-white"
+                                                                        : "border-white/20"
                                                                 }`}>
                                                                     {selectedExams.includes(exam.name) && <CheckCircle2 size={10} />}
                                                                 </div>
@@ -393,7 +393,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                                                         </div>
                                                     ))
                                                 ) : (
-                                                    <div className="text-[12px] text-slate-400 text-center py-4">
+                                                    <div className="text-[12px] text-slate-455 text-center py-4">
                                                         {lang === "EN" ? "No exams found." : "कोई परीक्षा नहीं मिली।"}
                                                     </div>
                                                 )}
@@ -404,7 +404,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                                         <div style={{ marginTop: '12px' }}>
                                             <button
                                                 onClick={handleNextStep2}
-                                                className="w-full py-3.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-container)] text-white font-bold text-[13px] rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-none"
+                                                className="w-full py-3.5 bg-blue-600 hover:bg-blue-550 text-white font-bold text-[13px] rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-none"
                                             >
                                                 {lang === "EN" ? "Continue" : "जारी रखें"}
                                             </button>
@@ -422,29 +422,29 @@ export default function OnboardingModal({ isOpen, exams }) {
                                                     initial={{ scale: 0 }}
                                                     animate={{ scale: 1 }}
                                                     transition={{ type: "spring", stiffness: 200, damping: 12 }}
-                                                    className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600"
+                                                    className="w-16 h-16 bg-emerald-550/10 border border-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400 mx-auto"
                                                 >
                                                     <CheckCircle2 size={32} />
                                                 </motion.div>
                                                 <div className="text-center space-y-1">
-                                                    <h3 className="text-lg font-bold text-emerald-600">
+                                                    <h3 className="text-lg font-bold text-emerald-450">
                                                         {lang === "EN" ? "Telegram Connected!" : "टेलीग्राम जुड़ गया!"}
                                                     </h3>
-                                                    <p className="text-[13px] font-medium text-slate-500">
+                                                    <p className="text-[13px] font-medium text-slate-300">
                                                         {lang === "EN"
                                                             ? "You'll now receive instant notifications on Telegram."
                                                             : "अब आपको टेलीग्राम पर त्वरित सूचनाएं प्राप्त होंगी।"}
                                                     </p>
                                                 </div>
-                                                <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-400 pt-1">
-                                                    <Loader2 size={12} className="animate-spin" />
+                                                <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-500 pt-1 justify-center">
+                                                    <Loader2 size={12} className="animate-spin text-slate-400" />
                                                     {lang === "EN" ? "Setting up your dashboard..." : "आपका डैशबोर्ड सेट हो रहा है..."}
                                                 </div>
                                             </div>
                                         ) : (
                                             <>
                                                 {/* Icon */}
-                                                <div className="bg-[#E3F2FD] w-16 h-16 rounded-full flex items-center justify-center mx-auto text-[#2AABEE]">
+                                                <div className="bg-[#2AABEE]/10 border border-[#2AABEE]/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto text-[#2AABEE]">
                                                     <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
                                                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.98 1.25-5.59 3.69-.53.35-1.01.52-1.44.51-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.41-1.43-.87.03-.24.37-.49 1.02-.75 4-1.74 6.67-2.89 8.01-3.45 3.82-1.6 4.61-1.87 5.12-1.88.11 0 .36.03.49.14.11.09.14.22.15.34.02.1-.01.27-.02.32z"/>
                                                     </svg>
@@ -452,10 +452,10 @@ export default function OnboardingModal({ isOpen, exams }) {
 
                                                 {/* Title & Description */}
                                                 <div>
-                                                    <h3 className="text-lg font-bold text-slate-800">
+                                                    <h3 className="text-lg font-bold text-white font-display">
                                                         {lang === "EN" ? "Connect Telegram Bot" : "टेलीग्राम बॉट से जुड़ें"}
                                                     </h3>
-                                                    <p className="text-[13px] text-slate-500 mt-1 px-4 leading-relaxed">
+                                                    <p className="text-[13px] text-slate-300 mt-1 px-4 leading-relaxed font-normal">
                                                         {lang === "EN" 
                                                             ? "To receive instant notifications and download admit cards directly on your phone, connect with our official Telegram bot."
                                                             : "त्वरित सूचनाएं प्राप्त करने और सीधे अपने फोन पर एडमिट कार्ड डाउनलोड करने के लिए हमारे टेलीग्राम बॉट से जुड़ें।"}
@@ -468,7 +468,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                                                         href={botUrl}
                                                         target="_blank" 
                                                         rel="noopener noreferrer"
-                                                        className="w-full py-3 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-bold text-[13.5px] rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
+                                                        className="w-full py-3 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-bold text-[13.5px] rounded-xl transition-all shadow-md flex items-center justify-center gap-2 decoration-none"
                                                     >
                                                         {lang === "EN" ? "Open Telegram Bot" : "टेलीग्राम बॉट खोलें"}
                                                         <ExternalLink size={14} />
@@ -476,9 +476,9 @@ export default function OnboardingModal({ isOpen, exams }) {
 
                                                     {/* Polling indicator — show when we have a token and are waiting */}
                                                     {telegramStatus === "waiting" && linkToken && (
-                                                        <div className="p-3 bg-sky-50 border border-sky-100 rounded-xl flex items-center justify-center gap-2.5">
-                                                            <Loader2 className="w-3.5 h-3.5 text-sky-500 animate-spin flex-shrink-0" />
-                                                            <p className="text-[11.5px] font-semibold text-slate-500 leading-normal">
+                                                        <div className="p-3 bg-white/5 border border-white/5 rounded-xl flex items-center justify-center gap-2.5">
+                                                            <Loader2 className="w-3.5 h-3.5 text-sky-400 animate-spin flex-shrink-0" />
+                                                            <p className="text-[11.5px] font-semibold text-slate-300 leading-normal">
                                                                 {lang === "EN"
                                                                     ? "Waiting for you to press 'Start' in the bot..."
                                                                     : "बॉट में 'Start' दबाने का इंतज़ार कर रहे हैं..."}
@@ -488,7 +488,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                                                     
                                                     <button
                                                         onClick={handleFinish}
-                                                        className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[13px] rounded-xl transition-all border-none cursor-pointer"
+                                                        className="w-full py-3 bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-[13px] rounded-xl transition-all border-none cursor-pointer"
                                                     >
                                                         {lang === "EN" ? "Skip for now" : "अभी छोड़ें"}
                                                     </button>

@@ -125,7 +125,7 @@ export default function LoginModal({ isOpen, onClose }) {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+                        className="absolute inset-0 bg-black/60 backdrop-blur-md"
                         onClick={onClose}
                     />
 
@@ -135,12 +135,12 @@ export default function LoginModal({ isOpen, onClose }) {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 15 }}
                         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                        className="relative w-full max-w-md bg-white border border-slate-100 rounded-3xl shadow-2xl p-6 sm:p-8 overflow-hidden z-10 text-center"
+                        className="relative w-full max-w-md bg-[#0b0f19]/95 border border-white/15 rounded-3xl shadow-2xl p-6 sm:p-8 overflow-hidden z-10 text-center backdrop-blur-xl"
                     >
                         {/* Close Button */}
                         <button
                             onClick={onClose}
-                            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-50 transition-all border-none bg-transparent cursor-pointer"
+                            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full hover:bg-white/5 transition-all border-none bg-transparent cursor-pointer"
                         >
                             <X size={18} />
                         </button>
@@ -149,8 +149,8 @@ export default function LoginModal({ isOpen, onClose }) {
                         <div className="space-y-6 py-4">
                             {status === "loading" && (
                                 <div className="flex flex-col items-center justify-center py-10 space-y-4">
-                                    <Loader2 className="w-10 h-10 text-[var(--color-primary)] animate-spin" />
-                                    <p className="text-[13px] font-semibold text-slate-500">
+                                    <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+                                    <p className="text-[13px] font-semibold text-slate-400">
                                         {lang === "EN" ? "Generating secure login session..." : "सुरक्षित लॉगिन सत्र जनरेट हो रहा है..."}
                                     </p>
                                 </div>
@@ -158,16 +158,16 @@ export default function LoginModal({ isOpen, onClose }) {
 
                             {status === "error" && (
                                 <div className="flex flex-col items-center justify-center py-6 space-y-4">
-                                    <div className="w-12 h-12 bg-rose-50 border border-rose-100 rounded-full flex items-center justify-center text-rose-500">
+                                    <div className="w-12 h-12 bg-rose-500/10 border border-rose-500/20 rounded-full flex items-center justify-center text-rose-400">
                                         <AlertCircle size={24} />
                                     </div>
-                                    <h3 className="text-lg font-black text-slate-800">Connection Error</h3>
-                                    <p className="text-[12.5px] text-slate-500 max-w-xs mx-auto leading-relaxed">
+                                    <h3 className="text-lg font-black text-white">Connection Error</h3>
+                                    <p className="text-[12.5px] text-slate-300 max-w-xs mx-auto leading-relaxed">
                                         {errorMsg}
                                     </p>
                                     <button
                                         onClick={startLoginSession}
-                                        className="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-[12px] rounded-xl transition-all border-none cursor-pointer"
+                                        className="px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold text-[12px] rounded-xl transition-all border border-white/10 cursor-pointer"
                                     >
                                         Retry Connection
                                     </button>
@@ -176,16 +176,16 @@ export default function LoginModal({ isOpen, onClose }) {
 
                             {status === "expired" && (
                                 <div className="flex flex-col items-center justify-center py-6 space-y-4">
-                                    <div className="w-12 h-12 bg-amber-50 border border-amber-100 rounded-full flex items-center justify-center text-amber-500 animate-pulse">
+                                    <div className="w-12 h-12 bg-amber-500/10 border border-amber-500/20 rounded-full flex items-center justify-center text-amber-450 animate-pulse">
                                         <AlertCircle size={24} />
                                     </div>
-                                    <h3 className="text-lg font-black text-slate-800">Session Expired</h3>
-                                    <p className="text-[12.5px] text-slate-500 max-w-xs mx-auto leading-relaxed">
+                                    <h3 className="text-lg font-black text-white">Session Expired</h3>
+                                    <p className="text-[12.5px] text-slate-300 max-w-xs mx-auto leading-relaxed">
                                         {lang === "EN" ? "The login link has expired. Please generate a new link to sign in." : "लॉगिन लिंक समाप्त हो गया है। कृपया साइन इन करने के लिए एक नया लिंक जनरेट करें।"}
                                     </p>
                                     <button
                                         onClick={startLoginSession}
-                                        className="px-6 py-2.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white font-bold text-[12px] rounded-xl transition-all border-none cursor-pointer"
+                                        className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[12px] rounded-xl transition-all border-none cursor-pointer"
                                     >
                                         {lang === "EN" ? "Generate New Link" : "नया लिंक बनाएं"}
                                     </button>
@@ -198,14 +198,14 @@ export default function LoginModal({ isOpen, onClose }) {
                                         initial={{ scale: 0.8, opacity: 0 }}
                                         animate={{ scale: 1, opacity: 1 }}
                                         transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                                        className="w-14 h-14 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center text-emerald-500"
+                                        className="w-14 h-14 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400"
                                     >
                                         <CheckCircle2 size={32} />
                                     </motion.div>
-                                    <h3 className="text-lg font-black text-slate-800">
+                                    <h3 className="text-lg font-black text-white">
                                         {lang === "EN" ? "Authentication Successful" : "सत्यापन सफल रहा"}
                                     </h3>
-                                    <p className="text-[12.5px] text-slate-500">
+                                    <p className="text-[12.5px] text-slate-400">
                                         {lang === "EN" ? "Logging you into your dashboard..." : "आपको डैशबोर्ड में लॉग इन किया जा रहा है..."}
                                     </p>
                                 </div>
@@ -215,10 +215,10 @@ export default function LoginModal({ isOpen, onClose }) {
                                 <div className="space-y-6">
                                     {/* Header */}
                                     <div className="space-y-2">
-                                        <div className="w-12 h-12 bg-sky-50 border border-sky-100 rounded-2xl flex items-center justify-center text-sky-500 mx-auto">
+                                        <div className="w-12 h-12 bg-sky-500/10 border border-sky-500/20 rounded-2xl flex items-center justify-center text-sky-400 mx-auto">
                                             <MessageSquare size={22} />
                                         </div>
-                                        <h3 className="text-xl font-black text-slate-800">
+                                        <h3 className="text-xl font-black text-white font-display">
                                             {lang === "EN" ? "Login with Telegram" : "टेलीग्राम से लॉग इन करें"}
                                         </h3>
                                         <p className="text-[12px] text-slate-400 max-w-xs mx-auto leading-relaxed">
@@ -242,11 +242,11 @@ export default function LoginModal({ isOpen, onClose }) {
                                     </div>
 
                                     <div className="relative flex py-2 items-center">
-                                        <div className="flex-grow border-t border-slate-200"></div>
-                                        <span className="flex-shrink mx-4 text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+                                        <div className="flex-grow border-t border-white/10"></div>
+                                        <span className="flex-shrink mx-4 text-slate-500 text-[11px] font-bold uppercase tracking-wider">
                                             {lang === "EN" ? "Or" : "या"}
                                         </span>
-                                        <div className="flex-grow border-t border-slate-200"></div>
+                                        <div className="flex-grow border-t border-white/10"></div>
                                     </div>
 
                                     <div>
@@ -264,7 +264,7 @@ export default function LoginModal({ isOpen, onClose }) {
                                                     })
                                                 }
                                             }}
-                                            className="w-full py-3 border border-slate-200 hover:bg-slate-50 text-slate-700 text-[13px] font-bold rounded-2xl transition-all shadow-sm cursor-pointer bg-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                            className="w-full py-3 border border-white/10 hover:bg-white/10 text-white text-[13px] font-bold rounded-2xl transition-all shadow-sm cursor-pointer bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                         >
                                             {!isClerkLoaded && <Loader2 size={16} className="animate-spin text-slate-400" />}
                                             {lang === "EN" ? "Sign in with Google / Email" : "गूगल / ईमेल से साइन इन करें"}
@@ -272,9 +272,9 @@ export default function LoginModal({ isOpen, onClose }) {
                                     </div>
 
                                     {/* Polling State Message */}
-                                    <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center gap-3">
-                                        <Loader2 className="w-4 h-4 text-sky-500 animate-spin flex-shrink-0" />
-                                        <p className="text-[11.5px] font-semibold text-slate-500 text-left leading-normal">
+                                    <div className="p-4 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-center gap-3">
+                                        <Loader2 className="w-4 h-4 text-sky-400 animate-spin flex-shrink-0" />
+                                        <p className="text-[11.5px] font-semibold text-slate-300 text-left leading-normal">
                                             {status === "pending" ? (
                                                 lang === "EN" 
                                                     ? "Awaiting your click on 'Start' in the bot..." 
