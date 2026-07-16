@@ -613,7 +613,7 @@ export default function StudentPanel() {
             <OnboardingModal isOpen={needsOnboarding} exams={exams} />
             
             {/* ── DESKTOP SIDEBAR ── */}
-            <aside className="w-[280px] bg-zinc-950/80 backdrop-blur-xl border-r border-white/5 hidden lg:flex flex-col sticky top-0 h-screen shrink-0 z-20">
+            <aside className="w-[280px] bg-zinc-950/40 backdrop-blur-xl border-r border-white/5 hidden lg:flex flex-col sticky top-0 h-screen shrink-0 z-20">
                 {/* Tricolor Saffron/Green Top Line */}
                 <div className="h-1 bg-gradient-to-r from-[#FF6B00] via-white to-[#10b981]" />
 
@@ -705,7 +705,7 @@ export default function StudentPanel() {
                 
                 {/* ── SINGLE CLEAN HEADER ── */}
                 <div className="flex flex-col sticky top-0 z-30 shrink-0 shadow-sm">
-                    <header className="h-14 md:h-16 bg-[#050508]/85 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-3 md:px-10">
+                    <header className="h-14 md:h-16 bg-[#050508]/40 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-3 md:px-10">
                         {/* Left Side: Logo + Tab Title */}
                         <div className="flex items-center gap-3">
                             <img src="/logo.png" alt="Logo" className="w-8 h-8 rounded-full object-cover border border-white/10 lg:hidden" onClick={() => setActiveTab("dashboard")} />
@@ -1053,7 +1053,7 @@ export default function StudentPanel() {
 
                     {/* ── RIGHT PREMIUM NOTIFICATION PANEL ── */}
                     {!loading && (
-                        <aside className="hidden xl:flex w-[340px] border-l border-white/5 h-[calc(100vh-108px)] shrink-0 flex-col overflow-y-auto scroll-container-smooth bg-zinc-950/80 backdrop-blur-xl relative z-10">
+                        <aside className="hidden xl:flex w-[340px] border-l border-white/5 h-[calc(100vh-108px)] shrink-0 flex-col overflow-y-auto scroll-container-smooth bg-zinc-950/30 backdrop-blur-md relative z-10">
                             {renderNotificationsPanel(true)}
                         </aside>
                     )}
