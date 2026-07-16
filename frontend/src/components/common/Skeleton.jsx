@@ -307,31 +307,31 @@ export function StudentPortalSkeleton() {
 }
 
 
-// ─── LANDING PAGE SKELETONS (Light Theme) ────────────────────────────────────
+// ─── LANDING PAGE SKELETONS (Dark Theme) ────────────────────────────────────
 
 // Specifically for Landing.jsx -> Available Services
 export function ServiceCardSkeleton() {
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] flex flex-col justify-between h-full space-y-6">
+    <div className="bg-zinc-950/40 backdrop-blur-md border border-white/5 p-6 rounded-[22px] flex flex-col justify-between h-full space-y-6">
       <div className="space-y-4">
         {/* Category & Fee Header */}
         <div className="flex items-center justify-between">
-          <Skeleton className="h-4 w-1/4 rounded-full" />
-          <Skeleton className="h-6 w-16 rounded-lg" />
+          <Skeleton dark className="h-4 w-1/4 rounded-full" />
+          <Skeleton dark className="h-6 w-16 rounded-lg" />
         </div>
         
         {/* Title */}
-        <Skeleton className="h-6 w-5/6 rounded-md" />
+        <Skeleton dark className="h-6 w-5/6 rounded-md" />
         
         {/* Description lines */}
         <div className="space-y-2 pt-2">
-          <Skeleton className="h-3 w-full rounded-md" />
-          <Skeleton className="h-3 w-4/5 rounded-md" />
+          <Skeleton dark className="h-3 w-full rounded-md" />
+          <Skeleton dark className="h-3 w-4/5 rounded-md" />
         </div>
       </div>
 
       {/* Button */}
-      <Skeleton className="h-10 w-full rounded-xl" />
+      <Skeleton dark className="h-10 w-full rounded-xl" />
     </div>
   )
 }
@@ -341,25 +341,25 @@ export function AnnouncementSkeleton({ count = 3 }) {
   return (
     <div className="space-y-4 mt-6">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="rounded-xl p-5 bg-slate-50/80 space-y-4 shadow-sm">
+        <div key={i} className="rounded-xl p-5 bg-zinc-900/40 border border-white/5 space-y-4 shadow-sm">
           {/* Date Header */}
           <div className="flex items-center justify-between">
-            <Skeleton className="h-5 w-20 rounded" />
-            <Skeleton className="h-4 w-32 rounded" />
+            <Skeleton dark className="h-5 w-20 rounded" />
+            <Skeleton dark className="h-4 w-32 rounded" />
           </div>
           
           {/* Title */}
-          <Skeleton className="h-5 w-3/4 rounded" />
+          <Skeleton dark className="h-5 w-3/4 rounded" />
           
           {/* Content lines */}
           <div className="space-y-2">
-            <Skeleton className="h-3 w-full rounded" />
-            <Skeleton className="h-3 w-11/12 rounded" />
-            <Skeleton className="h-3 w-4/5 rounded" />
+            <Skeleton dark className="h-3 w-full rounded" />
+            <Skeleton dark className="h-3 w-11/12 rounded" />
+            <Skeleton dark className="h-3 w-4/5 rounded" />
           </div>
           
           {/* Link */}
-          <Skeleton className="h-4 w-40 rounded mt-2" />
+          <Skeleton dark className="h-4 w-40 rounded mt-2" />
         </div>
       ))}
     </div>

@@ -7,7 +7,7 @@ import {
     Globe, Bell, LogOut, X, Search, Menu, Send, MessageSquare,
     Calendar, ChevronDown, Download, ExternalLink, FileText, LayoutDashboard,
     FileCheck, Info, RefreshCw, ChevronUp, FileBadge, Sparkles,
-    Settings, Check, MapPin, Eye, BookOpen
+    Settings, Check, MapPin, Eye, BookOpen, MoreHorizontal
 } from "lucide-react"
 
 import "../../portal.css"
@@ -46,6 +46,7 @@ export default function StudentPanel() {
     const [activeExamForTimeline, setActiveExamForTimeline] = useState(null)
     const [activeServiceForForm, setActiveServiceForForm] = useState(null)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+    const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false)
 
     // Data lists from DB
     const [services, setServices] = useState({})
@@ -694,11 +695,9 @@ export default function StudentPanel() {
                 {/* ── SINGLE CLEAN HEADER ── */}
                 <div className="flex flex-col sticky top-0 z-30 shrink-0 shadow-sm">
                     <header className="h-14 md:h-16 bg-[#050508]/85 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-3 md:px-10">
-                        {/* Left Side: Navigation / Tab Title */}
+                        {/* Left Side: Logo + Tab Title */}
                         <div className="flex items-center gap-3">
-                            <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 -ml-2 text-slate-450 hover:text-white hover:bg-white/5 rounded-lg cursor-pointer transition-colors">
-                                <Menu size={20} />
-                            </button>
+                            <img src="/logo.png" alt="Logo" className="w-8 h-8 rounded-full object-cover border border-white/10 lg:hidden" onClick={() => setActiveTab("dashboard")} />
                             <div className="flex items-center gap-2.5 text-left">
                                 <h2 className="text-[16px] font-extrabold text-white tracking-tight font-display">
                                     {lang === "EN" ? navigationItems.find(i => i.id === activeTab)?.label : navigationItems.find(i => i.id === activeTab)?.labelHi}
@@ -734,14 +733,13 @@ export default function StudentPanel() {
                     </header>
                 </div>
 
-                {/* ── MOBILE BOTTOM NAV (Replaces Drawer) ── */}
-                <nav className="lg:hidden fixed bottom-3 left-4 right-4 bg-zinc-950/80 backdrop-blur-lg border border-white/10 z-50 flex items-center justify-around px-2 py-1 shadow-lg rounded-2xl">
+                {/* ── MOBILE BOTTOM NAV ── */}
+                <nav className="lg:hidden fixed bottom-3 left-4 right-4 bg-zinc-950/90 backdrop-blur-xl border border-white/10 z-50 flex items-center justify-around px-1 py-1.5 shadow-2xl shadow-black/40 rounded-2xl">
                     {[
-                        { id: "dashboard", icon: LayoutDashboard, label: "Home" },
-                        { id: "services", icon: ClipboardList, label: "Services" },
-                        { id: "exams", icon: Bell, label: "Exams" },
-                        { id: "status", icon: CheckCircle2, label: "Status" },
-                        { id: "profile", icon: User, label: "Profile" }
+                        { id: "dashboard", icon: LayoutDashboard, label: lang === 'EN' ? "Home" : "होम" },
+                        { id: "services", icon: ClipboardList, label: lang === 'EN' ? "Services" : "सेवाएँ" },
+                        { id: "exams", icon: Award, label: lang === 'EN' ? "Exams" : "परीक्षा" },
+                        { id: "status", icon: CheckCircle2, label: lang === 'EN' ? "Status" : "स्थिति" }
                     ].map(item => {
                         const Icon = item.icon
                         const isActive = activeTab === item.id
@@ -751,17 +749,112 @@ export default function StudentPanel() {
                                 onClick={() => {
                                     setActiveTab(item.id)
                                     setActiveExamForTimeline(null)
+                                    setIsMoreSheetOpen(false)
                                 }}
-                                className={`flex flex-col items-center justify-center w-16 py-1 shrink-0 transition-colors ${isActive ? "text-blue-400" : "text-slate-400 hover:text-slate-200"}`}
+                                className={`flex flex-col items-center justify-center flex-1 min-h-[48px] py-1.5 shrink-0 transition-all rounded-xl ${isActive ? "text-blue-400" : "text-slate-400 active:text-slate-200"}`}
                             >
-                                <div className={`p-1.5 rounded-xl mb-0.5 transition-colors ${isActive ? "bg-white/5" : "bg-transparent"}`}>
-                                    <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
+                                <div className={`p-1.5 rounded-xl mb-0.5 transition-all ${isActive ? "bg-blue-500/10" : "bg-transparent"}`}>
+                                    <Icon size={18} strokeWidth={isActive ? 2.5 : 1.8} />
                                 </div>
-                                <span className={`text-[9px] font-bold ${isActive ? "text-white" : "text-slate-400"}`}>{item.label}</span>
+                                <span className={`text-[9px] font-bold ${isActive ? "text-blue-400" : "text-slate-500"}`}>{item.label}</span>
                             </button>
                         )
                     })}
+
+                    {/* More Button */}
+                    <button
+                        onClick={() => setIsMoreSheetOpen(!isMoreSheetOpen)}
+                        className={`flex flex-col items-center justify-center flex-1 min-h-[48px] py-1.5 shrink-0 transition-all rounded-xl ${["notifications", "neet", "about", "profile"].includes(activeTab) ? "text-blue-400" : isMoreSheetOpen ? "text-white" : "text-slate-400 active:text-slate-200"}`}
+                    >
+                        <div className={`p-1.5 rounded-xl mb-0.5 transition-all ${["notifications", "neet", "about", "profile"].includes(activeTab) ? "bg-blue-500/10" : "bg-transparent"}`}>
+                            <MoreHorizontal size={18} strokeWidth={["notifications", "neet", "about", "profile"].includes(activeTab) ? 2.5 : 1.8} />
+                        </div>
+                        <span className={`text-[9px] font-bold ${["notifications", "neet", "about", "profile"].includes(activeTab) ? "text-blue-400" : "text-slate-500"}`}>{lang === 'EN' ? 'More' : 'और'}</span>
+                    </button>
                 </nav>
+
+                {/* ── MORE SHEET OVERLAY ── */}
+                <AnimatePresence>
+                    {isMoreSheetOpen && (
+                        <>
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[55]"
+                                onClick={() => setIsMoreSheetOpen(false)}
+                            />
+                            <motion.div
+                                initial={{ y: "100%" }}
+                                animate={{ y: 0 }}
+                                exit={{ y: "100%" }}
+                                transition={{ type: "spring", damping: 28, stiffness: 350 }}
+                                className="lg:hidden fixed bottom-0 left-0 right-0 z-[60] bg-zinc-950/95 backdrop-blur-xl border-t border-white/10 rounded-t-3xl p-5 pb-8"
+                            >
+                                {/* Drag Handle */}
+                                <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-5" />
+                                
+                                <div className="grid grid-cols-4 gap-3">
+                                    {[
+                                        { id: "profile", icon: User, label: lang === 'EN' ? "Profile" : "प्रोफ़ाइल", color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
+                                        { id: "notifications", icon: Bell, label: lang === 'EN' ? "Alerts" : "सूचनाएँ", color: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
+                                        { id: "neet", icon: BookOpen, label: lang === 'EN' ? "NEET" : "नीट", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
+                                        { id: "about", icon: ShieldCheck, label: lang === 'EN' ? "About" : "हमारे बारे में", color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" }
+                                    ].map(item => {
+                                        const Icon = item.icon
+                                        const isActive = activeTab === item.id
+                                        return (
+                                            <button
+                                                key={item.id}
+                                                onClick={() => {
+                                                    setActiveTab(item.id)
+                                                    setActiveExamForTimeline(null)
+                                                    setIsMoreSheetOpen(false)
+                                                }}
+                                                className={`flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border transition-all active:scale-95 ${
+                                                    isActive
+                                                        ? "bg-white/10 border-white/20 shadow-md"
+                                                        : `${item.color} border`
+                                                }`}
+                                            >
+                                                <Icon size={22} strokeWidth={isActive ? 2.5 : 2} className={isActive ? "text-white" : ""} />
+                                                <span className={`text-[10px] font-bold ${isActive ? "text-white" : "text-slate-300"}`}>{item.label}</span>
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+
+                                {/* Quick Actions */}
+                                <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
+                                    {isLoggedIn ? (
+                                        <button
+                                            onClick={() => { handleLogout(); setIsMoreSheetOpen(false) }}
+                                            className="flex items-center gap-2 text-red-400 hover:text-red-300 text-[12px] font-bold py-2 px-3 rounded-xl hover:bg-red-500/10 transition-all"
+                                        >
+                                            <LogOut size={14} />
+                                            {lang === 'EN' ? 'Sign Out' : 'लॉगआउट'}
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => { triggerSignIn(); setIsMoreSheetOpen(false) }}
+                                            className="flex items-center gap-2 text-blue-400 hover:text-blue-300 text-[12px] font-bold py-2 px-3 rounded-xl hover:bg-blue-500/10 transition-all"
+                                        >
+                                            <User size={14} />
+                                            {lang === 'EN' ? 'Sign In' : 'लॉगिन'}
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={() => setIsMoreSheetOpen(false)}
+                                        className="p-2 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition-all"
+                                    >
+                                        <X size={18} />
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>
 
                 <div className="flex flex-1 w-full overflow-hidden items-start relative z-10">
                     {/* ── CENTER WORKSPACE ── */}

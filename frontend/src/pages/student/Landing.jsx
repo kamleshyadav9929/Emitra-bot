@@ -6,7 +6,7 @@ import LoginModal from "../../components/student/LoginModal"
 import {
     Send, Clock, Bell, Globe, ExternalLink,
     ChevronDown, Check, LogOut, User, Search,
-    X, Loader2, ArrowRight, Shield, MessageSquare, ClipboardCheck, Sparkles, Files, HelpCircle
+    X, Loader2, ArrowRight, Shield, MessageSquare, ClipboardCheck, Sparkles, Files, HelpCircle, Menu, ChevronUp
 } from "lucide-react"
 import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
@@ -31,6 +31,8 @@ const formatTelegramMessage = (text) => {
 export default function Landing() {
     const navigate = useNavigate()
     const [showLoginModal, setShowLoginModal] = useState(false)
+    const [showMobileMenu, setShowMobileMenu] = useState(false)
+    const [showScrollTop, setShowScrollTop] = useState(false)
     const { lang, toggleLanguage } = useLanguage()
     const { user, isLoggedIn, logout } = useAuth()
 
@@ -78,15 +80,15 @@ export default function Landing() {
         const fetchLandingData = async () => {
             try {
                 const [servicesRes, examsRes, announcementsRes, configRes] = await Promise.all([
-                    api.getPublicServices().catch(() => ({ services: {} })),
-                    api.getPublicExams().catch(() => ({ exams: [] })),
-                    api.getPublicAnnouncements().catch(() => ({ announcements: [] })),
-                    api.getPublicConfig().catch(() => ({}))
+                    api.getPublicServices(),
+                    api.getPublicExams(),
+                    api.getPublicAnnouncements(),
+                    api.getPublicConfig()
                 ])
-                setServices(servicesRes.services || {})
+                setServices(servicesRes.categories || {})
                 setExams(examsRes.exams || [])
                 setAnnouncements(announcementsRes.announcements || [])
-                setConfig(configRes || {})
+                setConfig(configRes.config || {})
             } catch (err) {
                 console.error("Failed to load landing data", err)
             } finally {
@@ -96,11 +98,24 @@ export default function Landing() {
         fetchLandingData()
     }, [])
 
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 400) {
+                setShowScrollTop(true)
+            } else {
+                setShowScrollTop(false)
+            }
+        }
+        window.addEventListener("scroll", handleScroll)
+        return () => window.removeEventListener("scroll", handleScroll)
+    }, [])
+
     const scrollToSection = (id) => {
         const element = document.getElementById(id)
         if (element) {
             element.scrollIntoView({ behavior: "smooth" })
         }
+        setShowMobileMenu(false)
     }
 
     const handleJoinWhatsApp = () => {
@@ -152,6 +167,7 @@ export default function Landing() {
 
     const triggerSignIn = () => {
         setShowLoginModal(true)
+        setShowMobileMenu(false)
     }
 
     const filteredAnnouncements = useMemo(() => {
@@ -212,7 +228,7 @@ export default function Landing() {
             <header className="sticky top-0 z-40 bg-[#050508]/75 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <Logo className="w-9 h-9 rounded-full border border-white/10" />
-                    <div className="leading-none hidden sm:block text-left">
+                    <div className="leading-none text-left">
                         <span className="text-base font-black tracking-tight text-white font-display">Krishna Emitra</span>
                         <span className="text-[8.5px] text-slate-500 font-bold tracking-widest uppercase block mt-0.5">Digital Administration</span>
                     </div>
@@ -222,16 +238,15 @@ export default function Landing() {
                     <button onClick={() => scrollToSection("what-we-do")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">What We Do</button>
                     <button onClick={() => scrollToSection("how-it-works")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">How It Works</button>
                     <button onClick={() => scrollToSection("notifications")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">Live Circulars</button>
-                    <button onClick={() => scrollToSection("resources")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">Resources</button>
-                    <button onClick={() => scrollToSection("faq")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">FAQs</button>
+                    <button onClick={() => scrollToSection("faq")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none font-semibold">FAQs</button>
                 </nav>
 
                 <div className="flex items-center gap-3">
-                    <button onClick={toggleLanguage} className="text-slate-300 hover:text-white transition-colors text-[10.5px] font-bold flex items-center gap-1.5 bg-white/5 px-2.5 py-1.5 rounded-lg border border-white/10 uppercase cursor-pointer">
+                    <button onClick={toggleLanguage} className="hidden sm:flex text-slate-350 hover:text-white transition-colors text-[10.5px] font-bold items-center gap-1.5 bg-white/5 px-2.5 py-1.5 rounded-lg border border-white/10 uppercase cursor-pointer">
                         <Globe size={12} className="text-slate-400" /> {lang === 'EN' ? 'हिंदी' : 'English'}
                     </button>
 
-                    <div className="h-5 w-px bg-white/10" />
+                    <div className="hidden sm:block h-5 w-px bg-white/10" />
 
                     {isLoggedIn ? (
                         <div className="flex items-center gap-2">
@@ -243,7 +258,7 @@ export default function Landing() {
                                 <User size={14} />
                                 <span>Dashboard</span>
                             </button>
-                            <button onClick={logout} className="p-2 rounded-lg hover:bg-white/5 text-slate-400 hover:text-red-400 transition-colors bg-transparent border-none cursor-pointer" title="Log Out">
+                            <button onClick={logout} className="p-2 rounded-lg hover:bg-white/5 text-slate-450 hover:text-red-400 transition-colors bg-transparent border-none cursor-pointer" title="Log Out">
                                 <LogOut size={14} />
                             </button>
                         </div>
@@ -257,8 +272,61 @@ export default function Landing() {
                             <span>Sign In</span>
                         </button>
                     )}
+
+                    {/* Mobile Hamburger menu toggle button */}
+                    <button
+                        onClick={() => setShowMobileMenu(!showMobileMenu)}
+                        className="md:hidden p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
+                    >
+                        {showMobileMenu ? <X size={20} /> : <Menu size={20} />}
+                    </button>
                 </div>
             </header>
+
+            {/* ── MOBILE MENU OVERLAY ── */}
+            <AnimatePresence>
+                {showMobileMenu && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="md:hidden fixed inset-0 top-16 bg-black/80 backdrop-blur-md z-30"
+                            onClick={() => setShowMobileMenu(false)}
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.2 }}
+                            className="md:hidden fixed top-16 left-0 right-0 bg-[#050508]/95 border-b border-white/10 p-6 z-45 text-left space-y-6"
+                        >
+                            <div className="flex flex-col gap-4 text-sm font-bold text-slate-300">
+                                <button onClick={() => scrollToSection("what-we-do")} className="text-left py-2 hover:text-white border-b border-white/5 bg-transparent border-none">What We Do</button>
+                                <button onClick={() => scrollToSection("how-it-works")} className="text-left py-2 hover:text-white border-b border-white/5 bg-transparent border-none">How It Works</button>
+                                <button onClick={() => scrollToSection("notifications")} className="text-left py-2 hover:text-white border-b border-white/5 bg-transparent border-none">Live Circulars</button>
+                                <button onClick={() => scrollToSection("faq")} className="text-left py-2 hover:text-white border-b border-white/5 bg-transparent border-none">FAQs</button>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2">
+                                <button onClick={toggleLanguage} className="text-slate-300 hover:text-white transition-colors text-[11px] font-bold flex items-center gap-1.5 bg-white/5 px-3 py-2 rounded-lg border border-white/10 uppercase cursor-pointer">
+                                    <Globe size={13} className="text-slate-400" /> {lang === 'EN' ? 'हिंदी' : 'English'}
+                                </button>
+                                
+                                {!isLoggedIn && (
+                                    <button
+                                        onClick={triggerSignIn}
+                                        className="px-5 py-2 rounded-xl bg-white text-slate-950 hover:bg-slate-100 text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all border-none cursor-pointer shadow-md"
+                                    >
+                                        <User size={14} />
+                                        <span>Sign In</span>
+                                    </button>
+                                )}
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
 
             {/* ── DEADLINES TICKER ── */}
             {upcomingDeadlines.length > 0 && (
@@ -288,7 +356,7 @@ export default function Landing() {
                                 : "आपकी सरकारी नौकरी आवेदन, अब स्वचालित।"}
                         </h1>
 
-                        <p className="text-[15px] sm:text-[17px] text-slate-400 leading-relaxed max-w-2xl mx-auto font-normal pt-2">
+                        <p className="text-[15px] sm:text-[17px] text-slate-300 leading-relaxed max-w-2xl mx-auto font-normal pt-2">
                             {lang === "EN"
                                 ? "SSC, Railways, NEET counselling, and state services. Track deadlines, store files, and submit application requests straight to our digital operator desk via Telegram."
                                 : "SSC, रेलवे, NEET काउंसलिंग और राज्य सेवाएँ। परीक्षा अंतिम तिथि ट्रैक करें, दस्तावेज स्टोर करें और सीधे टेलीग्राम द्वारा हमारे ऑपरेटर को आवेदन भेजें।"}
@@ -337,7 +405,7 @@ export default function Landing() {
                             <h4 className="text-[24px] font-bold text-[#38bdf8] font-display mt-8 mb-4">
                                 {lang === 'EN' ? 'Connect' : 'जुड़ें'}
                             </h4>
-                            <p className="text-[13px] text-slate-400 font-normal leading-relaxed">
+                            <p className="text-[13px] text-slate-300 font-normal leading-relaxed">
                                 {lang === 'EN'
                                     ? 'Sign in to our portal or add our Telegram bot to start receiving live alerts.'
                                     : 'पोर्टल में साइन इन करें या लाइव अलर्ट प्राप्त करने के लिए हमारे टेलीग्राम बॉट को जोड़ें।'}
@@ -371,7 +439,7 @@ export default function Landing() {
                             <h4 className="text-[24px] font-bold text-[#10b981] font-display mt-8 mb-4">
                                 {lang === 'EN' ? 'Request' : 'अनुरोध'}
                             </h4>
-                            <p className="text-[13px] text-slate-400 font-normal leading-relaxed">
+                            <p className="text-[13px] text-slate-300 font-normal leading-relaxed">
                                 {lang === 'EN'
                                     ? 'Choose your desired service and submit the required details securely.'
                                     : 'अपनी वांछित सेवा चुनें और सुरक्षित रूप से आवश्यक विवरण जमा करें।'}
@@ -397,7 +465,7 @@ export default function Landing() {
                             <h4 className="text-[24px] font-bold text-[#fbbf24] font-display mt-8 mb-4">
                                 {lang === 'EN' ? 'Complete' : 'पूरा करें'}
                             </h4>
-                            <p className="text-[13px] text-slate-400 font-normal leading-relaxed">
+                            <p className="text-[13px] text-slate-300 font-normal leading-relaxed">
                                 {lang === 'EN'
                                     ? 'Wait for processing to finish. You will receive the receipt automatically.'
                                     : 'प्रसंस्करण समाप्त होने की प्रतीक्षा करें। आपको रसीद स्वचालित रूप से प्राप्त होगी।'}
@@ -422,7 +490,7 @@ export default function Landing() {
                     <h2 className="text-3xl md:text-4xl font-black text-white font-display tracking-tight">
                         {lang === "EN" ? "Explore E-Mitra Services" : "ई-मित्र सेवाओं की सूची"}
                     </h2>
-                    <p className="text-[13.5px] text-slate-400 max-w-xl mx-auto font-normal">
+                    <p className="text-[13.5px] text-slate-300 max-w-xl mx-auto font-normal">
                         {lang === "EN"
                             ? "Browse official application filing desk services. Submit requests and check requirements."
                             : "आधिकारिक फॉर्म भरने की सेवाओं को ऑनलाइन देखें। अपने आवश्यक दस्तावेजों की जांच करें।"}
@@ -941,6 +1009,22 @@ export default function Landing() {
             </AnimatePresence>
 
             <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+
+            {/* Back to top floating button */}
+            <AnimatePresence>
+                {showScrollTop && (
+                    <motion.button
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                        className="fixed bottom-6 right-6 z-40 w-11 h-11 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg flex items-center justify-center cursor-pointer border-none hover:shadow-blue-500/30 active:scale-95 transition-all"
+                        title="Back to Top"
+                    >
+                        <ChevronUp size={20} />
+                    </motion.button>
+                )}
+            </AnimatePresence>
         </div>
     )
 }
