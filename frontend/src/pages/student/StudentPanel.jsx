@@ -681,7 +681,7 @@ export default function StudentPanel() {
                             onClick={handleLogout}
                             className="w-full flex items-center justify-center gap-1.5 py-2.5 border border-red-500/20 hover:bg-red-500/10 text-red-400 hover:text-red-300 text-[11px] font-bold uppercase rounded-lg transition-all cursor-pointer"
                         >
-                            <LogOut size={13} /> Close SSO Session
+                            <LogOut size={13} /> {lang === 'EN' ? 'Sign Out' : 'लॉगआउट'}
                         </button>
                     ) : (
                         <button
