@@ -361,7 +361,10 @@ def update_student_profile(user_id, name, phone, gender=None):
         supabase.table("users").update(update_data).eq("id", user_id).execute()
         return True, "Profile updated"
     except Exception as e:
-        return False, str(e)
+        err_msg = str(e)
+        if "users_phone_key" in err_msg or "duplicate key" in err_msg or "23505" in err_msg:
+            return False, "This phone number is already registered with another account."
+        return False, err_msg
 
 
 def _merge_users_data(old_uid, new_uid):

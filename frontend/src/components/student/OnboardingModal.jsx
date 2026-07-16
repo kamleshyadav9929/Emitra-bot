@@ -181,7 +181,20 @@ export default function OnboardingModal({ isOpen, exams }) {
         } catch (err) {
             console.error("Onboarding failed", err)
             setStatus("error")
-            setErrorMsg("Could not connect to backend server. Please check your internet.")
+            
+            const rawMsg = err?.message || "";
+            let msg = rawMsg;
+            
+            if (rawMsg.includes("already registered") || rawMsg.includes("users_phone_key") || rawMsg.includes("duplicate key") || rawMsg.includes("23505")) {
+                msg = lang === "EN" 
+                    ? "This mobile number is already registered with another account." 
+                    : "यह मोबाइल नंबर पहले से ही किसी अन्य खाते के साथ पंजीकृत है।";
+            }
+            
+            setErrorMsg(msg || (lang === "EN" 
+                ? "Could not connect to backend server. Please check your internet." 
+                : "सर्वर से कनेक्ट नहीं हो सका। कृपया अपना इंटरनेट जांचें।"));
+            setStep(1); // Go back to first step to allow the user to correct the phone number
         }
     }
 

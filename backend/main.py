@@ -812,7 +812,8 @@ def student_onboard():
     # Update profile
     success, msg = database.update_student_profile(user["id"], name, phone, gender)
     if not success:
-        return jsonify({"success": False, "error": msg}), 500
+        status_code = 400 if "already registered" in msg else 500
+        return jsonify({"success": False, "error": msg}), status_code
         
     # Update exams
     if isinstance(categories, list) and categories:
