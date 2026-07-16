@@ -609,8 +609,7 @@ export default function StudentPanel() {
             
             {/* ── DESKTOP SIDEBAR ── */}
             <aside className="w-[280px] bg-zinc-950/40 backdrop-blur-xl border-r border-white/5 hidden lg:flex flex-col sticky top-0 h-screen shrink-0 z-20">
-                {/* Tricolor Saffron/Green Top Line */}
-                <div className="h-1 bg-gradient-to-r from-[#FF6B00] via-white to-[#10b981]" />
+
 
                 {/* SSO / e-Mitra Kiosk Header */}
                 <div className="h-16 flex items-center px-5 border-b border-white/5 bg-transparent">
