@@ -255,7 +255,7 @@ export default function OnboardingModal({ isOpen, exams }) {
                         )}
                     </div>
 
-                    <div className="p-4 sm:p-6 flex-1 min-h-0 overflow-y-auto text-left">
+                    <div className="p-4 sm:p-6 flex-1 overflow-y-auto max-h-[55vh] sm:max-h-[60vh] text-left">
                         {status === "loading" || status === "success" ? (
                             <div className="flex flex-col items-center justify-center py-12 space-y-5 text-center w-full">
                                 {status === "loading" ? (
