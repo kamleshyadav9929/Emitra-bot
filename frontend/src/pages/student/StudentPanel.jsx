@@ -602,12 +602,7 @@ export default function StudentPanel() {
 
     return (
         <div className="min-h-screen flex text-slate-200 font-sans antialiased relative bg-[#050508] bg-grid-pattern w-full pb-16 lg:pb-0 overflow-x-hidden">
-            {/* Ambient Background Glow Circles */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-blue-600/10 blur-[130px] animate-slow-glow" />
-                <div className="absolute top-[30%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 blur-[140px] animate-slow-glow" />
-                <div className="absolute bottom-[20%] left-[-5%] w-[45%] h-[45%] rounded-full bg-emerald-500/5 blur-[120px] animate-slow-glow" />
-            </div>
+
 
             <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
             <OnboardingModal isOpen={needsOnboarding} exams={exams} />
