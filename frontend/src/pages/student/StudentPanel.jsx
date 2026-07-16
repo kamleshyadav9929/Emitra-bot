@@ -865,22 +865,7 @@ export default function StudentPanel() {
                     {/* ── CENTER WORKSPACE ── */}
                     <div className="flex-1 min-w-0 h-[calc(100vh-108px)] overflow-y-auto scroll-container-smooth flex flex-col justify-between">
                         {/* Official Bulletin Notice Ticker */}
-                        {upcomingDeadlines.length > 0 && activeTab !== "services" && (
-                            <div className="hidden md:flex bg-orange-500/10 text-orange-200 text-[11px] font-semibold py-1.5 md:py-2 px-3 md:px-6 overflow-hidden items-center border-b border-orange-500/20 shadow-inner relative shrink-0">
-                                <div className="flex items-center gap-1.5 shrink-0 bg-[#050508] z-10 pr-2 md:pr-4 mr-2 md:mr-4 text-orange-400 font-black uppercase tracking-wider relative">
-                                    <Clock size={12} className="animate-pulse" /> 
-                                    {lang === "EN" ? "URGENT NOTICES" : "आवश्यक सूचना"}
-                                    <div className="absolute right-0 top-0 bottom-0 w-3 bg-gradient-to-r from-transparent to-black/5 pointer-events-none translate-x-full" />
-                                </div>
-                                <div className="flex items-center gap-12 whitespace-nowrap marquee-track">
-                                    {upcomingDeadlines.map((ex, idx) => (
-                                        <span key={idx} className="inline-flex items-center gap-1 text-[11.5px]">
-                                            📢 <span className="font-extrabold text-white">{ex.name}</span>: {lang === "EN" ? "Submission closes on" : "आवेदन की अंतिम तिथि"} <span className="text-orange-400 font-bold">{new Date(ex.end_date).toLocaleDateString("en-IN")}</span>
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+
                         {/* ── CANVAS MAIN CONTENT ── */}
                         <main className="max-w-[1140px] w-full mx-auto px-3 md:px-10 py-4 md:py-8 flex-1">
                     
