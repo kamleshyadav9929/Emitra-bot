@@ -20,6 +20,7 @@ export default function OnboardingModal({ isOpen, exams }) {
     const initialPhone = (user?.phone && !user.phone.startsWith("CLERK_TEMP_") && !user.phone.startsWith("BOT_TEMP_")) ? user.phone : ""
     const [phone, setPhone] = useState(initialPhone)
     const [gender, setGender] = useState("")
+    const [category, setCategory] = useState("General")
 
     // Step 2 state
     const [selectedExams, setSelectedExams] = useState([])
@@ -171,7 +172,14 @@ export default function OnboardingModal({ isOpen, exams }) {
             })
 
             if (res.success && res.student) {
-                login(localStorage.getItem("student_token") || null, res.student)
+                const phoneVal = cleanPhone || res.student.phone_number
+                if (phoneVal) {
+                    localStorage.setItem(`category_${phoneVal}`, category)
+                }
+                login(localStorage.getItem("student_token") || null, {
+                    ...res.student,
+                    category: category
+                })
                 setStatus("success")
             } else {
                 setStatus("error")
@@ -342,6 +350,25 @@ export default function OnboardingModal({ isOpen, exams }) {
                                                         }`}
                                                     >
                                                         {lang === "EN" ? g : (g === "Male" ? "पुरुष" : g === "Female" ? "महिला" : "अन्य")}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <label className="text-[12px] font-bold text-slate-300 ml-1">
+                                                {lang === "EN" ? "Social Category" : "सामाजिक श्रेणी"} <span className="text-rose-500">*</span>
+                                            </label>
+                                            <div className="grid grid-cols-5 gap-1.5">
+                                                {["General", "OBC", "SC", "ST", "EWS"].map(cat => (
+                                                    <div 
+                                                        key={cat} 
+                                                        onClick={() => setCategory(cat)}
+                                                        className={`text-center py-2.5 rounded-xl cursor-pointer text-[11px] font-bold transition-all border ${
+                                                            category === cat ? 'bg-blue-600 text-white border-blue-500 shadow-sm' : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
+                                                        }`}
+                                                    >
+                                                        {cat}
                                                     </div>
                                                 ))}
                                             </div>

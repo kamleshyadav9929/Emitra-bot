@@ -41,7 +41,7 @@ export default function ProfileTab({
                             />
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
                                 <label className="text-[9.5px] font-extrabold uppercase text-slate-450 tracking-wider block mb-1">Phone Number</label>
                                 <input 
@@ -59,6 +59,18 @@ export default function ProfileTab({
                                     onChange={e => setEditableProfile({...editableProfile, email: e.target.value})}
                                     className="w-full p-2.5 md:p-3.5 bg-white/5 border border-white/10 rounded-xl text-[12px] md:text-[13px] font-semibold outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all shadow-sm text-white"
                                 />
+                            </div>
+                            <div>
+                                <label className="text-[9.5px] font-extrabold uppercase text-slate-450 tracking-wider block mb-1">Social Category</label>
+                                <select 
+                                    value={editableProfile.category || "General"}
+                                    onChange={e => setEditableProfile({...editableProfile, category: e.target.value})}
+                                    className="w-full p-2.5 md:p-3.5 bg-zinc-900 border border-white/10 rounded-xl text-[12px] md:text-[13px] font-semibold outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all shadow-sm text-white cursor-pointer"
+                                >
+                                    {["General", "OBC", "SC", "ST", "EWS"].map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
 

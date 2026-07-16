@@ -57,7 +57,7 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {},
     email: user?.email || "",
     dob: "",
     gender: "",
-    category: "General",
+    category: user?.category || "General",
     qualification: "",
     board: "",
     passingYear: "",
@@ -75,7 +75,8 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {},
         ...prev,
         name: prev.name && prev.name !== "Student" ? prev.name : (user.name || "Student"),
         phone: prev.phone ? prev.phone : (user.phone ? user.phone.replace("+91", "").replace(" ", "").trim() : ""),
-        email: prev.email ? prev.email : (user.email || "")
+        email: prev.email ? prev.email : (user.email || ""),
+        category: prev.category && prev.category !== "General" ? prev.category : (user.category || "General")
       }))
     }
   }, [user])
@@ -351,22 +352,30 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {},
                               const file = files[docLabel]
                               const isRequired = isDocRequired(docLabel, formData.category)
                               return (
-                                <div key={docLabel} className="border border-white/10 rounded-2xl p-4 flex flex-col justify-between bg-white/5 min-h-[140px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.2)] transition-all">
+                                <div key={docLabel} className={`border rounded-2xl p-4 flex flex-col justify-between min-h-[140px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] transition-all duration-300 ${
+                                  file 
+                                    ? "border-emerald-500/30 bg-emerald-550/[0.02]" 
+                                    : "border-white/10 bg-white/5"
+                                }`}>
                                   <div>
                                     <span className="text-[11.5px] font-bold text-white block mb-2">
                                       {docLabel} {isRequired ? "*" : "(Optional)"}
                                     </span>
                                     {file ? (
-                                      <div className="flex items-center justify-between p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                                        <div className="flex items-center gap-2 min-w-0">
-                                          <FileCheck size={16} className="text-[#10B981] shrink-0" />
-                                          <span className="text-[12px] font-semibold text-emerald-450 truncate pr-2">{file.name}</span>
-                                        </div>
+                                      <div className="flex flex-col items-center justify-center py-3 px-3 border border-solid border-emerald-500/25 rounded-xl bg-emerald-500/10 relative min-h-[94px]">
+                                        <FileCheck size={20} className="text-[#10B981]" />
+                                        <span className="text-[11px] font-bold text-emerald-450 mt-1.5 truncate w-full text-center px-1" title={file.name}>
+                                          {file.name}
+                                        </span>
+                                        <span className="text-[9px] font-extrabold text-emerald-500/70 mt-0.5">
+                                          {file.size > 1024 * 1024 ? (file.size / (1024 * 1024)).toFixed(2) + " MB" : (file.size / 1024).toFixed(1) + " KB"}
+                                        </span>
                                         <button 
-                                          type="button" onClick={() => removeFile(docLabel)} 
-                                          className="p-1 hover:bg-emerald-500/20 rounded-full text-[#10B981] hover:text-red-400 transition-colors cursor-pointer border-none bg-transparent"
+                                          type="button" 
+                                          onClick={() => removeFile(docLabel)} 
+                                          className="mt-2 px-2.5 py-1 bg-red-500/15 hover:bg-red-500/25 border border-red-500/20 hover:border-red-500/30 text-red-400 text-[9.5px] font-black rounded-lg transition-all cursor-pointer"
                                         >
-                                          <Trash2 size={13} />
+                                          Remove File
                                         </button>
                                       </div>
                                     ) : (

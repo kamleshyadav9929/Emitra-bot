@@ -27,12 +27,15 @@ export function AuthProvider({ children }) {
             try {
                 const res = await api.getStudentProfile(token)
                 if (res.success && res.student) {
+                    const phoneVal = res.student.phone_number || ""
+                    const savedCat = phoneVal ? (localStorage.getItem(`category_${phoneVal}`) || "General") : "General"
                     setUser({
                         name: res.student.name,
                         phone: res.student.phone_number,
                         telegram_id: res.student.telegram_id,
                         exam_preference: res.student.exam_preference,
-                        exam_preferences: res.student.exam_preferences || []
+                        exam_preferences: res.student.exam_preferences || [],
+                        category: savedCat
                     })
                     setIsLocalLoggedIn(true)
                 } else {
@@ -76,13 +79,16 @@ export function AuthProvider({ children }) {
                         // Sync Clerk user with Supabase database
                         const res = await api.syncClerkStudent(clerkToken, { email, phone, name })
                         if (res.success && res.user) {
+                            const phoneVal = res.user.phone_number || ""
+                            const savedCat = phoneVal ? (localStorage.getItem(`category_${phoneVal}`) || "General") : "General"
                             setUser({
                                 name: res.user.name,
                                 phone: res.user.phone_number,
                                 telegram_id: res.user.telegram_id,
                                 email: email,
                                 exam_preference: res.user.exam_preference || "NONE",
-                                exam_preferences: res.user.exam_preferences || []
+                                exam_preferences: res.user.exam_preferences || [],
+                                category: savedCat
                             })
                         } else {
                             // Fallback to local Clerk details
@@ -124,16 +130,19 @@ export function AuthProvider({ children }) {
 
     const handleLogin = (newToken, studentData) => {
         localStorage.setItem("student_token", newToken)
-        if (studentData.phone_number) {
-            localStorage.setItem("phone_emitra", studentData.phone_number)
+        const phone = studentData.phone_number || ""
+        if (phone) {
+            localStorage.setItem("phone_emitra", phone)
         }
+        const savedCat = phone ? (localStorage.getItem(`category_${phone}`) || "General") : "General"
         setToken(newToken)
         setUser({
             name: studentData.name,
             phone: studentData.phone_number,
             telegram_id: studentData.telegram_id,
             exam_preference: studentData.exam_preference,
-            exam_preferences: studentData.exam_preferences || []
+            exam_preferences: studentData.exam_preferences || [],
+            category: studentData.category || savedCat
         })
         setIsLocalLoggedIn(true)
     }

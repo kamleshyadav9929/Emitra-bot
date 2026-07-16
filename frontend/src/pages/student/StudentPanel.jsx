@@ -205,7 +205,8 @@ export default function StudentPanel() {
                 name: user.name || "",
                 phone: user.phone_number || user.phone || "",
                 email: user.email || "",
-                telegram_id: user.telegram_id || null
+                telegram_id: user.telegram_id || null,
+                category: user.category || "General"
             })
         }
     }, [user, storagePrefix])
@@ -399,6 +400,14 @@ export default function StudentPanel() {
     const handleSaveProfile = (e) => {
         e.preventDefault()
         localStorage.setItem(`${storagePrefix}_notificationPrefs`, JSON.stringify(notificationPrefs))
+        const phone = user?.phone_number || user?.phone || ""
+        if (phone) {
+            localStorage.setItem(`category_${phone}`, editableProfile.category)
+        }
+        if (user) {
+            user.category = editableProfile.category
+            user.name = editableProfile.name
+        }
         setProfileSavedMessage("Preferences and Profile settings updated successfully!")
         setTimeout(() => setProfileSavedMessage(""), 3000)
     }
@@ -583,7 +592,9 @@ export default function StudentPanel() {
     const navigationItems = [
         { id: "dashboard", label: "Dashboard", labelHi: "डैशबोर्ड", icon: LayoutDashboard },
         { id: "services", label: "Browse Services", labelHi: "सरकारी सेवाएँ", icon: ClipboardList },
-        { id: "exams", label: "Exam Alerts", labelHi: "परीक्षा अलर्ट", icon: Bell },
+        { id: "exams", label: "Exam Alerts", labelHi: "परीक्षा अलर्ट", icon: Award },
+        { id: "status", label: "Application Status", labelHi: "आवेदन स्थिति", icon: CheckCircle2 },
+        { id: "notifications", label: "Notifications", labelHi: "सूचनाएँ", icon: Bell },
         { id: "neet", label: "NEET Counselling", labelHi: "नीट काउंसलिंग", icon: BookOpen },
         { id: "profile", label: "Profile Settings", labelHi: "प्रोफ़ाइल", icon: Settings },
         { id: "about", label: "About Us", labelHi: "हमारे बारे में", icon: ShieldCheck }
