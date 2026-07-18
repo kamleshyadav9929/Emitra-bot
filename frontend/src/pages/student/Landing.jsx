@@ -221,65 +221,61 @@ export default function Landing() {
 
 
             {/* ── HEADER ── */}
-            <div className="fixed top-4 sm:top-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
-                <header className="pointer-events-auto bg-zinc-950/60 backdrop-blur-2xl border border-white/10 rounded-2xl sm:rounded-full px-4 sm:px-6 h-16 flex items-center justify-between w-full max-w-5xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
-                    <div className="flex items-center gap-3">
-                        <Logo className="w-8 h-8 rounded-full border border-white/10" />
-                        <div className="leading-none text-left">
-                            <span className="text-[14px] font-black tracking-tight text-white font-display">Krishna Emitra</span>
-                            <span className="text-[7.5px] text-slate-400 font-bold tracking-widest uppercase block mt-0.5">Digital Admin</span>
-                        </div>
+            <header className="sticky top-0 z-40 bg-[#050508]/80 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <Logo className="w-9 h-9 rounded-full border border-white/10" />
+                    <div className="leading-none text-left">
+                        <span className="text-base font-black tracking-tight text-white font-display">Krishna Emitra</span>
+                        <span className="text-[8.5px] text-slate-500 font-bold tracking-widest uppercase block mt-0.5">Digital Administration</span>
                     </div>
+                </div>
 
-                    <nav className="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/5">
-                        <button onClick={() => scrollToSection("what-we-do")} className="px-4 py-1.5 rounded-full hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none text-[12px] font-bold text-slate-300">What We Do</button>
-                        <button onClick={() => scrollToSection("how-it-works")} className="px-4 py-1.5 rounded-full hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none text-[12px] font-bold text-slate-300">How It Works</button>
-                        <button onClick={() => scrollToSection("notifications")} className="px-4 py-1.5 rounded-full hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none text-[12px] font-bold text-slate-300">Live Circulars</button>
-                        <button onClick={() => scrollToSection("faq")} className="px-4 py-1.5 rounded-full hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none text-[12px] font-bold text-slate-300">FAQs</button>
-                    </nav>
+                <nav className="hidden md:flex items-center gap-2 text-[12.5px] font-bold text-slate-400">
+                    <button onClick={() => scrollToSection("what-we-do")} className="px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none">What We Do</button>
+                    <button onClick={() => scrollToSection("how-it-works")} className="px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none">How It Works</button>
+                    <button onClick={() => scrollToSection("notifications")} className="px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none">Live Circulars</button>
+                    <button onClick={() => scrollToSection("faq")} className="px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none">FAQs</button>
+                </nav>
 
-                    <div className="flex items-center gap-2 sm:gap-3">
-                        <button onClick={toggleLanguage} className="hidden lg:flex text-slate-300 hover:text-white transition-colors text-[10.5px] font-bold items-center gap-1.5 bg-white/5 hover:bg-white/10 px-2.5 py-1.5 rounded-full border border-white/5 uppercase cursor-pointer">
-                            <Globe size={12} className="text-slate-400" /> {lang === 'EN' ? 'हिंदी' : 'English'}
-                        </button>
+                <div className="flex items-center gap-4">
+                    <button onClick={toggleLanguage} className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors text-[10px] font-black uppercase cursor-pointer border border-blue-500/20">
+                        {lang === 'EN' ? 'HI' : 'EN'}
+                    </button>
 
-                        <div className="hidden lg:block h-4 w-px bg-white/10 mx-1" />
+                    <div className="hidden sm:block h-5 w-px bg-white/10" />
 
-                        {isLoggedIn ? (
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => navigate("/dashboard")}
-                                    className="px-4 py-1.5 rounded-full bg-white hover:bg-slate-100 text-slate-950 text-[11.5px] font-bold flex items-center justify-center gap-2 transform active:scale-95 transition-all border-none cursor-pointer shadow-md"
-                                    title="Dashboard"
-                                >
-                                    <User size={14} />
-                                    <span>Dashboard</span>
-                                </button>
-                                <button onClick={logout} className="p-2 rounded-full hover:bg-red-500/10 text-slate-400 hover:text-red-400 transition-colors bg-transparent border-none cursor-pointer" title="Log Out">
-                                    <LogOut size={14} />
-                                </button>
-                            </div>
-                        ) : (
+                    {isLoggedIn ? (
+                        <div className="flex items-center gap-2">
                             <button
-                                onClick={triggerSignIn}
-                                className="px-5 py-2 rounded-full bg-white hover:bg-slate-200 text-slate-950 text-[11.5px] font-bold flex items-center justify-center gap-1.5 transform active:scale-95 transition-all border-none cursor-pointer shadow-[0_0_20px_rgba(255,255,255,0.2)]"
-                                title="Sign In Portal"
+                                onClick={() => navigate("/dashboard")}
+                                className="px-5 py-2 rounded-xl bg-gradient-to-br from-[#1a73e8] to-[#1557b0] hover:shadow-lg hover:shadow-blue-500/10 text-white text-[12px] font-bold flex items-center justify-center gap-2 transform active:scale-95 transition-all border-none cursor-pointer"
+                                title="Dashboard"
                             >
-                                <User size={13} />
-                                <span>Sign In</span>
+                                <span>Dashboard</span>
                             </button>
-                        )}
-
-                        {/* Mobile Hamburger */}
+                            <button onClick={logout} className="p-2 rounded-lg hover:bg-white/5 text-slate-450 hover:text-red-400 transition-colors bg-transparent border-none cursor-pointer" title="Log Out">
+                                <LogOut size={14} />
+                            </button>
+                        </div>
+                    ) : (
                         <button
-                            onClick={() => setShowMobileMenu(!showMobileMenu)}
-                            className="md:hidden p-2 text-slate-300 hover:text-white hover:bg-white/10 rounded-full transition-colors cursor-pointer ml-1"
+                            onClick={triggerSignIn}
+                            className="px-5 py-2 rounded-xl bg-white text-slate-950 hover:bg-slate-100 text-[12px] font-bold flex items-center justify-center transform active:scale-95 transition-all border-none cursor-pointer shadow-md"
+                            title="Sign In Portal"
                         >
-                            {showMobileMenu ? <X size={18} /> : <Menu size={18} />}
+                            <span>Sign In</span>
                         </button>
-                    </div>
-                </header>
-            </div>
+                    )}
+
+                    {/* Mobile Hamburger menu toggle button */}
+                    <button
+                        onClick={() => setShowMobileMenu(!showMobileMenu)}
+                        className="md:hidden p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
+                    >
+                        {showMobileMenu ? <X size={20} /> : <Menu size={20} />}
+                    </button>
+                </div>
+            </header>
 
             {/* ── MOBILE MENU OVERLAY ── */}
             <AnimatePresence>
@@ -307,16 +303,15 @@ export default function Landing() {
                             </div>
 
                             <div className="flex items-center justify-between border-t border-white/10 pt-6">
-                                <button onClick={toggleLanguage} className="text-slate-300 hover:text-white transition-colors text-[12px] font-bold flex items-center gap-2 bg-white/5 px-4 py-2.5 rounded-full border border-white/10 uppercase cursor-pointer">
-                                    <Globe size={14} className="text-slate-400" /> {lang === 'EN' ? 'हिंदी' : 'English'}
+                                <button onClick={toggleLanguage} className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors text-[11px] font-black uppercase cursor-pointer border border-blue-500/20">
+                                    {lang === 'EN' ? 'HI' : 'EN'}
                                 </button>
                                 
                                 {!isLoggedIn && (
                                     <button
                                         onClick={triggerSignIn}
-                                        className="px-6 py-2.5 rounded-full bg-white text-slate-950 hover:bg-slate-100 text-[13px] font-bold flex items-center justify-center gap-2 transition-all border-none cursor-pointer shadow-md"
+                                        className="px-6 py-2.5 rounded-xl bg-white text-slate-950 hover:bg-slate-100 text-[13px] font-bold flex items-center justify-center transition-all border-none cursor-pointer shadow-md"
                                     >
-                                        <User size={14} />
                                         <span>Sign In</span>
                                     </button>
                                 )}
