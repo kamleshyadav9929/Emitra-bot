@@ -217,13 +217,8 @@ export default function Landing() {
     ]
 
     return (
-        <div className="min-h-screen bg-[#050508] bg-grid-pattern text-slate-200 font-sans overflow-x-clip relative">
-            {/* Ambient Background Glow Circles */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-blue-600/10 blur-[130px] animate-slow-glow" />
-                <div className="absolute top-[30%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 blur-[140px] animate-slow-glow" />
-                <div className="absolute bottom-[20%] left-[-5%] w-[45%] h-[45%] rounded-full bg-emerald-500/5 blur-[120px] animate-slow-glow" />
-            </div>
+        <div className="min-h-screen bg-[#050508] text-slate-200 font-sans overflow-x-clip relative">
+
 
             {/* ── HEADER ── */}
             <header className="sticky top-0 z-40 bg-[#050508]/75 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between">
