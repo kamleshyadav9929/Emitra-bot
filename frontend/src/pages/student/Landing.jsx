@@ -12,7 +12,6 @@ import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
 import Logo from "../../components/common/Logo"
-import InteractiveHeroBackground from "../../components/student/InteractiveHeroBackground"
 import Aurora from "../../components/common/Aurora"
 
 const formatTelegramMessage = (text) => {
@@ -345,7 +344,6 @@ export default function Landing() {
                 <div className="absolute inset-0 z-0 opacity-40 mix-blend-screen pointer-events-none">
                     <Aurora colorStops={["#3A29FF", "#FF94B4", "#FF3232"]} speed={0.5} />
                 </div>
-                <InteractiveHeroBackground />
                 <section className="relative z-10 px-6 lg:px-12 max-w-[1000px] mx-auto space-y-12">
                     {/* Hero Header Content */}
                     <div className="space-y-6 max-w-4xl mx-auto">
