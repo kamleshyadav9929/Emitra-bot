@@ -400,23 +400,23 @@ export default function Landing() {
 
                 {/* Command-Palette style Search & Filter bar */}
                 {!loading && Object.keys(services).length > 0 && (
-                    <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-zinc-950/60 backdrop-blur-xl border border-white/10 p-4 rounded-2xl shadow-2xl max-w-4xl mx-auto">
-                        <div className="relative w-full sm:w-80">
-                            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                    <div className="flex flex-col sm:flex-row gap-3 items-center w-full max-w-6xl mx-auto">
+                        <div className="relative flex-1 w-full">
+                            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                             <input
                                 type="text"
                                 value={serviceSearch}
                                 onChange={e => setServiceSearch(e.target.value)}
                                 placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
-                                className="w-full bg-black/30 border border-white/5 text-[13px] text-slate-100 placeholder:text-slate-500 pl-11 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-medium"
+                                className="w-full bg-zinc-900/50 border border-white/10 text-[14px] text-slate-100 placeholder:text-slate-500 pl-12 pr-4 py-3.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-medium shadow-sm hover:border-white/20"
                             />
                         </div>
 
-                        <div className="w-full sm:w-auto">
+                        <div className="w-full sm:w-64 shrink-0">
                             <select
                                 value={serviceCatFilter}
                                 onChange={e => setServiceCatFilter(e.target.value)}
-                                className="w-full sm:w-auto px-4 py-2.5 bg-black/30 border border-white/5 text-[13px] text-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all cursor-pointer font-bold"
+                                className="w-full px-4 py-3.5 bg-zinc-900/50 border border-white/10 text-[14px] text-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all cursor-pointer font-bold shadow-sm hover:border-white/20"
                             >
                                 <option value="ALL" className="bg-[#050508]">{lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां'}</option>
                                 {Object.entries(services).map(([k, cat]) => (
