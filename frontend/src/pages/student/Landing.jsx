@@ -476,7 +476,7 @@ export default function Landing() {
                                                 glowRadius={40}
                                                 glowIntensity={1.0}
                                                 coneSpread={25}
-                                                animated={false}
+                                                animated={true}
                                                 colors={['#38bdf8', '#818cf8', '#c084fc']}
                                                 className="h-full"
                                             >
