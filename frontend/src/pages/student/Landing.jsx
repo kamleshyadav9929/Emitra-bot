@@ -13,6 +13,7 @@ import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
 import Logo from "../../components/common/Logo"
 import Aurora from "../../components/common/Aurora"
+import BorderGlow from "../../components/common/BorderGlow"
 
 const formatTelegramMessage = (text) => {
     if (!text) return "";
@@ -408,7 +409,7 @@ export default function Landing() {
                                 value={serviceSearch}
                                 onChange={e => setServiceSearch(e.target.value)}
                                 placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
-                                className="w-full bg-zinc-900/50 border border-white/10 text-[14px] text-slate-100 placeholder:text-slate-500 pl-12 pr-4 py-3.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-medium shadow-sm hover:border-white/20"
+                                className="w-full bg-zinc-900/50 border border-white/10 text-[14px] text-slate-100 placeholder:text-slate-500 pl-12 pr-4 py-3.5 rounded-full focus:outline-none focus:border-blue-500 transition-all font-medium shadow-sm hover:border-white/20"
                             />
                         </div>
 
@@ -416,7 +417,7 @@ export default function Landing() {
                             <select
                                 value={serviceCatFilter}
                                 onChange={e => setServiceCatFilter(e.target.value)}
-                                className="w-full px-4 py-3.5 bg-zinc-900/50 border border-white/10 text-[14px] text-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all cursor-pointer font-bold shadow-sm hover:border-white/20"
+                                className="w-full px-4 py-3.5 bg-zinc-900/50 border border-white/10 text-[14px] text-slate-300 rounded-full focus:outline-none focus:border-blue-500 transition-all cursor-pointer font-bold shadow-sm hover:border-white/20"
                             >
                                 <option value="ALL" className="bg-[#050508]">{lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां'}</option>
                                 {Object.entries(services).map(([k, cat]) => (
@@ -466,27 +467,36 @@ export default function Landing() {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {matchingServices.map((svc, idx) => (
-                                            <div key={idx} className="bg-zinc-950/40 backdrop-blur-md border border-white/5 p-6 rounded-[22px] hover:border-blue-500/20 hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-1.5 active:scale-[0.99] transition-all duration-300 flex flex-col justify-between group">
-                                                <div className="space-y-3">
-                                                    <div className="flex items-center justify-between text-[10px] font-bold uppercase text-slate-400 tracking-wider">
-                                                        <span>{cat.label}</span>
-                                                        {svc.price && (
-                                                            <span className="text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20 font-bold font-mono">
-                                                                {lang === "EN" ? "Fee" : "शुल्क"}: {svc.price}
-                                                            </span>
-                                                        )}
+                                            <BorderGlow
+                                                key={idx}
+                                                edgeSensitivity={30}
+                                                glowColor="200 80 80"
+                                                backgroundColor="rgba(9, 9, 11, 0.4)"
+                                                borderRadius={22}
+                                                glowRadius={40}
+                                                glowIntensity={1.0}
+                                                coneSpread={25}
+                                                animated={false}
+                                                colors={['#38bdf8', '#818cf8', '#c084fc']}
+                                                className="h-full"
+                                            >
+                                                <div className="p-6 backdrop-blur-md flex flex-col justify-between h-full group">
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center justify-between text-[10px] font-bold uppercase text-slate-400 tracking-wider">
+                                                            <span>{cat.label}</span>
+                                                        </div>
+                                                        <h4 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors leading-snug">{svc.name}</h4>
+                                                        <p className="text-[12.5px] text-slate-400 font-normal leading-relaxed">{svc.description || "Official filing and registration services."}</p>
                                                     </div>
-                                                    <h4 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors leading-snug">{svc.name}</h4>
-                                                    <p className="text-[12.5px] text-slate-400 font-normal leading-relaxed">{svc.description || "Official filing and registration services."}</p>
-                                                </div>
 
-                                                <button
-                                                    onClick={() => handleRequestServiceWhatsApp(svc, catKey, cat.label)}
-                                                    className="mt-6 w-full py-3 bg-white/5 hover:bg-white text-white hover:text-slate-950 text-[12px] font-bold uppercase rounded-xl transition-all border border-white/10 cursor-pointer text-center"
-                                                >
-                                                    {lang === 'EN' ? 'Request via WhatsApp' : 'व्हाट्सएप से अनुरोध करें'}
-                                                </button>
-                                            </div>
+                                                    <button
+                                                        onClick={() => handleRequestServiceWhatsApp(svc, catKey, cat.label)}
+                                                        className="mt-6 w-full py-3 bg-white/5 hover:bg-white text-white hover:text-slate-950 text-[12px] font-bold uppercase rounded-xl transition-all duration-300 border border-white/10 cursor-pointer text-center"
+                                                    >
+                                                        {lang === 'EN' ? 'Request via WhatsApp' : 'व्हाट्सएप से अनुरोध करें'}
+                                                    </button>
+                                                </div>
+                                            </BorderGlow>
                                         ))}
                                     </div>
                                 </div>
