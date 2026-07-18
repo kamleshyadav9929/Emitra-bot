@@ -176,6 +176,19 @@
 .marquee-track { animation: marquee 30s linear infinite; }
 .marquee-track:hover { animation-play-state: paused; }
 
+@keyframes marqueeUp {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+.marquee-up-track {
+  animation: marqueeUp 25s linear infinite;
+  display: flex;
+  flex-direction: column;
+}
+.marquee-up-track:hover {
+  animation-play-state: paused;
+}
+
 /* Pulse animation */
 @keyframes live-ping {
   0%, 100% { opacity: 1; transform: scale(1); }

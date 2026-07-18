@@ -12,7 +12,7 @@ import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
 import Logo from "../../components/common/Logo"
-import Aurora from "../../components/common/Aurora"
+import SoftAurora from "../../components/common/SoftAurora"
 import BorderGlow from "../../components/common/BorderGlow"
 
 const formatTelegramMessage = (text) => {
@@ -34,6 +34,7 @@ export default function Landing() {
     const [showLoginModal, setShowLoginModal] = useState(false)
     const [showMobileMenu, setShowMobileMenu] = useState(false)
     const [showScrollTop, setShowScrollTop] = useState(false)
+    const [showDeadlines, setShowDeadlines] = useState(true)
     const { lang, toggleLanguage } = useLanguage()
     const { user, isLoggedIn, logout } = useAuth()
 
@@ -56,6 +57,7 @@ export default function Landing() {
     const [filterCategory, setFilterCategory] = useState("ALL")
     const [serviceSearch, setServiceSearch] = useState("")
     const [serviceCatFilter, setServiceCatFilter] = useState("ALL")
+    const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false)
     const [expandedFaq, setExpandedFaq] = useState(null)
 
     const [showRequestModal, setShowRequestModal] = useState(false)
@@ -232,14 +234,16 @@ export default function Landing() {
 
                 <nav className="hidden md:flex items-center gap-2 text-[12.5px] font-bold text-slate-400">
                     <button onClick={() => scrollToSection("what-we-do")} className="px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none">What We Do</button>
-                    <button onClick={() => scrollToSection("how-it-works")} className="px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none">How It Works</button>
                     <button onClick={() => scrollToSection("notifications")} className="px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none">Live Circulars</button>
                     <button onClick={() => scrollToSection("faq")} className="px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none">FAQs</button>
                 </nav>
 
                 <div className="flex items-center gap-4">
-                    <button onClick={toggleLanguage} className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors text-[10px] font-black uppercase cursor-pointer border border-blue-500/20">
-                        {lang === 'EN' ? 'HI' : 'EN'}
+                    <button onClick={toggleLanguage} className="hidden sm:flex relative items-center justify-center w-9 h-9 rounded-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors cursor-pointer border border-blue-500/20">
+                        <Globe size={16} />
+                        <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-blue-600 shadow-sm leading-none">
+                            {lang === 'EN' ? 'EN' : 'HI'}
+                        </span>
                     </button>
 
                     <div className="hidden sm:block h-5 w-px bg-white/10" />
@@ -297,14 +301,16 @@ export default function Landing() {
                         >
                             <div className="flex flex-col gap-2">
                                 <button onClick={() => { scrollToSection("what-we-do"); setShowMobileMenu(false); }} className="text-left py-3 px-4 rounded-xl hover:bg-white/5 text-[14px] font-bold text-slate-200 transition-colors bg-transparent border-none cursor-pointer">What We Do</button>
-                                <button onClick={() => { scrollToSection("how-it-works"); setShowMobileMenu(false); }} className="text-left py-3 px-4 rounded-xl hover:bg-white/5 text-[14px] font-bold text-slate-200 transition-colors bg-transparent border-none cursor-pointer">How It Works</button>
                                 <button onClick={() => { scrollToSection("notifications"); setShowMobileMenu(false); }} className="text-left py-3 px-4 rounded-xl hover:bg-white/5 text-[14px] font-bold text-slate-200 transition-colors bg-transparent border-none cursor-pointer">Live Circulars</button>
                                 <button onClick={() => { scrollToSection("faq"); setShowMobileMenu(false); }} className="text-left py-3 px-4 rounded-xl hover:bg-white/5 text-[14px] font-bold text-slate-200 transition-colors bg-transparent border-none cursor-pointer">FAQs</button>
                             </div>
 
                             <div className="flex items-center justify-between border-t border-white/10 pt-6">
-                                <button onClick={toggleLanguage} className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors text-[11px] font-black uppercase cursor-pointer border border-blue-500/20">
-                                    {lang === 'EN' ? 'HI' : 'EN'}
+                                <button onClick={toggleLanguage} className="flex relative items-center justify-center w-10 h-10 rounded-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors cursor-pointer border border-blue-500/20">
+                                    <Globe size={18} />
+                                    <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-blue-600 shadow-sm leading-none">
+                                        {lang === 'EN' ? 'EN' : 'HI'}
+                                    </span>
                                 </button>
                                 
                                 {!isLoggedIn && (
@@ -322,25 +328,34 @@ export default function Landing() {
             </AnimatePresence>
 
             {/* ── DEADLINES TICKER ── */}
-            {upcomingDeadlines.length > 0 && (
-                <div className="hidden md:flex bg-slate-950/80 border-y border-white/5 text-slate-350 text-[10.5px] font-semibold py-2 px-6 overflow-hidden items-center relative z-10">
-                    <div className="flex items-center gap-1.5 shrink-0 bg-slate-950 z-10 pr-4 mr-4 text-amber-400 font-bold uppercase tracking-wider relative font-display">
-                        <Clock size={11} className="animate-pulse text-amber-400" /> {lang === "EN" ? "Upcoming Deadlines" : "आगामी अंतिम तिथियां"}
+            {showDeadlines && upcomingDeadlines.length > 0 && (
+                <div className="hidden md:flex bg-slate-950/80 border-y border-white/5 text-slate-350 text-[10.5px] font-semibold py-2 px-6 items-center justify-between relative z-10 group">
+                    <div className="flex overflow-hidden relative flex-1">
+                        <div className="flex items-center gap-1.5 shrink-0 bg-slate-950 z-10 pr-4 mr-4 text-amber-400 font-bold uppercase tracking-wider relative font-display">
+                            <Clock size={11} className="animate-pulse text-amber-400" /> {lang === "EN" ? "Upcoming Deadlines" : "आगामी अंतिम तिथियां"}
+                        </div>
+                        <div className={`flex items-center gap-12 whitespace-nowrap ${upcomingDeadlines.length > 1 ? "marquee-track" : ""}`}>
+                            {(upcomingDeadlines.length > 1 ? [...upcomingDeadlines, ...upcomingDeadlines] : upcomingDeadlines).map((ex, idx) => (
+                                <span key={idx} className="inline-flex items-center gap-1.5 text-[11px]">
+                                    ⚡ <span className="font-extrabold text-white">{ex.name}</span>: <span className="text-slate-400">{lang === "EN" ? "Closes on" : "अंतिम तिथि"}</span> <span className="text-amber-400 font-bold">{new Date(ex.end_date).toLocaleDateString()}</span>
+                                </span>
+                            ))}
+                        </div>
                     </div>
-                    <div className="flex items-center gap-12 whitespace-nowrap marquee-track">
-                        {[...upcomingDeadlines, ...upcomingDeadlines].map((ex, idx) => (
-                            <span key={idx} className="inline-flex items-center gap-1.5 text-[11px]">
-                                ⚡ <span className="font-extrabold text-white">{ex.name}</span>: <span className="text-slate-400">{lang === "EN" ? "Closes on" : "अंतिम तिथि"}</span> <span className="text-amber-400 font-bold">{new Date(ex.end_date).toLocaleDateString()}</span>
-                            </span>
-                        ))}
-                    </div>
+                    <button 
+                        onClick={() => setShowDeadlines(false)}
+                        className="ml-4 p-1 text-slate-500 hover:text-white hover:bg-white/10 rounded-full transition-colors shrink-0 border-none bg-transparent cursor-pointer"
+                        title="Close Deadlines"
+                    >
+                        <X size={14} />
+                    </button>
                 </div>
             )}
 
             {/* ── HERO SECTION ── */}
             <div className="relative py-24 lg:py-36 z-10 text-center overflow-hidden">
-                <div className="absolute inset-0 z-0 opacity-40 mix-blend-screen pointer-events-none">
-                    <Aurora colorStops={["#3A29FF", "#FF94B4", "#FF3232"]} speed={0.5} />
+                <div className="absolute inset-0 z-0 mix-blend-screen pointer-events-auto">
+                    <SoftAurora color1="#1A1F35" color2="#311B92" speed={0.4} brightness={1.2} enableMouseInteraction={true} />
                 </div>
                 <section className="relative z-10 px-6 lg:px-12 max-w-[1000px] mx-auto space-y-12">
                     {/* Hero Header Content */}
@@ -362,7 +377,7 @@ export default function Landing() {
                     <div className="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-xl mx-auto pt-4">
                         <button
                             onClick={handleJoinTelegram}
-                            className="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-[13px] font-bold rounded-full transition-all flex items-center justify-center gap-2 border-none shadow-lg shadow-cyan-500/20 active:scale-95 cursor-pointer"
+                            className="w-full sm:w-auto px-7 py-3.5 bg-[#229ED9] hover:bg-[#1E8CC0] text-white text-[13px] font-bold rounded-full transition-all flex items-center justify-center gap-2 border-none shadow-lg shadow-[#229ED9]/20 active:scale-95 cursor-pointer"
                         >
                             <Send size={14} /> {lang === "EN" ? "Join Telegram assistant" : "टेलीग्राम असिस्टेंट से जुड़ें"}
                         </button>
@@ -406,21 +421,40 @@ export default function Landing() {
                                 value={serviceSearch}
                                 onChange={e => setServiceSearch(e.target.value)}
                                 placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
-                                className="w-full bg-zinc-900/50 border border-white/10 text-[14px] text-slate-100 placeholder:text-slate-500 pl-12 pr-4 py-3.5 rounded-full focus:outline-none transition-all font-medium shadow-sm hover:border-white/20"
+                                className="w-full bg-zinc-900/40 border border-white/5 text-[14px] text-slate-100 placeholder:text-slate-500 pl-12 pr-4 py-3.5 rounded-2xl focus:outline-none transition-all font-medium"
                             />
                         </div>
 
-                        <div className="w-full sm:w-64 shrink-0">
-                            <select
-                                value={serviceCatFilter}
-                                onChange={e => setServiceCatFilter(e.target.value)}
-                                className="w-full px-4 py-3.5 bg-zinc-900/50 border border-white/10 text-[14px] text-slate-300 rounded-full focus:outline-none transition-all cursor-pointer font-bold shadow-sm hover:border-white/20"
+                        <div className="w-full sm:w-64 shrink-0 relative">
+                            <button
+                                onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                                className="w-full px-4 py-3.5 flex items-center justify-between bg-zinc-900/40 border border-white/5 text-[14px] text-slate-300 rounded-2xl focus:outline-none transition-all cursor-pointer font-bold"
                             >
-                                <option value="ALL" className="bg-[#050508]">{lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां'}</option>
-                                {Object.entries(services).map(([k, cat]) => (
-                                    <option key={k} value={k} className="bg-[#050508]">{cat.label}</option>
-                                ))}
-                            </select>
+                                <span className="truncate">
+                                    {serviceCatFilter === "ALL" ? (lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां') : (services[serviceCatFilter]?.label || '')}
+                                </span>
+                                <ChevronDown size={16} className={`transition-transform duration-200 ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
+                            </button>
+                            
+                            {isCategoryDropdownOpen && (
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-[#0a0a0f] border border-white/10 rounded-2xl p-2 shadow-2xl z-50 flex flex-col gap-1 max-h-64 overflow-y-auto">
+                                    <button
+                                        onClick={() => { setServiceCatFilter("ALL"); setIsCategoryDropdownOpen(false); }}
+                                        className={`text-left px-3 py-2.5 rounded-xl text-[13px] font-bold transition-all cursor-pointer border-none ${serviceCatFilter === "ALL" ? 'bg-white/10 text-white' : 'bg-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
+                                    >
+                                        {lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां'}
+                                    </button>
+                                    {Object.entries(services).map(([k, cat]) => (
+                                        <button
+                                            key={k}
+                                            onClick={() => { setServiceCatFilter(k); setIsCategoryDropdownOpen(false); }}
+                                            className={`text-left px-3 py-2.5 rounded-xl text-[13px] font-bold transition-all cursor-pointer border-none ${serviceCatFilter === k ? 'bg-white/10 text-white' : 'bg-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
+                                        >
+                                            {cat.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
@@ -568,7 +602,7 @@ export default function Landing() {
                     </div>
 
                     {/* Announcements Feed Container */}
-                    <div className="lg:col-span-8 bg-zinc-950/50 backdrop-blur-md border border-white/10 rounded-[28px] p-6 space-y-4 max-h-[500px] overflow-y-auto pr-3 text-left">
+                    <div className="lg:col-span-6 lg:col-start-7 bg-zinc-950/50 backdrop-blur-md border border-white/10 rounded-[28px] p-6 max-h-[500px] overflow-hidden flex flex-col relative text-left shadow-2xl">
                         <div className="border-b border-white/5 pb-3 flex justify-between items-center">
                             <span className="text-[12px] font-black text-white uppercase tracking-wider">{lang === "EN" ? "Recent Circulars" : "हालिया घोषणाएं"}</span>
                             <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{lang === "EN" ? "Live Feed" : "लाइव समाचार"}</span>
@@ -582,35 +616,37 @@ export default function Landing() {
                                 <p className="text-[12px] font-bold">{lang === "EN" ? "No matches found" : "कोई सूचना नहीं मिली"}</p>
                             </div>
                         ) : (
-                            <div className="space-y-4">
-                                {filteredAnnouncements.map((ann, idx) => (
-                                    <div key={idx} className="border border-white/5 rounded-xl p-5 bg-zinc-950/30 hover:bg-zinc-950/60 hover:border-white/10 transition-colors space-y-3">
-                                        <div className="flex items-center justify-between text-[9.5px] text-slate-500 font-bold border-b border-white/5 pb-1.5 uppercase tracking-wider font-mono">
-                                            <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded">Govt Alert</span>
-                                            <span>{new Date(ann.created_at || Date.now()).toLocaleString("en-IN", {
-                                                day: "numeric",
-                                                month: "short",
-                                                hour: "2-digit",
-                                                minute: "2-digit"
-                                            })}</span>
-                                        </div>
-                                        {ann.title && <h4 className="text-[13.5px] font-bold text-white leading-snug">{ann.title}</h4>}
-                                        <div className="text-[12px] text-slate-350 font-normal leading-relaxed whitespace-pre-wrap break-words font-sans">
-                                            {formatTelegramMessage(ann.content)}
-                                        </div>
+                            <div className="flex-1 overflow-hidden relative mt-4">
+                                <div className={`absolute inset-0 ${filteredAnnouncements.length > 3 ? 'marquee-up-track' : 'flex flex-col gap-4'}`}>
+                                    {(filteredAnnouncements.length > 3 ? [...filteredAnnouncements, ...filteredAnnouncements] : filteredAnnouncements).map((ann, idx) => (
+                                        <div key={idx} className="border border-white/5 rounded-xl p-5 bg-zinc-950/30 hover:bg-zinc-950/60 hover:border-white/10 transition-colors space-y-3 mb-4 shrink-0 shadow-sm">
+                                            <div className="flex items-center justify-between text-[9.5px] text-slate-500 font-bold border-b border-white/5 pb-1.5 uppercase tracking-wider font-mono">
+                                                <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded">Govt Alert</span>
+                                                <span>{new Date(ann.created_at || Date.now()).toLocaleString("en-IN", {
+                                                    day: "numeric",
+                                                    month: "short",
+                                                    hour: "2-digit",
+                                                    minute: "2-digit"
+                                                })}</span>
+                                            </div>
+                                            {ann.title && <h4 className="text-[13.5px] font-bold text-white leading-snug">{ann.title}</h4>}
+                                            <div className="text-[12px] text-slate-350 font-normal leading-relaxed whitespace-pre-wrap break-words font-sans">
+                                                {formatTelegramMessage(ann.content)}
+                                            </div>
 
-                                        {ann.links && (
-                                            <a
-                                                href={ann.links}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-blue-400 hover:text-blue-300 text-[11.5px] font-bold inline-flex items-center gap-1 mt-1"
-                                            >
-                                                {lang === "EN" ? "Download Official Circular" : "आधिकारिक अधिसूचना डाउनलोड करें"} <ExternalLink size={12} />
-                                            </a>
-                                        )}
-                                    </div>
-                                ))}
+                                            {ann.links && (
+                                                <a
+                                                    href={ann.links}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-400 hover:text-blue-300 text-[11.5px] font-bold inline-flex items-center gap-1 mt-1"
+                                                >
+                                                    {lang === "EN" ? "Download Official Circular" : "आधिकारिक अधिसूचना डाउनलोड करें"} <ExternalLink size={12} />
+                                                </a>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>
