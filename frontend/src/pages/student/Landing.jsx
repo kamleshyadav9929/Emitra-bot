@@ -13,6 +13,7 @@ import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
 import Logo from "../../components/common/Logo"
 import InteractiveHeroBackground from "../../components/student/InteractiveHeroBackground"
+import Aurora from "../../components/common/Aurora"
 
 const formatTelegramMessage = (text) => {
     if (!text) return "";
@@ -85,7 +86,7 @@ export default function Landing() {
                     api.getPublicAnnouncements(),
                     api.getPublicConfig()
                 ])
-                setServices(servicesRes.categories || {})
+                setServices(servicesRes.services || {})
                 setExams(examsRes.exams || [])
                 setAnnouncements(announcementsRes.announcements || [])
                 setConfig(configRes.config || {})
@@ -346,6 +347,9 @@ export default function Landing() {
 
             {/* ── HERO SECTION ── */}
             <div className="relative py-24 lg:py-36 z-10 text-center overflow-hidden">
+                <div className="absolute inset-0 z-0 opacity-40 mix-blend-screen pointer-events-none">
+                    <Aurora colorStops={["#3A29FF", "#FF94B4", "#FF3232"]} speed={0.5} />
+                </div>
                 <InteractiveHeroBackground />
                 <section className="relative z-10 px-6 lg:px-12 max-w-[1000px] mx-auto space-y-12">
                     {/* Hero Header Content */}
@@ -385,103 +389,7 @@ export default function Landing() {
                 </section>
             </div>
 
-            {/* ── HOW IT WORKS SECTION ── */}
-            <section id="how-it-works" className="border-t border-white/5 py-24 px-6 lg:px-12 text-center relative z-10">
-                <div className="max-w-[1000px] mx-auto space-y-16">
-                    <div className="space-y-3">
-                        <p className="text-[11px] font-black text-[#6366f1] uppercase tracking-[0.2em]">{lang === "EN" ? "Workflow" : "कार्यप्रणाली"}</p>
-                        <h2 className="text-3xl md:text-4xl font-black text-white font-display tracking-tight">
-                            {lang === "EN" ? "Just a few steps left" : "बस कुछ ही कदम बाकी हैं"}
-                        </h2>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-                        {/* STEP 1 */}
-                        <div className="flex flex-col bg-zinc-950/50 backdrop-blur-xl border border-white/10 p-8 rounded-[24px] relative overflow-hidden h-[400px] bento-glow-card transition-all duration-300 hover:-translate-y-1.5">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 blur-2xl rounded-full" />
-                            <div className="bg-white/5 text-slate-300 border border-white/10 px-3 py-1 rounded-full text-[9px] font-bold w-fit uppercase tracking-widest font-mono">
-                                {lang === "EN" ? "Step 1" : "चरण १"}
-                            </div>
-                            <h4 className="text-[24px] font-bold text-[#38bdf8] font-display mt-8 mb-4">
-                                {lang === 'EN' ? 'Connect' : 'जुड़ें'}
-                            </h4>
-                            <p className="text-[13px] text-slate-300 font-normal leading-relaxed">
-                                {lang === 'EN'
-                                    ? 'Sign in to our portal or add our Telegram bot to start receiving live alerts.'
-                                    : 'पोर्टल में साइन इन करें या लाइव अलर्ट प्राप्त करने के लिए हमारे टेलीग्राम बॉट को जोड़ें।'}
-                            </p>
-                            
-                            {/* Action Links */}
-                            <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-3">
-                                <button 
-                                    onClick={triggerSignIn}
-                                    className="w-full h-11 bg-white hover:bg-slate-100 text-slate-950 rounded-xl text-[12.5px] font-bold border-none shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
-                                >
-                                    <Globe size={14} /> {lang === 'EN' ? 'Website Portal' : 'वेबसाइट पोर्टल'}
-                                </button>
-                                <a 
-                                    href={config?.telegram_bot_url || "https://t.me/Kamlesh6377_bot"} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="w-full h-11 bg-[#0088cc] hover:bg-[#0077b3] text-white rounded-xl text-[12.5px] font-bold shadow-lg shadow-[#0088cc]/20 flex items-center justify-center gap-2 transition-all cursor-pointer text-center"
-                                >
-                                    <Send size={14} /> {lang === 'EN' ? 'Telegram Bot' : 'टेलीग्राम बॉट'}
-                                </a>
-                            </div>
-                        </div>
-
-                        {/* STEP 2 */}
-                        <div className="flex flex-col bg-zinc-950/50 backdrop-blur-xl border border-white/10 p-8 rounded-[24px] relative overflow-hidden h-[400px] bento-glow-card transition-all duration-300 hover:-translate-y-1.5">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-600/5 blur-2xl rounded-full" />
-                            <div className="bg-white/5 text-slate-300 border border-white/10 px-3 py-1 rounded-full text-[9px] font-bold w-fit uppercase tracking-widest font-mono">
-                                {lang === "EN" ? "Step 2" : "चरण २"}
-                            </div>
-                            <h4 className="text-[24px] font-bold text-[#10b981] font-display mt-8 mb-4">
-                                {lang === 'EN' ? 'Request' : 'अनुरोध'}
-                            </h4>
-                            <p className="text-[13px] text-slate-300 font-normal leading-relaxed">
-                                {lang === 'EN'
-                                    ? 'Choose your desired service and submit the required details securely.'
-                                    : 'अपनी वांछित सेवा चुनें और सुरक्षित रूप से आवश्यक विवरण जमा करें।'}
-                            </p>
-                            
-                            {/* Action Links */}
-                            <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-3">
-                                <button 
-                                    onClick={() => scrollToSection("what-we-do")}
-                                    className="w-full h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl text-[12.5px] font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
-                                >
-                                    <Search size={14} /> {lang === 'EN' ? 'Browse All Services' : 'सभी सेवाएँ ब्राउज़ करें'}
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* STEP 3 */}
-                        <div className="flex flex-col bg-zinc-950/50 backdrop-blur-xl border border-white/10 p-8 rounded-[24px] relative overflow-hidden h-[400px] bento-glow-card transition-all duration-300 hover:-translate-y-1.5">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-600/5 blur-2xl rounded-full" />
-                            <div className="bg-white/5 text-slate-300 border border-white/10 px-3 py-1 rounded-full text-[9px] font-bold w-fit uppercase tracking-widest font-mono">
-                                {lang === "EN" ? "Step 3" : "चरण ३"}
-                            </div>
-                            <h4 className="text-[24px] font-bold text-[#fbbf24] font-display mt-8 mb-4">
-                                {lang === 'EN' ? 'Complete' : 'पूरा करें'}
-                            </h4>
-                            <p className="text-[13px] text-slate-300 font-normal leading-relaxed">
-                                {lang === 'EN'
-                                    ? 'Wait for processing to finish. You will receive the receipt automatically.'
-                                    : 'प्रसंस्करण समाप्त होने की प्रतीक्षा करें। आपको रसीद स्वचालित रूप से प्राप्त होगी।'}
-                            </p>
-                            
-                            {/* Mockup Progress Loader */}
-                            <div className="absolute bottom-6 left-6 right-6 h-[88px] bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-0 shadow-xl flex flex-col justify-center gap-2">
-                                <span className="text-[11px] font-bold text-slate-300">{lang === "EN" ? "Filing in progress..." : "प्रक्रिया जारी है..."}</span>
-                                <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                                    <div className="w-[45%] h-full bg-[#10b981] rounded-full animate-pulse"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             {/* ── SERVICES CATALOG ── */}
             <section id="what-we-do" className="border-t border-white/5 py-24 px-6 lg:px-12 max-w-[1240px] mx-auto text-center space-y-16 relative z-10">
