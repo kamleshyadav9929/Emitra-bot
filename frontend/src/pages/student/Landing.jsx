@@ -471,7 +471,7 @@ export default function Landing() {
                                                 key={idx}
                                                 edgeSensitivity={30}
                                                 glowColor="200 80 80"
-                                                backgroundColor="#1c1c22"
+                                                backgroundColor="rgba(255, 255, 255, 0.03)"
                                                 borderRadius={22}
                                                 glowRadius={40}
                                                 glowIntensity={1.0}
