@@ -71,7 +71,7 @@
 
 /* colored mesh-gradient background fill near edges */
 .border-glow-card::after {
-  border: 1px solid transparent;
+  display: none;
   background:
     var(--gradient-one, radial-gradient(at 80% 55%, hsla(268, 100%, 76%, 1) 0px, transparent 50%)) padding-box,
     var(--gradient-two, radial-gradient(at 69% 34%, hsla(349, 100%, 74%, 1) 0px, transparent 50%)) padding-box,

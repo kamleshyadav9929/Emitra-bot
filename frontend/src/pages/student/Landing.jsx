@@ -409,7 +409,7 @@ export default function Landing() {
                                 value={serviceSearch}
                                 onChange={e => setServiceSearch(e.target.value)}
                                 placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
-                                className="w-full bg-zinc-900/50 border border-white/10 text-[14px] text-slate-100 placeholder:text-slate-500 pl-12 pr-4 py-3.5 rounded-full focus:outline-none focus:border-white/30 transition-all font-medium shadow-sm hover:border-white/20"
+                                className="w-full bg-zinc-900/50 border border-white/10 text-[14px] text-slate-100 placeholder:text-slate-500 pl-12 pr-4 py-3.5 rounded-full focus:outline-none transition-all font-medium shadow-sm hover:border-white/20"
                             />
                         </div>
 
@@ -417,7 +417,7 @@ export default function Landing() {
                             <select
                                 value={serviceCatFilter}
                                 onChange={e => setServiceCatFilter(e.target.value)}
-                                className="w-full px-4 py-3.5 bg-zinc-900/50 border border-white/10 text-[14px] text-slate-300 rounded-full focus:outline-none focus:border-white/30 transition-all cursor-pointer font-bold shadow-sm hover:border-white/20"
+                                className="w-full px-4 py-3.5 bg-zinc-900/50 border border-white/10 text-[14px] text-slate-300 rounded-full focus:outline-none transition-all cursor-pointer font-bold shadow-sm hover:border-white/20"
                             >
                                 <option value="ALL" className="bg-[#050508]">{lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां'}</option>
                                 {Object.entries(services).map(([k, cat]) => (
@@ -471,7 +471,7 @@ export default function Landing() {
                                                 key={idx}
                                                 edgeSensitivity={30}
                                                 glowColor="200 80 80"
-                                                backgroundColor="rgba(9, 9, 11, 0.4)"
+                                                backgroundColor="#1c1c22"
                                                 borderRadius={22}
                                                 glowRadius={40}
                                                 glowIntensity={1.0}
@@ -480,7 +480,7 @@ export default function Landing() {
                                                 colors={['#38bdf8', '#818cf8', '#c084fc']}
                                                 className="h-full"
                                             >
-                                                <div className="p-6 backdrop-blur-md flex flex-col justify-between h-full group">
+                                                <div className="p-6 flex flex-col justify-between h-full group">
                                                     <div className="space-y-3">
                                                         <div className="flex items-center justify-between text-[10px] font-bold uppercase text-slate-400 tracking-wider">
                                                             <span>{cat.label}</span>
