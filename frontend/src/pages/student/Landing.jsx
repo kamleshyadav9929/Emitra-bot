@@ -409,7 +409,7 @@ export default function Landing() {
                                 value={serviceSearch}
                                 onChange={e => setServiceSearch(e.target.value)}
                                 placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
-                                className="w-full bg-zinc-900/50 border border-white/10 text-[14px] text-slate-100 placeholder:text-slate-500 pl-12 pr-4 py-3.5 rounded-full focus:outline-none focus:border-blue-500 transition-all font-medium shadow-sm hover:border-white/20"
+                                className="w-full bg-zinc-900/50 border border-white/10 text-[14px] text-slate-100 placeholder:text-slate-500 pl-12 pr-4 py-3.5 rounded-full focus:outline-none focus:border-white/30 transition-all font-medium shadow-sm hover:border-white/20"
                             />
                         </div>
 
@@ -417,7 +417,7 @@ export default function Landing() {
                             <select
                                 value={serviceCatFilter}
                                 onChange={e => setServiceCatFilter(e.target.value)}
-                                className="w-full px-4 py-3.5 bg-zinc-900/50 border border-white/10 text-[14px] text-slate-300 rounded-full focus:outline-none focus:border-blue-500 transition-all cursor-pointer font-bold shadow-sm hover:border-white/20"
+                                className="w-full px-4 py-3.5 bg-zinc-900/50 border border-white/10 text-[14px] text-slate-300 rounded-full focus:outline-none focus:border-white/30 transition-all cursor-pointer font-bold shadow-sm hover:border-white/20"
                             >
                                 <option value="ALL" className="bg-[#050508]">{lang === 'EN' ? 'All Categories' : 'सभी श्रेणियां'}</option>
                                 {Object.entries(services).map(([k, cat]) => (

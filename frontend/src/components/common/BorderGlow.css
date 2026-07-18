@@ -98,17 +98,7 @@
 
 /* outer glow layer */
 .border-glow-card > .edge-light {
-  inset: calc(var(--glow-padding) * -1);
-  pointer-events: none;
-  z-index: 1;
-
-  mask-image:
-    conic-gradient(
-      from var(--cursor-angle) at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%
-    );
-
-  opacity: calc((var(--edge-proximity) - var(--edge-sensitivity)) / (100 - var(--edge-sensitivity)));
-  mix-blend-mode: plus-lighter;
+  display: none;
 }
 
 .border-glow-card > .edge-light::before {
@@ -136,6 +126,7 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: auto;
+  overflow: hidden;
   z-index: 1;
+  border-radius: inherit;
 }
