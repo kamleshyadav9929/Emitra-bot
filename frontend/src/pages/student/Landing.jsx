@@ -221,63 +221,65 @@ export default function Landing() {
 
 
             {/* ── HEADER ── */}
-            <header className="sticky top-0 z-40 bg-[#050508]/75 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <Logo className="w-9 h-9 rounded-full border border-white/10" />
-                    <div className="leading-none text-left">
-                        <span className="text-base font-black tracking-tight text-white font-display">Krishna Emitra</span>
-                        <span className="text-[8.5px] text-slate-500 font-bold tracking-widest uppercase block mt-0.5">Digital Administration</span>
-                    </div>
-                </div>
-
-                <nav className="hidden md:flex items-center gap-8 text-[12.5px] font-bold text-slate-400">
-                    <button onClick={() => scrollToSection("what-we-do")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">What We Do</button>
-                    <button onClick={() => scrollToSection("how-it-works")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">How It Works</button>
-                    <button onClick={() => scrollToSection("notifications")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">Live Circulars</button>
-                    <button onClick={() => scrollToSection("faq")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none font-semibold">FAQs</button>
-                </nav>
-
-                <div className="flex items-center gap-3">
-                    <button onClick={toggleLanguage} className="hidden sm:flex text-slate-350 hover:text-white transition-colors text-[10.5px] font-bold items-center gap-1.5 bg-white/5 px-2.5 py-1.5 rounded-lg border border-white/10 uppercase cursor-pointer">
-                        <Globe size={12} className="text-slate-400" /> {lang === 'EN' ? 'हिंदी' : 'English'}
-                    </button>
-
-                    <div className="hidden sm:block h-5 w-px bg-white/10" />
-
-                    {isLoggedIn ? (
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => navigate("/dashboard")}
-                                className="px-4 py-2 rounded-xl bg-gradient-to-br from-[#1a73e8] to-[#1557b0] hover:shadow-lg hover:shadow-blue-500/10 text-white text-[12px] font-bold flex items-center justify-center gap-2 transform active:scale-95 transition-all border-none cursor-pointer"
-                                title="Dashboard"
-                            >
-                                <User size={14} />
-                                <span>Dashboard</span>
-                            </button>
-                            <button onClick={logout} className="p-2 rounded-lg hover:bg-white/5 text-slate-450 hover:text-red-400 transition-colors bg-transparent border-none cursor-pointer" title="Log Out">
-                                <LogOut size={14} />
-                            </button>
+            <div className="fixed top-4 sm:top-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+                <header className="pointer-events-auto bg-zinc-950/60 backdrop-blur-2xl border border-white/10 rounded-2xl sm:rounded-full px-4 sm:px-6 h-16 flex items-center justify-between w-full max-w-5xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+                    <div className="flex items-center gap-3">
+                        <Logo className="w-8 h-8 rounded-full border border-white/10" />
+                        <div className="leading-none text-left">
+                            <span className="text-[14px] font-black tracking-tight text-white font-display">Krishna Emitra</span>
+                            <span className="text-[7.5px] text-slate-400 font-bold tracking-widest uppercase block mt-0.5">Digital Admin</span>
                         </div>
-                    ) : (
-                        <button
-                            onClick={triggerSignIn}
-                            className="px-4 py-2 rounded-xl bg-white text-slate-950 hover:bg-slate-100 text-[12px] font-bold flex items-center justify-center gap-1.5 transform active:scale-95 transition-all border-none cursor-pointer shadow-md"
-                            title="Sign In Portal"
-                        >
-                            <User size={14} />
-                            <span>Sign In</span>
-                        </button>
-                    )}
+                    </div>
 
-                    {/* Mobile Hamburger menu toggle button */}
-                    <button
-                        onClick={() => setShowMobileMenu(!showMobileMenu)}
-                        className="md:hidden p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
-                    >
-                        {showMobileMenu ? <X size={20} /> : <Menu size={20} />}
-                    </button>
-                </div>
-            </header>
+                    <nav className="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/5">
+                        <button onClick={() => scrollToSection("what-we-do")} className="px-4 py-1.5 rounded-full hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none text-[12px] font-bold text-slate-300">What We Do</button>
+                        <button onClick={() => scrollToSection("how-it-works")} className="px-4 py-1.5 rounded-full hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none text-[12px] font-bold text-slate-300">How It Works</button>
+                        <button onClick={() => scrollToSection("notifications")} className="px-4 py-1.5 rounded-full hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none text-[12px] font-bold text-slate-300">Live Circulars</button>
+                        <button onClick={() => scrollToSection("faq")} className="px-4 py-1.5 rounded-full hover:bg-white/10 hover:text-white transition-all cursor-pointer bg-transparent border-none text-[12px] font-bold text-slate-300">FAQs</button>
+                    </nav>
+
+                    <div className="flex items-center gap-2 sm:gap-3">
+                        <button onClick={toggleLanguage} className="hidden lg:flex text-slate-300 hover:text-white transition-colors text-[10.5px] font-bold items-center gap-1.5 bg-white/5 hover:bg-white/10 px-2.5 py-1.5 rounded-full border border-white/5 uppercase cursor-pointer">
+                            <Globe size={12} className="text-slate-400" /> {lang === 'EN' ? 'हिंदी' : 'English'}
+                        </button>
+
+                        <div className="hidden lg:block h-4 w-px bg-white/10 mx-1" />
+
+                        {isLoggedIn ? (
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => navigate("/dashboard")}
+                                    className="px-4 py-1.5 rounded-full bg-white hover:bg-slate-100 text-slate-950 text-[11.5px] font-bold flex items-center justify-center gap-2 transform active:scale-95 transition-all border-none cursor-pointer shadow-md"
+                                    title="Dashboard"
+                                >
+                                    <User size={14} />
+                                    <span>Dashboard</span>
+                                </button>
+                                <button onClick={logout} className="p-2 rounded-full hover:bg-red-500/10 text-slate-400 hover:text-red-400 transition-colors bg-transparent border-none cursor-pointer" title="Log Out">
+                                    <LogOut size={14} />
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={triggerSignIn}
+                                className="px-5 py-2 rounded-full bg-white hover:bg-slate-200 text-slate-950 text-[11.5px] font-bold flex items-center justify-center gap-1.5 transform active:scale-95 transition-all border-none cursor-pointer shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                                title="Sign In Portal"
+                            >
+                                <User size={13} />
+                                <span>Sign In</span>
+                            </button>
+                        )}
+
+                        {/* Mobile Hamburger */}
+                        <button
+                            onClick={() => setShowMobileMenu(!showMobileMenu)}
+                            className="md:hidden p-2 text-slate-300 hover:text-white hover:bg-white/10 rounded-full transition-colors cursor-pointer ml-1"
+                        >
+                            {showMobileMenu ? <X size={18} /> : <Menu size={18} />}
+                        </button>
+                    </div>
+                </header>
+            </div>
 
             {/* ── MOBILE MENU OVERLAY ── */}
             <AnimatePresence>
@@ -287,32 +289,32 @@ export default function Landing() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="md:hidden fixed inset-0 top-16 bg-black/80 backdrop-blur-md z-30"
+                            className="md:hidden fixed inset-0 bg-black/80 backdrop-blur-md z-40"
                             onClick={() => setShowMobileMenu(false)}
                         />
                         <motion.div
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
+                            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -20, scale: 0.95 }}
                             transition={{ duration: 0.2 }}
-                            className="md:hidden fixed top-16 left-0 right-0 bg-[#050508]/95 border-b border-white/10 p-6 z-45 text-left space-y-6"
+                            className="md:hidden fixed top-24 left-4 right-4 bg-zinc-900/90 backdrop-blur-xl border border-white/10 rounded-3xl p-6 z-50 shadow-2xl flex flex-col gap-6"
                         >
-                            <div className="flex flex-col gap-4 text-sm font-bold text-slate-300">
-                                <button onClick={() => scrollToSection("what-we-do")} className="text-left py-2 hover:text-white border-b border-white/5 bg-transparent border-none">What We Do</button>
-                                <button onClick={() => scrollToSection("how-it-works")} className="text-left py-2 hover:text-white border-b border-white/5 bg-transparent border-none">How It Works</button>
-                                <button onClick={() => scrollToSection("notifications")} className="text-left py-2 hover:text-white border-b border-white/5 bg-transparent border-none">Live Circulars</button>
-                                <button onClick={() => scrollToSection("faq")} className="text-left py-2 hover:text-white border-b border-white/5 bg-transparent border-none">FAQs</button>
+                            <div className="flex flex-col gap-2">
+                                <button onClick={() => { scrollToSection("what-we-do"); setShowMobileMenu(false); }} className="text-left py-3 px-4 rounded-xl hover:bg-white/5 text-[14px] font-bold text-slate-200 transition-colors bg-transparent border-none cursor-pointer">What We Do</button>
+                                <button onClick={() => { scrollToSection("how-it-works"); setShowMobileMenu(false); }} className="text-left py-3 px-4 rounded-xl hover:bg-white/5 text-[14px] font-bold text-slate-200 transition-colors bg-transparent border-none cursor-pointer">How It Works</button>
+                                <button onClick={() => { scrollToSection("notifications"); setShowMobileMenu(false); }} className="text-left py-3 px-4 rounded-xl hover:bg-white/5 text-[14px] font-bold text-slate-200 transition-colors bg-transparent border-none cursor-pointer">Live Circulars</button>
+                                <button onClick={() => { scrollToSection("faq"); setShowMobileMenu(false); }} className="text-left py-3 px-4 rounded-xl hover:bg-white/5 text-[14px] font-bold text-slate-200 transition-colors bg-transparent border-none cursor-pointer">FAQs</button>
                             </div>
 
-                            <div className="flex items-center justify-between pt-2">
-                                <button onClick={toggleLanguage} className="text-slate-300 hover:text-white transition-colors text-[11px] font-bold flex items-center gap-1.5 bg-white/5 px-3 py-2 rounded-lg border border-white/10 uppercase cursor-pointer">
-                                    <Globe size={13} className="text-slate-400" /> {lang === 'EN' ? 'हिंदी' : 'English'}
+                            <div className="flex items-center justify-between border-t border-white/10 pt-6">
+                                <button onClick={toggleLanguage} className="text-slate-300 hover:text-white transition-colors text-[12px] font-bold flex items-center gap-2 bg-white/5 px-4 py-2.5 rounded-full border border-white/10 uppercase cursor-pointer">
+                                    <Globe size={14} className="text-slate-400" /> {lang === 'EN' ? 'हिंदी' : 'English'}
                                 </button>
                                 
                                 {!isLoggedIn && (
                                     <button
                                         onClick={triggerSignIn}
-                                        className="px-5 py-2 rounded-xl bg-white text-slate-950 hover:bg-slate-100 text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all border-none cursor-pointer shadow-md"
+                                        className="px-6 py-2.5 rounded-full bg-white text-slate-950 hover:bg-slate-100 text-[13px] font-bold flex items-center justify-center gap-2 transition-all border-none cursor-pointer shadow-md"
                                     >
                                         <User size={14} />
                                         <span>Sign In</span>
