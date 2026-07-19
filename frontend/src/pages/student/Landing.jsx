@@ -6,7 +6,8 @@ import LoginModal from "../../components/student/LoginModal"
 import {
     Send, Clock, Bell, Globe, ExternalLink,
     ChevronDown, Check, LogOut, User, Search,
-    X, Loader2, ArrowRight, Shield, MessageSquare, ClipboardCheck, Sparkles, Files, HelpCircle, Menu, ChevronUp
+    X, Loader2, ArrowRight, Shield, MessageSquare, ClipboardCheck, Sparkles, Files, HelpCircle, Menu, ChevronUp,
+    MapPin, Phone, Mail
 } from "lucide-react"
 import { useLanguage } from "../../context/LanguageContext"
 import { useAuth } from "../../context/AuthContext"
@@ -803,51 +804,94 @@ export default function Landing() {
                 </div>
             </section>
 
-            {/* ── FOOTER ── */}
-            <footer className="bg-[#050508] border-t border-white/10 text-slate-500 text-[12px] font-normal py-16 px-6 lg:px-12 relative z-10">
-                <div className="max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 text-left">
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                            <Logo className="w-10 h-10 ring-2 ring-white/10" />
-                            <span className="font-black text-white text-[15px] tracking-tight font-display">Krishna Emitra<br/><span className="text-blue-500">Digital Seva</span></span>
+            {/* ── STUNNING PREMIUM FOOTER ── */}
+            <footer className="relative bg-[#030305] pt-24 pb-12 overflow-hidden z-10 border-t border-white/5 mt-20">
+                {/* Background ambient glow */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[300px] bg-blue-600/10 blur-[120px] rounded-[100%] pointer-events-none" />
+                
+                <div className="max-w-[1240px] mx-auto px-6 lg:px-12 relative z-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16 text-left">
+                        
+                        {/* Brand Column */}
+                        <div className="lg:col-span-4 space-y-6">
+                            <div className="flex items-center gap-3">
+                                <div className="p-1 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 shadow-xl">
+                                    <Logo className="w-10 h-10 rounded-lg" />
+                                </div>
+                                <span className="font-black text-white text-xl tracking-tight font-display leading-tight">Krishna Emitra<br/><span className="text-blue-500 text-[13px] uppercase tracking-wider">Digital Seva</span></span>
+                            </div>
+                            <p className="text-[13px] leading-relaxed text-slate-400 font-medium pr-8">
+                                {lang === "EN"
+                                    ? "A secure, prompt, and convenient platform designed to file and track recruitment forms and counselling."
+                                    : "सरकारी नौकरी फॉर्म एवं कॉलेज काउंसलिंग आवेदन भरने व लाइव अपडेट पाने का सुरक्षित पोर्टल।"}
+                            </p>
                         </div>
-                        <p className="text-[11.5px] leading-relaxed text-slate-400">
-                            {lang === "EN"
-                                ? "A secure, prompt, and convenient platform designed to file and track recruitment forms and counselling."
-                                : "सरकारी नौकरी फॉर्म एवं कॉलेज काउंसलिंग आवेदन भरने व लाइव अपडेट पाने का सुरक्षित पोर्टल।"}
+
+                        {/* Location */}
+                        <div className="lg:col-span-3 space-y-5">
+                            <h4 className="font-black text-white text-[13px] uppercase tracking-[0.15em] opacity-90">{lang === "EN" ? "Our Center" : "हमारा केंद्र"}</h4>
+                            <div className="flex gap-4">
+                                <div className="w-10 h-10 shrink-0 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shadow-inner">
+                                    <MapPin size={18} className="text-blue-400" />
+                                </div>
+                                <p className="text-[13px] leading-relaxed text-slate-300 font-bold">
+                                    Ward No. 42, New Indra Colony,<br />
+                                    Near Janki Tower, Sikar,<br />
+                                    <span className="text-slate-500 mt-1 block font-medium">Rajasthan - 332001</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Contact */}
+                        <div className="lg:col-span-3 space-y-5">
+                            <h4 className="font-black text-white text-[13px] uppercase tracking-[0.15em] opacity-90">{lang === "EN" ? "Operator Contact" : "ऑपरेटर संपर्क"}</h4>
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-4 group cursor-pointer">
+                                    <div className="w-10 h-10 shrink-0 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 group-hover:bg-emerald-500/20 transition-colors shadow-inner">
+                                        <Phone size={16} className="text-emerald-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">{lang === "EN" ? "Direct Line" : "सीधी लाइन"}</p>
+                                        <p className="text-[14.5px] font-black text-slate-200 group-hover:text-white transition-colors tracking-wide">+91 8955275304</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4 group cursor-pointer">
+                                    <div className="w-10 h-10 shrink-0 rounded-full bg-amber-500/10 flex items-center justify-center border border-amber-500/20 group-hover:bg-amber-500/20 transition-colors shadow-inner">
+                                        <Mail size={16} className="text-amber-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">{lang === "EN" ? "Email Us" : "ईमेल करें"}</p>
+                                        <p className="text-[14.5px] font-black text-slate-200 group-hover:text-white transition-colors tracking-wide">vkm5977@gmail.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Links */}
+                        <div className="lg:col-span-2 space-y-5">
+                            <h4 className="font-black text-white text-[13px] uppercase tracking-[0.15em] opacity-90">{lang === "EN" ? "Desks" : "सहायक सेवाएं"}</h4>
+                            <div className="space-y-3">
+                                <a href={config.telegram_bot_url || "https://t.me/Kamlesh6377_bot"} target="_blank" rel="noreferrer" className="flex items-center gap-2.5 text-[13.5px] font-bold text-slate-400 hover:text-cyan-400 transition-colors group">
+                                    <span className="w-7 h-7 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-cyan-500/10"><Send size={12} /></span>
+                                    Telegram Bot
+                                </a>
+                                <a href={`https://wa.me/918955275304`} target="_blank" rel="noreferrer" className="flex items-center gap-2.5 text-[13.5px] font-bold text-slate-400 hover:text-[#25D366] transition-colors group">
+                                    <span className="w-7 h-7 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#25D366]/10"><MessageSquare size={12} /></span>
+                                    WhatsApp Desk
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Bottom Bar */}
+                    <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <p className="text-[12px] font-medium text-slate-500">
+                            © {new Date().getFullYear()} Krishna Emitra Digital Seva. All rights reserved.
                         </p>
-                    </div>
-
-                    <div className="space-y-3">
-                        <h4 className="font-extrabold text-white text-[12.5px] uppercase tracking-wider">{lang === "EN" ? "Our Center Address" : "हमारा केंद्र पता"}</h4>
-                        <p className="text-[11.5px] leading-relaxed text-slate-400">
-                            📍 Ward No. 42, New Indra Colony,<br />
-                            Near Janki Tower, Sikar,<br />
-                            Rajasthan - 332001
-                        </p>
-                    </div>
-
-                    <div className="space-y-3">
-                        <h4 className="font-extrabold text-white text-[12.5px] uppercase tracking-wider">{lang === "EN" ? "Operator Contact" : "ऑपरेटर संपर्क"}</h4>
-                        <p className="text-[11.5px] text-slate-400 space-y-1">
-                            <span className="block">📞 Phone: +91 8955275304</span>
-                            <span className="block">✉️ Email: vkm5977@gmail.com</span>
-                        </p>
-                    </div>
-
-                    <div className="space-y-3">
-                        <h4 className="font-extrabold text-white text-[12.5px] uppercase tracking-wider">{lang === "EN" ? "Automated Desks" : "सहायक सेवाएं"}</h4>
-                        <a href={config.telegram_bot_url || "https://t.me/Kamlesh6377_bot"} target="_blank" rel="noreferrer" className="block text-cyan-400 hover:text-cyan-300 transition-colors">Telegram Assistant Bot</a>
-                        <a href={`https://wa.me/918955275304`} target="_blank" rel="noreferrer" className="block text-[#25D366] hover:text-[#20B958] transition-colors">WhatsApp Operator Desk</a>
-                    </div>
-                </div>
-
-                <div className="max-w-[1240px] mx-auto mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10.5px]">
-                    <p className="text-slate-500 font-medium">© {new Date().getFullYear()} Krishna Emitra Digital Administration. All rights reserved.</p>
-                    <div className="flex gap-4 font-bold text-slate-400">
-                        <span className="cursor-pointer hover:text-white transition-colors">Privacy Policy</span>
-                        <span>·</span>
-                        <span className="cursor-pointer hover:text-white transition-colors">Terms of Service</span>
+                        <div className="flex items-center gap-6 text-[12px] font-bold text-slate-500">
+                            <span className="hover:text-white cursor-pointer transition-colors">Privacy Policy</span>
+                            <span className="hover:text-white cursor-pointer transition-colors">Terms of Service</span>
+                        </div>
                     </div>
                 </div>
             </footer>
