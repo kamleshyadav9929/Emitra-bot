@@ -804,16 +804,14 @@ export default function Landing() {
             </section>
 
             {/* ── FOOTER ── */}
-            <footer className="bg-black/80 border-t border-white/5 text-slate-500 text-[12px] font-normal py-16 px-6 lg:px-12 relative z-10">
+            <footer className="bg-[#050508] border-t border-white/10 text-slate-500 text-[12px] font-normal py-16 px-6 lg:px-12 relative z-10">
                 <div className="max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 text-left">
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-sm">
-                                K
-                            </div>
-                            <span className="font-bold text-white tracking-tight">Krishna Emitra Digital</span>
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                            <Logo className="w-10 h-10 ring-2 ring-white/10" />
+                            <span className="font-black text-white text-[15px] tracking-tight font-display">Krishna Emitra<br/><span className="text-blue-500">Digital Seva</span></span>
                         </div>
-                        <p className="text-[11px] leading-relaxed text-slate-400">
+                        <p className="text-[11.5px] leading-relaxed text-slate-400">
                             {lang === "EN"
                                 ? "A secure, prompt, and convenient platform designed to file and track recruitment forms and counselling."
                                 : "सरकारी नौकरी फॉर्म एवं कॉलेज काउंसलिंग आवेदन भरने व लाइव अपडेट पाने का सुरक्षित पोर्टल।"}
@@ -821,34 +819,35 @@ export default function Landing() {
                     </div>
 
                     <div className="space-y-3">
-                        <h4 className="font-bold text-white text-[12.5px]">{lang === "EN" ? "Our Center Address" : "हमारा केंद्र पता"}</h4>
+                        <h4 className="font-extrabold text-white text-[12.5px] uppercase tracking-wider">{lang === "EN" ? "Our Center Address" : "हमारा केंद्र पता"}</h4>
                         <p className="text-[11.5px] leading-relaxed text-slate-400">
-                            📍 Shop No. 12, Main Market,<br />
-                            Jodhpur, Rajasthan, India
+                            📍 Ward No. 42, New Indra Colony,<br />
+                            Near Janki Tower, Sikar,<br />
+                            Rajasthan - 332001
                         </p>
                     </div>
 
                     <div className="space-y-3">
-                        <h4 className="font-bold text-white text-[12.5px]">{lang === "EN" ? "Operator Contact" : "ऑपरेटर संपर्क"}</h4>
-                        <p className="text-[11.5px] text-slate-400">
-                            📞 Phone: +91 {config.whatsapp_number || "916377964293"}<br />
-                            ✉️ Email: support@krishnaemitra.com
+                        <h4 className="font-extrabold text-white text-[12.5px] uppercase tracking-wider">{lang === "EN" ? "Operator Contact" : "ऑपरेटर संपर्क"}</h4>
+                        <p className="text-[11.5px] text-slate-400 space-y-1">
+                            <span className="block">📞 Phone: +91 8955275304</span>
+                            <span className="block">✉️ Email: vkm5977@gmail.com</span>
                         </p>
                     </div>
 
                     <div className="space-y-3">
-                        <h4 className="font-bold text-white text-[12.5px]">{lang === "EN" ? "Automated Desks" : "सहायक सेवाएं"}</h4>
-                        <a href={config.telegram_bot_url || "https://t.me/Kamlesh6377_bot"} target="_blank" rel="noreferrer" className="block text-cyan-400 hover:underline">Telegram Assistant Bot</a>
-                        <a href={`https://wa.me/${config.whatsapp_number || "916377964293"}`} target="_blank" rel="noreferrer" className="block text-[#25D366] hover:underline">WhatsApp Operator Desk</a>
+                        <h4 className="font-extrabold text-white text-[12.5px] uppercase tracking-wider">{lang === "EN" ? "Automated Desks" : "सहायक सेवाएं"}</h4>
+                        <a href={config.telegram_bot_url || "https://t.me/Kamlesh6377_bot"} target="_blank" rel="noreferrer" className="block text-cyan-400 hover:text-cyan-300 transition-colors">Telegram Assistant Bot</a>
+                        <a href={`https://wa.me/918955275304`} target="_blank" rel="noreferrer" className="block text-[#25D366] hover:text-[#20B958] transition-colors">WhatsApp Operator Desk</a>
                     </div>
                 </div>
 
-                <div className="max-w-[1240px] mx-auto mt-12 pt-6 border-t border-white/5 flex flex-col sm:flex-row justify-between gap-4 text-[10.5px]">
-                    <p>© {new Date().getFullYear()} Krishna Emitra Digital Administration. All rights reserved.</p>
-                    <div className="flex gap-4">
-                        <span className="cursor-pointer hover:text-white">Privacy Policy</span>
+                <div className="max-w-[1240px] mx-auto mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10.5px]">
+                    <p className="text-slate-500 font-medium">© {new Date().getFullYear()} Krishna Emitra Digital Administration. All rights reserved.</p>
+                    <div className="flex gap-4 font-bold text-slate-400">
+                        <span className="cursor-pointer hover:text-white transition-colors">Privacy Policy</span>
                         <span>·</span>
-                        <span className="cursor-pointer hover:text-white">Terms of Service</span>
+                        <span className="cursor-pointer hover:text-white transition-colors">Terms of Service</span>
                     </div>
                 </div>
             </footer>
