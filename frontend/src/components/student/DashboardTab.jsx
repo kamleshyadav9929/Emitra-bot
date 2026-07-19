@@ -86,7 +86,7 @@ export default function DashboardTab({
                         <button 
                             key={nav.id}
                             onClick={() => setActiveTab(nav.id)}
-                            className="bg-white/[0.02] backdrop-blur-md p-5 rounded-2xl border border-white/10 shadow-sm flex flex-col items-center justify-center gap-3.5 hover:border-blue-500/30 hover:bg-white/[0.06] hover:shadow-[0_0_20px_rgba(59,130,246,0.1)] hover:-translate-y-1 transition-all duration-300 cursor-pointer group active:scale-97"
+                            className="bg-white/[0.02] backdrop-blur-md p-5 rounded-2xl border border-white/10 shadow-sm flex flex-col items-center justify-center gap-3.5 hover:border-blue-500/30 hover:bg-white/[0.06] hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer group active:scale-97"
                         >
                             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${nav.color} border transition-all duration-300 group-hover:scale-105`}>
                                 <Icon size={20} />
@@ -110,7 +110,7 @@ export default function DashboardTab({
                 {exams && exams.filter(ex => ex.end_date && new Date(ex.end_date) >= new Date()).length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {exams.filter(ex => ex.end_date && new Date(ex.end_date) >= new Date()).slice(0, 2).map((ex, idx) => (
-                            <div key={idx} className="bg-white/[0.02] backdrop-blur-sm border border-white/10 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:border-blue-500/30 hover:bg-white/[0.05] hover:shadow-[0_0_20px_rgba(59,130,246,0.06)] hover:-translate-y-0.5 transition-all duration-300">
+                            <div key={idx} className="bg-white/[0.02] backdrop-blur-sm border border-white/10 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:border-blue-500/30 hover:bg-white/[0.05] hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
                                 <div className="flex items-center gap-3.5 min-w-0">
                                     <div className="w-11 h-11 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0">
                                         <Calendar size={18} />
@@ -178,7 +178,7 @@ export default function DashboardTab({
                                 <div 
                                     key={idx}
                                     onClick={() => setActiveTab("status")}
-                                    className="bg-white/[0.02] backdrop-blur-sm border border-white/10 rounded-2xl p-4.5 flex flex-col justify-between shadow-sm hover:border-blue-500/30 hover:bg-white/[0.05] hover:shadow-[0_0_20px_rgba(59,130,246,0.06)] transition-all duration-300 cursor-pointer"
+                                    className="bg-white/[0.02] backdrop-blur-sm border border-white/10 rounded-2xl p-4.5 flex flex-col justify-between shadow-sm hover:border-blue-500/30 hover:bg-white/[0.05] hover:shadow-md transition-all duration-300 cursor-pointer"
                                 >
                                     <div className="flex items-start justify-between gap-2">
                                         <div className="flex items-center gap-3.5 min-w-0">
