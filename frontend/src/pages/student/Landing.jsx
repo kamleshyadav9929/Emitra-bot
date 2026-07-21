@@ -555,7 +555,7 @@ export default function Landing() {
                         <button
                             data-gsap="hero-btn"
                             onClick={handleJoinTelegram}
-                            className="w-full sm:w-auto px-7 py-3.5 bg-[#229ED9] hover:bg-[#1E8CC0] text-white text-[13px] font-bold rounded-full transition-all flex items-center justify-center gap-2 border-none shadow-lg shadow-[#229ED9]/20 active:scale-95 cursor-pointer"
+                            className="w-full sm:w-auto px-7 py-3.5 bg-[#229ED9] hover:bg-[#1E8CC0] text-white text-[13px] font-bold rounded-full transition-colors duration-200 flex items-center justify-center gap-2 border-none shadow-lg shadow-[#229ED9]/20 active:scale-95 cursor-pointer"
                         >
                             <Send size={14} /> {lang === "EN" ? "Join Telegram assistant" : "टेलीग्राम असिस्टेंट से जुड़ें"}
                         </button>
@@ -563,7 +563,7 @@ export default function Landing() {
                         <button
                             data-gsap="hero-btn"
                             onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
-                            className="w-full sm:w-auto px-7 py-3.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[13px] font-bold rounded-full transition-all flex items-center justify-center gap-2 backdrop-blur-sm active:scale-95 cursor-pointer"
+                            className="w-full sm:w-auto px-7 py-3.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[13px] font-bold rounded-full transition-colors duration-200 flex items-center justify-center gap-2 backdrop-blur-sm active:scale-95 cursor-pointer"
                         >
                             <User size={14} />
                             {isLoggedIn ? (lang === "EN" ? "Enter Student Dashboard" : "पैनल में प्रवेश करें") : (lang === "EN" ? "Sign In student portal" : "स्टूडेंट पोर्टल में लॉगिन")}
@@ -728,7 +728,7 @@ export default function Landing() {
                                             <div
                                                 key={idx}
                                                 data-gsap="service-card"
-                                                className="h-full bg-white/[0.03] border border-white/10 rounded-[22px] hover:border-indigo-500/30 hover:shadow-[0_0_30px_rgba(99,102,241,0.15)] transition-all duration-500"
+                                                className="h-full bg-white/[0.03] border border-white/10 rounded-[22px] hover:border-indigo-500/30 hover:shadow-[0_0_30px_rgba(99,102,241,0.15)] transition-[border-color,box-shadow] duration-500"
                                             >
                                                 <div className="p-6 flex flex-col justify-between h-full group">
                                                     <div className="space-y-3">
@@ -895,7 +895,7 @@ export default function Landing() {
                             target="_blank"
                             rel="noopener noreferrer"
                             data-gsap="resource-card"
-                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-all duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
+                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-[transform,border-color,box-shadow] duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">State Quota</span>
                             <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">Rajasthan SSO</span>
@@ -907,7 +907,7 @@ export default function Landing() {
                             target="_blank"
                             rel="noopener noreferrer"
                             data-gsap="resource-card"
-                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-all duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
+                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-[transform,border-color,box-shadow] duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Govt Jobs</span>
                             <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">SSC Portal</span>
@@ -919,7 +919,7 @@ export default function Landing() {
                             target="_blank"
                             rel="noopener noreferrer"
                             data-gsap="resource-card"
-                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-all duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
+                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-[transform,border-color,box-shadow] duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Medical Exams</span>
                             <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">NEET UG (NTA)</span>
@@ -931,7 +931,7 @@ export default function Landing() {
                             target="_blank"
                             rel="noopener noreferrer"
                             data-gsap="resource-card"
-                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-all duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
+                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-[transform,border-color,box-shadow] duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Railways</span>
                             <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">RRB Recruitment</span>
@@ -943,7 +943,7 @@ export default function Landing() {
                             target="_blank"
                             rel="noopener noreferrer"
                             data-gsap="resource-card"
-                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-all duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
+                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-[transform,border-color,box-shadow] duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Banking</span>
                             <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">IBPS Exams</span>
