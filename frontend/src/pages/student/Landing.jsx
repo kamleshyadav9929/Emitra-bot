@@ -395,6 +395,39 @@ export default function Landing() {
         }
     ]
 
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#050508] relative overflow-hidden text-slate-200">
+                {/* Ambient Background Glows */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] rounded-full bg-blue-500/10 blur-[80px] pointer-events-none" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full bg-indigo-500/5 blur-[50px] pointer-events-none" />
+
+                <div className="flex flex-col items-center gap-6 relative z-10 text-center px-4">
+                    {/* Pulsing Brand Logo Ring */}
+                    <div className="relative">
+                        <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 opacity-40 blur-md animate-pulse" />
+                        <div className="relative p-1 bg-[#0a0f1d] border border-white/10 rounded-full shadow-2xl">
+                            <Logo className="w-16 h-16 rounded-full" />
+                        </div>
+                    </div>
+
+                    {/* Brand Identity */}
+                    <div className="space-y-1 mt-2">
+                        <h2 className="text-lg font-black tracking-tight text-white font-display">Krishna Emitra</h2>
+                        <p className="text-[10px] text-blue-400 font-bold uppercase tracking-[0.2em]">{lang === "EN" ? "Digital Administration" : "डिजिटल प्रशासन"}</p>
+                    </div>
+
+                    {/* Staggered Dot Loading Indicator */}
+                    <div className="flex items-center gap-1.5 mt-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div ref={pageRef} className="min-h-screen bg-[#050508] text-slate-200 font-sans overflow-x-clip relative">
 
