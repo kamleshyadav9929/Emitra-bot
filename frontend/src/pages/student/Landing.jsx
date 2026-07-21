@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useLayoutEffect, useMemo, useRef } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { useNavigate } from "react-router-dom"
 import { ServiceCardSkeleton, AnnouncementSkeleton } from "../../components/common/Skeleton"
@@ -14,6 +14,10 @@ import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
 import Logo from "../../components/common/Logo"
 import SoftAurora from "../../components/common/SoftAurora"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+
+gsap.registerPlugin(ScrollTrigger)
 
 const formatTelegramMessage = (text) => {
     if (!text) return "";
@@ -134,6 +138,144 @@ export default function Landing() {
         return () => window.removeEventListener("scroll", handleScroll)
     }, [])
 
+    // ─── GSAP SCROLL ANIMATIONS ───
+    const pageRef = useRef(null)
+
+    useLayoutEffect(() => {
+        if (!pageRef.current) return
+        const ctx = gsap.context(() => {
+
+            // Hero title — cinematic slide up
+            const heroTitle = pageRef.current.querySelector('[data-gsap="hero-title"]')
+            if (heroTitle) {
+                gsap.from(heroTitle, {
+                    y: 80, opacity: 0, duration: 1.2,
+                    ease: "power4.out", delay: 0.2,
+                })
+            }
+
+            // Hero subtitle — fade up
+            const heroSub = pageRef.current.querySelector('[data-gsap="hero-sub"]')
+            if (heroSub) {
+                gsap.from(heroSub, {
+                    y: 40, opacity: 0, duration: 1,
+                    ease: "power3.out", delay: 0.6,
+                })
+            }
+
+            // Hero CTA buttons — stagger with bounce
+            const heroBtns = pageRef.current.querySelectorAll('[data-gsap="hero-btn"]')
+            if (heroBtns.length) {
+                gsap.from(heroBtns, {
+                    y: 30, opacity: 0, scale: 0.95,
+                    duration: 0.8, ease: "back.out(1.7)",
+                    stagger: 0.15, delay: 0.9,
+                })
+            }
+
+            // Section headings — slide up on scroll
+            pageRef.current.querySelectorAll('[data-gsap="section-heading"]').forEach(el => {
+                gsap.from(el, {
+                    y: 60, opacity: 0, duration: 0.9, ease: "power3.out",
+                    scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none none" }
+                })
+            })
+
+            // Service cards — stagger reveal
+            pageRef.current.querySelectorAll('[data-gsap="service-grid"]').forEach(grid => {
+                const cards = grid.querySelectorAll('[data-gsap="service-card"]')
+                if (cards.length) {
+                    gsap.from(cards, {
+                        y: 50, opacity: 0, scale: 0.96,
+                        duration: 0.7, ease: "power3.out", stagger: 0.1,
+                        scrollTrigger: { trigger: grid, start: "top 85%", toggleActions: "play none none none" }
+                    })
+                }
+            })
+
+            // Search bars — slide in from left
+            pageRef.current.querySelectorAll('[data-gsap="search-bar"]').forEach(bar => {
+                gsap.from(bar, {
+                    x: -60, opacity: 0, duration: 0.8, ease: "power3.out",
+                    scrollTrigger: { trigger: bar, start: "top 90%", toggleActions: "play none none none" }
+                })
+            })
+
+            // Notification left column — slide from left
+            const notifLeft = pageRef.current.querySelector('[data-gsap="notif-left"]')
+            if (notifLeft) {
+                gsap.from(notifLeft, {
+                    x: -60, opacity: 0, duration: 1, ease: "power3.out",
+                    scrollTrigger: { trigger: notifLeft, start: "top 85%", toggleActions: "play none none none" }
+                })
+            }
+
+            // Notification panel — slide from right
+            const notifPanel = pageRef.current.querySelector('[data-gsap="notif-panel"]')
+            if (notifPanel) {
+                gsap.from(notifPanel, {
+                    x: 80, opacity: 0, duration: 1, ease: "power3.out",
+                    scrollTrigger: { trigger: notifPanel, start: "top 85%", toggleActions: "play none none none" }
+                })
+            }
+
+            // Resource cards — stagger scale up
+            const resourceGrid = pageRef.current.querySelector('[data-gsap="resource-grid"]')
+            if (resourceGrid) {
+                const rCards = resourceGrid.querySelectorAll('[data-gsap="resource-card"]')
+                if (rCards.length) {
+                    gsap.from(rCards, {
+                        y: 40, opacity: 0, scale: 0.9,
+                        duration: 0.6, ease: "back.out(1.4)", stagger: 0.08,
+                        scrollTrigger: { trigger: resourceGrid, start: "top 85%", toggleActions: "play none none none" }
+                    })
+                }
+            }
+
+            // FAQ items — stagger from below
+            const faqList = pageRef.current.querySelector('[data-gsap="faq-list"]')
+            if (faqList) {
+                const faqItems = faqList.querySelectorAll('[data-gsap="faq-item"]')
+                if (faqItems.length) {
+                    gsap.from(faqItems, {
+                        y: 30, opacity: 0, duration: 0.5, ease: "power2.out", stagger: 0.1,
+                        scrollTrigger: { trigger: faqList, start: "top 85%", toggleActions: "play none none none" }
+                    })
+                }
+            }
+
+            // CTA section — dramatic scale + fade
+            const ctaSection = pageRef.current.querySelector('[data-gsap="cta-section"]')
+            if (ctaSection) {
+                gsap.from(ctaSection, {
+                    y: 60, opacity: 0, scale: 0.95,
+                    duration: 1, ease: "power3.out",
+                    scrollTrigger: { trigger: ctaSection, start: "top 88%", toggleActions: "play none none none" }
+                })
+            }
+
+            // Footer columns — stagger up
+            const footerGrid = pageRef.current.querySelector('[data-gsap="footer-grid"]')
+            if (footerGrid) {
+                gsap.from(footerGrid.children, {
+                    y: 40, opacity: 0, duration: 0.7, ease: "power2.out", stagger: 0.12,
+                    scrollTrigger: { trigger: footerGrid, start: "top 90%", toggleActions: "play none none none" }
+                })
+            }
+
+            // Filter buttons — stagger pop
+            pageRef.current.querySelectorAll('[data-gsap="filter-group"]').forEach(group => {
+                gsap.from(group.children, {
+                    scale: 0.8, opacity: 0, duration: 0.5, ease: "back.out(2)", stagger: 0.07,
+                    scrollTrigger: { trigger: group, start: "top 90%", toggleActions: "play none none none" }
+                })
+            })
+
+        }, pageRef)
+
+        return () => ctx.revert()
+    }, [loading])
+
     const scrollToSection = (id) => {
         const element = document.getElementById(id)
         if (element) {
@@ -240,7 +382,7 @@ export default function Landing() {
     ]
 
     return (
-        <div className="min-h-screen bg-[#050508] text-slate-200 font-sans overflow-x-clip relative">
+        <div ref={pageRef} className="min-h-screen bg-[#050508] text-slate-200 font-sans overflow-x-clip relative">
 
 
             {/* ── HEADER ── */}
@@ -381,13 +523,13 @@ export default function Landing() {
                 <section className="relative z-10 px-6 lg:px-12 max-w-[1000px] mx-auto space-y-12">
                     {/* Hero Header Content */}
                     <div className="space-y-6 max-w-4xl mx-auto">
-                        <h1 className="text-4xl sm:text-7xl lg:text-[84px] leading-[0.95] font-black tracking-tight font-display text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-400">
+                        <h1 data-gsap="hero-title" className="text-4xl sm:text-7xl lg:text-[84px] leading-[0.95] font-black tracking-tight font-display text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-400">
                             {lang === "EN" 
                                 ? "Your government applications, automated."
                                 : "आपकी सरकारी नौकरी आवेदन, अब स्वचालित।"}
                         </h1>
 
-                        <p className="text-[15px] sm:text-[17px] text-slate-300 leading-relaxed max-w-2xl mx-auto font-normal pt-2">
+                        <p data-gsap="hero-sub" className="text-[15px] sm:text-[17px] text-slate-300 leading-relaxed max-w-2xl mx-auto font-normal pt-2">
                             {lang === "EN"
                                 ? "SSC, Railways, NEET counselling, and state services. Track deadlines, store files, and submit application requests straight to our digital operator desk via Telegram."
                                 : "SSC, रेलवे, NEET काउंसलिंग और राज्य सेवाएँ। परीक्षा अंतिम तिथि ट्रैक करें, दस्तावेज स्टोर करें और सीधे टेलीग्राम द्वारा हमारे ऑपरेटर को आवेदन भेजें।"}
@@ -397,6 +539,7 @@ export default function Landing() {
                     {/* Integrated 2-Step Action Row */}
                     <div className="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-xl mx-auto pt-4">
                         <button
+                            data-gsap="hero-btn"
                             onClick={handleJoinTelegram}
                             className="w-full sm:w-auto px-7 py-3.5 bg-[#229ED9] hover:bg-[#1E8CC0] text-white text-[13px] font-bold rounded-full transition-all flex items-center justify-center gap-2 border-none shadow-lg shadow-[#229ED9]/20 active:scale-95 cursor-pointer"
                         >
@@ -404,6 +547,7 @@ export default function Landing() {
                         </button>
 
                         <button
+                            data-gsap="hero-btn"
                             onClick={isLoggedIn ? () => navigate("/dashboard") : triggerSignIn}
                             className="w-full sm:w-auto px-7 py-3.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[13px] font-bold rounded-full transition-all flex items-center justify-center gap-2 backdrop-blur-sm active:scale-95 cursor-pointer"
                         >
@@ -420,7 +564,7 @@ export default function Landing() {
 
             {/* ── SERVICES CATALOG ── */}
             <section id="what-we-do" className="border-t border-white/5 py-24 px-6 lg:px-12 max-w-[1240px] mx-auto text-center space-y-16 relative z-10">
-                <div className="space-y-4">
+                <div data-gsap="section-heading" className="space-y-4">
                     <p className="text-[11px] font-black text-[#6366f1] uppercase tracking-[0.2em]">{lang === "EN" ? "Catalog" : "सूची पत्र"}</p>
                     <h2 className="text-3xl md:text-4xl font-black text-white font-display tracking-tight">
                         {lang === "EN" ? "Explore E-Mitra Services" : "ई-मित्र सेवाओं की सूची"}
@@ -434,7 +578,7 @@ export default function Landing() {
 
                 {/* Command-Palette style Search & Filter bar */}
                 {!loading && Object.keys(services).length > 0 && (
-                    <div className="flex flex-col sm:flex-row gap-3 items-center w-full max-w-6xl mx-auto">
+                    <div data-gsap="search-bar" className="flex flex-col sm:flex-row gap-3 items-center w-full max-w-6xl mx-auto">
                         <div className="relative flex-1 w-full">
                             <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                             <input
@@ -565,10 +709,11 @@ export default function Landing() {
                                         </span>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <div data-gsap="service-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {matchingServices.map((svc, idx) => (
                                             <div
                                                 key={idx}
+                                                data-gsap="service-card"
                                                 className="h-full bg-white/[0.03] border border-white/10 rounded-[22px] hover:border-indigo-500/30 hover:shadow-[0_0_30px_rgba(99,102,241,0.15)] transition-all duration-500"
                                             >
                                                 <div className="p-6 flex flex-col justify-between h-full group">
@@ -601,7 +746,7 @@ export default function Landing() {
             <section id="notifications" className="py-24 px-6 lg:px-12 max-w-[1240px] mx-auto border-t border-white/5 relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
                     {/* Left Column - Info & Filters */}
-                    <div className="lg:col-span-5 space-y-10">
+                    <div data-gsap="notif-left" className="lg:col-span-5 space-y-10">
                         <div className="space-y-4">
                             <p className="text-[11px] font-black text-[#6366f1] uppercase tracking-[0.2em]">{lang === "EN" ? "Real-time updates" : "वास्तविक समय अपडेट"}</p>
                             <h2 className="text-3xl md:text-4xl font-black text-white font-display tracking-tight flex items-center gap-3">
@@ -631,7 +776,7 @@ export default function Landing() {
                                 />
                             </div>
 
-                            <div className="flex flex-wrap gap-2.5">
+                            <div data-gsap="filter-group" className="flex flex-wrap gap-2.5">
                                 <button
                                     onClick={() => setFilterCategory("ALL")}
                                     className={`px-5 py-2.5 text-[12px] font-bold rounded-xl border transition-all cursor-pointer ${filterCategory === "ALL"
@@ -664,7 +809,7 @@ export default function Landing() {
                     </div>
 
                     {/* Right Column - Announcements Feed Container */}
-                    <div className="lg:col-span-7 bg-[#0a0a0f] border border-white/10 rounded-[32px] p-2 pr-1 min-h-[500px] max-h-[600px] flex flex-col relative text-left shadow-2xl shadow-black/50">
+                    <div data-gsap="notif-panel" className="lg:col-span-7 bg-[#0a0a0f] border border-white/10 rounded-[32px] p-2 pr-1 min-h-[500px] max-h-[600px] flex flex-col relative text-left shadow-2xl shadow-black/50">
                         <div className="px-6 pt-6 pb-4 border-b border-white/5 flex justify-between items-center shrink-0">
                             <span className="text-[13px] font-black text-white uppercase tracking-wider">{lang === "EN" ? "Recent Circulars" : "हालिया घोषणाएं"}</span>
                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
@@ -718,7 +863,7 @@ export default function Landing() {
             {/* ── IMPORTANT RESOURCES ── */}
             <section id="resources" className="border-t border-white/5 py-24 px-6 lg:px-12 text-center relative z-10">
                 <div className="max-w-[1240px] mx-auto space-y-12">
-                    <div className="space-y-3">
+                    <div data-gsap="section-heading" className="space-y-3">
                         <p className="text-[11px] font-black text-[#6366f1] uppercase tracking-[0.2em]">{lang === "EN" ? "Portals" : "प्रमुख वेबसाइट्स"}</p>
                         <h2 className="text-3xl font-black text-white font-display tracking-tight">
                             {lang === "EN" ? "Important Government Gateways" : "महत्वपूर्ण सरकारी लिंक्स"}
@@ -730,11 +875,12 @@ export default function Landing() {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-5 max-w-5xl mx-auto text-left">
+                    <div data-gsap="resource-grid" className="grid grid-cols-2 md:grid-cols-5 gap-5 max-w-5xl mx-auto text-left">
                         <a
                             href="https://sso.rajasthan.gov.in/"
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-gsap="resource-card"
                             className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-all duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">State Quota</span>
@@ -746,6 +892,7 @@ export default function Landing() {
                             href="https://ssc.gov.in/"
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-gsap="resource-card"
                             className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-all duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Govt Jobs</span>
@@ -757,6 +904,7 @@ export default function Landing() {
                             href="https://neet.nta.nic.in/"
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-gsap="resource-card"
                             className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-all duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Medical Exams</span>
@@ -768,6 +916,7 @@ export default function Landing() {
                             href="https://www.rrcb.gov.in/"
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-gsap="resource-card"
                             className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-all duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Railways</span>
@@ -779,6 +928,7 @@ export default function Landing() {
                             href="https://www.ibps.in/"
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-gsap="resource-card"
                             className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-all duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Banking</span>
@@ -791,7 +941,7 @@ export default function Landing() {
 
             {/* ── FAQ SECTION ── */}
             <section id="faq" className="py-24 px-6 lg:px-12 max-w-[800px] mx-auto space-y-12 relative z-10">
-                <div className="text-center space-y-3">
+                <div data-gsap="section-heading" className="text-center space-y-3">
                     <p className="text-[11px] font-black text-[#6366f1] uppercase tracking-[0.2em]">{lang === "EN" ? "Help" : "सहायता"}</p>
                     <h2 className="text-3xl font-black text-white font-display tracking-tight">{lang === "EN" ? "Frequently Asked Questions" : "अक्सर पूछे जाने वाले सवाल"}</h2>
                     <p className="text-[13px] text-slate-400 font-normal">
@@ -801,9 +951,9 @@ export default function Landing() {
                     </p>
                 </div>
 
-                <div className="space-y-4">
+                <div data-gsap="faq-list" className="space-y-4">
                     {faqs.map((faq, idx) => (
-                        <div key={idx} className="border border-white/5 rounded-2xl bg-[#0a0a0f] overflow-hidden">
+                        <div key={idx} data-gsap="faq-item" className="border border-white/5 rounded-2xl bg-[#0a0a0f] overflow-hidden">
                             <button
                                 onClick={() => setExpandedFaq(expandedFaq === idx ? null : idx)}
                                 className="w-full p-5 flex items-center justify-between text-left font-bold text-[13px] text-white hover:bg-white/5 bg-transparent border-none cursor-pointer"
@@ -834,7 +984,7 @@ export default function Landing() {
 
             {/* ── FINAL CALL TO ACTION ── */}
             <section className="px-6 lg:px-12 pb-24 max-w-[1240px] mx-auto relative z-10">
-                <div className="bg-[#0a0a0f] border border-white/10 rounded-[32px] text-white p-12 text-center space-y-6 relative overflow-hidden">
+                <div data-gsap="cta-section" className="bg-[#0a0a0f] border border-white/10 rounded-[32px] text-white p-12 text-center space-y-6 relative overflow-hidden">
 
                     <h3 className="text-2xl lg:text-3xl font-black font-display tracking-tight">
                         {lang === "EN" ? "Ready to file forms from home?" : "क्या आप घर बैठे फॉर्म भरना चाहते हैं?"}
@@ -869,7 +1019,7 @@ export default function Landing() {
             <footer className="relative bg-[#030305] pt-24 pb-12 overflow-hidden z-10 border-t border-white/5 mt-20">
                 
                 <div className="max-w-[1240px] mx-auto px-6 lg:px-12 relative z-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16 text-left">
+                    <div data-gsap="footer-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16 text-left">
                         
                         {/* Brand Column */}
                         <div className="lg:col-span-4 space-y-6">
