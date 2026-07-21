@@ -229,9 +229,18 @@ export default function SoftAurora({
     }
 
     let animationFrameId;
+    let isVisible = true;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => { isVisible = entry.isIntersecting; },
+      { threshold: 0 }
+    );
+    observer.observe(container);
 
     function update(time) {
       animationFrameId = requestAnimationFrame(update);
+      if (!isVisible) return;
+
       program.uniforms.uTime.value = time * 0.001;
 
       if (enableMouseInteraction) {
@@ -250,6 +259,7 @@ export default function SoftAurora({
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      observer.disconnect();
       window.removeEventListener('resize', resize);
       if (enableMouseInteraction) {
         gl.canvas.removeEventListener('mousemove', handleMouseMove);

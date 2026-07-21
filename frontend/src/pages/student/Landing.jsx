@@ -601,7 +601,7 @@ export default function Landing() {
             <section id="notifications" className="py-24 px-6 lg:px-12 max-w-[1240px] mx-auto border-t border-white/5 relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
                     {/* Left Column - Info & Filters */}
-                    <div className="lg:col-span-5 space-y-10 lg:sticky lg:top-28">
+                    <div className="lg:col-span-5 space-y-10">
                         <div className="space-y-4">
                             <p className="text-[11px] font-black text-[#6366f1] uppercase tracking-[0.2em]">{lang === "EN" ? "Real-time updates" : "वास्तविक समय अपडेट"}</p>
                             <h2 className="text-3xl md:text-4xl font-black text-white font-display tracking-tight flex items-center gap-3">
@@ -664,7 +664,7 @@ export default function Landing() {
                     </div>
 
                     {/* Right Column - Announcements Feed Container */}
-                    <div className="lg:col-span-7 bg-[#0a0a0f] border border-white/10 rounded-[32px] p-2 pr-1 h-[600px] flex flex-col relative text-left shadow-2xl shadow-black/50">
+                    <div className="lg:col-span-7 bg-[#0a0a0f] border border-white/10 rounded-[32px] p-2 pr-1 min-h-[500px] max-h-[600px] flex flex-col relative text-left shadow-2xl shadow-black/50">
                         <div className="px-6 pt-6 pb-4 border-b border-white/5 flex justify-between items-center shrink-0">
                             <span className="text-[13px] font-black text-white uppercase tracking-wider">{lang === "EN" ? "Recent Circulars" : "हालिया घोषणाएं"}</span>
                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
@@ -735,7 +735,7 @@ export default function Landing() {
                             href="https://sso.rajasthan.gov.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group"
+                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-all duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">State Quota</span>
                             <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">Rajasthan SSO</span>
@@ -746,7 +746,7 @@ export default function Landing() {
                             href="https://ssc.gov.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group"
+                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-all duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Govt Jobs</span>
                             <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">SSC Portal</span>
@@ -757,7 +757,7 @@ export default function Landing() {
                             href="https://neet.nta.nic.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group"
+                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-all duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Medical Exams</span>
                             <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">NEET UG (NTA)</span>
@@ -768,7 +768,7 @@ export default function Landing() {
                             href="https://www.rrcb.gov.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group"
+                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-all duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Railways</span>
                             <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">RRB Recruitment</span>
@@ -779,7 +779,7 @@ export default function Landing() {
                             href="https://www.ibps.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group"
+                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:scale-[1.02] transition-all duration-300 will-change-transform flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Banking</span>
                             <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">IBPS Exams</span>
@@ -812,13 +812,14 @@ export default function Landing() {
                                 <ChevronDown size={14} className={`text-slate-500 transition-transform duration-300 ${expandedFaq === idx ? "rotate-180" : ""}`} />
                             </button>
 
-                            <AnimatePresence>
+                            <AnimatePresence initial={false}>
                                 {expandedFaq === idx && (
                                     <motion.div
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: "auto", opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}
-                                        className="border-t border-white/5"
+                                        transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+                                        className="border-t border-white/5 overflow-hidden"
                                     >
                                         <div className="p-5 text-[12.5px] text-slate-400 font-normal leading-relaxed bg-[#050508]">
                                             {faq.a}
