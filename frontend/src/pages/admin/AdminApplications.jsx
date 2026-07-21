@@ -77,21 +77,21 @@ function ApplicationDetailsModal({ appId, onClose, onStatusUpdated, toastMsgSett
   if (!app) return null
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#071e27]/40 backdrop-blur-md flex items-center justify-center px-4 overflow-y-auto">
-      <div className="w-full max-w-xl bg-[var(--color-surface-lowest)] shadow-ambient rounded-3xl overflow-hidden my-8">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="w-full max-w-xl bg-[var(--color-surface-lowest)] shadow-2xl rounded-3xl overflow-hidden flex flex-col h-[80vh] sm:h-[85vh] min-h-0">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 bg-[var(--color-surface-low)] border-b border-gray-100">
+        <div className="flex items-center justify-between px-6 py-5 bg-[var(--color-surface-low)] border-b border-gray-100 shrink-0">
           <div>
             <p className="text-[10px] text-[var(--color-primary)] font-bold tracking-widest uppercase">Form Application Details</p>
             <h2 className="text-[16px] font-bold text-[#0A1A40] mt-1 font-display">#EM-{app.id} — {app.exam_name}</h2>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-900 transition-colors p-1.5 bg-[var(--color-surface-base)] rounded-full">
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-900 transition-colors p-1.5 bg-[var(--color-surface-base)] rounded-full border-none cursor-pointer">
             <X size={16} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6 max-h-[65vh] overflow-y-auto">
+        <div className="p-6 space-y-6 flex-1 min-h-0 overflow-y-auto pr-4 sm:pr-6">
           {/* Student Profile */}
           <div className="space-y-3">
             <h4 className="text-[11.5px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-1.5">Student Profile</h4>
@@ -215,12 +215,12 @@ function ApplicationDetailsModal({ appId, onClose, onStatusUpdated, toastMsgSett
         </div>
 
         {/* Footer */}
-        <div className="px-6 pb-6 pt-2 flex gap-3">
-          <button onClick={onClose} className="flex-1 py-3 bg-[var(--color-surface-bright)] text-[13px] font-semibold text-gray-600 hover:bg-gray-100 transition-all rounded-xl border border-gray-200">Close</button>
+        <div className="px-6 pb-6 pt-3 flex gap-3 shrink-0 border-t border-gray-100 bg-gray-50/50">
+          <button onClick={onClose} className="flex-1 py-3 bg-[var(--color-surface-bright)] text-[13px] font-semibold text-gray-600 hover:bg-gray-100 transition-all rounded-xl border border-gray-200 cursor-pointer">Close</button>
           <button
             onClick={handleUpdate}
             disabled={updating}
-            className="flex-1 py-3 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] text-white text-[13px] font-bold hover:shadow-ambient transition-all rounded-xl disabled:opacity-50"
+            className="flex-1 py-3 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-container)] text-white text-[13px] font-bold hover:shadow-ambient transition-all rounded-xl disabled:opacity-50 cursor-pointer border-none"
           >
             {updating ? "Updating..." : "Save Status Changes"}
           </button>
