@@ -607,8 +607,7 @@ export default function Landing() {
                             <h2 className="text-3xl md:text-4xl font-black text-white font-display tracking-tight flex items-center gap-2 justify-center">
                                 {lang === "EN" ? "Live Notice Board" : "लाइव सूचना बोर्ड"}
                                 <span className="flex h-2 w-2 relative">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
                                 </span>
                             </h2>
                             <p className="text-[13.5px] text-slate-300 font-normal leading-relaxed mt-2">
@@ -728,7 +727,7 @@ export default function Landing() {
                             href="https://sso.rajasthan.gov.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-zinc-950/50 border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
+                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">State Quota</span>
                             <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">Rajasthan SSO</span>
@@ -739,7 +738,7 @@ export default function Landing() {
                             href="https://ssc.gov.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-zinc-950/50 border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
+                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Govt Jobs</span>
                             <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">SSC Portal</span>
@@ -750,7 +749,7 @@ export default function Landing() {
                             href="https://neet.nta.nic.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-zinc-950/50 border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
+                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Medical Exams</span>
                             <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">NEET UG (NTA)</span>
@@ -761,7 +760,7 @@ export default function Landing() {
                             href="https://www.rrcb.gov.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-zinc-950/50 border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
+                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Railways</span>
                             <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">RRB Recruitment</span>
@@ -772,7 +771,7 @@ export default function Landing() {
                             href="https://www.ibps.in/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-zinc-950/50 border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group shadow-lg"
+                            className="bg-[#0a0a0f] border border-white/5 p-5 rounded-2xl hover:border-blue-500/30 hover:-translate-y-1 transition-all flex flex-col justify-between h-[130px] group"
                         >
                             <span className="text-[9.5px] font-bold text-slate-500 uppercase font-mono">Banking</span>
                             <span className="font-bold text-[13.5px] text-white group-hover:text-blue-450">IBPS Exams</span>
@@ -796,7 +795,7 @@ export default function Landing() {
 
                 <div className="space-y-4">
                     {faqs.map((faq, idx) => (
-                        <div key={idx} className="border border-white/5 rounded-2xl bg-zinc-950/30 overflow-hidden transition-all duration-300">
+                        <div key={idx} className="border border-white/5 rounded-2xl bg-[#0a0a0f] overflow-hidden">
                             <button
                                 onClick={() => setExpandedFaq(expandedFaq === idx ? null : idx)}
                                 className="w-full p-5 flex items-center justify-between text-left font-bold text-[13px] text-white hover:bg-white/5 bg-transparent border-none cursor-pointer"
@@ -826,8 +825,7 @@ export default function Landing() {
 
             {/* ── FINAL CALL TO ACTION ── */}
             <section className="px-6 lg:px-12 pb-24 max-w-[1240px] mx-auto relative z-10">
-                <div className="bg-gradient-to-br from-zinc-900 via-indigo-950/40 to-zinc-950 border border-white/10 rounded-[32px] text-white p-12 text-center space-y-6 shadow-2xl relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.04),transparent)] pointer-events-none" />
+                <div className="bg-[#0a0a0f] border border-white/10 rounded-[32px] text-white p-12 text-center space-y-6 relative overflow-hidden">
 
                     <h3 className="text-2xl lg:text-3xl font-black font-display tracking-tight">
                         {lang === "EN" ? "Ready to file forms from home?" : "क्या आप घर बैठे फॉर्म भरना चाहते हैं?"}
@@ -860,8 +858,6 @@ export default function Landing() {
 
             {/* ── STUNNING PREMIUM FOOTER ── */}
             <footer className="relative bg-[#030305] pt-24 pb-12 overflow-hidden z-10 border-t border-white/5 mt-20">
-                {/* Background ambient glow */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[300px] bg-blue-600/10 blur-[120px] rounded-[100%] pointer-events-none" />
                 
                 <div className="max-w-[1240px] mx-auto px-6 lg:px-12 relative z-10">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16 text-left">
