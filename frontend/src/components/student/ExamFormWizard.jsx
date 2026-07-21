@@ -191,7 +191,7 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {},
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.98 }}
             transition={{ type: "spring", duration: 0.45 }}
-            className="relative w-full max-w-2xl bg-[#0b0f19]/95 border border-white/15 shadow-[0_24px_50px_rgba(0,0,0,0.3)] rounded-3xl overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[90vh] min-h-0 backdrop-blur-xl"
+            className="relative w-full max-w-2xl bg-[#0b0f19]/95 border border-white/15 shadow-[0_24px_50px_rgba(0,0,0,0.3)] rounded-3xl overflow-hidden flex flex-col h-[80vh] sm:h-[85vh] min-h-0 backdrop-blur-xl"
           >
             {/* Header */}
             <div className="px-6 py-5 border-b border-white/10 flex items-center justify-between bg-white/5">
@@ -240,7 +240,7 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {},
             )}
 
             {/* Content Scroll Area */}
-            <div className="flex-1 min-h-0 overflow-y-auto max-h-[40vh] sm:max-h-[48vh] p-6 pr-4 sm:p-8 sm:pr-6 scrollbar-thin">
+            <div className="flex-1 min-h-0 overflow-y-auto p-6 pr-4 sm:p-8 sm:pr-6 scrollbar-thin">
               {error && (
                 <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center gap-3 text-rose-400 text-[12.5px] font-medium">
                   <AlertCircle size={16} className="shrink-0" />
