@@ -14,7 +14,6 @@ import { useAuth } from "../../context/AuthContext"
 import * as api from "../../api"
 import Logo from "../../components/common/Logo"
 import SoftAurora from "../../components/common/SoftAurora"
-import BorderGlow from "../../components/common/BorderGlow"
 
 const formatTelegramMessage = (text) => {
     if (!text) return "";
@@ -60,6 +59,27 @@ export default function Landing() {
     const [serviceCatFilter, setServiceCatFilter] = useState("ALL")
     const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false)
     const [expandedFaq, setExpandedFaq] = useState(null)
+
+    const [showSearchDropdown, setShowSearchDropdown] = useState(false)
+    const [focusedSearchIndex, setFocusedSearchIndex] = useState(-1)
+
+    const autocompleteSuggestions = useMemo(() => {
+        if (!serviceSearch.trim()) return []
+        const suggestions = []
+        Object.entries(services).forEach(([catKey, cat]) => {
+            const isVisible = serviceCatFilter === "ALL" || serviceCatFilter === catKey
+            if (!isVisible) return
+            ;(cat.services || []).forEach(s => {
+                if (
+                    s.name.toLowerCase().includes(serviceSearch.toLowerCase()) ||
+                    (s.description && s.description.toLowerCase().includes(serviceSearch.toLowerCase()))
+                ) {
+                    suggestions.push(s)
+                }
+            })
+        })
+        return suggestions.slice(0, 8)
+    }, [services, serviceSearch, serviceCatFilter])
 
     const [showRequestModal, setShowRequestModal] = useState(false)
     const [requestModalSvc, setRequestModalSvc] = useState(null)
@@ -420,10 +440,58 @@ export default function Landing() {
                             <input
                                 type="text"
                                 value={serviceSearch}
-                                onChange={e => setServiceSearch(e.target.value)}
+                                onChange={e => {
+                                    setServiceSearch(e.target.value)
+                                    setShowSearchDropdown(true)
+                                    setFocusedSearchIndex(-1)
+                                }}
+                                onFocus={() => setShowSearchDropdown(true)}
+                                onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
+                                onKeyDown={(e) => {
+                                    if (!showSearchDropdown || autocompleteSuggestions.length === 0) return
+                                    if (e.key === "ArrowDown") {
+                                        e.preventDefault()
+                                        setFocusedSearchIndex(prev => (prev < autocompleteSuggestions.length - 1 ? prev + 1 : prev))
+                                    } else if (e.key === "ArrowUp") {
+                                        e.preventDefault()
+                                        setFocusedSearchIndex(prev => (prev > 0 ? prev - 1 : prev))
+                                    } else if (e.key === "Enter") {
+                                        e.preventDefault()
+                                        if (focusedSearchIndex >= 0 && focusedSearchIndex < autocompleteSuggestions.length) {
+                                            setServiceSearch(autocompleteSuggestions[focusedSearchIndex].name)
+                                            setShowSearchDropdown(false)
+                                        }
+                                    } else if (e.key === "Escape") {
+                                        setShowSearchDropdown(false)
+                                    }
+                                }}
                                 placeholder={lang === 'EN' ? 'Search services...' : 'सेवाएं खोजें...'}
                                 className="w-full bg-zinc-900/40 border border-white/5 text-[14px] text-slate-100 placeholder:text-slate-500 pl-12 pr-4 py-3.5 rounded-2xl focus:outline-none transition-all font-medium"
                             />
+
+                            <AnimatePresence>
+                                {showSearchDropdown && serviceSearch.trim() && autocompleteSuggestions.length > 0 && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="absolute top-full mt-2 left-0 right-0 bg-[#0a0a0f] border border-white/10 rounded-2xl p-2 shadow-2xl z-50 flex flex-col gap-1 max-h-64 overflow-y-auto"
+                                    >
+                                        {autocompleteSuggestions.map((s, idx) => (
+                                            <div
+                                                key={idx}
+                                                onMouseDown={() => {
+                                                    setServiceSearch(s.name)
+                                                    setShowSearchDropdown(false)
+                                                }}
+                                                className={`text-left px-3 py-2.5 rounded-xl text-[13px] font-bold transition-all cursor-pointer border-none flex items-center justify-between ${focusedSearchIndex === idx ? 'bg-white/10 text-white' : 'bg-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
+                                            >
+                                                <span className="truncate">{s.name}</span>
+                                            </div>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
 
                         <div className="w-full sm:w-64 shrink-0 relative">
@@ -499,18 +567,9 @@ export default function Landing() {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {matchingServices.map((svc, idx) => (
-                                            <BorderGlow
+                                            <div
                                                 key={idx}
-                                                edgeSensitivity={30}
-                                                glowColor="200 80 80"
-                                                backgroundColor="rgba(255, 255, 255, 0.03)"
-                                                borderRadius={22}
-                                                glowRadius={40}
-                                                glowIntensity={1.0}
-                                                coneSpread={25}
-                                                animated={true}
-                                                colors={['#38bdf8', '#818cf8', '#c084fc']}
-                                                className="h-full"
+                                                className="h-full bg-white/[0.03] border border-white/10 rounded-[22px] hover:border-indigo-500/30 hover:shadow-[0_0_30px_rgba(99,102,241,0.15)] transition-all duration-500"
                                             >
                                                 <div className="p-6 flex flex-col justify-between h-full group">
                                                     <div className="space-y-3">
@@ -528,7 +587,7 @@ export default function Landing() {
                                                         {lang === 'EN' ? 'Request via WhatsApp' : 'व्हाट्सएप से अनुरोध करें'}
                                                     </button>
                                                 </div>
-                                            </BorderGlow>
+                                            </div>
                                         ))}
                                     </div>
                                 </div>
