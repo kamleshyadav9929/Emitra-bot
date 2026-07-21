@@ -244,7 +244,7 @@ export default function Landing() {
 
 
             {/* ── HEADER ── */}
-            <header className="sticky top-0 z-40 bg-[#050508]/80 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between">
+            <header className="sticky top-0 z-40 bg-[#050508] border-b border-white/5 px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <Logo className="w-9 h-9 rounded-full border border-white/10" />
                     <div className="leading-none text-left">
@@ -376,7 +376,7 @@ export default function Landing() {
             {/* ── HERO SECTION ── */}
             <div className="relative py-24 lg:py-36 z-10 text-center overflow-hidden">
                 <div className="absolute inset-0 z-0 mix-blend-screen pointer-events-auto">
-                    <SoftAurora color1="#1A1F35" color2="#311B92" speed={0.4} brightness={1.2} enableMouseInteraction={true} />
+                    <SoftAurora color1="#1A1F35" color2="#311B92" speed={0.4} brightness={1.2} enableMouseInteraction={false} />
                 </div>
                 <section className="relative z-10 px-6 lg:px-12 max-w-[1000px] mx-auto space-y-12">
                     {/* Hero Header Content */}
@@ -663,7 +663,7 @@ export default function Landing() {
                     </div>
 
                     {/* Announcements Feed Container (Full width) */}
-                    <div className="bg-[#0a0a0f] border border-white/10 rounded-[28px] p-6 sm:p-8 max-w-5xl mx-auto h-[600px] flex flex-col relative text-left shadow-2xl">
+                    <div className="bg-[#0a0a0f] border border-white/10 rounded-[28px] p-6 sm:p-8 max-w-5xl mx-auto h-[600px] flex flex-col relative text-left">
                         <div className="border-b border-white/5 pb-4 mb-4 flex justify-between items-center shrink-0">
                             <span className="text-[13px] font-black text-white uppercase tracking-wider">{lang === "EN" ? "Recent Circulars" : "हालिया घोषणाएं"}</span>
                             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{lang === "EN" ? "Live Feed" : "लाइव समाचार"}</span>
@@ -812,7 +812,7 @@ export default function Landing() {
                                         exit={{ height: 0, opacity: 0 }}
                                         className="border-t border-white/5"
                                     >
-                                        <div className="p-5 text-[12.5px] text-slate-400 font-normal leading-relaxed bg-zinc-950/10">
+                                        <div className="p-5 text-[12.5px] text-slate-400 font-normal leading-relaxed bg-[#050508]">
                                             {faq.a}
                                         </div>
                                     </motion.div>
@@ -865,7 +865,7 @@ export default function Landing() {
                         {/* Brand Column */}
                         <div className="lg:col-span-4 space-y-6">
                             <div className="flex items-center gap-3">
-                                <div className="p-1 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 shadow-xl">
+                                <div className="p-1 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/10">
                                     <Logo className="w-10 h-10 rounded-lg" />
                                 </div>
                                 <span className="font-black text-white text-xl tracking-tight font-display leading-tight">Krishna Emitra<br/><span className="text-blue-500 text-[13px] uppercase tracking-wider">Digital Seva</span></span>
@@ -897,7 +897,7 @@ export default function Landing() {
                             <h4 className="font-black text-white text-[13px] uppercase tracking-[0.15em] opacity-90">{lang === "EN" ? "Operator Contact" : "ऑपरेटर संपर्क"}</h4>
                             <div className="space-y-4">
                                 <div className="flex items-center gap-4 group cursor-pointer">
-                                    <div className="w-10 h-10 shrink-0 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 group-hover:bg-emerald-500/20 transition-colors shadow-inner">
+                                    <div className="w-10 h-10 shrink-0 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 group-hover:bg-emerald-500/20 transition-colors">
                                         <Phone size={16} className="text-emerald-400" />
                                     </div>
                                     <div>
@@ -906,7 +906,7 @@ export default function Landing() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-4 group cursor-pointer">
-                                    <div className="w-10 h-10 shrink-0 rounded-full bg-amber-500/10 flex items-center justify-center border border-amber-500/20 group-hover:bg-amber-500/20 transition-colors shadow-inner">
+                                    <div className="w-10 h-10 shrink-0 rounded-full bg-amber-500/10 flex items-center justify-center border border-amber-500/20 group-hover:bg-amber-500/20 transition-colors">
                                         <Mail size={16} className="text-amber-400" />
                                     </div>
                                     <div>
