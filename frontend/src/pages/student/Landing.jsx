@@ -599,18 +599,19 @@ export default function Landing() {
 
             {/* ── LIVE NOTIFICATIONS FEED ── */}
             <section id="notifications" className="py-24 px-6 lg:px-12 max-w-[1240px] mx-auto border-t border-white/5 relative z-10">
-                <div className="space-y-12">
-                    {/* Notice Board Info - Centered */}
-                    <div className="text-center space-y-6 max-w-2xl mx-auto">
-                        <div className="space-y-2 flex flex-col items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
+                    {/* Left Column - Info & Filters */}
+                    <div className="lg:col-span-5 space-y-10 lg:sticky lg:top-28">
+                        <div className="space-y-4">
                             <p className="text-[11px] font-black text-[#6366f1] uppercase tracking-[0.2em]">{lang === "EN" ? "Real-time updates" : "वास्तविक समय अपडेट"}</p>
-                            <h2 className="text-3xl md:text-4xl font-black text-white font-display tracking-tight flex items-center gap-2 justify-center">
+                            <h2 className="text-3xl md:text-4xl font-black text-white font-display tracking-tight flex items-center gap-3">
                                 {lang === "EN" ? "Live Notice Board" : "लाइव सूचना बोर्ड"}
                                 <span className="flex h-2 w-2 relative">
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                                 </span>
                             </h2>
-                            <p className="text-[13.5px] text-slate-300 font-normal leading-relaxed mt-2">
+                            <p className="text-[14px] text-slate-400 font-normal leading-relaxed mt-2 max-w-md">
                                 {lang === "EN" 
                                     ? "Official exam circulars, admit card releases, result sheets, and counselling downloads."
                                     : "आधिकारिक परीक्षा अधिसूचनाएं, एडमिट कार्ड, परीक्षा परिणाम व काउंसलिंग की खबरें।"}
@@ -618,42 +619,42 @@ export default function Landing() {
                         </div>
 
                         {/* Search & Filters */}
-                        <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
-                            <div className="relative w-full sm:w-72">
+                        <div className="space-y-6">
+                            <div className="relative w-full max-w-md text-left">
                                 <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                                 <input
                                     type="text"
                                     placeholder={lang === "EN" ? "Search announcements..." : "सूचना खोजें..."}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-zinc-900/35 border border-white/5 pl-11 pr-4 py-3 rounded-2xl text-[13px] outline-none focus:border-blue-500/50 transition-all font-medium text-white placeholder:text-slate-500"
+                                    className="w-full bg-zinc-900/50 border border-white/10 pl-11 pr-4 py-3.5 rounded-2xl text-[13px] outline-none focus:border-blue-500/50 focus:bg-zinc-900 transition-all font-medium text-white placeholder:text-slate-500 shadow-sm"
                                 />
                             </div>
 
-                            <div className="flex flex-wrap gap-2 justify-center">
+                            <div className="flex flex-wrap gap-2.5">
                                 <button
                                     onClick={() => setFilterCategory("ALL")}
-                                    className={`px-4 py-3 text-[12px] font-bold rounded-xl border transition-all ${filterCategory === "ALL"
-                                        ? "bg-white text-slate-950 border-white"
-                                        : "bg-white/5 text-slate-400 border-white/5 hover:bg-white/10"
+                                    className={`px-5 py-2.5 text-[12px] font-bold rounded-xl border transition-all cursor-pointer ${filterCategory === "ALL"
+                                        ? "bg-white text-slate-950 border-white shadow-md shadow-white/10"
+                                        : "bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:text-slate-300"
                                         }`}
                                 >
-                                    {lang === "EN" ? "All" : "सभी"} ({announcements.length})
+                                    {lang === "EN" ? "All" : "सभी"} <span className="opacity-60 ml-1">({announcements.length})</span>
                                 </button>
                                 <button
                                     onClick={() => setFilterCategory("exams")}
-                                    className={`px-4 py-3 text-[12px] font-bold rounded-xl border transition-all ${filterCategory === "exams"
-                                        ? "bg-white text-slate-950 border-white"
-                                        : "bg-white/5 text-slate-400 border-white/5 hover:bg-white/10"
+                                    className={`px-5 py-2.5 text-[12px] font-bold rounded-xl border transition-all cursor-pointer ${filterCategory === "exams"
+                                        ? "bg-white text-slate-950 border-white shadow-md shadow-white/10"
+                                        : "bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:text-slate-300"
                                         }`}
                                 >
                                     {lang === "EN" ? "Exam Circulars" : "परीक्षा विज्ञापन"}
                                 </button>
                                 <button
                                     onClick={() => setFilterCategory("general")}
-                                    className={`px-4 py-3 text-[12px] font-bold rounded-xl border transition-all ${filterCategory === "general"
-                                        ? "bg-white text-slate-950 border-white"
-                                        : "bg-white/5 text-slate-400 border-white/5 hover:bg-white/10"
+                                    className={`px-5 py-2.5 text-[12px] font-bold rounded-xl border transition-all cursor-pointer ${filterCategory === "general"
+                                        ? "bg-white text-slate-950 border-white shadow-md shadow-white/10"
+                                        : "bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:text-slate-300"
                                         }`}
                                 >
                                     {lang === "EN" ? "General Alerts" : "सामान्य खबरें"}
@@ -662,36 +663,43 @@ export default function Landing() {
                         </div>
                     </div>
 
-                    {/* Announcements Feed Container (Full width) */}
-                    <div className="bg-[#0a0a0f] border border-white/10 rounded-[28px] p-6 sm:p-8 max-w-5xl mx-auto h-[600px] flex flex-col relative text-left">
-                        <div className="border-b border-white/5 pb-4 mb-4 flex justify-between items-center shrink-0">
+                    {/* Right Column - Announcements Feed Container */}
+                    <div className="lg:col-span-7 bg-[#0a0a0f] border border-white/10 rounded-[32px] p-2 pr-1 h-[600px] flex flex-col relative text-left shadow-2xl shadow-black/50">
+                        <div className="px-6 pt-6 pb-4 border-b border-white/5 flex justify-between items-center shrink-0">
                             <span className="text-[13px] font-black text-white uppercase tracking-wider">{lang === "EN" ? "Recent Circulars" : "हालिया घोषणाएं"}</span>
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{lang === "EN" ? "Live Feed" : "लाइव समाचार"}</span>
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                                <Clock size={12} /> {lang === "EN" ? "Live Feed" : "लाइव समाचार"}
+                            </span>
                         </div>
 
                         {loading ? (
-                            <AnnouncementSkeleton count={3} />
+                            <div className="px-6 py-4">
+                                <AnnouncementSkeleton count={3} />
+                            </div>
                         ) : filteredAnnouncements.length === 0 ? (
                             <div className="text-center py-20 text-slate-500 flex-1 flex flex-col items-center justify-center">
-                                <Bell className="mx-auto text-slate-600 mb-3" size={28} />
-                                <p className="text-[13px] font-bold">{lang === "EN" ? "No matches found" : "कोई सूचना नहीं मिली"}</p>
+                                <Bell className="mx-auto text-slate-600 mb-3 opacity-50" size={32} />
+                                <p className="text-[14px] font-bold">{lang === "EN" ? "No updates found" : "कोई सूचना नहीं मिली"}</p>
+                                <p className="text-[12px] mt-1">{lang === "EN" ? "Try adjusting your filters" : "फ़िल्टर बदल कर प्रयास करें"}</p>
                             </div>
                         ) : (
-                            <div className="flex-1 overflow-y-auto scrollbar-thin pr-2 space-y-6 scroll-smooth pb-4">
+                            <div className="flex-1 overflow-y-auto scrollbar-thin px-4 py-4 space-y-3 scroll-smooth">
                                 {filteredAnnouncements.map((ann, idx) => (
-                                    <div key={idx} className="flex items-start gap-4 group text-left transition-colors hover:bg-white/[0.02] p-3 -mx-3 rounded-xl cursor-pointer">
-                                        <div className="text-[#ef4444] mt-0.5 flex-shrink-0 text-[18px]">
-                                            📌
+                                    <div key={ann.id || idx} className="flex items-start gap-3.5 group text-left transition-all duration-300 hover:bg-white/[0.03] p-4 rounded-2xl border border-transparent hover:border-white/5 cursor-pointer">
+                                        <div className="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center">
+                                            <Bell size={14} className="group-hover:scale-110 transition-transform duration-300" />
                                         </div>
-                                        <div className="text-[14.5px] font-bold text-slate-200 leading-relaxed font-sans w-full announcement-content tracking-tight break-words whitespace-pre-wrap overflow-hidden">
-                                            {formatTelegramMessage(ann.content)}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="text-[13.5px] font-medium text-slate-200 leading-relaxed font-sans announcement-content break-words whitespace-pre-wrap">
+                                                {formatTelegramMessage(ann.content)}
+                                            </div>
                                             {ann.links && (
-                                                <div className="mt-2">
+                                                <div className="mt-3">
                                                     <a
                                                         href={ann.links}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="text-blue-400 hover:text-blue-300 hover:underline inline-flex items-center gap-1 font-semibold text-[13px]"
+                                                        className="inline-flex items-center gap-1.5 text-[11.5px] font-bold text-blue-400 hover:text-white bg-blue-500/10 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg transition-colors border border-blue-500/20"
                                                         onClick={(e) => e.stopPropagation()}
                                                     >
                                                         {lang === "EN" ? "View Document" : "दस्तावेज़ देखें"} <ExternalLink size={12} />
