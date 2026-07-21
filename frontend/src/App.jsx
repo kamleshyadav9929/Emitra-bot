@@ -35,7 +35,7 @@ function StudentDashboardRoute() {
 }
 
 // ── Loading Spinner ───────────────────────────────────────────────────────────
-import { Loader2 } from "lucide-react"
+import Logo from "./components/common/Logo"
 function ClerkLoadingSpinner() {
     const [showWake, setShowWake] = useState(false)
     
@@ -45,14 +45,49 @@ function ClerkLoadingSpinner() {
     }, [])
 
     return (
-        <div className="min-h-screen flex flex-col gap-4 items-center justify-center bg-transparent">
-            <Loader2 className="w-8 h-8 animate-spin text-[#164FA8]" />
-            {showWake && (
-                <div className="text-center animate-fadeIn">
-                    <p className="text-[13px] text-gray-600 font-bold tracking-wide uppercase">Waking up server...</p>
-                    <p className="text-[11px] text-gray-400 mt-1 max-w-xs">Free tier servers spin down when inactive. This may take up to 60 seconds.</p>
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#050508] relative overflow-hidden text-slate-200">
+            {/* Ambient Background Glows */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] rounded-full bg-blue-500/10 blur-[80px] pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full bg-indigo-500/5 blur-[50px] pointer-events-none" />
+
+            <div className="flex flex-col items-center gap-6 relative z-10 text-center px-4">
+                {/* Pulsing Brand Logo Ring */}
+                <div className="relative">
+                    <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 opacity-40 blur-md animate-pulse" />
+                    <div className="relative p-1 bg-[#0a0f1d] border border-white/10 rounded-full shadow-2xl">
+                        <Logo className="w-16 h-16 rounded-full" />
+                    </div>
                 </div>
-            )}
+
+                {/* Brand Identity */}
+                <div className="space-y-1 mt-2">
+                    <h2 className="text-lg font-black tracking-tight text-white font-display">Krishna Emitra</h2>
+                    <p className="text-[10px] text-blue-400 font-bold uppercase tracking-[0.2em]">Digital Administration</p>
+                </div>
+
+                {/* Staggered Dot Loading Indicator */}
+                <div className="flex items-center gap-1.5 mt-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+
+                {/* Server spin up fallback */}
+                {showWake && (
+                    <div className="mt-4 max-w-xs space-y-2 animate-fadeIn transition-all duration-750">
+                        <div className="flex items-center justify-center gap-2">
+                            <span className="flex h-2 w-2 relative">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                            </span>
+                            <p className="text-[12px] text-amber-400 font-extrabold tracking-wider uppercase">Waking up server...</p>
+                        </div>
+                        <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
+                            Free-tier database server is spinning up. This can take up to 30 seconds.
+                        </p>
+                    </div>
+                )}
+            </div>
         </div>
     )
 }
