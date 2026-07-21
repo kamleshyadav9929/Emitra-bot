@@ -145,12 +145,24 @@ export default function Landing() {
     useGSAP(() => {
         if (!pageRef.current) return
 
+        // Screen-size responsive values to prevent layout clipping and excessive scrolling on mobile/tablet
+        const isMobile = window.innerWidth < 768
+        const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
+        
+        const titleY = isMobile ? 30 : isTablet ? 50 : 85
+        const subY = isMobile ? 20 : isTablet ? 30 : 45
+        const btnY = isMobile ? 15 : isTablet ? 20 : 30
+        const headingY = isMobile ? 25 : isTablet ? 40 : 60
+        const cardY = isMobile ? 20 : isTablet ? 35 : 50
+        const leftX = isMobile ? -25 : -60
+        const rightX = isMobile ? 25 : 80
+
         // Hero title — cinematic slide up
         const heroTitle = pageRef.current.querySelector('[data-gsap="hero-title"]')
         if (heroTitle) {
             gsap.fromTo(heroTitle, 
-                { y: 80, opacity: 0 },
-                { y: 0, opacity: 1, duration: 1.2, ease: "power4.out", delay: 0.2 }
+                { y: titleY, opacity: 0 },
+                { y: 0, opacity: 1, duration: 1.4, ease: "expo.out", delay: 0.1 }
             )
         }
 
@@ -158,26 +170,26 @@ export default function Landing() {
         const heroSub = pageRef.current.querySelector('[data-gsap="hero-sub"]')
         if (heroSub) {
             gsap.fromTo(heroSub,
-                { y: 40, opacity: 0 },
-                { y: 0, opacity: 1, duration: 1, ease: "power3.out", delay: 0.6 }
+                { y: subY, opacity: 0 },
+                { y: 0, opacity: 1, duration: 1.2, ease: "power3.out", delay: 0.35 }
             )
         }
 
-        // Hero CTA buttons — stagger with bounce
+        // Hero CTA buttons — stagger with smooth power3 easing
         const heroBtns = pageRef.current.querySelectorAll('[data-gsap="hero-btn"]')
         if (heroBtns.length) {
             gsap.fromTo(heroBtns,
-                { y: 30, opacity: 0, scale: 0.95 },
-                { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.7)", stagger: 0.15, delay: 0.9 }
+                { y: btnY, opacity: 0, scale: 0.97 },
+                { y: 0, opacity: 1, scale: 1, duration: 0.9, ease: "power3.out", stagger: 0.12, delay: 0.55 }
             )
         }
 
         // Section headings — slide up on scroll
         pageRef.current.querySelectorAll('[data-gsap="section-heading"]').forEach(el => {
             gsap.fromTo(el,
-                { y: 60, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.9, ease: "power3.out",
-                  scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none none" } }
+                { y: headingY, opacity: 0 },
+                { y: 0, opacity: 1, duration: 1.0, ease: "power3.out",
+                  scrollTrigger: { trigger: el, start: "top 90%", toggleActions: "play none none none" } }
             )
         })
 
@@ -186,9 +198,9 @@ export default function Landing() {
             const cards = grid.querySelectorAll('[data-gsap="service-card"]')
             if (cards.length) {
                 gsap.fromTo(cards,
-                    { y: 50, opacity: 0, scale: 0.96 },
-                    { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "power3.out", stagger: 0.1,
-                      scrollTrigger: { trigger: grid, start: "top 85%", toggleActions: "play none none none" } }
+                    { y: cardY, opacity: 0, scale: 0.97 },
+                    { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: "power3.out", stagger: 0.08,
+                      scrollTrigger: { trigger: grid, start: "top 88%", toggleActions: "play none none none" } }
                 )
             }
         })
@@ -196,9 +208,9 @@ export default function Landing() {
         // Search bars — slide in from left
         pageRef.current.querySelectorAll('[data-gsap="search-bar"]').forEach(bar => {
             gsap.fromTo(bar,
-                { x: -60, opacity: 0 },
+                { x: leftX, opacity: 0 },
                 { x: 0, opacity: 1, duration: 0.8, ease: "power3.out",
-                  scrollTrigger: { trigger: bar, start: "top 90%", toggleActions: "play none none none" } }
+                  scrollTrigger: { trigger: bar, start: "top 92%", toggleActions: "play none none none" } }
             )
         })
 
@@ -206,9 +218,9 @@ export default function Landing() {
         const notifLeft = pageRef.current.querySelector('[data-gsap="notif-left"]')
         if (notifLeft) {
             gsap.fromTo(notifLeft,
-                { x: -60, opacity: 0 },
-                { x: 0, opacity: 1, duration: 1, ease: "power3.out",
-                  scrollTrigger: { trigger: notifLeft, start: "top 85%", toggleActions: "play none none none" } }
+                { x: leftX, opacity: 0 },
+                { x: 0, opacity: 1, duration: 1.1, ease: "power3.out",
+                  scrollTrigger: { trigger: notifLeft, start: "top 88%", toggleActions: "play none none none" } }
             )
         }
 
@@ -216,9 +228,9 @@ export default function Landing() {
         const notifPanel = pageRef.current.querySelector('[data-gsap="notif-panel"]')
         if (notifPanel) {
             gsap.fromTo(notifPanel,
-                { x: 80, opacity: 0 },
-                { x: 0, opacity: 1, duration: 1, ease: "power3.out",
-                  scrollTrigger: { trigger: notifPanel, start: "top 85%", toggleActions: "play none none none" } }
+                { x: rightX, opacity: 0 },
+                { x: 0, opacity: 1, duration: 1.1, ease: "power3.out",
+                  scrollTrigger: { trigger: notifPanel, start: "top 88%", toggleActions: "play none none none" } }
             )
         }
 
@@ -228,9 +240,9 @@ export default function Landing() {
             const rCards = resourceGrid.querySelectorAll('[data-gsap="resource-card"]')
             if (rCards.length) {
                 gsap.fromTo(rCards,
-                    { y: 40, opacity: 0, scale: 0.9 },
-                    { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.4)", stagger: 0.08,
-                      scrollTrigger: { trigger: resourceGrid, start: "top 85%", toggleActions: "play none none none" } }
+                    { y: cardY, opacity: 0, scale: 0.92 },
+                    { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "power3.out", stagger: 0.06,
+                      scrollTrigger: { trigger: resourceGrid, start: "top 88%", toggleActions: "play none none none" } }
                 )
             }
         }
@@ -241,9 +253,9 @@ export default function Landing() {
             const faqItems = faqList.querySelectorAll('[data-gsap="faq-item"]')
             if (faqItems.length) {
                 gsap.fromTo(faqItems,
-                    { y: 30, opacity: 0 },
-                    { y: 0, opacity: 1, duration: 0.5, ease: "power2.out", stagger: 0.1,
-                      scrollTrigger: { trigger: faqList, start: "top 85%", toggleActions: "play none none none" } }
+                    { y: isMobile ? 15 : 25, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 0.6, ease: "power2.out", stagger: 0.08,
+                      scrollTrigger: { trigger: faqList, start: "top 88%", toggleActions: "play none none none" } }
                 )
             }
         }
@@ -252,9 +264,9 @@ export default function Landing() {
         const ctaSection = pageRef.current.querySelector('[data-gsap="cta-section"]')
         if (ctaSection) {
             gsap.fromTo(ctaSection,
-                { y: 60, opacity: 0, scale: 0.95 },
-                { y: 0, opacity: 1, scale: 1, duration: 1, ease: "power3.out",
-                  scrollTrigger: { trigger: ctaSection, start: "top 88%", toggleActions: "play none none none" } }
+                { y: headingY, opacity: 0, scale: 0.97 },
+                { y: 0, opacity: 1, scale: 1, duration: 1.1, ease: "power3.out",
+                  scrollTrigger: { trigger: ctaSection, start: "top 90%", toggleActions: "play none none none" } }
             )
         }
 
@@ -262,18 +274,18 @@ export default function Landing() {
         const footerGrid = pageRef.current.querySelector('[data-gsap="footer-grid"]')
         if (footerGrid) {
             gsap.fromTo(footerGrid.children,
-                { y: 40, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.7, ease: "power2.out", stagger: 0.12,
-                  scrollTrigger: { trigger: footerGrid, start: "top 90%", toggleActions: "play none none none" } }
+                { y: isMobile ? 20 : 35, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.8, ease: "power2.out", stagger: 0.1,
+                  scrollTrigger: { trigger: footerGrid, start: "top 92%", toggleActions: "play none none none" } }
             )
         }
 
         // Filter buttons — stagger pop
         pageRef.current.querySelectorAll('[data-gsap="filter-group"]').forEach(group => {
             gsap.fromTo(group.children,
-                { scale: 0.8, opacity: 0 },
-                { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)", stagger: 0.07,
-                  scrollTrigger: { trigger: group, start: "top 90%", toggleActions: "play none none none" } }
+                { scale: 0.85, opacity: 0 },
+                { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out", stagger: 0.05,
+                  scrollTrigger: { trigger: group, start: "top 92%", toggleActions: "play none none none" } }
             )
         })
     }, { dependencies: [loading], scope: pageRef })
