@@ -664,7 +664,7 @@ export default function Landing() {
                     </div>
 
                     {/* Announcements Feed Container (Full width) */}
-                    <div className="bg-zinc-950/50 backdrop-blur-md border border-white/10 rounded-[28px] p-6 sm:p-8 max-w-5xl mx-auto h-[600px] flex flex-col relative text-left shadow-2xl">
+                    <div className="bg-[#0a0a0f] border border-white/10 rounded-[28px] p-6 sm:p-8 max-w-5xl mx-auto h-[600px] flex flex-col relative text-left shadow-2xl">
                         <div className="border-b border-white/5 pb-4 mb-4 flex justify-between items-center shrink-0">
                             <span className="text-[13px] font-black text-white uppercase tracking-wider">{lang === "EN" ? "Recent Circulars" : "हालिया घोषणाएं"}</span>
                             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{lang === "EN" ? "Live Feed" : "लाइव समाचार"}</span>
