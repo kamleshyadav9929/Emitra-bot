@@ -240,7 +240,7 @@ export default function ExamFormWizard({ isOpen, onClose, examName, config = {},
             )}
 
             {/* Content Scroll Area */}
-            <div className="flex-1 min-h-0 overflow-y-auto max-h-[55vh] sm:max-h-[60vh] p-6 sm:p-8">
+            <div className="flex-1 min-h-0 overflow-y-auto max-h-[55vh] sm:max-h-[60vh] p-6 pr-4 sm:p-8 sm:pr-6 scrollbar-thin">
               {error && (
                 <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center gap-3 text-rose-400 text-[12.5px] font-medium">
                   <AlertCircle size={16} className="shrink-0" />
