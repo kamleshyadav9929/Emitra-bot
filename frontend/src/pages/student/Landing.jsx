@@ -599,114 +599,109 @@ export default function Landing() {
 
             {/* ── LIVE NOTIFICATIONS FEED ── */}
             <section id="notifications" className="py-24 px-6 lg:px-12 max-w-[1240px] mx-auto border-t border-white/5 relative z-10">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                    {/* Notice Board Info */}
-                    <div className="lg:col-span-4 space-y-6 text-left">
-                        <div className="space-y-2">
+                <div className="space-y-12">
+                    {/* Notice Board Info - Centered */}
+                    <div className="text-center space-y-6 max-w-2xl mx-auto">
+                        <div className="space-y-2 flex flex-col items-center">
                             <p className="text-[11px] font-black text-[#6366f1] uppercase tracking-[0.2em]">{lang === "EN" ? "Real-time updates" : "वास्तविक समय अपडेट"}</p>
-                            <h2 className="text-3xl font-black text-white font-display tracking-tight flex items-center gap-2">
+                            <h2 className="text-3xl md:text-4xl font-black text-white font-display tracking-tight flex items-center gap-2 justify-center">
                                 {lang === "EN" ? "Live Notice Board" : "लाइव सूचना बोर्ड"}
                                 <span className="flex h-2 w-2 relative">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                                 </span>
                             </h2>
-                            <p className="text-[13px] text-slate-400 font-normal leading-relaxed">
+                            <p className="text-[13.5px] text-slate-300 font-normal leading-relaxed mt-2">
                                 {lang === "EN" 
                                     ? "Official exam circulars, admit card releases, result sheets, and counselling downloads."
                                     : "आधिकारिक परीक्षा अधिसूचनाएं, एडमिट कार्ड, परीक्षा परिणाम व काउंसलिंग की खबरें।"}
                             </p>
                         </div>
 
-                        {/* Search */}
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder={lang === "EN" ? "Search announcements..." : "सूचना खोजें..."}
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full bg-zinc-900/35 border border-white/5 px-4 py-3 rounded-xl text-[13px] outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-white placeholder:text-slate-500"
-                            />
-                        </div>
+                        {/* Search & Filters */}
+                        <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+                            <div className="relative w-full sm:w-72">
+                                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                                <input
+                                    type="text"
+                                    placeholder={lang === "EN" ? "Search announcements..." : "सूचना खोजें..."}
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full bg-zinc-900/35 border border-white/5 pl-11 pr-4 py-3 rounded-2xl text-[13px] outline-none focus:border-blue-500/50 transition-all font-medium text-white placeholder:text-slate-500"
+                                />
+                            </div>
 
-                        {/* Filter Categories */}
-                        <div className="flex flex-wrap gap-2">
-                            <button
-                                onClick={() => setFilterCategory("ALL")}
-                                className={`px-4 py-2 text-[11px] font-bold rounded-lg border transition-all ${filterCategory === "ALL"
-                                    ? "bg-white text-slate-950 border-white"
-                                    : "bg-white/5 text-slate-450 border-white/5 hover:bg-white/10"
-                                    }`}
-                            >
-                                {lang === "EN" ? "All" : "सभी"} ({announcements.length})
-                            </button>
-                            <button
-                                onClick={() => setFilterCategory("exams")}
-                                className={`px-4 py-2 text-[11px] font-bold rounded-lg border transition-all ${filterCategory === "exams"
-                                    ? "bg-white text-slate-950 border-white"
-                                    : "bg-white/5 text-slate-450 border-white/5 hover:bg-white/10"
-                                    }`}
-                            >
-                                {lang === "EN" ? "Exam Circulars" : "परीक्षा विज्ञापन"}
-                            </button>
-                            <button
-                                onClick={() => setFilterCategory("general")}
-                                className={`px-4 py-2 text-[11px] font-bold rounded-lg border transition-all ${filterCategory === "general"
-                                    ? "bg-white text-slate-950 border-white"
-                                    : "bg-white/5 text-slate-450 border-white/5 hover:bg-white/10"
-                                    }`}
-                            >
-                                {lang === "EN" ? "General Alerts" : "सामान्य खबरें"}
-                            </button>
+                            <div className="flex flex-wrap gap-2 justify-center">
+                                <button
+                                    onClick={() => setFilterCategory("ALL")}
+                                    className={`px-4 py-3 text-[12px] font-bold rounded-xl border transition-all ${filterCategory === "ALL"
+                                        ? "bg-white text-slate-950 border-white"
+                                        : "bg-white/5 text-slate-400 border-white/5 hover:bg-white/10"
+                                        }`}
+                                >
+                                    {lang === "EN" ? "All" : "सभी"} ({announcements.length})
+                                </button>
+                                <button
+                                    onClick={() => setFilterCategory("exams")}
+                                    className={`px-4 py-3 text-[12px] font-bold rounded-xl border transition-all ${filterCategory === "exams"
+                                        ? "bg-white text-slate-950 border-white"
+                                        : "bg-white/5 text-slate-400 border-white/5 hover:bg-white/10"
+                                        }`}
+                                >
+                                    {lang === "EN" ? "Exam Circulars" : "परीक्षा विज्ञापन"}
+                                </button>
+                                <button
+                                    onClick={() => setFilterCategory("general")}
+                                    className={`px-4 py-3 text-[12px] font-bold rounded-xl border transition-all ${filterCategory === "general"
+                                        ? "bg-white text-slate-950 border-white"
+                                        : "bg-white/5 text-slate-400 border-white/5 hover:bg-white/10"
+                                        }`}
+                                >
+                                    {lang === "EN" ? "General Alerts" : "सामान्य खबरें"}
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Announcements Feed Container */}
-                    <div className="lg:col-span-6 lg:col-start-7 bg-zinc-950/50 backdrop-blur-md border border-white/10 rounded-[28px] p-6 max-h-[500px] overflow-hidden flex flex-col relative text-left shadow-2xl">
-                        <div className="border-b border-white/5 pb-3 flex justify-between items-center">
-                            <span className="text-[12px] font-black text-white uppercase tracking-wider">{lang === "EN" ? "Recent Circulars" : "हालिया घोषणाएं"}</span>
-                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{lang === "EN" ? "Live Feed" : "लाइव समाचार"}</span>
+                    {/* Announcements Feed Container (Full width) */}
+                    <div className="bg-zinc-950/50 backdrop-blur-md border border-white/10 rounded-[28px] p-6 sm:p-8 max-w-5xl mx-auto h-[600px] flex flex-col relative text-left shadow-2xl">
+                        <div className="border-b border-white/5 pb-4 mb-4 flex justify-between items-center shrink-0">
+                            <span className="text-[13px] font-black text-white uppercase tracking-wider">{lang === "EN" ? "Recent Circulars" : "हालिया घोषणाएं"}</span>
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{lang === "EN" ? "Live Feed" : "लाइव समाचार"}</span>
                         </div>
 
                         {loading ? (
                             <AnnouncementSkeleton count={3} />
                         ) : filteredAnnouncements.length === 0 ? (
-                            <div className="text-center py-20 text-slate-500">
-                                <Bell className="mx-auto text-slate-655 mb-2" size={24} />
-                                <p className="text-[12px] font-bold">{lang === "EN" ? "No matches found" : "कोई सूचना नहीं मिली"}</p>
+                            <div className="text-center py-20 text-slate-500 flex-1 flex flex-col items-center justify-center">
+                                <Bell className="mx-auto text-slate-600 mb-3" size={28} />
+                                <p className="text-[13px] font-bold">{lang === "EN" ? "No matches found" : "कोई सूचना नहीं मिली"}</p>
                             </div>
                         ) : (
-                            <div className="flex-1 overflow-hidden relative mt-4">
-                                <div className={`absolute inset-0 ${filteredAnnouncements.length > 3 ? 'marquee-up-track' : 'flex flex-col gap-4'}`}>
-                                    {(filteredAnnouncements.length > 3 ? [...filteredAnnouncements, ...filteredAnnouncements] : filteredAnnouncements).map((ann, idx) => (
-                                        <div key={idx} className="border border-white/5 rounded-xl p-5 bg-zinc-950/30 hover:bg-zinc-950/60 hover:border-white/10 transition-colors space-y-3 mb-4 shrink-0 shadow-sm">
-                                            <div className="flex items-center justify-between text-[9.5px] text-slate-500 font-bold border-b border-white/5 pb-1.5 uppercase tracking-wider font-mono">
-                                                <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded">Govt Alert</span>
-                                                <span>{new Date(ann.created_at || Date.now()).toLocaleString("en-IN", {
-                                                    day: "numeric",
-                                                    month: "short",
-                                                    hour: "2-digit",
-                                                    minute: "2-digit"
-                                                })}</span>
-                                            </div>
-                                            {ann.title && <h4 className="text-[13.5px] font-bold text-white leading-snug">{ann.title}</h4>}
-                                            <div className="text-[12px] text-slate-350 font-normal leading-relaxed whitespace-pre-wrap break-words font-sans">
-                                                {formatTelegramMessage(ann.content)}
-                                            </div>
-
+                            <div className="flex-1 overflow-y-auto scrollbar-thin pr-2 space-y-6 scroll-smooth pb-4">
+                                {filteredAnnouncements.map((ann, idx) => (
+                                    <div key={idx} className="flex items-start gap-4 group text-left transition-colors hover:bg-white/[0.02] p-3 -mx-3 rounded-xl cursor-pointer">
+                                        <div className="text-[#ef4444] mt-0.5 flex-shrink-0 text-[18px]">
+                                            📌
+                                        </div>
+                                        <div className="text-[14.5px] font-bold text-slate-200 leading-relaxed font-sans w-full announcement-content tracking-tight break-words whitespace-pre-wrap overflow-hidden">
+                                            {formatTelegramMessage(ann.content)}
                                             {ann.links && (
-                                                <a
-                                                    href={ann.links}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-blue-400 hover:text-blue-300 text-[11.5px] font-bold inline-flex items-center gap-1 mt-1"
-                                                >
-                                                    {lang === "EN" ? "Download Official Circular" : "आधिकारिक अधिसूचना डाउनलोड करें"} <ExternalLink size={12} />
-                                                </a>
+                                                <div className="mt-2">
+                                                    <a
+                                                        href={ann.links}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-400 hover:text-blue-300 hover:underline inline-flex items-center gap-1 font-semibold text-[13px]"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        {lang === "EN" ? "View Document" : "दस्तावेज़ देखें"} <ExternalLink size={12} />
+                                                    </a>
+                                                </div>
                                             )}
                                         </div>
-                                    ))}
-                                </div>
+                                    </div>
+                                ))}
                             </div>
                         )}
                     </div>
