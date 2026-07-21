@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useMemo, useRef } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { useNavigate } from "react-router-dom"
 import { ServiceCardSkeleton, AnnouncementSkeleton } from "../../components/common/Skeleton"
@@ -16,6 +16,7 @@ import Logo from "../../components/common/Logo"
 import SoftAurora from "../../components/common/SoftAurora"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { useGSAP } from "@gsap/react"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -141,140 +142,141 @@ export default function Landing() {
     // ─── GSAP SCROLL ANIMATIONS ───
     const pageRef = useRef(null)
 
-    useLayoutEffect(() => {
+    useGSAP(() => {
         if (!pageRef.current) return
-        const ctx = gsap.context(() => {
 
-            // Hero title — cinematic slide up
-            const heroTitle = pageRef.current.querySelector('[data-gsap="hero-title"]')
-            if (heroTitle) {
-                gsap.from(heroTitle, {
-                    y: 80, opacity: 0, duration: 1.2,
-                    ease: "power4.out", delay: 0.2,
-                })
+        // Hero title — cinematic slide up
+        const heroTitle = pageRef.current.querySelector('[data-gsap="hero-title"]')
+        if (heroTitle) {
+            gsap.fromTo(heroTitle, 
+                { y: 80, opacity: 0 },
+                { y: 0, opacity: 1, duration: 1.2, ease: "power4.out", delay: 0.2 }
+            )
+        }
+
+        // Hero subtitle — fade up
+        const heroSub = pageRef.current.querySelector('[data-gsap="hero-sub"]')
+        if (heroSub) {
+            gsap.fromTo(heroSub,
+                { y: 40, opacity: 0 },
+                { y: 0, opacity: 1, duration: 1, ease: "power3.out", delay: 0.6 }
+            )
+        }
+
+        // Hero CTA buttons — stagger with bounce
+        const heroBtns = pageRef.current.querySelectorAll('[data-gsap="hero-btn"]')
+        if (heroBtns.length) {
+            gsap.fromTo(heroBtns,
+                { y: 30, opacity: 0, scale: 0.95 },
+                { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.7)", stagger: 0.15, delay: 0.9 }
+            )
+        }
+
+        // Section headings — slide up on scroll
+        pageRef.current.querySelectorAll('[data-gsap="section-heading"]').forEach(el => {
+            gsap.fromTo(el,
+                { y: 60, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.9, ease: "power3.out",
+                  scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none none" } }
+            )
+        })
+
+        // Service cards — stagger reveal
+        pageRef.current.querySelectorAll('[data-gsap="service-grid"]').forEach(grid => {
+            const cards = grid.querySelectorAll('[data-gsap="service-card"]')
+            if (cards.length) {
+                gsap.fromTo(cards,
+                    { y: 50, opacity: 0, scale: 0.96 },
+                    { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "power3.out", stagger: 0.1,
+                      scrollTrigger: { trigger: grid, start: "top 85%", toggleActions: "play none none none" } }
+                )
             }
+        })
 
-            // Hero subtitle — fade up
-            const heroSub = pageRef.current.querySelector('[data-gsap="hero-sub"]')
-            if (heroSub) {
-                gsap.from(heroSub, {
-                    y: 40, opacity: 0, duration: 1,
-                    ease: "power3.out", delay: 0.6,
-                })
+        // Search bars — slide in from left
+        pageRef.current.querySelectorAll('[data-gsap="search-bar"]').forEach(bar => {
+            gsap.fromTo(bar,
+                { x: -60, opacity: 0 },
+                { x: 0, opacity: 1, duration: 0.8, ease: "power3.out",
+                  scrollTrigger: { trigger: bar, start: "top 90%", toggleActions: "play none none none" } }
+            )
+        })
+
+        // Notification left column — slide from left
+        const notifLeft = pageRef.current.querySelector('[data-gsap="notif-left"]')
+        if (notifLeft) {
+            gsap.fromTo(notifLeft,
+                { x: -60, opacity: 0 },
+                { x: 0, opacity: 1, duration: 1, ease: "power3.out",
+                  scrollTrigger: { trigger: notifLeft, start: "top 85%", toggleActions: "play none none none" } }
+            )
+        }
+
+        // Notification panel — slide from right
+        const notifPanel = pageRef.current.querySelector('[data-gsap="notif-panel"]')
+        if (notifPanel) {
+            gsap.fromTo(notifPanel,
+                { x: 80, opacity: 0 },
+                { x: 0, opacity: 1, duration: 1, ease: "power3.out",
+                  scrollTrigger: { trigger: notifPanel, start: "top 85%", toggleActions: "play none none none" } }
+            )
+        }
+
+        // Resource cards — stagger scale up
+        const resourceGrid = pageRef.current.querySelector('[data-gsap="resource-grid"]')
+        if (resourceGrid) {
+            const rCards = resourceGrid.querySelectorAll('[data-gsap="resource-card"]')
+            if (rCards.length) {
+                gsap.fromTo(rCards,
+                    { y: 40, opacity: 0, scale: 0.9 },
+                    { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.4)", stagger: 0.08,
+                      scrollTrigger: { trigger: resourceGrid, start: "top 85%", toggleActions: "play none none none" } }
+                )
             }
+        }
 
-            // Hero CTA buttons — stagger with bounce
-            const heroBtns = pageRef.current.querySelectorAll('[data-gsap="hero-btn"]')
-            if (heroBtns.length) {
-                gsap.from(heroBtns, {
-                    y: 30, opacity: 0, scale: 0.95,
-                    duration: 0.8, ease: "back.out(1.7)",
-                    stagger: 0.15, delay: 0.9,
-                })
+        // FAQ items — stagger from below
+        const faqList = pageRef.current.querySelector('[data-gsap="faq-list"]')
+        if (faqList) {
+            const faqItems = faqList.querySelectorAll('[data-gsap="faq-item"]')
+            if (faqItems.length) {
+                gsap.fromTo(faqItems,
+                    { y: 30, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 0.5, ease: "power2.out", stagger: 0.1,
+                      scrollTrigger: { trigger: faqList, start: "top 85%", toggleActions: "play none none none" } }
+                )
             }
+        }
 
-            // Section headings — slide up on scroll
-            pageRef.current.querySelectorAll('[data-gsap="section-heading"]').forEach(el => {
-                gsap.from(el, {
-                    y: 60, opacity: 0, duration: 0.9, ease: "power3.out",
-                    scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none none" }
-                })
-            })
+        // CTA section — dramatic scale + fade
+        const ctaSection = pageRef.current.querySelector('[data-gsap="cta-section"]')
+        if (ctaSection) {
+            gsap.fromTo(ctaSection,
+                { y: 60, opacity: 0, scale: 0.95 },
+                { y: 0, opacity: 1, scale: 1, duration: 1, ease: "power3.out",
+                  scrollTrigger: { trigger: ctaSection, start: "top 88%", toggleActions: "play none none none" } }
+            )
+        }
 
-            // Service cards — stagger reveal
-            pageRef.current.querySelectorAll('[data-gsap="service-grid"]').forEach(grid => {
-                const cards = grid.querySelectorAll('[data-gsap="service-card"]')
-                if (cards.length) {
-                    gsap.from(cards, {
-                        y: 50, opacity: 0, scale: 0.96,
-                        duration: 0.7, ease: "power3.out", stagger: 0.1,
-                        scrollTrigger: { trigger: grid, start: "top 85%", toggleActions: "play none none none" }
-                    })
-                }
-            })
+        // Footer columns — stagger up
+        const footerGrid = pageRef.current.querySelector('[data-gsap="footer-grid"]')
+        if (footerGrid) {
+            gsap.fromTo(footerGrid.children,
+                { y: 40, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.7, ease: "power2.out", stagger: 0.12,
+                  scrollTrigger: { trigger: footerGrid, start: "top 90%", toggleActions: "play none none none" } }
+            )
+        }
 
-            // Search bars — slide in from left
-            pageRef.current.querySelectorAll('[data-gsap="search-bar"]').forEach(bar => {
-                gsap.from(bar, {
-                    x: -60, opacity: 0, duration: 0.8, ease: "power3.out",
-                    scrollTrigger: { trigger: bar, start: "top 90%", toggleActions: "play none none none" }
-                })
-            })
-
-            // Notification left column — slide from left
-            const notifLeft = pageRef.current.querySelector('[data-gsap="notif-left"]')
-            if (notifLeft) {
-                gsap.from(notifLeft, {
-                    x: -60, opacity: 0, duration: 1, ease: "power3.out",
-                    scrollTrigger: { trigger: notifLeft, start: "top 85%", toggleActions: "play none none none" }
-                })
-            }
-
-            // Notification panel — slide from right
-            const notifPanel = pageRef.current.querySelector('[data-gsap="notif-panel"]')
-            if (notifPanel) {
-                gsap.from(notifPanel, {
-                    x: 80, opacity: 0, duration: 1, ease: "power3.out",
-                    scrollTrigger: { trigger: notifPanel, start: "top 85%", toggleActions: "play none none none" }
-                })
-            }
-
-            // Resource cards — stagger scale up
-            const resourceGrid = pageRef.current.querySelector('[data-gsap="resource-grid"]')
-            if (resourceGrid) {
-                const rCards = resourceGrid.querySelectorAll('[data-gsap="resource-card"]')
-                if (rCards.length) {
-                    gsap.from(rCards, {
-                        y: 40, opacity: 0, scale: 0.9,
-                        duration: 0.6, ease: "back.out(1.4)", stagger: 0.08,
-                        scrollTrigger: { trigger: resourceGrid, start: "top 85%", toggleActions: "play none none none" }
-                    })
-                }
-            }
-
-            // FAQ items — stagger from below
-            const faqList = pageRef.current.querySelector('[data-gsap="faq-list"]')
-            if (faqList) {
-                const faqItems = faqList.querySelectorAll('[data-gsap="faq-item"]')
-                if (faqItems.length) {
-                    gsap.from(faqItems, {
-                        y: 30, opacity: 0, duration: 0.5, ease: "power2.out", stagger: 0.1,
-                        scrollTrigger: { trigger: faqList, start: "top 85%", toggleActions: "play none none none" }
-                    })
-                }
-            }
-
-            // CTA section — dramatic scale + fade
-            const ctaSection = pageRef.current.querySelector('[data-gsap="cta-section"]')
-            if (ctaSection) {
-                gsap.from(ctaSection, {
-                    y: 60, opacity: 0, scale: 0.95,
-                    duration: 1, ease: "power3.out",
-                    scrollTrigger: { trigger: ctaSection, start: "top 88%", toggleActions: "play none none none" }
-                })
-            }
-
-            // Footer columns — stagger up
-            const footerGrid = pageRef.current.querySelector('[data-gsap="footer-grid"]')
-            if (footerGrid) {
-                gsap.from(footerGrid.children, {
-                    y: 40, opacity: 0, duration: 0.7, ease: "power2.out", stagger: 0.12,
-                    scrollTrigger: { trigger: footerGrid, start: "top 90%", toggleActions: "play none none none" }
-                })
-            }
-
-            // Filter buttons — stagger pop
-            pageRef.current.querySelectorAll('[data-gsap="filter-group"]').forEach(group => {
-                gsap.from(group.children, {
-                    scale: 0.8, opacity: 0, duration: 0.5, ease: "back.out(2)", stagger: 0.07,
-                    scrollTrigger: { trigger: group, start: "top 90%", toggleActions: "play none none none" }
-                })
-            })
-
-        }, pageRef)
-
-        return () => ctx.revert()
-    }, [loading])
+        // Filter buttons — stagger pop
+        pageRef.current.querySelectorAll('[data-gsap="filter-group"]').forEach(group => {
+            gsap.fromTo(group.children,
+                { scale: 0.8, opacity: 0 },
+                { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)", stagger: 0.07,
+                  scrollTrigger: { trigger: group, start: "top 90%", toggleActions: "play none none none" } }
+            )
+        })
+    }, { dependencies: [loading], scope: pageRef })
 
     const scrollToSection = (id) => {
         const element = document.getElementById(id)
